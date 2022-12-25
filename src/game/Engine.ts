@@ -6,7 +6,7 @@ export class Engine {
     private static _instance: Engine | null
     private _application: ApplicationEngine | null
 
-    public static get instance(): Engine {
+    public static getInstance(): Engine {
         return Engine._instance
     }
 
@@ -23,8 +23,15 @@ export class Engine {
             antialias: true,
             resolution: window.devicePixelRatio,
             width: window.innerWidth,
-            height: window.innerHeight
+            height: window.innerHeight,
+            powerPreference: "high-performance",
+            resizeTo: window
         })
+
+        this.application.view.style.height = window.innerHeight + "px";
+        this.application.view.style.width = window.innerWidth + "px";
+
+
 
         document.body.appendChild(this._application.view)
 
