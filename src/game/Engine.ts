@@ -2,11 +2,19 @@ import { ApplicationEngine } from './core/Application'
 import RoomManager from './engine/room/RoomManager'
 import Point from './utils/point/Point'
 
+import generalConfig from './configuration/general.json'
+
 export class Engine {
     private static _instance: Engine | null
     private _application: ApplicationEngine | null
 
+    public config = generalConfig
+
+
     public static getInstance(): Engine {
+        if (Engine._instance == null) {
+            Engine._instance = new Engine()
+        }
         return Engine._instance
     }
 
@@ -38,7 +46,7 @@ export class Engine {
         this._application.stage.interactive = true
 
         let room = new RoomManager()
-        room.setRoom('prova', '111111111/111111111/111111111/111111111', new Point(7, 4), 1)
+        room.setRoom('prova', '111111/11100111/11100111', new Point(1, 1), 1)
     }
 
     public get application(): ApplicationEngine {
