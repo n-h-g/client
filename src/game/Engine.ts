@@ -39,8 +39,6 @@ export class Engine {
         this.application.view.style.height = window.innerHeight + "px";
         this.application.view.style.width = window.innerWidth + "px";
 
-
-
         document.body.appendChild(this._application.view)
 
         this._application.stage.interactive = true

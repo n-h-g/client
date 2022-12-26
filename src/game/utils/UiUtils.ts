@@ -1,9 +1,8 @@
-import { Container, DisplayObject } from '@pixi/display';
-import { Matrix } from '@pixi/math';
-import { Engine } from '../Engine';
+import { Container, DisplayObject } from '@pixi/display'
+import { Matrix } from '@pixi/math'
+import { Engine } from '../Engine'
 
 export default class UiUtils {
-
     static guidGenerator() {
         let S4 = function () {
             return (((1 + Math.random()) * 0x10000) | 0).toString(16).substring(1);
@@ -24,11 +23,11 @@ export default class UiUtils {
 
     static generateImageFromObject(object: DisplayObject | Container): HTMLImageElement | undefined {
         
-        return Engine.instance.application?.renderer.plugins.extract.image((object));
+        return Engine.getInstance().application?.renderer.plugins.extract.image((object));
     }
 
     static generateBase64FromObject(object: DisplayObject | Container): string | undefined {
-        const image = Engine.instance.application?.renderer.plugins.extract.base64(object)
+        const image = Engine.getInstance().application?.renderer.plugins.extract.base64(object)
         return image;
     }
 
@@ -63,10 +62,4 @@ export default class UiUtils {
         })(navigator.userAgent || navigator.vendor);
         return check;
     }
-
-
-
-
-
-
 }
