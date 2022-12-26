@@ -1,20 +1,14 @@
 import { ApplicationEngine } from './core/Application'
 import RoomManager from './engine/room/RoomManager'
 import Point from './utils/point/Point'
-
 import generalConfig from './configuration/general.json'
 
 export class Engine {
     private static _instance: Engine | null
     private _application: ApplicationEngine | null
-
-    public config = generalConfig
-
+    private _config = generalConfig
 
     public static getInstance(): Engine {
-        if (Engine._instance == null) {
-            Engine._instance = new Engine()
-        }
         return Engine._instance
     }
 
@@ -23,7 +17,7 @@ export class Engine {
             Engine._instance = this
         }
 
-        console.log("%cNHG React v1.0.0", "font-size:2rem; background-color:#069; color:#fff; padding:10px 45px;")
+        console.log("%cNHG React v" + this._config.version, "font-size:2rem; background-color:#069; color:#fff; padding:10px 45px;")
 
         this._application = new ApplicationEngine({
             backgroundColor: 0x00000,
@@ -44,7 +38,11 @@ export class Engine {
         this._application.stage.interactive = true
 
         let room = new RoomManager()
-        room.setRoom('prova', '111111/11100111/11100111', new Point(1, 1), 1)
+        room.setRoom('prova', '111111/11100111/11100111', new Point(1, -1), 1)
+    }
+
+    public get config(): typeof generalConfig {
+        return this._config;
     }
 
     public get application(): ApplicationEngine {
