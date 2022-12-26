@@ -2,6 +2,6 @@
     <RouterView></RouterView>
 </template>
 
-<script lang="ts">
-
+<script setup lang="ts">
+const name = 'NHG'
 </script>

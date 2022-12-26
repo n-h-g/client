@@ -2,14 +2,21 @@ import { ApplicationEngine } from './core/Application'
 import RoomManager from './engine/room/RoomManager'
 import Point from './utils/point/Point'
 import generalConfig from './configuration/general.json'
+import Vue from 'vue'
+import { ComponentsManager } from './engine/ui/ComponentsManager'
 
 export class Engine {
-    private static _instance: Engine | null
+    private static _instance: Engine
     private _application: ApplicationEngine | null
+    private _componentsManager: ComponentsManager | null
+    private _roomsManager: RoomManager | null
     private _config = generalConfig
 
     public static getInstance(): Engine {
-        return Engine._instance
+        if (this._instance == null) {
+            this._instance = new Engine()
+        }
+        return this._instance
     }
 
     public init(): void {
@@ -17,7 +24,7 @@ export class Engine {
             Engine._instance = this
         }
 
-        console.log("%cNHG React v" + this._config.version, "font-size:2rem; background-color:#069; color:#fff; padding:10px 45px;")
+        console.log("%cNHG Client v" + this._config.version, "font-size:2rem; background-color:#069; color:#fff; padding:10px 45px;")
 
         this._application = new ApplicationEngine({
             backgroundColor: 0x00000,
@@ -37,8 +44,12 @@ export class Engine {
 
         this._application.stage.interactive = true
 
-        let room = new RoomManager()
-        room.setRoom('prova', '111111/11100111/11100111', new Point(1, -1), 1)
+        this._componentsManager = new ComponentsManager()
+        this._componentsManager.loadGameComponents()
+        this._componentsManager.initGameComponents()
+
+        this._roomsManager = new RoomManager()
+        this._roomsManager.setRoom('prova', '111111/11100111/11100111', new Point(1, -1), 1)
     }
 
     public get config(): typeof generalConfig {
@@ -47,5 +58,9 @@ export class Engine {
 
     public get application(): ApplicationEngine {
         return this._application || null
+    }
+
+    public get componentsManager(): ComponentsManager {
+        return this._componentsManager
     }
 }

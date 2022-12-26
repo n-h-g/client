@@ -4,24 +4,12 @@
     </div>
 </template>
   
-<script lang="ts">
-export default {
-    name: "Game",
-    data() {
-        return {
+<script setup lang="ts">
+import { onMounted } from 'vue'
+import { Engine } from '../../game/Engine'
 
-        }
-    },
-    mounted() {
+onMounted(() => {
+    Engine.getInstance().init()
+})
 
-    },
-    methods: {
-        reloadPage() {
-            window.location.reload()
-        },
-        loadGame() {
-
-        }
-    }
-}
 </script>
