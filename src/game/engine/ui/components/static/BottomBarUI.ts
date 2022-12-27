@@ -1,8 +1,7 @@
 import { getCurrentInstance } from 'vue'
 import { IComponentUI } from '../../../../core/ui/IComponentUI'
 import BottomBarGUI from '../../../../../ui/components/static/bottomBar/BottomBarGUI.vue'
-import { renderComponent } from '../../utils/RenderComponent'
-
+import UiUtils from '../../../../utils/UiUtils'
 export class BottomBarUI implements IComponentUI { 
     private bottomBarGUI: typeof BottomBarGUI
 
@@ -11,7 +10,7 @@ export class BottomBarUI implements IComponentUI {
     }
 
     init(): void {
-        renderComponent({
+        UiUtils.renderComponent({
             el: '#gameContainer',
             component: this.bottomBarGUI,
             appContext: getCurrentInstance().appContext

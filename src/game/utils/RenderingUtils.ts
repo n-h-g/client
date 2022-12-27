@@ -1,5 +1,6 @@
 import { Texture } from '@pixi/core';
 import { Rectangle } from '@pixi/math';
+import { createApp } from 'vue';
 
 export default class RenderingUtils {
     static arrayBufferToBase64(arrayBuffer: ArrayBuffer) {

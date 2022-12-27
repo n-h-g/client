@@ -1,5 +1,3 @@
-import { onMounted } from "vue";
-
 <template>
     <div class="loaderContainer">
         <div class="loader">

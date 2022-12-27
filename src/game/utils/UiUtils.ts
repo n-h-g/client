@@ -1,5 +1,6 @@
 import { Container, DisplayObject } from '@pixi/display'
 import { Matrix } from '@pixi/math'
+import { createApp } from 'vue';
 import { Engine } from '../Engine'
 
 export default class UiUtils {
@@ -50,6 +51,22 @@ export default class UiUtils {
                 y: y
             }
     }
+
+    static renderComponent({ el, component, appContext }) {
+        try {
+            let app = createApp(component)
+            Object.assign(app._context, appContext)
+            app.mount(el)
+        
+            return () => {
+                app?.unmount()
+                app = undefined
+            }
+        } catch(e){
+            console.log(e)
+        }
+    }
+    
     /**
      * 
      * @returns true if mobile
