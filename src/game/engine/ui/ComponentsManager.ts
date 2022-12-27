@@ -1,8 +1,9 @@
 import { IComponentUI } from '../../core/ui/IComponentUI'
 import { UIComponent } from './ComponentsType'
-import { BottomBarUI } from './lists/BottomBarUI'
+import { BottomBarUI } from './lists/static/BottomBarUI'
 import { EventManager } from './events/EventManager'
 import { OpenBoxEvent, OpenBoxType } from './events/OpenBoxEvent'
+import { GameLoaderUI } from './lists/loader/GameLoaderUI'
 
 export class ComponentsManager {
     private _rootComponent: HTMLElement
@@ -14,7 +15,8 @@ export class ComponentsManager {
     }
 
     public loadGameComponents(): void {
-        this._gameComponents.set(UIComponent.StaticContainerUI, new BottomBarUI());
+        this._gameComponents.set(UIComponent.StaticContainerUI, new BottomBarUI())
+        //this._gameComponents.set(UIComponent.GameLoaderUI, new GameLoaderUI())
     }
 
     public initGameComponents(): void {

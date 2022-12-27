@@ -55,6 +55,8 @@ export default class RoomVisualization implements IRoomVisualization {
         this.canvasDoorWall.zIndex = 4;
         this.canvasWall.zIndex = 4;
 
+        this.container.interactive = true
+
         Engine.getInstance().application?.stage.addChild(this.container);
     }
 

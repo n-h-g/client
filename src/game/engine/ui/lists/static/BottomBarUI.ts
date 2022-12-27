@@ -1,7 +1,7 @@
 import { getCurrentInstance } from 'vue'
-import { IComponentUI } from '../../../core/ui/IComponentUI'
-import BottomBarGUI from '../../../../ui/components/bottomBar/BottomBarGUI.vue'
-import { renderComponent } from '../utils/RenderComponent'
+import { IComponentUI } from '../../../../core/ui/IComponentUI'
+import BottomBarGUI from '../../../../../ui/components/static/bottomBar/BottomBarGUI.vue'
+import { renderComponent } from '../../utils/RenderComponent'
 
 export class BottomBarUI implements IComponentUI { 
     private bottomBarGUI: typeof BottomBarGUI

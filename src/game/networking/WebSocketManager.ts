@@ -39,7 +39,7 @@ export class WebSocketManager {
 
             if (Engine.getInstance().config.debug) {
                 Logger.debug('Connection error - event details: ')
-                console.log(event)
+                //console.log(event)
             }
         }
 
