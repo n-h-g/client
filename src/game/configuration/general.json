@@ -1,7 +1,7 @@
 {
   "version": "2.0.0",
   "server": {
-    "host": "localhost",
+    "host": "127.0.0.1",
     "port": 8083,
     "channel": "ballstorm",
     "ssl": false,

@@ -2,20 +2,18 @@ import { ApplicationEngine } from './core/Application'
 import RoomManager from './engine/room/RoomManager'
 import Point from './utils/point/Point'
 import generalConfig from './configuration/general.json'
-import Vue from 'vue'
 import { ComponentsManager } from './engine/ui/ComponentsManager'
+import { NetworkingManager } from './networking/NetworkingManager'
 
 export class Engine {
     private static _instance: Engine
     private _application: ApplicationEngine | null
     private _componentsManager: ComponentsManager | null
     private _roomsManager: RoomManager | null
+    private _networkingManager: NetworkingManager | null
     private _config = generalConfig
 
     public static getInstance(): Engine {
-        if (this._instance == null) {
-            this._instance = new Engine()
-        }
         return this._instance
     }
 
@@ -48,6 +46,8 @@ export class Engine {
         this._componentsManager.loadGameComponents()
         this._componentsManager.initGameComponents()
 
+        this._networkingManager = new NetworkingManager();
+
         this._roomsManager = new RoomManager()
         this._roomsManager.setRoom('prova', '111111/11100111/11100111', new Point(1, -1), 1)
     }
@@ -62,5 +62,9 @@ export class Engine {
 
     public get componentsManager(): ComponentsManager {
         return this._componentsManager
+    }
+
+    public get networkingManager(): NetworkingManager {
+        return this._networkingManager
     }
 }
