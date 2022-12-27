@@ -11,5 +11,4 @@ import { Engine } from '../../game/Engine'
 onMounted(() => {
     Engine.getInstance().init()
 })
-
 </script>

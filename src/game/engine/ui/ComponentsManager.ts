@@ -1,6 +1,7 @@
 import { IComponentUI } from '../../core/ui/IComponentUI'
 import { UIComponent } from './ComponentsType'
 import { BottomBarUI } from './lists/BottomBarUI'
+import { Event } from './events/Event'
 
 export class ComponentsManager {
     private _rootComponent: HTMLElement
@@ -19,6 +20,7 @@ export class ComponentsManager {
         for (let component of this._gameComponents.values()) {
             component.init()
         }
+        Event.emit('init')
     }
 
     public get rootComponent(): HTMLElement {

@@ -21,7 +21,16 @@
 </template>
 
 <script setup lang="ts">
+import { watchEffect } from 'vue'
+import { Event } from '../../../game/engine/ui/events/Event';
+
 function toggle(ui: string) {
     console.log(ui);
 }
+
+watchEffect(() => {
+    Event.read('init', () => {
+        console.log('Init event')
+    })
+})
 </script>
