@@ -1,7 +1,8 @@
 import { Container, DisplayObject } from '@pixi/display'
 import { Matrix } from '@pixi/math'
-import { createApp, getCurrentInstance } from 'vue';
+import { createApp, getCurrentInstance } from 'vue'
 import { Engine } from '../Engine'
+import { Logger } from './Logger'
 
 export default class UiUtils {
     static guidGenerator() {
@@ -55,19 +56,22 @@ export default class UiUtils {
     static renderComponent({ el, component, appContext }) {
         try {
             let app = createApp(component)
-            Object.assign(app._context, appContext)
             app.mount(el)
-        } catch(e){
-            console.log(e)
+        } catch(e) {
+            if (Engine.getInstance().config.debug) {
+                Logger.debug(e)
+            }
         }
     }
     
     static unrenderComponent() {
         try {
-            let app = getCurrentInstance()?.appContext?.app
+            let app = getCurrentInstance()?.appContext.app
             app.unmount()
-        } catch(e){
-            console.log(e)
+        } catch(e) {
+            if (Engine.getInstance().config.debug) {
+                Logger.debug(e)
+            }
         }
     }
 

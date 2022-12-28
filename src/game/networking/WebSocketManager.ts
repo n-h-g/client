@@ -1,7 +1,7 @@
 import { Engine } from '../Engine';
 import { EventManager } from '../engine/ui/events/EventManager';
 import { LoadProgressEvent } from '../engine/ui/events/LoadProgressEvent';
-import Logger from '../utils/Logger';
+import { Logger } from '../utils/Logger';
 import { OutgoingPacket } from './packets/outgoing/OutgoingPacket';
 
 export class WebSocketManager {

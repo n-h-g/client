@@ -1,5 +1,5 @@
 import { Engine } from '../../Engine';
-import Logger from '../../utils/Logger';
+import { Logger } from '../../utils/Logger';
 import { MessageHandler } from '../handler/MessageHandler';
 import { LoginResponse } from './incoming/handshake/LoginResponse';
 import { OutgoingPacket } from './outgoing/OutgoingPacket';

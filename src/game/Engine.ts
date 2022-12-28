@@ -6,6 +6,7 @@ import { ComponentsManager } from './engine/ui/ComponentsManager'
 import { NetworkingManager } from './networking/NetworkingManager'
 import { EventManager } from './engine/ui/events/EventManager'
 import { LoadProgressEvent } from './engine/ui/events/LoadProgressEvent'
+import { Logger } from './utils/Logger'
 
 export class Engine {
     private static _instance: Engine
