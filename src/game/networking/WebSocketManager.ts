@@ -1,5 +1,6 @@
 import { Engine } from '../Engine';
 import { EventManager } from '../engine/ui/events/EventManager';
+import { LoadProgressEvent } from '../engine/ui/events/LoadProgressEvent';
 import Logger from '../utils/Logger';
 import { OutgoingPacket } from './packets/outgoing/OutgoingPacket';
 
@@ -28,19 +29,33 @@ export class WebSocketManager {
 
     private setUpWebSocketEvents(): void {
         this.webSocket.onopen = (event) => {
-            Logger.info('Connected')
+            if (Engine.getInstance().config.debug) {
+                Logger.info('Connected')
+            }
             this._closed = false
+
+            const load = new LoadProgressEvent()
+            load.data = {
+                width: 20,
+                message: 'Connected'
+            }
+            EventManager.emit('load-progress', load)
         }
 
         this.webSocket.onerror = (event) => {
             this._closed = true
 
-            Logger.error('Connection error')
-
             if (Engine.getInstance().config.debug) {
                 Logger.debug('Connection error - event details: ')
-                //console.log(event)
+                console.log(event)
             }
+            
+            const load = new LoadProgressEvent()
+            load.data = {
+                width: 20,
+                message: 'Connection error'
+            }
+            EventManager.emit('load-progress', load)
         }
 
         this.webSocket.onclose = (event) => {

@@ -1,8 +1,6 @@
 import { IComponentUI } from '../../core/ui/IComponentUI'
 import { UIComponent } from './ComponentsType'
 import { BottomBarUI } from './components/static/BottomBarUI'
-import { EventManager } from './events/EventManager'
-import { OpenBoxEvent, OpenBoxType } from './events/OpenBoxEvent'
 import { GameLoaderUI } from './components/loader/GameLoaderUI'
 
 export class ComponentsManager {
@@ -16,18 +14,13 @@ export class ComponentsManager {
 
     public loadGameComponents(): void {
         this.addComponent(UIComponent.StaticContainerUI, new BottomBarUI())
-        //this.addComponent(UIComponent.GameLoaderUI, new GameLoaderUI())
+        this.addComponent(UIComponent.GameLoaderUI, new GameLoaderUI())
     }
 
     public initGameComponents(): void {
         for (let component of this._gameComponents.values()) {
             component.init()
         }
-        let event = new OpenBoxEvent()
-        event.data = {
-            type: 'test'
-        }
-        EventManager.emit<OpenBoxType>('init', event)
     }
 
     public get rootComponent(): HTMLElement {

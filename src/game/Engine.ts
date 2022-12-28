@@ -4,6 +4,8 @@ import Point from './utils/point/Point'
 import generalConfig from './configuration/general.json'
 import { ComponentsManager } from './engine/ui/ComponentsManager'
 import { NetworkingManager } from './networking/NetworkingManager'
+import { EventManager } from './engine/ui/events/EventManager'
+import { LoadProgressEvent } from './engine/ui/events/LoadProgressEvent'
 
 export class Engine {
     private static _instance: Engine
@@ -46,7 +48,7 @@ export class Engine {
         this._componentsManager.loadGameComponents()
         this._componentsManager.initGameComponents()
 
-        this._networkingManager = new NetworkingManager();
+        this._networkingManager = new NetworkingManager()
 
         this._roomsManager = new RoomManager()
         this._roomsManager.setRoom('prova', '111111/11100111/11100111', new Point(1, -1), 1)

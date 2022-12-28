@@ -3,22 +3,26 @@
         <div class="loader">
             <div class="logo"></div>
             <div class="progressBar">
-                <div v-bind:style="{width: progress}" class="progressStriped"></div>
+                <div :style="{ width: progress }" class="progressStriped"></div>
             </div>
-            <div id="progressDescription" class="progressDescription">Loading...</div>
+            <div id="progressDescription" class="progressDescription">{{ message }}</div>
         </div>
     </div>
 </template>
 <script setup lang="ts">
+import { ref } from 'vue'
+import { EventManager } from '../../../game/engine/ui/events/EventManager'
+import { LoadProgressEvent } from '../../../game/engine/ui/events/LoadProgressEvent'
 
-import { onMounted, ref } from 'vue';
+const progress = ref('0px')
+const message = ref('Loading...')
 
-const progress = ref(0)
-
-onMounted(() => {
+EventManager.read('load-progress', (event: LoadProgressEvent) => {
+    progress.value = event.data.width + 'px'
+    message.value = event.data.message
 })
-
 </script>
+
 <style lang="scss">
 .loaderContainer {
     width: 100%;
@@ -45,7 +49,7 @@ onMounted(() => {
           }
 
         & .logo {
-            background-image: url('~@/assets/images/nhg_logo_white.png');
+            background-image: url('@/assets/images/nhg_logo_white.png');
             background-size: cover;
             background-repeat: no-repeat;
             width:305px;

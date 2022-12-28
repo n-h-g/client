@@ -19,14 +19,8 @@
 
 <script setup lang="ts">
 import '@/assets/scss/bottom-bar/bottom-bar.scss'
-import { EventManager } from '../../../../game/engine/ui/events/EventManager';
-import { OpenBoxEvent } from '../../../../game/engine/ui/events/OpenBoxEvent';
 
 function toggle(ui: string) {
     console.log(ui);
 }
-
-EventManager.read('init', (event: OpenBoxEvent) => {
-    console.log(event)
-})
 </script>
