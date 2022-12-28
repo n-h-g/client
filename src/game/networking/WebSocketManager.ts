@@ -52,7 +52,7 @@ export class WebSocketManager {
             
             const load = new LoadProgressEvent()
             load.data = {
-                width: 20,
+                width: 100,
                 message: 'Connection error'
             }
             EventManager.emit('load-progress', load)

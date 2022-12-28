@@ -57,11 +57,6 @@ export default class UiUtils {
             let app = createApp(component)
             Object.assign(app._context, appContext)
             app.mount(el)
-        
-            return () => {
-                app?.unmount()
-                app = undefined
-            }
         } catch(e){
             console.log(e)
         }
@@ -69,7 +64,7 @@ export default class UiUtils {
     
     static unrenderComponent() {
         try {
-            let app = getCurrentInstance().appContext.app
+            let app = getCurrentInstance()?.appContext?.app
             app.unmount()
         } catch(e){
             console.log(e)
