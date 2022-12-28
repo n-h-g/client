@@ -9,16 +9,17 @@
         </div>
     </div>
 </template>
+
 <script setup lang="ts">
 import { ref } from 'vue'
 import { EventManager } from '../../../game/engine/ui/events/EventManager'
 import { LoadProgressEvent } from '../../../game/engine/ui/events/LoadProgressEvent'
 
-const progress = ref('0px')
+const progress = ref('0%')
 const message = ref('Loading...')
 
 EventManager.read('load-progress', (event: LoadProgressEvent) => {
-    progress.value = event.data.width + 'px'
+    progress.value = event.data.width + '%'
     message.value = event.data.message
 })
 </script>

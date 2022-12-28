@@ -1,6 +1,6 @@
 import { Container, DisplayObject } from '@pixi/display'
 import { Matrix } from '@pixi/math'
-import { createApp } from 'vue';
+import { createApp, getCurrentInstance } from 'vue';
 import { Engine } from '../Engine'
 
 export default class UiUtils {
@@ -67,6 +67,15 @@ export default class UiUtils {
         }
     }
     
+    static unrenderComponent() {
+        try {
+            let app = getCurrentInstance().appContext.app
+            app.unmount()
+        } catch(e){
+            console.log(e)
+        }
+    }
+
     /**
      * 
      * @returns true if mobile

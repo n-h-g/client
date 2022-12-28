@@ -1,17 +1,24 @@
 import { AppContext, getCurrentInstance } from 'vue'
-import { IComponentUI } from '../../../../core/ui/IComponentUI'
 import GameLoaderGUI from '../../../../../ui/components/loader/GameLoaderGUI.vue'
 import UiUtils from '../../../../utils/UiUtils'
+import { IComponentDeletableUI } from '../../../../core/ui/IComponentDeletableUI'
+import { LoadProgressEvent } from '../../events/LoadProgressEvent'
+import { EventManager } from '../../events/EventManager'
 
-export class GameLoaderUI implements IComponentUI { 
+export class GameLoaderUI implements IComponentDeletableUI { 
     private gameLoaderGUI: typeof GameLoaderGUI
     private appContext: AppContext
-
     public visible: boolean = true
 
     constructor() {
         this.gameLoaderGUI = GameLoaderGUI
         this.appContext = getCurrentInstance().appContext
+
+        EventManager.read('load-progress', (event: LoadProgressEvent) => {
+            if (event.data.width == 100) {
+                this.delete()
+            }
+        })
     }
 
     init(): void {
@@ -23,6 +30,6 @@ export class GameLoaderUI implements IComponentUI {
     }
 
     delete(): void {
-        throw new Error('Method not implemented.')
+        UiUtils.unrenderComponent()
     }
 }

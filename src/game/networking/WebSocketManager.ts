@@ -36,7 +36,7 @@ export class WebSocketManager {
 
             const load = new LoadProgressEvent()
             load.data = {
-                width: 20,
+                width: 100,
                 message: 'Connected'
             }
             EventManager.emit('load-progress', load)
