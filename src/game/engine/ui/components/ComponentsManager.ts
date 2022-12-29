@@ -2,6 +2,7 @@ import { IComponentUI } from '../../../core/ui/IComponentUI'
 import { UIComponent } from './UIComponent'
 import { BottomBarUI } from './static/BottomBarUI'
 import { GameLoaderUI } from './loader/GameLoaderUI'
+import { TopBarUI } from './static/TopBarUI'
 
 export class ComponentsManager {
     private _rootComponent: HTMLElement
@@ -13,8 +14,9 @@ export class ComponentsManager {
     }
 
     public loadGameComponents(): void {
-        this.addComponent(UIComponent.StaticContainerUI, new BottomBarUI())
         this.addComponent(UIComponent.GameLoaderUI, new GameLoaderUI())
+        this.addComponent(UIComponent.BottomBarUI, new BottomBarUI())
+        //this.addComponent(UIComponent.TopBarUI, new TopBarUI())
     }
 
     public initGameComponents(): void {

@@ -2,10 +2,12 @@
 @import url("https://fonts.googleapis.com/css2?family=Ubuntu+Condensed&display=swap");
 @import url("https://fonts.googleapis.com/css2?family=DM+Sans&display=swap");
 
+@import "./variables.scss";
+
 html, body {
   overflow: hidden;
   margin: 0;
-  font-family: "Ubuntu", sans-serif;
+  font-family: $fontFamily, sans-serif;
 }
 
 #gameContainer {
