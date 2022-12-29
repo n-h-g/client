@@ -21,6 +21,6 @@
 import '@/assets/scss/bottom-bar/bottom-bar.scss'
 
 function toggle(ui: string) {
-    console.log(ui);
+    
 }
 </script>
