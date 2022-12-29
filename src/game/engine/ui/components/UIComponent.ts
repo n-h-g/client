@@ -1,5 +1,6 @@
 export enum UIComponent {
-    StaticContainerUI,
+    BottomBarUI,
+    TopBarUI,
     GameLoaderUI,
     RoomUI,
     NavigatorUI,
