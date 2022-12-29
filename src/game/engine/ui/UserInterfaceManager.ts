@@ -4,12 +4,18 @@ import { ComponentsManager } from "./components/ComponentsManager";
 import { EventManager } from "./events/EventManager";
 import { LoadProgressEvent } from "./events/LoadProgressEvent";
 import { UIEvents } from "./events/UIEvents";
+import AvatarImager from "./imagers/avatars/AvatarImager";
+import AvatarStructure from "./imagers/avatars/structure/AvatarStructure";
+import FurniImager from "./imagers/items/FurniImager";
 import SoundManager from "./sound/SoundManager";
 
 export default class UserInterfaceManager {
 
     private _soundManager: SoundManager
     private _componentsManager: ComponentsManager;
+    private _avatarStructure: AvatarStructure
+    private _avatarImager: AvatarImager
+    private _furniImager: FurniImager
 
     constructor() {
 
@@ -18,6 +24,9 @@ export default class UserInterfaceManager {
         this._componentsManager.initGameComponents()
 
         this._soundManager = new SoundManager(this)
+        this._avatarStructure = new AvatarStructure();
+        this._avatarImager = new AvatarImager(this._avatarStructure)
+        this._furniImager = new FurniImager()
     }
 
     public get soundManager(): SoundManager {
@@ -26,23 +35,32 @@ export default class UserInterfaceManager {
 
     public async init(): Promise<void> {
         return Promise.all([
-            /*(this._avatarImager.Data.loadGameData().then(() => {
+            (this._avatarImager.Data.loadGameData().then(() => {
                 this._avatarImager.loadStructure()
+            }).catch((err => {
+                if (Engine.getInstance().config.debug) {
+                    Logger.error("Avatar UI GameData initialization failed")
+                }   
             })),
-            this.furniImager.init()*/
-            //this._soundManager.loadAudioResources()
-        ]).then(() => {
-            /*EventManager.emit(UIEvents.LOAD, new LoadProgressEvent({
+            this._furniImager.init()
+        )]).then(() => {
+            EventManager.emit(UIEvents.LOAD, new LoadProgressEvent({
                 width: 100,
                 message: 'Completed'
-            }))*/
+            }))
         }).catch(err => {
             if (Engine.getInstance().config.debug) {
                 Logger.error("UI initialization failed", err)
             }     
-        }).finally(() => {
-            //Engine.getInstance().networkingManager.setUpPingRequest()
         })
 
+    }
+
+    public get avatarStructure(): AvatarStructure {
+        return this._avatarStructure
+    }
+
+    public get avatarImager(): AvatarImager {
+        return this._avatarImager
     }
 }
