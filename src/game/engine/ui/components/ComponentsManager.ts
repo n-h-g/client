@@ -1,7 +1,7 @@
-import { IComponentUI } from '../../core/ui/IComponentUI'
-import { UIComponent } from './ComponentsType'
-import { BottomBarUI } from './components/static/BottomBarUI'
-import { GameLoaderUI } from './components/loader/GameLoaderUI'
+import { IComponentUI } from '../../../core/ui/IComponentUI'
+import { UIComponent } from './UIComponent'
+import { BottomBarUI } from './static/BottomBarUI'
+import { GameLoaderUI } from './loader/GameLoaderUI'
 
 export class ComponentsManager {
     private _rootComponent: HTMLElement

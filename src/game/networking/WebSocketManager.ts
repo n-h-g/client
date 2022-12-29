@@ -3,6 +3,7 @@ import { EventManager } from '../engine/ui/events/EventManager'
 import { LoadProgressEvent } from '../engine/ui/events/LoadProgressEvent'
 import { UIEvents } from '../engine/ui/events/UIEvents'
 import { Logger } from '../utils/Logger'
+import { NetworkingManager } from './NetworkingManager'
 import { OutgoingPacket } from './packets/outgoing/OutgoingPacket'
 
 export class WebSocketManager {
@@ -10,7 +11,12 @@ export class WebSocketManager {
     private _closed: boolean = false
     private reconnectCounter: number = 0
 
-    constructor() {
+    private _networkingManager: NetworkingManager
+
+    constructor(networkingManager: NetworkingManager) {
+
+        this._networkingManager = networkingManager;
+
         if (Engine.getInstance().config.debug) {
             Logger.debug('Connection url: ' + this.webSocketUrl);
         }
@@ -34,13 +40,9 @@ export class WebSocketManager {
                 Logger.debug('Connected')
             }
 
-            this._closed = false
+            Engine.getInstance().networkingManager.packetManager.applyOut(OutgoingPacket.PingRequest)
 
-            Engine.getInstance().networkingManager?.packetManager.applyOut(OutgoingPacket.LoginMessage,
-                {
-                    sso: 1
-                }
-            )
+            this._closed = false
 
             EventManager.emit(UIEvents.LOAD, new LoadProgressEvent({
                 width: 20,
@@ -79,7 +81,7 @@ export class WebSocketManager {
             }
         }
 
-        //window.onbeforeunload = () => this.disconnect()
+        window.onbeforeunload = () => this.disconnect()
 
         this.webSocket.onmessage = (event) => {
             let packet = JSON.parse(event.data)
@@ -87,6 +89,13 @@ export class WebSocketManager {
             Engine.getInstance().networkingManager?.packetManager?.applyIn(header, packet.body)
         }
     }
+
+    public disconnect() {
+        Logger.info("Disconnected");
+        this._networkingManager.packetManager.applyOut(OutgoingPacket.DisconnectMessage);
+        this.webSocket.close()
+    }
+
 
     public get closed(): boolean {
         return this._closed

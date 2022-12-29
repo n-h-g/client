@@ -10,10 +10,12 @@ export class LoginResponse extends MessageHandler {
         if (this.message.data) {
             EventManager.emit(UIEvents.LOAD, new LoadProgressEvent({
                 width: 40,
-                message: 'Wait for access'
+                message: 'Loading'
             }))
 
             Engine.getInstance().networkingManager?.packetManager.applyOut(OutgoingPacket.UserProfileInformation)
         }
+
+        Engine.getInstance().networkingManager?.webSocketManager.disconnect()
     }
 }
