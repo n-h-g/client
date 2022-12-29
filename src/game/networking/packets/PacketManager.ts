@@ -1,8 +1,9 @@
-import { Engine } from '../../Engine';
-import { Logger } from '../../utils/Logger';
-import { MessageHandler } from '../handler/MessageHandler';
-import { LoginResponse } from './incoming/handshake/LoginResponse';
-import { OutgoingPacket } from './outgoing/OutgoingPacket';
+import { Engine } from '../../Engine'
+import { Logger } from '../../utils/Logger'
+import { MessageHandler } from '../handler/MessageHandler'
+import { LoginResponse } from './incoming/handshake/LoginResponse'
+import { UpdateUserInformation } from './incoming/users/UpdateUserInformation'
+import { OutgoingPacket } from './outgoing/OutgoingPacket'
 
 export class PacketManager {
     private _incomingPackets: Map<number, MessageHandler>
@@ -14,7 +15,8 @@ export class PacketManager {
 
     private bindIncomingPackets(): void {
         let incomingPacketsHeader: any = {
-            1: new LoginResponse()
+            1: new LoginResponse(),
+            17: new UpdateUserInformation()
         }
 
         Object.keys(incomingPacketsHeader).forEach((index) => {

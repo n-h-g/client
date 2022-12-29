@@ -14,11 +14,12 @@
 import { ref } from 'vue'
 import { EventManager } from '../../../game/engine/ui/events/EventManager'
 import { LoadProgressEvent } from '../../../game/engine/ui/events/LoadProgressEvent'
+import { UIEvents } from '../../../game/engine/ui/events/UIEvents'
 
 const progress = ref('0%')
 const message = ref('Loading...')
 
-EventManager.read('load-progress', (event: LoadProgressEvent) => {
+EventManager.read(UIEvents.LOAD, (event: LoadProgressEvent) => {
     progress.value = event.data.width + '%'
     message.value = event.data.message
 })

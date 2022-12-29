@@ -8,4 +8,11 @@ export type LoadProgressType = {
 export class LoadProgressEvent implements IEvent<LoadProgressType> {
     key: string = 'load-progress'
     data: LoadProgressType
+
+    constructor(event: LoadProgressType) {
+        this.data = {
+            width: event.width,
+            message: event.message
+        }
+    }
 }

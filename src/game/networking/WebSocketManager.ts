@@ -1,8 +1,9 @@
-import { Engine } from '../Engine';
-import { EventManager } from '../engine/ui/events/EventManager';
-import { LoadProgressEvent } from '../engine/ui/events/LoadProgressEvent';
-import { Logger } from '../utils/Logger';
-import { OutgoingPacket } from './packets/outgoing/OutgoingPacket';
+import { Engine } from '../Engine'
+import { EventManager } from '../engine/ui/events/EventManager'
+import { LoadProgressEvent } from '../engine/ui/events/LoadProgressEvent'
+import { UIEvents } from '../engine/ui/events/UIEvents'
+import { Logger } from '../utils/Logger'
+import { OutgoingPacket } from './packets/outgoing/OutgoingPacket'
 
 export class WebSocketManager {
     private webSocket: WebSocket
@@ -30,16 +31,21 @@ export class WebSocketManager {
     private setUpWebSocketEvents(): void {
         this.webSocket.onopen = (event) => {
             if (Engine.getInstance().config.debug) {
-                Logger.info('Connected')
+                Logger.debug('Connected')
             }
+
             this._closed = false
 
-            const load = new LoadProgressEvent()
-            load.data = {
-                width: 100,
+            Engine.getInstance().networkingManager?.packetManager.applyOut(OutgoingPacket.LoginMessage,
+                {
+                    sso: 1
+                }
+            )
+
+            EventManager.emit(UIEvents.LOAD, new LoadProgressEvent({
+                width: 20,
                 message: 'Connected'
-            }
-            EventManager.emit('load-progress', load)
+            }))
         }
 
         this.webSocket.onerror = (event) => {
@@ -47,15 +53,13 @@ export class WebSocketManager {
 
             if (Engine.getInstance().config.debug) {
                 Logger.debug('Connection error - event details: ')
-                console.log(event)
+                Logger.info(event.toString())
             }
-            
-            const load = new LoadProgressEvent()
-            load.data = {
-                width: 100,
-                message: 'Connection error'
-            }
-            EventManager.emit('load-progress', load)
+
+            EventManager.emit(UIEvents.LOAD, new LoadProgressEvent({
+                width: 20,
+                message: 'Connection Error'
+            }))
         }
 
         this.webSocket.onclose = (event) => {

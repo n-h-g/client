@@ -1,5 +1,5 @@
-import { PacketManager } from './packets/PacketManager';
-import { WebSocketManager } from './WebSocketManager';
+import { PacketManager } from './packets/PacketManager'
+import { WebSocketManager } from './WebSocketManager'
 
 export class NetworkingManager {
     private _webSocketManager: WebSocketManager

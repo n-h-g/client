@@ -4,6 +4,7 @@ import BottomBarGUI from '../../../../../ui/components/static/bottomBar/BottomBa
 import UiUtils from '../../../../utils/UiUtils'
 import { EventManager } from '../../events/EventManager'
 import { LoadProgressEvent } from '../../events/LoadProgressEvent'
+import { UIEvents } from '../../events/UIEvents'
 
 export class BottomBarUI implements IComponentUI { 
     private bottomBarGUI: typeof BottomBarGUI
@@ -13,7 +14,7 @@ export class BottomBarUI implements IComponentUI {
         this.bottomBarGUI = BottomBarGUI
         this.appContext = getCurrentInstance().appContext
 
-        EventManager.read('load-progress', (event: LoadProgressEvent) => {
+        EventManager.read(UIEvents.LOAD, (event: LoadProgressEvent) => {
             if (event.data.width == 100) {
                 this.add()
             }

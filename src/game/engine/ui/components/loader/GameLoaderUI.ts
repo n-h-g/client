@@ -4,6 +4,7 @@ import UiUtils from '../../../../utils/UiUtils'
 import { IComponentDeletableUI } from '../../../../core/ui/IComponentDeletableUI'
 import { LoadProgressEvent } from '../../events/LoadProgressEvent'
 import { EventManager } from '../../events/EventManager'
+import { UIEvents } from '../../events/UIEvents'
 
 export class GameLoaderUI implements IComponentDeletableUI { 
     private gameLoaderGUI: typeof GameLoaderGUI
@@ -14,7 +15,7 @@ export class GameLoaderUI implements IComponentDeletableUI {
         this.gameLoaderGUI = GameLoaderGUI
         this.appContext = getCurrentInstance().appContext
 
-        EventManager.read('load-progress', (event: LoadProgressEvent) => {
+        EventManager.read(UIEvents.LOAD, (event: LoadProgressEvent) => {
             if (event.data.width == 100) {
                 this.delete()
             }
