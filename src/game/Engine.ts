@@ -7,6 +7,7 @@ import UserInterfaceManager from './engine/ui/UserInterfaceManager'
 import UserService from './engine/user/UserService'
 import CommandService from './engine/game/commands/CommandService'
 import ChatMessageService from './engine/game/chat/ChatMessageService'
+import Room from './engine/room/Room'
 
 export class Engine {
     private static _instance: Engine
@@ -47,8 +48,8 @@ export class Engine {
         this._networkingManager = new NetworkingManager()
         this._userInterfaceManager = new UserInterfaceManager()
 
-        this.application.view.style.height = window.innerHeight + "px";
-        this.application.view.style.width = window.innerWidth + "px";
+        this._application.view.style.height = window.innerHeight + "px";
+        this._application.view.style.width = window.innerWidth + "px";
 
         document.body.appendChild(this._application.view)
 
@@ -62,7 +63,7 @@ export class Engine {
         this._chatService = new ChatMessageService()
 
         if(this._config.offlineMode) {
-            this._roomsService.setRoom('prova', '111111/11100111/11100111', new Point(1, -1), 1)
+            let room: Room = this._roomsService.setRoom('prova', '111111/11100111/11100111', new Point(1, -1), 1)
         }
     }
 

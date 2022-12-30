@@ -29,26 +29,9 @@ export default class UserInterfaceManager {
         this._furniImager = new FurniImager()
     }
     public async init(): Promise<void> {
-        return Promise.all([
-            (this._avatarImager.Data.loadGameData().then(() => {
-                this._avatarImager.loadStructure()
-            }).catch((err => {
-                if (Engine.getInstance().config.debug) {
-                    Logger.error("Avatar UI GameData initialization failed")
-                }   
-            })),
-            this._furniImager.init()
-        )]).then(() => {
-            EventManager.emit<LoadProgressEvent>(UIEvents.LOAD, {
-                width: 20,
-                message: 'Assets loaded'
-            })
-        }).catch(err => {
-            if (Engine.getInstance().config.debug) {
-                Logger.error("UI initialization failed", err)
-            }     
-        })
-
+        await this._avatarImager.Data.loadGameData();
+        this._avatarImager.loadStructure()
+        await this._furniImager.init()
     }
 
     public get soundManager(): SoundManager {
@@ -59,6 +42,9 @@ export default class UserInterfaceManager {
         return this._componentsManager
     }
 
+    public get furniImager(): FurniImager {
+        return this._furniImager
+    }
 
     public get avatarStructure(): AvatarStructure {
         return this._avatarStructure
