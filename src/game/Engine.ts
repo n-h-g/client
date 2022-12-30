@@ -14,9 +14,9 @@ export class Engine {
     private _userInterfaceManager: UserInterfaceManager | null
     private _roomsService: RoomService | null
     private _networkingManager: NetworkingManager | null
-    private _usersService: UserService
-    private _commandService: CommandService
-    private _chatService: ChatMessageService
+    private _usersService: UserService | null
+    private _commandService: CommandService | null
+    private _chatService: ChatMessageService | null
 
     private _config = generalConfig
 

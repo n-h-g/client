@@ -48,7 +48,7 @@ function toggle(ui: string) {
   width: 100%;
   bottom: 0;
   left: 0;
-  height: 85px;
+  height: 100px;
   background-color: transparent;
   z-index: 10000;
 
@@ -124,17 +124,22 @@ function toggle(ui: string) {
       &.inventory {
         background-color: rgb(63, 141, 222);
         position: absolute;
-        transform: translate(-4.8em, -4.3em);
+        left: 10px;
+        bottom: 100px;
       }
+
       &.navigator {
         background-color: rgb(46, 148, 85);
         position: absolute;
-        transform: translate(-0.8em, -3em);
+        left: 85px;
+        bottom: 75px;
       }
+
       &.catalog {
         background-color: rgb(217, 176, 32);
-        padding-top: 5px;
-        padding-left: 9px;
+        position: absolute;
+        left: 110px;
+        bottom: 0px;
       }
 
       &.navigator .img {

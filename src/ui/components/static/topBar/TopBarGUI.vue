@@ -1,13 +1,22 @@
 <template>
     <div class="topBar">
-        <div class="coinsBox credits" v-html="credits"></div>
-        <div class="coinsBox points" v-html="credits"></div>
+        <div class="coinsBox credits">{{  credits  }}</div>
+        <div class="coinsBox points">0</div>
     </div>
 
 </template>
 
 <script setup lang="ts">
-const credits = 0
+import { ref } from 'vue'
+import { EventManager } from '../../../../game/engine/ui/events/EventManager'
+import { TopBarEvent } from '../../../../game/engine/ui/events/TopBarEvent';
+import { UIEvents } from '../../../../game/engine/ui/events/UIEvents'
+
+const credits = ref(0)
+
+EventManager.read(UIEvents.SET_TOPBAR, (event: TopBarEvent) => {
+    credits.value = event.credits
+})
 
 </script>
 

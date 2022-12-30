@@ -1,5 +1,3 @@
-import Repository from "../../core/Repository";
-import IService from "../../core/IService";
 import User from "./User";
 import UserRepository from "./UserRepository";
 import Service from "../../core/Service";
@@ -9,15 +7,14 @@ export default class UserService extends Service<IUserRepository> {
     /**
      *  The current user in the game
      */
-    private currentUser: User | null = null;
+    private currentUser: User | null
 
-    public repository: UserRepository;
+    public repository: UserRepository = null
 
     public constructor() {
-
         super()
 
-        this.repository = new UserRepository();
+        this.repository = new UserRepository()
     }
 
     public setUp(): void {

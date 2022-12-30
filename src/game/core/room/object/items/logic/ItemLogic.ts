@@ -1,17 +1,13 @@
-import { InteractionPixiEvents } from "pixi.js";
-import Engine from "../../../../../Engine";
+import { Engine } from '../../../../../Engine';
 import Item from "../../../../../engine/room/objects/items/Item";
 import RoomVisualization from "../../../../../engine/room/visualization/RoomVisualization";
-import PreviewBoxUI from "../../../../../engine/ui/components/general/PreviewBoxUI";
-import UIComponent from "../../../../../engine/ui/components/UIComponentEnum";
+import { UIComponent } from '../../../../../engine/ui/components/UIComponent';
 import FurniImager from "../../../../../engine/ui/imagers/items/FurniImager";
-
-import { OutgoingPacket } from "../../../../../networking/packets/outgoing/OutgoingPacketEnum";
+import { OutgoingPacket } from '../../../../../networking/packets/outgoing/OutgoingPacket';
 import RoomObjectLogic from "../../RoomObjectLogic";
 import ItemVisualization from "../visualization/ItemVisualization";
 
 export default abstract class ItemLogic extends RoomObjectLogic {
-
     protected item: Item;
     public frameTracker: number = 0;
 
@@ -46,7 +42,7 @@ export default abstract class ItemLogic extends RoomObjectLogic {
     public onHover(): void { }
 
     public onClick(): void {
-        let movingItem = Engine.getInstance().roomManager!.CurrentRoom!.RoomItemManager.movingItem 
+        let movingItem = Engine.getInstance().roomService.CurrentRoom!.roomItemRepository.movingItem 
         let moving = movingItem?.id === this.item.id
 
         if(moving) {
@@ -62,7 +58,7 @@ export default abstract class ItemLogic extends RoomObjectLogic {
         this.roll = value;
         this.item.visualization!.needsUpdate = value;
         this.item.base.alpha = value ? FurniImager.LOADING_ALPHA : FurniImager.DEFAULT_ALPHA;
-        Engine.getInstance().roomManager!.CurrentRoom!.RoomItemManager.movingItem = value ? this.item : null;
+        Engine.getInstance().roomService!.CurrentRoom!.roomItemRepository.movingItem = value ? this.item : null;
     }
     
     public onMove(delta: number): void {
@@ -71,10 +67,10 @@ export default abstract class ItemLogic extends RoomObjectLogic {
     }
 
     public togglePreview() {
-        let preview = Engine.getInstance().userInterfaceManager?.getUIComponentManager().getComponent(UIComponent.PreviewBoxUI) as PreviewBoxUI;
+        let preview = Engine.getInstance().userInterfaceManager?.componentsManager.getComponent(UIComponent.PreviewBoxUI)
 
-        preview.setItem(this.item)
-        preview.show();
+        /*preview.setItem(this.item)
+        preview.show()*/
     }
 
     public tick(delta: number) {

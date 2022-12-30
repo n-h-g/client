@@ -3,7 +3,7 @@ import IUserController from "../../core/users/IUserController";
 import IUserRepository from "../../core/users/IUserRepository";
 import User from "./User";
 
-export default class UserRepository extends Repository<number, IUserController> implements IUserRepository {
+export default class UserRepository extends Repository<number, User> implements IUserRepository {
 
     public findByUsername(username: string): IUserController | null {
         for(let user of this.map.values()) {

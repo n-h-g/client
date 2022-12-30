@@ -1,7 +1,7 @@
 import BubbleAction from "../BubbleAction";
 import BubbleActionClickable from "../../../../../../core/game/messeger/bubble/actions/BubbleActionClickable";
-import Engine from "../../../../../../Engine";
-import { OutgoingPacket } from "../../../../../../networking/packets/outgoing/OutgoingPacketEnum";
+import { OutgoingPacket } from '../../../../../../networking/packets/outgoing/OutgoingPacket';
+import { Engine } from '../../../../../../Engine';
 
 export default class FriendBubbleAction extends BubbleAction implements BubbleActionClickable {
 

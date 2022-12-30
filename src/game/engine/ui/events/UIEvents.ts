@@ -1,3 +1,4 @@
 export enum UIEvents {
-    LOAD = 'loading'
+    LOAD = 'loading',
+    SET_TOPBAR = 'set-top-bar'
 }
