@@ -62,16 +62,19 @@ export default class RoomVisualization implements IRoomVisualization {
 
 
     public render() {
-
         this.roomLayout.getWallPlane().visualization?.render()
         this.roomLayout.getFloorPlane().visualization?.render()
-        
     }
 
     public tileToLocal(x: number, y: number, z: number): Point {
         return new Point((x - y) * MapData.tileWidth, (x + y) * MapData.tileHeight - (z * MapData.tileHeight * 2));
     }
 
+    /**
+     * Get a tile by event
+     * @param event 
+     * @returns 
+     */
     public getTileByEvent(event: Event): Tile | undefined{
         let hitCtx = this.canvasFloor;
         let coords = UiUtils.getPosition(event, hitCtx);
@@ -79,7 +82,13 @@ export default class RoomVisualization implements IRoomVisualization {
         return this.roomLayout.getFloorPlane().getTilebyPosition(new Point(Math.floor(coords.x), Math.floor(coords.y)));
     }
 
-
+    /**
+     * Transform a global position to a local tile
+     * @param x 
+     * @param y 
+     * @param z 
+     * @returns 
+     */
     public globalToTileWithHeight(x: number, y: number, z: number): Point {
         const offsetX = this.container.x;
         const offsetY = this.container.y - (z * MapData.tileHeight * 2);
@@ -93,6 +102,27 @@ export default class RoomVisualization implements IRoomVisualization {
         return new Point(tileX, tileY);
     }
 
+    /**
+     * Flip the room visualization
+     */
+    public flip() {
+        let scale = this.container.scale.y == 1 ? -1 : 1 ;
+
+        this.container.scale.y = scale;
+    }
+
+    /**
+     * Zoom the room from 0-infinity
+     * @param scale 
+     */
+    public zoom(scale: number) {
+        if(scale < 0) {
+            return;
+        }
+        
+        this.container.scale.x = +scale;
+        this.container.scale.y = +scale;
+    }
 
     public getCanvasFloor() : Container {
         return this.canvasFloor

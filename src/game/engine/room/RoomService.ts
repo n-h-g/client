@@ -1,9 +1,9 @@
-import IRoomManager from "../../core/room/IRoomManager";
+import IRoomService from "../../core/room/IRoomManager";
 import Room from "./Room";
 import Point from "../../utils/point/Point";
 import RoomVisualization from "./visualization/RoomVisualization";
 
-export default class RoomManager implements IRoomManager {
+export default class RoomService   {
     private currentRoom: Room | null = null
 
     public setRoom(roomName: string, roomModel: string, doorPosition: Point, roomId: number) : Room {

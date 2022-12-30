@@ -12,7 +12,6 @@ export default class AvatarImageContainer {
         this.offsets = new Point(0, 0);
     }
 
-
     public get image(): Container {
         return this.imageContainer;
     }

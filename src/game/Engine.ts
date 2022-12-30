@@ -1,16 +1,23 @@
 import { ApplicationEngine } from './core/Application'
-import RoomManager from './engine/room/RoomManager'
+import RoomService from './engine/room/RoomService'
 import Point from './utils/point/Point'
 import generalConfig from './configuration/general.json'
 import { NetworkingManager } from './networking/NetworkingManager'
 import UserInterfaceManager from './engine/ui/UserInterfaceManager'
+import UserService from './engine/user/UserService'
+import CommandService from './engine/game/commands/CommandService'
+import ChatMessageService from './engine/game/chat/ChatMessageService'
 
 export class Engine {
     private static _instance: Engine
     private _application: ApplicationEngine | null
     private _userInterfaceManager: UserInterfaceManager | null
-    private _roomsManager: RoomManager | null
+    private _roomsService: RoomService | null
     private _networkingManager: NetworkingManager | null
+    private _usersService: UserService
+    private _commandService: CommandService
+    private _chatService: ChatMessageService
+
     private _config = generalConfig
 
     private _sso: string;
@@ -49,9 +56,13 @@ export class Engine {
 
         await this.userInterfaceManager.init()
 
+        this._roomsService = new RoomService()
+        this._usersService = new UserService()
+        this._commandService = new CommandService()
+        this._chatService = new ChatMessageService()
+
         if(this._config.offlineMode) {
-            this._roomsManager = new RoomManager()
-            this._roomsManager.setRoom('prova', '111111/11100111/11100111', new Point(1, -1), 1)
+            this._roomsService.setRoom('prova', '111111/11100111/11100111', new Point(1, -1), 1)
         }
     }
 
@@ -69,6 +80,22 @@ export class Engine {
 
     public get application(): ApplicationEngine {
         return this._application || null
+    }
+
+    public get chatService(): ChatMessageService {
+        return this._chatService
+    }
+
+    public get commandService(): CommandService {
+        return this._commandService
+    }
+
+    public get usersService(): UserService {
+        return this._usersService
+    }
+
+    public get roomService(): RoomService {
+        return this._roomsService
     }
 
     public get userInterfaceManager(): UserInterfaceManager {

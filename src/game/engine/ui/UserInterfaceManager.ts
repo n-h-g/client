@@ -28,11 +28,6 @@ export default class UserInterfaceManager {
         this._avatarImager = new AvatarImager(this._avatarStructure)
         this._furniImager = new FurniImager()
     }
-
-    public get soundManager(): SoundManager {
-        return this._soundManager
-    }
-
     public async init(): Promise<void> {
         return Promise.all([
             (this._avatarImager.Data.loadGameData().then(() => {
@@ -55,6 +50,15 @@ export default class UserInterfaceManager {
         })
 
     }
+
+    public get soundManager(): SoundManager {
+        return this._soundManager
+    }
+
+    public get componentsManager(): ComponentsManager {
+        return this._componentsManager
+    }
+
 
     public get avatarStructure(): AvatarStructure {
         return this._avatarStructure
