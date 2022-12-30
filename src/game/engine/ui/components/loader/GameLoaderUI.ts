@@ -4,6 +4,7 @@ import { IComponentDeletableUI } from '../../../../core/ui/IComponentDeletableUI
 import { LoadProgressEvent } from '../../events/LoadProgressEvent'
 import { EventManager } from '../../events/EventManager'
 import { UIEvents } from '../../events/UIEvents'
+import { UIComponent } from '../UIComponent'
 
 export class GameLoaderUI implements IComponentDeletableUI { 
     private gameLoaderGUI: typeof GameLoaderGUI
@@ -14,7 +15,7 @@ export class GameLoaderUI implements IComponentDeletableUI {
     }
 
     init(): void {
-        UiUtils.renderComponent(this.gameLoaderGUI, 'gameLoader')
+        UiUtils.renderComponent(this.gameLoaderGUI, UIComponent.GameLoaderUI)
 
         EventManager.read(UIEvents.LOAD, (event: LoadProgressEvent) => {
             if (event.width == 100) {

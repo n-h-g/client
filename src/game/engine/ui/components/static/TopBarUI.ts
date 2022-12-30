@@ -4,6 +4,7 @@ import UiUtils from '../../../../utils/UiUtils'
 import { EventManager } from '../../events/EventManager'
 import { UIEvents } from '../../events/UIEvents'
 import { LoadProgressEvent } from '../../events/LoadProgressEvent'
+import { UIComponent } from '../UIComponent'
 
 export class TopBarUI implements IComponentUI { 
     private topBarUI: typeof TopBarGUI
@@ -15,7 +16,7 @@ export class TopBarUI implements IComponentUI {
     init(): void {
         EventManager.read(UIEvents.LOAD, (event: LoadProgressEvent) => {
             if (event.width == 100) {
-                UiUtils.renderComponent(this.topBarUI, 'topBar')
+                UiUtils.renderComponent(this.topBarUI, UIComponent.TopBarUI)
             }
         })
     }

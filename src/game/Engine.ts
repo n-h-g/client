@@ -64,6 +64,7 @@ export class Engine {
 
         if(this._config.offlineMode) {
             let room: Room = this._roomsService.setRoom('prova', '111111/11100111/11100111', new Point(1, -1), 1)
+            room.getRoomLayout().Visualization.render()
         }
     }
 

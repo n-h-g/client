@@ -60,6 +60,8 @@ export default class UiUtils {
             wrapper.id = name
             ComponentApp.mount(wrapper)
             document.getElementById('gameContainer').appendChild(wrapper)
+
+            return ComponentApp
         } catch(e) {
             if (Engine.getInstance().config.debug) {
                 Logger.debug(e)
