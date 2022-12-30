@@ -8,14 +8,14 @@ import { OutgoingPacket } from '../../outgoing/OutgoingPacket'
 export class LoginResponse extends MessageHandler {
     public handle(): void {
         if (this.message.data) {
-            EventManager.emit(UIEvents.LOAD, new LoadProgressEvent({
+            EventManager.emit<LoadProgressEvent>(UIEvents.LOAD, {
                 width: 100,
                 message: 'Logged'
-            }))
+            })
 
             Engine.getInstance().networkingManager?.packetManager.applyOut(OutgoingPacket.UserProfileInformation)
+        } else {
+            Engine.getInstance().networkingManager?.webSocketManager.disconnect()
         }
-
-        Engine.getInstance().networkingManager?.webSocketManager.disconnect()
     }
 }

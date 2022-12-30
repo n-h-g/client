@@ -2,11 +2,7 @@ import { ApplicationEngine } from './core/Application'
 import RoomManager from './engine/room/RoomManager'
 import Point from './utils/point/Point'
 import generalConfig from './configuration/general.json'
-import { ComponentsManager } from './engine/ui/components/ComponentsManager'
 import { NetworkingManager } from './networking/NetworkingManager'
-import { EventManager } from './engine/ui/events/EventManager'
-import { LoadProgressEvent } from './engine/ui/events/LoadProgressEvent'
-import { Logger } from './utils/Logger'
 import UserInterfaceManager from './engine/ui/UserInterfaceManager'
 
 export class Engine {

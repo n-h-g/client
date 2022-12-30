@@ -44,10 +44,10 @@ export default class UserInterfaceManager {
             })),
             this._furniImager.init()
         )]).then(() => {
-            EventManager.emit(UIEvents.LOAD, new LoadProgressEvent({
+            EventManager.emit<LoadProgressEvent>(UIEvents.LOAD, {
                 width: 20,
                 message: 'Assets loaded'
-            }))
+            })
         }).catch(err => {
             if (Engine.getInstance().config.debug) {
                 Logger.error("UI initialization failed", err)

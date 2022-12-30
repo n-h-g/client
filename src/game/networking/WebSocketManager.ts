@@ -44,10 +44,10 @@ export class WebSocketManager {
 
             this._closed = false
 
-            EventManager.emit(UIEvents.LOAD, new LoadProgressEvent({
+            EventManager.emit<LoadProgressEvent>(UIEvents.LOAD, {
                 width: 40,
                 message: 'Connected'
-            }))
+            })
         }
 
         this.webSocket.onerror = (event) => {
@@ -58,10 +58,10 @@ export class WebSocketManager {
                 Logger.info(event.toString())
             }
 
-            EventManager.emit(UIEvents.LOAD, new LoadProgressEvent({
+            EventManager.emit<LoadProgressEvent>(UIEvents.LOAD, {
                 width: 40,
                 message: 'Connection Error'
-            }))
+            })
         }
 
         this.webSocket.onclose = (event) => {

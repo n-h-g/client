@@ -20,8 +20,8 @@ const progress = ref('0%')
 const message = ref('Loading...')
 
 EventManager.read(UIEvents.LOAD, (event: LoadProgressEvent) => {
-    progress.value = event.data.width + '%'
-    message.value = event.data.message
+    progress.value = event.width + '%'
+    message.value = event.message
 })
 </script>
 

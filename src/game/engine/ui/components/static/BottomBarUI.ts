@@ -14,7 +14,7 @@ export class BottomBarUI implements IComponentUI {
 
     init(): void {
         EventManager.read(UIEvents.LOAD, (event: LoadProgressEvent) => {
-            if (event.data.width == 100) {
+            if (event.width == 100) {
                 UiUtils.renderComponent(this.bottomBarGUI, 'bottomBar')
             }
         })

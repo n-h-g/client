@@ -17,7 +17,7 @@ export class GameLoaderUI implements IComponentDeletableUI {
         UiUtils.renderComponent(this.gameLoaderGUI, 'gameLoader')
 
         EventManager.read(UIEvents.LOAD, (event: LoadProgressEvent) => {
-            if (event.data.width == 100) {
+            if (event.width == 100) {
                 this.delete()
             }
         })
