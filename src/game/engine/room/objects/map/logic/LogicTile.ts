@@ -3,13 +3,12 @@ import RoomLogic from "../../../logic/RoomLogic"
 import RoomObjectLogic from "../../../../../core/room/object/RoomObjectLogic"
 import MapData from "../MapData"
 import TileType from "../TileTypeEnum"
-import VisualizationTile from "../visualization/VisualizationTile"
 import VisualizationPointer from "../visualization/VisualizationPointer"
 import Room from "../../../Room"
 import RoomVisualization from "../../../visualization/RoomVisualization"
 import { Container } from '@pixi/display'
 import { Engine } from "../../../../../Engine"
-import Logger from "../../../../../utils/Logger"
+import { Logger } from "../../../../../utils/Logger"
 
 export default class LogicTile extends RoomObjectLogic {
 

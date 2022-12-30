@@ -1,7 +1,13 @@
-html,
-body {
+@import url("https://fonts.googleapis.com/css?family=Ubuntu:300,400,500,700");
+@import url("https://fonts.googleapis.com/css2?family=Ubuntu+Condensed&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=DM+Sans&display=swap");
+
+@import "./variables.scss";
+
+html, body {
   overflow: hidden;
   margin: 0;
+  font-family: $fontFamily, sans-serif;
 }
 
 #gameContainer {

@@ -45,11 +45,13 @@
     "@pixi/ticker": "~6.4.2",
     "@pixi/tilemap": "^3.2.2",
     "@pixi/utils": "~6.4.2",
+    "animejs": "^3.2.1",
     "pixi.js": "^6.4.2",
     "vue": "^3.2.45",
     "vue-router": "^4.1.6"
   },
   "devDependencies": {
+    "@types/animejs": "^3.1.6",
     "@types/node": "^18.11.17",
     "@vitejs/plugin-vue": "^4.0.0",
     "sass": "^1.57.1",

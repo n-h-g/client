@@ -1,0 +1,19 @@
+export enum UIComponent {
+    BottomBarUI,
+    TopBarUI,
+    GameLoaderUI,
+    RoomUI,
+    NavigatorUI,
+    FriendsMenuUI,
+    PreviewBoxUI,
+    ListUI,
+    CreateRoomUI,
+    CatalogueUI,
+    RoomInfoUI,
+    RoomEditInfoUI,
+    DefaultPanelUI,
+    UserPanelUI,
+    AvatarContainerUI,
+    InventoryUI,
+    PrivateChatUI
+}

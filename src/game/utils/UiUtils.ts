@@ -1,6 +1,8 @@
 import { Container, DisplayObject } from '@pixi/display'
 import { Matrix } from '@pixi/math'
+import { createApp } from 'vue'
 import { Engine } from '../Engine'
+import { Logger } from './Logger'
 
 export default class UiUtils {
     static guidGenerator() {
@@ -50,6 +52,31 @@ export default class UiUtils {
                 y: y
             }
     }
+
+    static renderComponent(component, name) {
+        try {
+            var ComponentApp = createApp(component)
+            const wrapper = document.createElement('div')
+            wrapper.id = name
+            ComponentApp.mount(wrapper)
+            document.getElementById('gameContainer').appendChild(wrapper)
+        } catch(e) {
+            if (Engine.getInstance().config.debug) {
+                Logger.debug(e)
+            }
+        }
+    }
+    
+    static unrenderComponent(name) {
+        try {
+            document.getElementById(name).remove()
+        } catch(e) {
+            if (Engine.getInstance().config.debug) {
+                Logger.debug(e)
+            }
+        }
+    }
+
     /**
      * 
      * @returns true if mobile
