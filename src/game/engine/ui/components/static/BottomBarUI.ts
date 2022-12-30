@@ -1,4 +1,3 @@
-import { AppContext, getCurrentInstance } from 'vue'
 import { IComponentUI } from '../../../../core/ui/IComponentUI'
 import BottomBarGUI from '../../../../../ui/components/static/bottomBar/BottomBarGUI.vue'
 import UiUtils from '../../../../utils/UiUtils'
@@ -8,28 +7,16 @@ import { UIEvents } from '../../events/UIEvents'
 
 export class BottomBarUI implements IComponentUI { 
     private bottomBarGUI: typeof BottomBarGUI
-    private appContext: AppContext
 
     constructor() {
         this.bottomBarGUI = BottomBarGUI
-        this.appContext = getCurrentInstance().appContext
-
-        EventManager.read(UIEvents.LOAD, (event: LoadProgressEvent) => {
-            if (event.data.width == 100) {
-                this.add()
-            }
-        })
     }
 
     init(): void {
-        
-    }
-
-    public add(): void {
-        UiUtils.renderComponent({
-            el: '#gameContainer',
-            component: this.bottomBarGUI,
-            appContext: this.appContext
+        EventManager.read(UIEvents.LOAD, (event: LoadProgressEvent) => {
+            if (event.data.width == 100) {
+                UiUtils.renderComponent(this.bottomBarGUI, 'bottomBar')
+            }
         })
     }
 }

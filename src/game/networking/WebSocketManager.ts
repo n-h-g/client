@@ -45,7 +45,7 @@ export class WebSocketManager {
             this._closed = false
 
             EventManager.emit(UIEvents.LOAD, new LoadProgressEvent({
-                width: 20,
+                width: 40,
                 message: 'Connected'
             }))
         }
@@ -59,7 +59,7 @@ export class WebSocketManager {
             }
 
             EventManager.emit(UIEvents.LOAD, new LoadProgressEvent({
-                width: 20,
+                width: 40,
                 message: 'Connection Error'
             }))
         }

@@ -9,8 +9,8 @@ export class LoginResponse extends MessageHandler {
     public handle(): void {
         if (this.message.data) {
             EventManager.emit(UIEvents.LOAD, new LoadProgressEvent({
-                width: 40,
-                message: 'Loading'
+                width: 100,
+                message: 'Logged'
             }))
 
             Engine.getInstance().networkingManager?.packetManager.applyOut(OutgoingPacket.UserProfileInformation)

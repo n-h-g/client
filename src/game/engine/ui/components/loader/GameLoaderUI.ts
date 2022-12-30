@@ -1,4 +1,3 @@
-import { AppContext, getCurrentInstance } from 'vue'
 import GameLoaderGUI from '../../../../../ui/components/loader/GameLoaderGUI.vue'
 import UiUtils from '../../../../utils/UiUtils'
 import { IComponentDeletableUI } from '../../../../core/ui/IComponentDeletableUI'
@@ -8,12 +7,14 @@ import { UIEvents } from '../../events/UIEvents'
 
 export class GameLoaderUI implements IComponentDeletableUI { 
     private gameLoaderGUI: typeof GameLoaderGUI
-    private appContext: AppContext
     public visible: boolean = true
 
     constructor() {
         this.gameLoaderGUI = GameLoaderGUI
-        this.appContext = getCurrentInstance().appContext
+    }
+
+    init(): void {
+        UiUtils.renderComponent(this.gameLoaderGUI, 'gameLoader')
 
         EventManager.read(UIEvents.LOAD, (event: LoadProgressEvent) => {
             if (event.data.width == 100) {
@@ -22,15 +23,7 @@ export class GameLoaderUI implements IComponentDeletableUI {
         })
     }
 
-    init(): void {
-        UiUtils.renderComponent({
-            el: '#gameContainer',
-            component: this.gameLoaderGUI,
-            appContext: this.appContext
-        })
-    }
-
     delete(): void {
-        UiUtils.unrenderComponent()
+        UiUtils.unrenderComponent('gameLoader')
     }
 }

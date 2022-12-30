@@ -7,13 +7,11 @@
 </template>
 
 <script setup lang="ts">
-import '@/assets/scss/game.scss';
-
 const credits = 0
 
 </script>
-<style lang="scss">
 
+<style lang="scss">
 @import '@/assets/scss/game.scss';
 
 .topBar {

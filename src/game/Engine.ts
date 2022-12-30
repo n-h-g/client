@@ -51,7 +51,6 @@ export class Engine {
 
         this._application.stage.interactive = true
 
-        
         await this.userInterfaceManager.init()
 
         if(this._config.offlineMode) {

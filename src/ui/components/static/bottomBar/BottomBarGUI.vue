@@ -18,12 +18,11 @@
 </template>
 
 <script setup lang="ts">
-import '@/assets/scss/game.scss'
-
 function toggle(ui: string) {
     
 }
 </script>
+
 <style lang="scss">
 @import '@/assets/scss/game.scss';
 
@@ -139,15 +138,15 @@ function toggle(ui: string) {
       }
 
       &.navigator .img {
-        background-image: url("~@/assets/images/bottom-bar/navigator.png");
+        background-image: url("@/assets/images/bottom-bar/navigator.png");
       }
 
       &.catalog .img {
-        background-image: url("~@/assets/images/bottom-bar/catalog.png");
+        background-image: url("@/assets/images/bottom-bar/catalog.png");
       }
 
       &.inventory .img {
-        background-image: url("~@/assets/images/bottom-bar/inventory.png");
+        background-image: url("@/assets/images/bottom-bar/inventory.png");
       }
 
       &.friends {
@@ -156,7 +155,7 @@ function toggle(ui: string) {
       }
 
       &.settings .img {
-        background-image: url("../assets/images/bottom-bar/settings.png");
+        background-image: url("@/assets/images/bottom-bar/settings.png");
       }
 
       &.avatar {
@@ -197,9 +196,6 @@ function toggle(ui: string) {
     cursor: pointer;
     color: #000;
     box-shadow: 1px #ccc;
-  }
-
-  .rightOptions .friend .optionVisible .follow-friend {
   }
 
   .roomInfo {

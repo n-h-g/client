@@ -1,6 +1,6 @@
 <template>
-    <div id="gameContainer" ref="game">
-
+    <div id="gameContainer">
+        
     </div>
 </template>
   

@@ -1,6 +1,6 @@
 import { Container, DisplayObject } from '@pixi/display'
 import { Matrix } from '@pixi/math'
-import { createApp, getCurrentInstance } from 'vue'
+import { createApp } from 'vue'
 import { Engine } from '../Engine'
 import { Logger } from './Logger'
 
@@ -53,10 +53,13 @@ export default class UiUtils {
             }
     }
 
-    static renderComponent({ el, component, appContext }) {
+    static renderComponent(component, name) {
         try {
-            let app = createApp(component)
-            app.mount(el)
+            var ComponentApp = createApp(component)
+            const wrapper = document.createElement('div')
+            wrapper.id = name
+            ComponentApp.mount(wrapper)
+            document.getElementById('gameContainer').appendChild(wrapper)
         } catch(e) {
             if (Engine.getInstance().config.debug) {
                 Logger.debug(e)
@@ -64,10 +67,9 @@ export default class UiUtils {
         }
     }
     
-    static unrenderComponent() {
+    static unrenderComponent(name) {
         try {
-            let app = getCurrentInstance()?.appContext.app
-            app.unmount()
+            document.getElementById(name).remove()
         } catch(e) {
             if (Engine.getInstance().config.debug) {
                 Logger.debug(e)

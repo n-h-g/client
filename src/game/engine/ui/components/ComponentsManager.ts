@@ -16,7 +16,7 @@ export class ComponentsManager {
     public loadGameComponents(): void {
         this.addComponent(UIComponent.GameLoaderUI, new GameLoaderUI())
         this.addComponent(UIComponent.BottomBarUI, new BottomBarUI())
-        //this.addComponent(UIComponent.TopBarUI, new TopBarUI())
+        this.addComponent(UIComponent.TopBarUI, new TopBarUI())
     }
 
     public initGameComponents(): void {
