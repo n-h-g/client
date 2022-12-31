@@ -118,7 +118,7 @@
 </template>
 
 <script setup lang="ts">
-import { reactive, ref } from "vue";
+import { ref } from "vue";
 import { Engine } from "../../../game/Engine";
 import { BoxEvent } from "../../../game/engine/ui/events/BoxEvent";
 import { EventManager } from "../../../game/engine/ui/events/EventManager";
@@ -126,14 +126,13 @@ import { NavigatorRoomsAdded } from "../../../game/engine/ui/events/navigator/Na
 import { UIEvents } from "../../../game/engine/ui/events/UIEvents";
 import { OutgoingPacket } from "../../../game/networking/packets/outgoing/OutgoingPacket";
 
-let rooms = reactive([])
+let rooms = ref([])
 let currentTab = ref("public");
 
 EventManager.read(
   UIEvents.NAVIGATOR_ROOMS_ADDED,
   (event: NavigatorRoomsAdded) => {
-    //console.log(event);
-    rooms = event.rooms;
+    rooms.value = event.rooms;
   }
 );
 

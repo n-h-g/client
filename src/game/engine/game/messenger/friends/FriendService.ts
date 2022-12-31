@@ -53,7 +53,7 @@ export default class FriendService extends Service<IFriendRepository>{
      * @returns 
      */
     public getFriendByUsername(username: string): IUserController | null {
-        let user = Engine.getInstance().usersService?.repository.findByUsername(username) as IUserController;
+        let user = Engine.getInstance().usersService?._repository.findByUsername(username) as IUserController;
 
         if (!user) {
             user = Engine.getInstance().roomService?.CurrentRoom?.roomUserRepository.findByUsername(username) as IUserController;
