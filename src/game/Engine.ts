@@ -44,7 +44,6 @@ export class Engine {
         PIXI.settings.SCALE_MODE = PIXI.SCALE_MODES.NEAREST;
         PIXI.settings.ROUND_PIXELS = true;
 
-
         console.log("%cNHG Client v" + this._config.version, "font-size:2rem; background-color:#069; color:#fff; padding:10px 45px;")
 
         this._application = new ApplicationEngine(this, {

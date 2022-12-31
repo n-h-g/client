@@ -131,9 +131,9 @@ export default class VisualizationWall extends RoomObjectVisualization {
             let last: boolean = false;
 
 
-            if(this.wall.position.getX() === this.wall.getPlane().getRoom().getDoorPosition().getX() -1 && this.wall.position.getY() === 0) {
+            if(this.wall.position.getX() === this.wall.getPlane().getRoom().getDoorPosition().getX() -1 && this.wall.position.getY() === 1) {
                 ctx.endFill()
-            } else if(this.wall.position.getY() === this.wall.getPlane().getRoom().getDoorPosition().getY() -1 && this.wall.position.getX() === 0) {
+            } else if(this.wall.position.getY() === this.wall.getPlane().getRoom().getDoorPosition().getY() -1 && this.wall.position.getX() === 1) {
                 ctx.endFill()
             } else {
                 
