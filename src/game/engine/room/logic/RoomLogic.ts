@@ -1,4 +1,3 @@
-import RoomVisualization from "../visualization/RoomVisualization"
 import IRoomLogic from "../../../core/room/IRoomLogic"
 import RoomLayout from "../RoomLayout"
 import Room from "../Room"
@@ -19,7 +18,7 @@ class RoomLogic implements IRoomLogic {
     }
 
     public registerEvents() : void {
-        let roomVisualization = (this.room.Visualization as RoomVisualization);
+        let roomVisualization = this.room.Visualization;
         
         roomVisualization.getCanvasFloor().on('pointerover', this.onMouseOver.bind(this));
         roomVisualization.Container.on('pointerdown', this.onMouseClick.bind(this));
@@ -30,21 +29,21 @@ class RoomLogic implements IRoomLogic {
     }
 
     private onMouseClick(e: any) {
-        let room: Room | null = this.room.getRoom();
+        let room: Room = this.room.getRoom();
     }
 
     private onMouseOver(e: any) {
-        let room: Room | null = this.room.getRoom();
+        let room: Room = this.room.getRoom();
 
-        (this.room.Visualization as RoomVisualization).getCanvasPointer().zIndex = 5;
-        (this.room.Visualization as RoomVisualization).Container.sortChildren()
+        this.room.Visualization.getCanvasPointer().zIndex = 5;
+        this.room.Visualization.Container.sortChildren()
     }
 
     private onMouseOut() {
-        let room: Room | null = this.room.getRoom();
+        let room: Room = this.room.getRoom();
 
-        (this.room.Visualization as RoomVisualization).getCanvasPointer().zIndex = 3;
-        (this.room.Visualization as RoomVisualization).Container.sortChildren()
+        this.room.Visualization.getCanvasPointer().zIndex = 3;
+        this.room.Visualization.Container.sortChildren()
     }
 
 

@@ -1,6 +1,8 @@
 import * as PIXI from "pixi.js";
 import { Sprite } from "pixi.js";
 import { Direction } from "../../../../core/objects/Direction";
+import { Engine } from '../../../../Engine';
+import { Logger } from '../../../../utils/Logger';
 import Point from "../../../../utils/point/Point";
 import RenderingUtils from "../../../../utils/RenderingUtils";
 import Action from "./actions/Action";
@@ -261,7 +263,9 @@ export default class AvatarImager {
                 avatar.Container.addChild(sprite)
             }
         } else {
-            //Engine.getInstance().logger?.debug('cannot find resource ' + this.getTextureId(assetName, component.ResourceName))
+            if (Engine.getInstance().config.debug) {
+                Logger.debug('cannot find resource ' + this.getTextureId(assetName, component.ResourceName))
+            }
         }
     }
 

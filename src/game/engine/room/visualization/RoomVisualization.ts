@@ -6,6 +6,8 @@ import MapData from "../objects/map/MapData"
 import UiUtils from "../../../utils/UiUtils"
 import Tile from "../objects/map/Tile"
 import { Engine } from '../../../Engine'
+import Avatar from '../../ui/imagers/avatars/Avatar'
+import { Direction } from '../../../core/objects/Direction'
 
 export default class RoomVisualization implements IRoomVisualization {
 
