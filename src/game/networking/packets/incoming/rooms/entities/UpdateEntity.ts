@@ -21,8 +21,7 @@ export default class UpdateEntity extends MessageHandler {
             
             let isUser = entityData.user_id != undefined;
             let entity: Entity | null = null;
-            let entityVisualization: EntityVisualization | null = null;
-
+      
             if(isUser) {
                 entity = ((Engine.getInstance().roomService?.CurrentRoom?.roomUserRepository.get(entityData.user_id)?.visualization as UserVisualization).userEntity);
             } else {

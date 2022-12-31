@@ -28,6 +28,8 @@ export class Engine {
     private _config = generalConfig
 
     private _sso: string;
+    lastFrameTime: number
+    timeElapsed: number
 
     public static getInstance(): Engine {
         return this._instance
@@ -57,14 +59,14 @@ export class Engine {
 
         document.body.appendChild(this._application.view)
 
-        this._networkingManager = new NetworkingManager()
-        this._userInterfaceManager = new UserInterfaceManager()
-        await this._userInterfaceManager.init()
-
         this._roomsService = new RoomService()
         this._usersService = new UserService()
         this._commandService = new CommandService()
         this._chatService = new ChatMessageService()
+
+        this._networkingManager = new NetworkingManager()
+        this._userInterfaceManager = new UserInterfaceManager()
+        await this._userInterfaceManager.init()
 
         this.application.init()
 

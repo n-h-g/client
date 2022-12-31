@@ -16,6 +16,7 @@ export class ApplicationEngine extends Application {
 
         this.view.style.height = window.innerHeight + "px"
         this.view.style.width = window.innerWidth + "px"
+        
 
         this.engine = engine
     }
@@ -56,7 +57,6 @@ export class ApplicationEngine extends Application {
                 (window as any).window.msRequestAnimationFrame ||
                 function (callback) {
                     let fpsInterval = 1000 / Engine.getInstance().config.fps
-
                     window.setTimeout(callback, fpsInterval);
                 };
         })();

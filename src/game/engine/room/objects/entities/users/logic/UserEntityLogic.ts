@@ -112,6 +112,7 @@ export default class UserEntityLogic extends EntityLogic  {
         let userVisualization = (this.entity.visualization as UserEntityVisualization)
 
         if(userVisualization.needsUpdate) {
+    
             this.frameTracker += delta;
 
             if (this.frameTracker >= AvatarData.AVATAR_FRAME_SPEED) {
