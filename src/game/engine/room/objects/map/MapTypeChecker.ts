@@ -8,8 +8,7 @@ export default class MapTypeChecker {
 
     
         if (doorPosition.getY() == position.getY() && doorPosition.getX() == position.getX() && modelMatrix[position.getX()][position.getY()] == 0) {
-    
-            return TileType.DoorTile
+            return TileType.Door
         } else if (modelMatrix[position.getX()][position.getY()] == 0) {
             return TileType.Hole
         } else if (

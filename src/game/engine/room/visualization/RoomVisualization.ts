@@ -15,11 +15,10 @@ export default class RoomVisualization implements IRoomVisualization {
 
     private canvasFloor: Container
     private canvasWall: Container
-    private canvasDoorFloor: Container
+    private canvasDoorTile: Container
     private canvasDoorWall: Container
 
     private canvasPointer: Container
-    private canvasDoorTile: Container
 
     public container: Container
 
@@ -31,15 +30,13 @@ export default class RoomVisualization implements IRoomVisualization {
         this.container = new Container();
 
         this.canvasFloor = new Container();
-        this.canvasDoorFloor = new Container();
         this.canvasWall = new Container();
         this.canvasDoorWall = new Container();
         this.canvasPointer = new Container();
         this.canvasDoorTile = new Container();
         
 
-        this.container.addChild(this.canvasDoorTile);
-        this.container.addChild(this.canvasDoorFloor) 
+        this.container.addChild(this.canvasDoorTile) 
         this.container.addChild(this.canvasWall)
         this.container.addChild(this.canvasDoorWall) 
         this.container.addChild(this.canvasFloor)
@@ -48,10 +45,10 @@ export default class RoomVisualization implements IRoomVisualization {
         this.container.x = window.innerWidth / 2
         this.container.y = window.innerHeight / 2
         
-        this.canvasDoorFloor.interactive = true;
+        this.canvasDoorTile.interactive = true;
         this.canvasFloor.interactive = true;
 
-        this.canvasDoorFloor.zIndex = 1;
+        this.canvasDoorTile.zIndex = 1;
         this.canvasFloor.zIndex = 4;
         this.canvasPointer.zIndex = 3;
         this.canvasDoorWall.zIndex = 4;
@@ -132,10 +129,6 @@ export default class RoomVisualization implements IRoomVisualization {
 
     public getCanvasWall() : Container {
         return this.canvasWall
-    }
-
-    public getCanvasDoorFloor() : Container {
-        return this.canvasDoorFloor
     }
 
     public getCanvasDoorWall() : Container {

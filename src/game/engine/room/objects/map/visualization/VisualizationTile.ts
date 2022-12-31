@@ -24,8 +24,6 @@ export default class VisualizationTile extends RoomObjectVisualization {
     private strokeColor: ColorRGB = ColorRGB.getColorFromNumber(0x7E7E52)
     private useStroke: boolean = true
 
-    private doorTileContext: Container
-
     private stairsContext: Graphics | null;
 
     constructor(tile: Tile) {
@@ -39,8 +37,7 @@ export default class VisualizationTile extends RoomObjectVisualization {
 
         let roomV = (tile.getPlane().getRoom().Visualization as RoomVisualization)
         this.floorContext = roomV.getCanvasFloor()
-        this.doorContext = roomV.getCanvasDoorFloor()
-        this.doorTileContext = roomV.getCanvasDoorTile();
+        this.doorContext = roomV.getCanvasDoorTile();
     }
 
 
@@ -49,11 +46,11 @@ export default class VisualizationTile extends RoomObjectVisualization {
     }
 
     private static calculateOffsetY(position: Point3d, type: TileType): number {
-        return (position.getY() * MapData.tileHeight) / 2 + (position.getX() * MapData.tileWidth) / 4 - ((position.getZ() + (type == TileType.DoorTile ? 1 : 0)) * MapData.thickSpace * MapData.stairSteps)
+        return (position.getY() * MapData.tileHeight) / 2 + (position.getX() * MapData.tileWidth) / 4 - ((position.getZ() + (type == TileType.Door ? 1 : 0)) * MapData.thickSpace * MapData.stairSteps)
     }
 
     private static calculateZIndex(position: Point3d, type: TileType): number {
-        return (1 * position.getX()) + (1 * position.getY()) + (1 * (position.getZ() + type == TileType.DoorTile ? 1 : 0))
+        return (1 * position.getX()) + (1 * position.getY()) + (1 * (position.getZ() + type == TileType.Door ? 1 : 0))
     }
 
     public render(): void {
@@ -68,9 +65,8 @@ export default class VisualizationTile extends RoomObjectVisualization {
 
         switch (this.tile.getType()) {
 
-            case TileType.DoorTile:
             case TileType.Door:
-                this.drawTile(this.doorTileContext, true)
+                this.drawTile(this.doorContext, true)
                 break
             case TileType.Flat:
                 this.drawTile(this.floorContext)
@@ -576,5 +572,5 @@ export default class VisualizationTile extends RoomObjectVisualization {
         return ctx;
     }
 
-    public get FloorContext(): Container { return this.floorContext; }
+
 }
