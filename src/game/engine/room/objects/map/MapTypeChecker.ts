@@ -56,13 +56,13 @@ export default class MapTypeChecker {
     }
 
     public static checkWallCorner(x: number, y: number, modelMatrix: Array<Array<number>>) {
-        let i;
+        let i : number;
         let isCorner =
             (x == 0 && y == 0) ||
-            (modelMatrix[x - 1] &&
-                modelMatrix[x][y - 1] &&
-                modelMatrix[x - 1][y] == 0 &&
-                modelMatrix[x][y - 1] == 0) ?
+            (modelMatrix[x - 1] && modelMatrix[x - 1][y] == 0 && modelMatrix[x][y - 1] && modelMatrix[x][y - 1] == 0) ||
+            (modelMatrix[x - 1] && modelMatrix[x - 1][y] == 0 && !modelMatrix[x][y - 1]) ||
+            (modelMatrix[x][y - 1] && modelMatrix[x][y - 1] == 0 && !modelMatrix[x - 1])
+             ?
             true :
             false;
 
