@@ -66,6 +66,16 @@ export class Engine {
 
         if (this._config.offlineMode) {
             let room: Room = this._roomsService.setRoom('prova', '111111/11100111/11100111', new Point(1, -1), 1)
+
+            let avatar = new Avatar("hd-180-1.ch-255-66.lg-280-110.sh-305-62.ha-1012-110.hr-828-61", Direction.SOUTH, Direction.SOUTH, new Set());
+
+            this.userInterfaceManager.avatarImager.Data.loadGameData().then(() => {
+                this.userInterfaceManager?.avatarImager.loadAvatar(avatar).then(() => {
+                    this.userInterfaceManager?.avatarImager.drawAvatar(avatar)
+                })
+            })
+
+            room.getRoomLayout().Visualization.Container.addChild(avatar.Container)
         }
     }
 
