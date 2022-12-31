@@ -2,7 +2,7 @@ import InventoryGUI from '../../../../../ui/components/inventory/InventoryGUI.vu
 import { EventManager } from '../../events/EventManager'
 import { UIEvents } from '../../events/UIEvents'
 import { IComponentShowableUI } from '../../../../core/ui/IComponentShowableUI'
-import { BoxEvent } from '../../events/BoxEvent'
+import { BoxEvent } from '../../events/general/BoxEvent'
 import UiUtils from '../../../../utils/UiUtils'
 import { UIComponent } from '../UIComponent'
 
