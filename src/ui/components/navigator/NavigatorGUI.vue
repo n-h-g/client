@@ -95,6 +95,7 @@ let currentTab = ref("public")
 
 EventManager.read(UIEvents.NAVIGATOR_ROOMS_ADDED, (event: NavigatorRoomsAdded) => {
     console.log(event)
+    rooms = event.rooms
 })
 
 function hide() {
@@ -103,8 +104,11 @@ function hide() {
     })
 }
 
-function enterRoom(id: number) {
-
+function enterRoom(roomId: number) {
+    this.hide()
+    Engine.getInstance()?.networkingManager?.packetManager.applyOut(OutgoingPacket.UserEnterRoom, {
+        id: roomId
+    })
 }
 
 function createRoom() {

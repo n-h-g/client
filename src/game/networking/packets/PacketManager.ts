@@ -5,6 +5,7 @@ import { LoginResponse } from './incoming/handshake/LoginResponse'
 import { PongResponse } from './incoming/handshake/PongResponse'
 import AllRoomsList from './incoming/navigator/AllRoomsList'
 import MyRoomsList from './incoming/navigator/MyRoomsList'
+import { UpdateRoomData } from './incoming/rooms/UpdateRoomData'
 import { UpdateUserInformation } from './incoming/users/UpdateUserInformation'
 import { OutgoingPacket } from './outgoing/OutgoingPacket'
 
@@ -22,6 +23,7 @@ export class PacketManager {
             2: new PongResponse,
             8: new AllRoomsList,
             9: new MyRoomsList,
+            10: new UpdateRoomData,
             17: new UpdateUserInformation
         }
 
