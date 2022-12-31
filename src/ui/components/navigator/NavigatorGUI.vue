@@ -8,62 +8,33 @@
     </div>
     <div class="content">
       <div class="searchContainer">
-        <img
-          src="https://cdn.discordapp.com/attachments/799750747281031228/800333126395232266/btn_search.png"
-        />
-        <input
-          type="text"
-          class="searchInput"
-          placeholder="Type here the name of the room you want to search"
-        />
+        <img src="https://cdn.discordapp.com/attachments/799750747281031228/800333126395232266/btn_search.png" />
+        <input type="text" class="searchInput" placeholder="Type here the name of the room you want to search" />
       </div>
       <div class="roomContainer">
         <div class="roomContainerBg">
           <div class="navigatorTabs">
-            <div
-              class="tab"
-              :class="{ active: currentTab == 'public' }"
-              @click="changeTab('public')"
-            >
+            <div class="tab" :class="{ active: currentTab == 'public' }" @click="changeTab('public')">
               Public
             </div>
-            <div
-              class="tab"
-              :class="{ active: currentTab == 'all' }"
-              @click="changeTab('all')"
-            >
+            <div class="tab" :class="{ active: currentTab == 'all' }" @click="changeTab('all')">
               All
             </div>
-            <div
-              class="tab"
-              :class="{ active: currentTab == 'my' }"
-              @click="changeTab('my')"
-            >
+            <div class="tab" :class="{ active: currentTab == 'my' }" @click="changeTab('my')">
               My
             </div>
           </div>
           <div class="roomsListContainer">
-            <ul
-              class="easyRoomsListUl"
-              v-if="currentTab == 'my' || currentTab == 'all'"
-            >
-              <li
-                class="roomLi"
-                v-for="room in rooms"
-                :key="room.id"
-                v-on:click="enterRoom(room.id)"
-              >
+            <ul class="easyRoomsListUl" v-if="currentTab == 'my' || currentTab == 'all'">
+              <li class="roomLi" v-for="room in rooms" :key="room.id" v-on:click="enterRoom(room.id)">
                 <span class="title">{{ room.name }}</span>
                 <div class="icons_container">
-                  <div
-                    class="usersNowRoom"
-                    :class="{
-                      navigatorRoomFull: room.users_count >= room.maxUsers,
-                      greenIcon:
-                        room.users_count > 0 &&
-                        room.users_count < room.maxUsers,
-                    }"
-                  >
+                  <div class="usersNowRoom" :class="{
+  navigatorRoomFull: room.users_count >= room.maxUsers,
+  greenIcon:
+    room.users_count > 0 &&
+    room.users_count < room.maxUsers,
+}">
                     {{ room.users_count }}
                   </div>
                 </div>
@@ -71,29 +42,19 @@
             </ul>
 
             <ul class="roomsListUl" v-else>
-              <li
-                class="roomLi"
-                v-for="room in rooms"
-                :key="room.id"
-                v-on:click="enterRoom(room.id)"
-              >
-                <div
-                  v-if="
-                    room.type == 'public' ||
-                    room.type == 'all' ||
-                    room.type == 'my'
-                  "
-                >
+              <li class="roomLi" v-for="room in rooms" :key="room.id" v-on:click="enterRoom(room.id)">
+                <div v-if="
+  room.type == 'public' ||
+  room.type == 'all' ||
+  room.type == 'my'
+">
                   <div class="roomInfoPreview">
                     <div class="roomPreview">
                       <img src="@/assets/images/room/roomPreview.png" />
                     </div>
-                    <div
-                      class="usersNowRoom"
-                      :class="{
-                        navigatorRoomFull: room.usersnow >= room.maxusers,
-                      }"
-                    >
+                    <div class="usersNowRoom" :class="{
+  navigatorRoomFull: room.usersnow >= room.maxusers,
+}">
                       {{ room.usersnow }}
                     </div>
                   </div>
@@ -118,65 +79,54 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from "vue";
-import { Engine } from "../../../game/Engine";
-import { BoxEvent } from "../../../game/engine/ui/events/BoxEvent";
-import { EventManager } from "../../../game/engine/ui/events/EventManager";
-import { NavigatorRoomsAdded } from "../../../game/engine/ui/events/navigator/NavigatorRoomsAdded";
-import { UIEvents } from "../../../game/engine/ui/events/UIEvents";
-import { OutgoingPacket } from "../../../game/networking/packets/outgoing/OutgoingPacket";
+import { ref } from "vue"
+import { Engine } from "../../../game/Engine"
+import { BoxEvent } from "../../../game/engine/ui/events/BoxEvent"
+import { EventManager } from "../../../game/engine/ui/events/EventManager"
+import { NavigatorRoomsAdded } from "../../../game/engine/ui/events/navigator/NavigatorRoomsAdded"
+import { UIEvents } from "../../../game/engine/ui/events/UIEvents"
+import { OutgoingPacket } from "../../../game/networking/packets/outgoing/OutgoingPacket"
 
 let rooms = ref([])
 let currentTab = ref("public");
 
-EventManager.read(
-  UIEvents.NAVIGATOR_ROOMS_ADDED,
-  (event: NavigatorRoomsAdded) => {
-    rooms.value = event.rooms;
-  }
-);
+EventManager.read(UIEvents.NAVIGATOR_ROOMS_ADDED, (event: NavigatorRoomsAdded) => {
+  rooms.value = event.rooms
+})
 
 function hide() {
   EventManager.emit<BoxEvent>(UIEvents.CLOSE, {
-    type: "navigator",
-  });
+    type: "navigator"
+  })
 }
 
 function enterRoom(roomId: number) {
-  this.hide();
-  Engine.getInstance()?.networkingManager?.packetManager.applyOut(
-    OutgoingPacket.UserEnterRoom,
-    {
-      id: roomId,
-    }
-  );
+  this.hide()
+  Engine.getInstance()?.networkingManager?.packetManager.applyOut(OutgoingPacket.UserEnterRoom, {
+    id: roomId
+  })
 }
 
-function createRoom() {}
+function createRoom() { }
 
 function changeTab(tab: string) {
   switch (tab) {
     case "public":
-      this.currentTab = tab;
-      Engine.getInstance()?.networkingManager?.packetManager.applyOut(
-        OutgoingPacket.NavigatorPublicRooms
-      );
-      break;
+      this.currentTab = tab
+      Engine.getInstance()?.networkingManager?.packetManager.applyOut(OutgoingPacket.NavigatorPublicRooms)
+    break;
     case "my":
       this.currentTab = tab;
-      Engine.getInstance()?.networkingManager?.packetManager.applyOut(
-        OutgoingPacket.NavigatorMyRooms
-      );
-      break;
+      Engine.getInstance()?.networkingManager?.packetManager.applyOut(OutgoingPacket.NavigatorMyRooms)
+    break;
     case "all":
       this.currentTab = tab;
-      Engine.getInstance()?.networkingManager?.packetManager.applyOut(
-        OutgoingPacket.NavigatorAllRooms
-      );
-      break;
+      Engine.getInstance()?.networkingManager?.packetManager.applyOut(OutgoingPacket.NavigatorAllRooms)
+    break;
   }
 }
 </script>
+
 <style lang="scss">
 #navigator {
   position: fixed;
@@ -429,7 +379,7 @@ function changeTab(tab: string) {
               background-color: darken(#fff, 10%);
             }
 
-            & > div {
+            &>div {
               display: flex;
               padding-bottom: 4px;
 

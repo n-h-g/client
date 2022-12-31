@@ -9,7 +9,7 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import { EventManager } from '../../../../game/engine/ui/events/EventManager'
-import { TopBarEvent } from '../../../../game/engine/ui/events/TopBarEvent';
+import { TopBarEvent } from '../../../../game/engine/ui/events/static/TopBarEvent'
 import { UIEvents } from '../../../../game/engine/ui/events/UIEvents'
 
 const credits = ref(0)

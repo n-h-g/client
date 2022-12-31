@@ -17,16 +17,14 @@
                 <div class="inventoryListAndButtonsContainer">
 
                     <div class="listContainer itemsContainer" v-if="currentTab == 'floor'">
-                        <div class="itemInventory"
-                            :class="{selected: selectedItem && selectedItem.id == item.Id}"
+                        <div class="itemInventory" :class="{ selected: selectedItem && selectedItem.id == item.Id }"
                             v-for="item in floorItems" @click.stop="selectItem(item)" v-bind:key="item.Id">
                             <img v-bind:src="item.objectVisualization.iconImage" :alt="item.Name" />
                             <span class="stackSize">{{ item.qty }}</span>
                         </div>
                     </div>
                     <div class="listContainer itemsContainer" v-if="currentTab == 'wall'">
-                        <div class="itemInventory"
-                            :class="{selected: selectedItem && selectedItem.id == item.Id}"
+                        <div class="itemInventory" :class="{ selected: selectedItem && selectedItem.id == item.Id }"
                             v-for="item in wallItems" @click.stop="selectItem(item)" v-bind:key="item.Id">
                             <img :src="item.objectVisualization.iconImage" alt="item.Name" />
                             <span class="stackSize">{{ item.qty }}</span>
@@ -34,20 +32,19 @@
                     </div>
                     <div class="buttonsContainer">
                         <div class="itemPreivew">
-                            <img v-if="selectedItem"
-                                v-bind:src="getImagePreview(selectedItem)" />
+                            <img v-if="selectedItem" v-bind:src="getImagePreview(selectedItem)" />
                         </div>
-                        <div class="ui-button small" :class="{hidden: !showPlaceItemButton}" ref="PlaceItemButton"
+                        <div class="ui-button small" :class="{ hidden: !showPlaceItemButton }" ref="PlaceItemButton"
                             @click.stop="placeItem()">Place</div>
-                        <div class="ui-button small" :class="{hidden: !showAddAllItemsToTradeButton}"
+                        <div class="ui-button small" :class="{ hidden: !showAddAllItemsToTradeButton }"
                             ref="AddItemToTradeButton" @click.stop="addAllItemsToTrade">
                             Trade</div>
-                        <div class="ui-button small" :class="{hidden: !showAddAllItemsToTradeButton}"
+                        <div class="ui-button small" :class="{ hidden: !showAddAllItemsToTradeButton }"
                             ref="AddAllItemsToTradeButton" @click.stop="addAllItemsToTrade()">
                             Trade</div>
                     </div>
                 </div>
-                <div class="tradeContainer" :class="{hidden: !tradeMode}">
+                <div class="tradeContainer" :class="{ hidden: !tradeMode }">
                     <div class="trade-container">
                         <div>
                             <span>Your offer</span>
@@ -79,15 +76,16 @@
         </div>
     </div>
 </template>
+
 <script setup lang="ts">
-import { ref } from "vue";
-import ItemVisualization from "../../../game/core/room/object/items/visualization/ItemVisualization";
-import { Engine } from "../../../game/Engine";
-import Item from "../../../game/engine/room/objects/items/Item";
-import { BoxEvent } from "../../../game/engine/ui/events/BoxEvent";
-import { EventManager } from "../../../game/engine/ui/events/EventManager";
-import { UIEvents } from "../../../game/engine/ui/events/UIEvents";
-import { OutgoingPacket } from "../../../game/networking/packets/outgoing/OutgoingPacket";
+import { ref } from "vue"
+import ItemVisualization from "../../../game/core/room/object/items/visualization/ItemVisualization"
+import { Engine } from "../../../game/Engine"
+import Item from "../../../game/engine/room/objects/items/Item"
+import { BoxEvent } from "../../../game/engine/ui/events/BoxEvent"
+import { EventManager } from "../../../game/engine/ui/events/EventManager"
+import { UIEvents } from "../../../game/engine/ui/events/UIEvents"
+import { OutgoingPacket } from "../../../game/networking/packets/outgoing/OutgoingPacket"
 
 const tradeMode = ref(false)
 const myTradeItems = ref([])
@@ -109,11 +107,11 @@ const wallItems = ref([])
 const showAddAllItemsToTradeButton = ref(false)
 
 function addAllItemsToTrade() {
-    
+
 }
 
 function placeItem() {
-    this.hide();
+    this.hide()
     Engine.getInstance().networkingManager.packetManager.applyOut(OutgoingPacket.RoomPlaceItemEvent, {
         id: this.selectedItem.id,
         name: this.selectedItem.name,
@@ -131,11 +129,11 @@ function getImagePreview(item: Item) {
 function changeTab(tab: string) {
     switch (tab) {
         case 'floor':
-            this.currentTab = tab;
-            break;
+            this.currentTab = tab
+        break;
         case 'wall':
-            this.currentTab = tab;
-            break;
+            this.currentTab = tab
+        break;
     }
 
     this.showPlaceItemButton = false
@@ -143,10 +141,10 @@ function changeTab(tab: string) {
 }
 
 function selectItem(item: Item) {
-    this.selectedItem = item;
+    this.selectedItem = item
 
-    if(Engine.getInstance().roomService.CurrentRoom != undefined) {
-        this.showPlaceItemButton = true;
+    if (Engine.getInstance().roomService.CurrentRoom != undefined) {
+        this.showPlaceItemButton = true
     }
 
 }
@@ -165,10 +163,11 @@ function cancelTrade() {
 
 function hide() {
     EventManager.emit<BoxEvent>(UIEvents.CLOSE, {
-    type: "inventory",
-  });
+        type: "inventory",
+    })
 }
 </script>
+
 <style lang="scss">
 #inventory {
     position: fixed;
@@ -265,7 +264,7 @@ function hide() {
 
                     &.active {
                         background-color: #fff;
-                        color:#272727;
+                        color: #272727;
 
                         &::after {
                             content: ' ';
@@ -436,10 +435,6 @@ function hide() {
             img {
                 object-fit: none;
             }
-
-            .stackSize {
-
-            }
         }
     }
 
@@ -456,5 +451,4 @@ function hide() {
         }
     }
 }
-
 </style>
