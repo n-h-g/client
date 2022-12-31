@@ -13,6 +13,8 @@ import { Direction } from './core/objects/Direction'
 import { EventManager } from './engine/ui/events/EventManager'
 import { UIEvents } from './engine/ui/events/UIEvents'
 
+import * as PIXI from "pixi.js"
+
 export class Engine {
     private static _instance: Engine
     private _application: ApplicationEngine | null
@@ -36,9 +38,13 @@ export class Engine {
             Engine._instance = this
         }
 
+        PIXI.settings.SCALE_MODE = PIXI.SCALE_MODES.NEAREST;
+        PIXI.settings.ROUND_PIXELS = true;
+
+
         console.log("%cNHG Client v" + this._config.version, "font-size:2rem; background-color:#069; color:#fff; padding:10px 45px;")
 
-        this._application = new ApplicationEngine({
+        this._application = new ApplicationEngine(this, {
             backgroundColor: 0x00000,
             backgroundAlpha: 1,
             antialias: true,
@@ -49,22 +55,18 @@ export class Engine {
             resizeTo: window
         })
 
-        this._application.view.style.height = window.innerHeight + "px"
-        this._application.view.style.width = window.innerWidth + "px"
-
         document.body.appendChild(this._application.view)
 
         this._networkingManager = new NetworkingManager()
         this._userInterfaceManager = new UserInterfaceManager()
         await this._userInterfaceManager.init()
 
-        this._application.stage.interactive = true
-
-
         this._roomsService = new RoomService()
         this._usersService = new UserService()
         this._commandService = new CommandService()
         this._chatService = new ChatMessageService()
+
+        this.application.init()
 
         if (this._config.offlineMode) {
             let room: Room = this._roomsService.setRoom('prova', '111111/11100111/11100111', new Point(1, -1), 1)
