@@ -1,7 +1,7 @@
 import { UserData } from '../../../../core/communication/incoming/users/UserData';
 import { Engine } from '../../../../Engine';
 import { EventManager } from '../../../../engine/ui/events/EventManager';
-import { TopBarEvent } from '../../../../engine/ui/events/TopBarEvent';
+import { TopBarEvent } from '../../../../engine/ui/events/static/TopBarEvent';
 import { UIEvents } from '../../../../engine/ui/events/UIEvents';
 import User from '../../../../engine/user/User';
 import { MessageHandler } from '../../../handler/MessageHandler';

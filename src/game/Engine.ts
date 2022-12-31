@@ -10,6 +10,8 @@ import ChatMessageService from './engine/game/chat/ChatMessageService'
 import Room from './engine/room/Room'
 import Avatar from './engine/ui/imagers/avatars/Avatar'
 import { Direction } from './core/objects/Direction'
+import { EventManager } from './engine/ui/events/EventManager'
+import { UIEvents } from './engine/ui/events/UIEvents'
 
 export class Engine {
     private static _instance: Engine

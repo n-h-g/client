@@ -18,8 +18,21 @@
 </template>
 
 <script setup lang="ts">
+import { Engine } from '../../../../game/Engine';
+import { NavigatorUI } from '../../../../game/engine/ui/components/navigator/NavigatorUI';
+import { UIComponent } from '../../../../game/engine/ui/components/UIComponent';
+import { BoxEvent } from '../../../../game/engine/ui/events/BoxEvent';
+import { EventManager } from '../../../../game/engine/ui/events/EventManager';
+import { UIEvents } from '../../../../game/engine/ui/events/UIEvents';
+
 function toggle(ui: string) {
-    
+  switch(ui) {
+    case 'navigator':
+      EventManager.emit<BoxEvent>(UIEvents.OPEN, {
+        type: 'navigator'
+      })
+    break;
+  }
 }
 </script>
 

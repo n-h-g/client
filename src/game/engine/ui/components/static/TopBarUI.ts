@@ -3,7 +3,7 @@ import TopBarGUI from '../../../../../ui/components/static/topBar/TopBarGUI.vue'
 import UiUtils from '../../../../utils/UiUtils'
 import { EventManager } from '../../events/EventManager'
 import { UIEvents } from '../../events/UIEvents'
-import { LoadProgressEvent } from '../../events/LoadProgressEvent'
+import { LoadProgressEvent } from '../../events/loader/LoadProgressEvent'
 import { UIComponent } from '../UIComponent'
 
 export class TopBarUI implements IComponentUI { 

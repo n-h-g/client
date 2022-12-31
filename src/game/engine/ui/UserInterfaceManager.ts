@@ -2,7 +2,7 @@ import { Engine } from "../../Engine";
 import { Logger } from "../../utils/Logger";
 import { ComponentsManager } from "./components/ComponentsManager";
 import { EventManager } from "./events/EventManager";
-import { LoadProgressEvent } from "./events/LoadProgressEvent";
+import { LoadProgressEvent } from "./events/loader/LoadProgressEvent";
 import { UIEvents } from "./events/UIEvents";
 import AvatarImager from "./imagers/avatars/AvatarImager";
 import AvatarStructure from "./imagers/avatars/structure/AvatarStructure";

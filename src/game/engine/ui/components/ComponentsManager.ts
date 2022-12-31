@@ -38,7 +38,7 @@ export class ComponentsManager {
         this._gameComponents.set(componentKey, component)
     }
 
-    public getComponent<IComponentUI>(componentKey: UIComponent): IComponentUI {
-        return this._gameComponents.get(componentKey) as IComponentUI
+    public getComponent<T>(componentKey: UIComponent): T {
+        return this._gameComponents.get(componentKey) as T
     }
 }
