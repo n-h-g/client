@@ -7,7 +7,6 @@ import { OutgoingPacket } from '../../outgoing/OutgoingPacket';
 export class UpdateRoomData extends MessageHandler {
     public handle(): void {
         let room: RoomData = this.message
-        console.log(room)
 
         if (room.id == -1) {
             Engine.getInstance()?.roomService?.unsetRoom();

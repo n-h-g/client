@@ -264,7 +264,7 @@ export default class AvatarImager {
             }
         } else {
             if (Engine.getInstance().config.debug) {
-                Logger.debug('cannot find resource ' + this.getTextureId(assetName, component.ResourceName))
+                //Logger.debug('cannot find resource ' + this.getTextureId(assetName, component.ResourceName))
             }
         }
     }
