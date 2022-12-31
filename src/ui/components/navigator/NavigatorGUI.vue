@@ -404,14 +404,14 @@ function changeTab(tab: string) {
                 margin: auto 0 auto 2px;
                 line-height: 13px;
                 padding: 1px 6px;
-                background-image: url("~@/assets/images/navigator/icon_g.png");
+                background-image: url("../../../assets/images/navigator/icon_g.png");
 
                 &.greenIcon {
-                  background-image: url("~@/assets/images/navigator/icon_g.png");
+                  background-image: url("../../../assets/images/navigator/icon_g.png");
                 }
 
                 &.navigatorRoomFull {
-                  background-image: url("~@/assets/images/navigator/icon_r.png");
+                  background-image: url("../../../assets/images/navigator/icon_r.png");
                 }
               }
             }
