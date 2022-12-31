@@ -3,6 +3,8 @@ import { Logger } from '../../utils/Logger'
 import { MessageHandler } from '../handler/MessageHandler'
 import { LoginResponse } from './incoming/handshake/LoginResponse'
 import { PongResponse } from './incoming/handshake/PongResponse'
+import AllRoomsList from './incoming/navigator/AllRoomsList'
+import MyRoomsList from './incoming/navigator/MyRoomsList'
 import { UpdateUserInformation } from './incoming/users/UpdateUserInformation'
 import { OutgoingPacket } from './outgoing/OutgoingPacket'
 
@@ -18,6 +20,8 @@ export class PacketManager {
         let incomingPacketsHeader: any = {
             1: new LoginResponse,
             2: new PongResponse,
+            8: new AllRoomsList,
+            9: new MyRoomsList,
             17: new UpdateUserInformation
         }
 

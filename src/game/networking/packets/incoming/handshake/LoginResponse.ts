@@ -1,6 +1,6 @@
 import { Engine } from '../../../../Engine'
 import { EventManager } from '../../../../engine/ui/events/EventManager'
-import { LoadProgressEvent } from '../../../../engine/ui/events/LoadProgressEvent'
+import { LoadProgressEvent } from '../../../../engine/ui/events/loader/LoadProgressEvent'
 import { UIEvents } from '../../../../engine/ui/events/UIEvents'
 import { MessageHandler } from '../../../handler/MessageHandler'
 import { OutgoingPacket } from '../../outgoing/OutgoingPacket'

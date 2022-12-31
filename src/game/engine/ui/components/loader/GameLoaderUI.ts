@@ -1,7 +1,7 @@
 import GameLoaderGUI from '../../../../../ui/components/loader/GameLoaderGUI.vue'
 import UiUtils from '../../../../utils/UiUtils'
 import { IComponentDeletableUI } from '../../../../core/ui/IComponentDeletableUI'
-import { LoadProgressEvent } from '../../events/LoadProgressEvent'
+import { LoadProgressEvent } from '../../events/loader/LoadProgressEvent'
 import { EventManager } from '../../events/EventManager'
 import { UIEvents } from '../../events/UIEvents'
 import { UIComponent } from '../UIComponent'
