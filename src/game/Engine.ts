@@ -8,6 +8,8 @@ import UserService from './engine/user/UserService'
 import CommandService from './engine/game/commands/CommandService'
 import ChatMessageService from './engine/game/chat/ChatMessageService'
 import Room from './engine/room/Room'
+import Avatar from './engine/ui/imagers/avatars/Avatar'
+import { Direction } from './core/objects/Direction'
 
 export class Engine {
     private static _instance: Engine
@@ -45,26 +47,35 @@ export class Engine {
             resizeTo: window
         })
 
-        this._networkingManager = new NetworkingManager()
-        this._userInterfaceManager = new UserInterfaceManager()
-
-        this._application.view.style.height = window.innerHeight + "px";
-        this._application.view.style.width = window.innerWidth + "px";
+        this._application.view.style.height = window.innerHeight + "px"
+        this._application.view.style.width = window.innerWidth + "px"
 
         document.body.appendChild(this._application.view)
 
+        this._networkingManager = new NetworkingManager()
+        this._userInterfaceManager = new UserInterfaceManager()
+        await this._userInterfaceManager.init()
+
         this._application.stage.interactive = true
 
-        await this.userInterfaceManager.init()
 
         this._roomsService = new RoomService()
         this._usersService = new UserService()
         this._commandService = new CommandService()
         this._chatService = new ChatMessageService()
 
-        if(this._config.offlineMode) {
+        if (this._config.offlineMode) {
             let room: Room = this._roomsService.setRoom('prova', '111111/11100111/11100111', new Point(1, -1), 1)
-            room.getRoomLayout().Visualization.render()
+
+            let avatar = new Avatar("hd-180-1.ch-255-66.lg-280-110.sh-305-62.ha-1012-110.hr-828-61", Direction.SOUTH, Direction.SOUTH, new Set());
+
+            this.userInterfaceManager.avatarImager.Data.loadGameData().then(() => {
+                this.userInterfaceManager?.avatarImager.loadAvatar(avatar).then(() => {
+                    this.userInterfaceManager?.avatarImager.drawAvatar(avatar)
+                })
+            })
+
+            room.getRoomLayout().Visualization.Container.addChild(avatar.Container)
         }
     }
 
