@@ -17,6 +17,7 @@ export default class AddRoomEntity extends MessageHandler {
         let entity: Entity | null = null;
         let entityVisualization: EntityVisualization | null = null;
 
+    
         if(Engine.getInstance().roomService?.CurrentRoom?.roomEntityRepository.get(entityData.id.toString()) !== undefined) {
             return;
         }
@@ -37,7 +38,7 @@ export default class AddRoomEntity extends MessageHandler {
 
             let user = Engine.getInstance().roomService?.CurrentRoom?.roomUserRepository.get(entityData.user_id);
             
-
+            
             if(!user) {
                 
                 let currentUser = Engine.getInstance().usersService.repository.get(entityData.user_id);

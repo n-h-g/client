@@ -9,6 +9,7 @@ import RoomVisualization from "../../../visualization/RoomVisualization"
 import { Container } from '@pixi/display'
 import { Engine } from "../../../../../Engine"
 import { Logger } from "../../../../../utils/Logger"
+import { OutgoingPacket } from "../../../../../networking/packets/outgoing/OutgoingPacket"
 
 export default class LogicTile extends RoomObjectLogic {
 
@@ -39,6 +40,11 @@ export default class LogicTile extends RoomObjectLogic {
         if(Engine.getInstance().config.debug) {
             Logger.debug('Clicked: ' + this.tile.position.getX() + ' | ' + this.tile.position.getY())
         }
+
+        Engine.getInstance().networkingManager.packetManager.applyOut(OutgoingPacket.UserMove, {
+            x: this.tile.position.getX(),
+            y: this.tile.position.getY()
+        })
 
     }
 

@@ -7,6 +7,7 @@ import AllRoomsList from './incoming/navigator/AllRoomsList'
 import MyRoomsList from './incoming/navigator/MyRoomsList'
 import AddRoomEntity from './incoming/rooms/entities/AddRoomEntity'
 import LoadRoomEntities from './incoming/rooms/entities/LoadRoomEntities'
+import UpdateEntity from './incoming/rooms/entities/UpdateEntity'
 import { UpdateRoomData } from './incoming/rooms/UpdateRoomData'
 import { UpdateUserInformation } from './incoming/users/UpdateUserInformation'
 import { OutgoingPacket } from './outgoing/OutgoingPacket'
@@ -27,6 +28,7 @@ export class PacketManager {
             9: new MyRoomsList,
             10: new UpdateRoomData,
             11: new LoadRoomEntities,
+            12: new UpdateEntity,
             13: new AddRoomEntity,
             17: new UpdateUserInformation
         }

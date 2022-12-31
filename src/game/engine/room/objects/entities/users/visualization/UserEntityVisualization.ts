@@ -33,7 +33,7 @@ export default class UserEntityVisualization extends RoomEntityVisualization {
         this.avatar.Container.interactive = true;
         this.avatar.Container.interactiveChildren = true;
 
-
+     
         this.container = this.avatar.Container;
         
         (this.entity.logic as UserEntityLogic).registerEvents();

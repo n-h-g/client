@@ -25,7 +25,7 @@ export default class LoadRoomEntities extends MessageHandler
 
             let isUser = userId !== undefined;
 
-            if(Engine.getInstance().roomService?.CurrentRoom?.roomEntityRepository.get(entityData.id.toString()) !== undefined) {
+            if(Engine.getInstance().roomService?.CurrentRoom?.roomEntityRepository.get(entityData.id.toString()) !== null) {
                 return;
             }
     
@@ -45,8 +45,6 @@ export default class LoadRoomEntities extends MessageHandler
                 entity.visualization!.inRoom = true;
 
                 user = Engine.getInstance().roomService?.CurrentRoom?.roomUserRepository.get(userId)
-
-                console.log(user);
 
                 if(!user) {
 
