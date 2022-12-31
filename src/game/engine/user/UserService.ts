@@ -9,12 +9,12 @@ export default class UserService extends Service<IUserRepository> {
      */
     private currentUser: User | null
 
-    public repository: UserRepository = null
+    public _repository: UserRepository = null
 
     public constructor() {
         super()
 
-        this.repository = new UserRepository()
+        this._repository = new UserRepository()
     }
 
     public setUp(): void {
