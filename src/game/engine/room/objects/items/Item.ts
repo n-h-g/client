@@ -1,3 +1,5 @@
+import IRoomObjectLogic from "../../../../core/room/object/IRoomObjectLogic";
+import IRoomObjectVisualization from "../../../../core/room/object/IRoomObjectVisualization";
 import IRoomItemObject from "../../../../core/room/object/items/IRoomItemObject";
 import ItemLogic from "../../../../core/room/object/items/logic/ItemLogic";
 import RoomObjectController from "../../../../core/room/object/RoomObjectController";
@@ -28,8 +30,8 @@ export default abstract class Item extends RoomObjectController implements IRoom
         let visualization = this.getItemVisualizationFromType(this.base.furniBase.data.visualization.type)
         let logic = this.getItemLogicFromType(this.base.furniBase.data.logic.type)
 
-        this.visualization = (visualization);
-        this.logic = logic
+        this.objectVisualization = (visualization);
+        this.objectLogic = logic
 
         
     }

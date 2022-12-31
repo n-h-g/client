@@ -32,6 +32,10 @@ function toggle(ui: string) {
         type: 'navigator'
       })
     break;
+    case 'inventory':
+    EventManager.emit<BoxEvent>(UIEvents.OPEN, {
+        type: 'inventory'
+      })
   }
 }
 </script>
