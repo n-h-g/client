@@ -141,7 +141,10 @@ export default class UserEntityVisualization extends RoomEntityVisualization {
     public updatePosition() {
         const currentRoom = Engine.getInstance().roomService?.CurrentRoom; // current user room
 
-        let tile: Tile | undefined = currentRoom?.getRoomLayout().getFloorPlane().getTilebyPosition(new Point(Math.round(this.entity.position.getX()), Math.round(this.entity.position.getY()))); // get the tile where you want to set avatar
+        let tile: Tile | null = currentRoom?.getRoomLayout().getFloorPlane().getTilebyPosition(new Point(Math.round(this.entity.position.getX()), Math.round(this.entity.position.getY()))); // get the tile where you want to set avatar
+
+        if(tile == null) return;
+
         let offsetFloor = tile!.position.getZ() > 0 ? -MapData.thickSpace * MapData.stepHeight * tile!.position.getZ() : -AvatarData.AVATAR_TOP_OFFSET;
 
         this.container!.x = (((this.entity.position.getY() - this.entity.position.getX()) * MapData.tileWidth / 2) + (MapData.tileWidth / 2)) - MapData.tileWidth / 2

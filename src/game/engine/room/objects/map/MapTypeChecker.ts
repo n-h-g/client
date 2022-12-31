@@ -6,9 +6,9 @@ export default class MapTypeChecker {
 
     public static checkTileType(position: Point3d, doorPosition: Point, modelMatrix: Array<Array<number>>) : TileType {
 
-       // console.log(position);
-
+    
         if (doorPosition.getY() == position.getY() && doorPosition.getX() == position.getX() && modelMatrix[position.getX()][position.getY()] == 0) {
+    
             return TileType.DoorTile
         } else if (modelMatrix[position.getX()][position.getY()] == 0) {
             return TileType.Hole

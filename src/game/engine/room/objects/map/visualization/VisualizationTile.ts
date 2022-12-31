@@ -70,7 +70,6 @@ export default class VisualizationTile extends RoomObjectVisualization {
 
             case TileType.DoorTile:
             case TileType.Door:
-
                 this.drawTile(this.doorTileContext, true)
                 break
             case TileType.Flat:
