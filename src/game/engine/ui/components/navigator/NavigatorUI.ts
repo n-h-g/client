@@ -2,9 +2,10 @@ import NavigatorGUI from '../../../../../ui/components/navigator/NavigatorGUI.vu
 import { EventManager } from '../../events/EventManager'
 import { UIEvents } from '../../events/UIEvents'
 import { IComponentShowableUI } from '../../../../core/ui/IComponentShowableUI'
-import { BoxEvent } from '../../events/BoxEvent'
+import { BoxEvent } from '../../events/general/BoxEvent'
 import UiUtils from '../../../../utils/UiUtils'
 import { UIComponent } from '../UIComponent'
+import { UIEventsType } from '../../events/UIEventsType'
 
 export class NavigatorUI implements IComponentShowableUI { 
     private NavigatorGUI: typeof NavigatorGUI
@@ -20,7 +21,7 @@ export class NavigatorUI implements IComponentShowableUI {
 
     hide(): void {
         EventManager.read(UIEvents.CLOSE, (event: BoxEvent) => {
-            if (event.type == 'navigator') {
+            if (event.type == UIEventsType.NAVIGATOR) {
                 UiUtils.unrenderComponent(UIComponent.NavigatorUI)
             }
         })
@@ -28,7 +29,7 @@ export class NavigatorUI implements IComponentShowableUI {
 
     show(): void {
         EventManager.read(UIEvents.OPEN, (event: BoxEvent) => {
-            if (event.type == 'navigator') {
+            if (event.type == UIEventsType.NAVIGATOR) {
                 UiUtils.renderComponent(this.NavigatorGUI, UIComponent.NavigatorUI)
             }
         })

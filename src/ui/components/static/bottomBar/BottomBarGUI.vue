@@ -18,20 +18,21 @@
 </template>
 
 <script setup lang="ts">
-import { BoxEvent } from '../../../../game/engine/ui/events/BoxEvent'
+import { BoxEvent } from '../../../../game/engine/ui/events/general/BoxEvent'
 import { EventManager } from '../../../../game/engine/ui/events/EventManager'
 import { UIEvents } from '../../../../game/engine/ui/events/UIEvents'
+import { UIEventsType } from '../../../../game/engine/ui/events/UIEventsType';
 
 function toggle(ui: string) {
   switch(ui) {
     case 'navigator':
       EventManager.emit<BoxEvent>(UIEvents.OPEN, {
-        type: 'navigator'
+        type: UIEventsType.NAVIGATOR
       })
     break;
     case 'inventory':
       EventManager.emit<BoxEvent>(UIEvents.OPEN, {
-        type: 'inventory'
+        type: UIEventsType.INVENTORY
       })
     break;
   }

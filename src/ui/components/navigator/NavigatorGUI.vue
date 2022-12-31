@@ -81,11 +81,12 @@
 <script setup lang="ts">
 import { ref } from "vue"
 import { Engine } from "../../../game/Engine"
-import { BoxEvent } from "../../../game/engine/ui/events/BoxEvent"
+import { BoxEvent } from "../../../game/engine/ui/events/general/BoxEvent"
 import { EventManager } from "../../../game/engine/ui/events/EventManager"
 import { NavigatorRoomsAdded } from "../../../game/engine/ui/events/navigator/NavigatorRoomsAdded"
 import { UIEvents } from "../../../game/engine/ui/events/UIEvents"
 import { OutgoingPacket } from "../../../game/networking/packets/outgoing/OutgoingPacket"
+import { UIEventsType } from "../../../game/engine/ui/events/UIEventsType"
 
 let rooms = ref([])
 let currentTab = ref("public");
@@ -96,7 +97,7 @@ EventManager.read(UIEvents.NAVIGATOR_ROOMS_ADDED, (event: NavigatorRoomsAdded) =
 
 function hide() {
   EventManager.emit<BoxEvent>(UIEvents.CLOSE, {
-    type: "navigator"
+    type: UIEventsType.NAVIGATOR
   })
 }
 
