@@ -135,29 +135,26 @@ export default class VisualizationWall extends RoomObjectVisualization {
                 ctx.endFill()
             } else if(this.wall.position.getY() === this.wall.getPlane().getRoom().getDoorPosition().getY() -1 && this.wall.position.getX() === 1) {
                 ctx.endFill()
-            }
-
-
-            else {
+            } else {
                 
-            ctx.moveTo(
-                this.getOffsetX() + (MapData.wallWidth * (isLeft ? -1 : 1)) + (isLeft ? 0 : -MapData.wallDepth),
-                this.getOffsetY() + (MapData.wallBlankBottom + (isLeft ? 0 : MapData.wallBlankTop))
-            );
+                ctx.moveTo(
+                    this.getOffsetX() + (MapData.wallWidth * (isLeft ? -1 : 1)) + (isLeft ? 0 : -MapData.wallDepth),
+                    this.getOffsetY() + (MapData.wallBlankBottom + (isLeft ? 0 : MapData.wallBlankTop))
+                );
 
-            ctx.lineTo(
-                this.getOffsetX() + (MapData.wallWidth * (isLeft ? -1 : 1)),
-                this.getOffsetY() + (isLeft ? MapData.wallHeight - MapData.wallDepth / 2 : MapData.wallBlankBottom ));
+                ctx.lineTo(
+                    this.getOffsetX() + (MapData.wallWidth * (isLeft ? -1 : 1)),
+                    this.getOffsetY() + (isLeft ? MapData.wallHeight - MapData.wallDepth / 2 + (last ? 0 : -MapData.thickSpace) : MapData.wallBlankBottom ));
 
-            ctx.lineTo(
-                this.getOffsetX() + (MapData.wallWidth * (isLeft ? -1 : 1)) + (isLeft ? MapData.wallDepth : 0),
-                this.getOffsetY() + MapData.wallHeight + (isLeft ? (last ? 0 : 0) : -MapData.wallBlankTop)
-            );
+                ctx.lineTo(
+                    this.getOffsetX() + (MapData.wallWidth * (isLeft ? -1 : 1)) + (isLeft ? MapData.wallDepth : 0),
+                    this.getOffsetY() + MapData.wallHeight + (last ? 0 : -MapData.thickSpace) + (isLeft ? 0 : -MapData.wallBlankTop)
+                );
 
-            ctx.lineTo(
-                this.getOffsetX() + (MapData.wallWidth * (isLeft ? -1 : 1)) + (MapData.wallDepth * (isLeft ? 1 : -1)),
-                this.getOffsetY() + (isLeft ? MapData.wallBlankBottom + MapData.wallBlankTop : MapData.wallHeight - (last ? 0 : 0))
-            );
+                ctx.lineTo(
+                    this.getOffsetX() + (MapData.wallWidth * (isLeft ? -1 : 1)) + (MapData.wallDepth * (isLeft ? 1 : -1)),
+                    this.getOffsetY() + (isLeft ? MapData.wallBlankBottom + MapData.wallBlankTop : MapData.wallHeight + (last ? 0 : -MapData.thickSpace))
+                );
             }
 
             ctx.closePath();
