@@ -1,4 +1,5 @@
 import { Direction } from "../../../../../core/objects/Direction";
+import { ActionId } from "./actions/ActionId";
 
 export default class AvatarData {
     // dimensions
@@ -17,7 +18,7 @@ export default class AvatarData {
     public static AVATAR_WALK_SPEED = 2.1
 
     //misc
-    public static DEFAULT_ACTION: string = "Default";
+    public static DEFAULT_ACTION: string = ActionId.STAND;
     public static DEFAULT_DIRECTION: number = Direction.SOUTH;
 
     // angles

@@ -10,6 +10,7 @@ import Point from "../../../../../../utils/point/Point";
 import UserEntityLogic from "../logic/UserEntityLogic";
 import Rotation from "../../../../../../utils/Rotation";
 import { Engine } from "../../../../../../Engine";
+import AvatarPlaceHolder from "../../../../../ui/imagers/avatars/AvatarPlaceholder";
 
 export default class UserEntityVisualization extends RoomEntityVisualization {
     declare public entity: UserEntity;
@@ -21,6 +22,8 @@ export default class UserEntityVisualization extends RoomEntityVisualization {
     }
 
     public render(): void {
+
+     
         let avatar = new Avatar(this.entity.Look, this.rotation, this.rotation, this.actions);
         
         this.avatar = avatar;

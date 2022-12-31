@@ -1,5 +1,5 @@
 export enum AvatarEventsType {
-    LOAD_COMPLETE = "AVATAR_LOAD_COMPLETE",
-    PLACEHOLDER_LOAD_COMPLETE = "AVATAR_PLACEHOLDER_LOAD_COMPLETE",
-    ASSETS_LOADED = "AVATAR_ASSETS_LOADED"
+    LOAD_COMPLETE = "avatar_load_complete",
+    PLACEHOLDER_LOAD_COMPLETE = "avatar_placeholder_load_complete",
+    ASSETS_LOADED = "avatar_assets_loaded"
 }
