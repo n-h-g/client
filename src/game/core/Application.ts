@@ -60,5 +60,12 @@ export class ApplicationEngine extends Application {
                     window.setTimeout(callback, fpsInterval);
                 };
         })();
+
+        window.onresize = () => this.onResize()
+    }
+
+    private onResize() {
+        this.view.style.height = window.innerHeight + "px"
+        this.view.style.width = window.innerWidth + "px"
     }
 }
