@@ -1,7 +1,6 @@
 import Entity from "../../../../../core/room/object/entities/Entity";
 import IUserController from "../../../../../core/users/IUserController";
 import Point3d from "../../../../../utils/point/Point3d";
-import User from "../../../../user/User";
 import Room from "../../../Room";
 import UserEntityLogic from "./logic/UserEntityLogic";
 import UserEntityVisualization from "./visualization/UserEntityVisualization";

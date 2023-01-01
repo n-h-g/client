@@ -4,14 +4,17 @@ import { OutgoingPacket } from "../../../../../../networking/packets/outgoing/Ou
 import Point from "../../../../../../utils/point/Point";
 import UiUtils from "../../../../../../utils/UiUtils";
 import ChatData from "../../../../../game/chat/ChatData";
-import { BottomBarUI } from "../../../../../ui/components/static/BottomBarUI";
-import { UIComponent } from "../../../../../ui/components/UIComponent";
+import { EventManager } from '../../../../../ui/events/EventManager';
+import { BoxEvent } from '../../../../../ui/events/general/BoxEvent';
+import { PreviewUserModeEvent } from '../../../../../ui/events/general/PreviewUserModeEvent';
+import { UIEvents } from '../../../../../ui/events/UIEvents';
+import { UIEventsType } from '../../../../../ui/events/UIEventsType';
 import { ActionId } from "../../../../../ui/imagers/avatars/enum/actions/ActionId";
 import AvatarData from "../../../../../ui/imagers/avatars/enum/AvatarData";
 import UserEntity from "../UserEntity";
 import UserEntityVisualization from "../visualization/UserEntityVisualization";
 
-export default class UserEntityLogic extends EntityLogic  {
+export default class UserEntityLogic extends EntityLogic {
 
     public frameTracker: number = 0;
 
@@ -26,7 +29,7 @@ export default class UserEntityLogic extends EntityLogic  {
     public registerEvents() {
 
         this.entity.visualization?.container?.on('pointerdown', () => this.onClick())
-        this.entity.visualization?.container?.on('user-position-changed',() => this.onPositionChanged())
+        this.entity.visualization?.container?.on('user-position-changed', () => this.onPositionChanged())
         this.entity.visualization?.container?.on('user-started-typing', () => this.userToggleTyping(true))
         this.entity.visualization?.container?.on('user-stop-typing', () => this.userToggleTyping(false))
         this.entity.visualization?.container?.on('user-look-changed', () => this.userLookChanged())
@@ -44,7 +47,7 @@ export default class UserEntityLogic extends EntityLogic  {
     public onMove(delta: number): void {
         let userVisualization = (this.entity.visualization as UserEntityVisualization)
 
-        if(userVisualization.Actions.has(ActionId.WALK)) {
+        if (userVisualization.Actions.has(ActionId.WALK)) {
             userVisualization.move(delta);
         }
     }
@@ -56,7 +59,7 @@ export default class UserEntityLogic extends EntityLogic  {
     public onPositionChanged() {
         this.setAvatarContainer()
     }
-    
+
     public onClick() {
         let roomId = Engine.getInstance().roomService?.CurrentRoom?.Id;
         let x = this.entity.position.getX();
@@ -64,7 +67,7 @@ export default class UserEntityLogic extends EntityLogic  {
 
         Engine.getInstance().networkingManager?.packetManager.applyOut(OutgoingPacket.UserLookAtPoint, {
             roomId: roomId,
-            x: x, 
+            x: x,
             y: y
         })
 
@@ -75,11 +78,11 @@ export default class UserEntityLogic extends EntityLogic  {
 
         let dimension = new Point(this.entity.visualization?.container?.height!,
             this.entity.visualization?.container?.width!
-            );                
+        );
 
         let position = new Point(UiUtils.getGlobalPosition(this.entity.visualization?.container!).tx + dimension.getY() + AvatarData.AVATAR_LEFT_TYPING_OFFSET,
-                                UiUtils.getGlobalPosition(this.entity.visualization?.container!).ty - dimension.getX() + AvatarData.AVATAR_TOP_TYPING_OFFSET);        
-                                
+            UiUtils.getGlobalPosition(this.entity.visualization?.container!).ty - dimension.getX() + AvatarData.AVATAR_TOP_TYPING_OFFSET);
+
 
         //avatarContainerUI.setSize(position, dimension)
     }
@@ -90,20 +93,20 @@ export default class UserEntityLogic extends EntityLogic  {
     }
 
     public togglePreview() {
-        /*let previewBox = (Engine.getInstance().userInterfaceManager?.componentsManager.getComponent(UIComponent.PreviewBoxUI) as PreviewBoxUI)
-        previewBox.Gui.$data.mode = 'user';
-        previewBox.Gui.$data.motto = (this.entity as UserEntity).user?.userInfo.motto;
-        previewBox.Gui.$data.username = this.entity.Name
-        previewBox.Gui.$data.optionVisible = true;
-        let image: HTMLImageElement | undefined = UiUtils.generateImageFromObject((this.entity.visualization?.container!));
-        previewBox.Gui.$data.image = image?.src;
-        previewBox.Gui.$forceUpdate();
-        previewBox.show();*/
+        let entity: UserEntity = this.entity as UserEntity
+        EventManager.emit<PreviewUserModeEvent>(UIEvents.PREVIEW_BOX_MODE, {
+            mode: 'user',
+            username: entity.Name,
+            motto: entity.user?.userInfo.motto,
+            look: UiUtils.generateImageFromObject(this.entity.visualization?.container!).src
+        })
+        EventManager.emit<BoxEvent>(UIEvents.OPEN, {
+            type: UIEventsType.PREVIEWBOX
+        })
     }
 
     private userLookChanged() {
-        let bottomBarGui = (Engine.getInstance().userInterfaceManager?.componentsManager.getComponent(UIComponent.BottomBarUI) as BottomBarUI)
-        let image: HTMLImageElement | undefined = UiUtils.generateImageFromObject((this.entity.visualization?.container!));
+        let image: HTMLImageElement = UiUtils.generateImageFromObject(this.entity.visualization?.container!);
         //bottomBarGui.$data.look = image?.src;
         //bottomBarGui.$forceUpdate();
     }
@@ -111,8 +114,8 @@ export default class UserEntityLogic extends EntityLogic  {
     public tick(delta: number): void {
         let userVisualization = (this.entity.visualization as UserEntityVisualization)
 
-        if(userVisualization.needsUpdate) {
-    
+        if (userVisualization.needsUpdate) {
+
             this.frameTracker += delta;
 
             if (this.frameTracker >= AvatarData.AVATAR_FRAME_SPEED) {
@@ -120,7 +123,7 @@ export default class UserEntityLogic extends EntityLogic  {
                 this.frameTracker = 0;
                 (userVisualization as UserEntityVisualization).draw();
             }
-            if(userVisualization.Actions.has(ActionId.WALK)) {
+            if (userVisualization.Actions.has(ActionId.WALK)) {
                 this.onMove(delta);
             }
         }

@@ -157,6 +157,7 @@ export default class UserEntityVisualization extends RoomEntityVisualization {
         this.container!.buttonMode = true;
         this.container!.interactive = true;
         this.container!.interactiveChildren = true;
+        this.entity.logic.registerEvents()
     }
 
     public updateDirection(direction: Direction) {
