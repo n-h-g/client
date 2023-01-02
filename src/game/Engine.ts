@@ -10,6 +10,7 @@ import ChatMessageService from './engine/game/chat/ChatMessageService'
 import Room from './engine/room/Room'
 import * as PIXI from "pixi.js"
 import UserEntity from './engine/room/objects/entities/users/UserEntity'
+import { Direction } from './core/objects/Direction'
 
 export class Engine {
     private static _instance: Engine
@@ -71,6 +72,7 @@ export class Engine {
              new Point(2,0), 200)
 
             let entity = new UserEntity("id", "prova", "hd-180-1.ch-255-66.lg-280-110.sh-305-62.ha-1012-110.hr-828-61", room)
+            entity.visualization.Rot = Direction.SOUTH_WEST
             entity.visualization.render()
         }
     }

@@ -73,7 +73,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from "vue"
+import { onMounted, ref } from "vue"
 import ItemVisualization from "../../../game/core/room/object/items/visualization/ItemVisualization"
 import { Engine } from "../../../game/Engine"
 import Item from "../../../game/engine/room/objects/items/Item"
@@ -163,6 +163,9 @@ function hide() {
         type: UIEventsType.INVENTORY,
     })
 }
+onMounted(() => {
+    Engine.getInstance().networkingManager.packetManager.applyOut(OutgoingPacket.RequestInventoryItemsEvent)
+})
 </script>
 
 <style lang="scss">
