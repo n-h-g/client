@@ -18,6 +18,8 @@ export default class WallPlane extends RoomPlane {
         let isCorner = false
         let isDoor = false
         let isLast = false;
+        let doorX = this.getRoom().getDoorPosition().getX();
+        let doorY = this.getRoom().getDoorPosition().getY()
 
         for (let x = 0; x < this.getRoom().getModelMaltrix().length; x++) {
             for (let y = 0; y < this.getRoom().getModelMaltrix()[x].length; y++) {
@@ -26,7 +28,7 @@ export default class WallPlane extends RoomPlane {
                 isCorner = MapTypeChecker.checkWallCorner(x, y, this.getRoom().getModelMaltrix());
 
                 isDoor = false
-                if (x == this.getRoom().getDoorPosition().getX() && y - 1 == this.getRoom().getDoorPosition().getY()) {
+                if (x == doorX && y - 1 == doorY) {
                     isDoor = true
                 }
 
@@ -35,7 +37,7 @@ export default class WallPlane extends RoomPlane {
                     isLast = true;
                 }
 
-                if (y <= minY && this.getRoom().getModelMaltrix()[x][y] != 0) {
+                if (y <= minY && this.getRoom().getModelMaltrix()[x][y] != 0 && !(x == doorX && y == doorY)) {
                     if (minY > y) {
                         minY = y;
                     }
@@ -60,7 +62,7 @@ export default class WallPlane extends RoomPlane {
                 isCorner = MapTypeChecker.checkWallCorner(x, y, this.getRoom().getModelMaltrix());
 
                 isDoor = false
-                if (x - 1 == this.getRoom().getDoorPosition().getX() && y == this.getRoom().getDoorPosition().getY()) {
+                if (x - 1 == doorX && y == doorY) {
                     isDoor = true
                 }
 
@@ -69,7 +71,7 @@ export default class WallPlane extends RoomPlane {
                     isLast = true;
                 }
 
-                if (x <= minX && this.getRoom().getModelMaltrix()[x][y] != 0) {
+                if (x <= minX && this.getRoom().getModelMaltrix()[x][y] != 0 && !(x == doorX && y == doorY)) {
                     if (minX > x) {
                         minX = x;
                     }                    
