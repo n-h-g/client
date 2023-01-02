@@ -206,6 +206,8 @@ export default class AvatarImager {
 
         let assetData: AssetData = spritesheet[component.ResourceName] as AssetData
 
+        //console.log(this.getTextureId(assetName, component.ResourceName))
+
         if(assetData !== undefined) {
             let downloadedTexture: PIXI.Texture | null = await this.data.getTexture(assetName)
 
