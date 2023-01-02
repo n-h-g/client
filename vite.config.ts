@@ -13,12 +13,5 @@ export default defineConfig({
     host: '127.0.0.1',
     port: 3005
   },
-  css: {
-    preprocessorOptions: {
-      scss: {
-
-      }
-    }
-  },
   plugins: [vue()]
 })

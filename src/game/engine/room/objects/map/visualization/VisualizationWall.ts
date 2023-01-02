@@ -6,11 +6,9 @@ import WallType from "../WallTypeEnum"
 
 import Point3d from "../../.././../../utils/point/Point3d"
 import ColorRGB from "../../../../../utils/color/ColorRGB"
-import * as PIXI from "pixi.js"
 import NormalType from "../../../visualization/NormalTypeEnum"
 import RoomVisualizationColorData from "../../../visualization/RoomVisualizationColorData"
-import { Container } from '@pixi/display'
-import { Graphics } from '@pixi/graphics'
+import { Container, Graphics } from 'pixi.js'
 
 export default class VisualizationWall extends RoomObjectVisualization {
 

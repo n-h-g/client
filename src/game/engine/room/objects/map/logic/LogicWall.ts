@@ -3,7 +3,7 @@ import RoomLogic from "../../../logic/RoomLogic"
 import RoomObjectLogic from "../../../../../core/room/object/RoomObjectLogic"
 import VisualizationWall from "../visualization/VisualizationWall"
 import Room from "../../../Room"
-import { Graphics } from '@pixi/graphics'
+import { Graphics } from 'pixi.js'
 
 export default class LogicWall extends RoomObjectLogic {
 

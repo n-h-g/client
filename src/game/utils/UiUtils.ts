@@ -1,5 +1,4 @@
-import { Container, DisplayObject } from '@pixi/display'
-import { Matrix } from '@pixi/math'
+import { Matrix, Container, DisplayObject } from 'pixi.js'
 import { createApp } from 'vue'
 import { Engine } from '../Engine'
 import { Logger } from './Logger'
