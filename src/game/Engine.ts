@@ -65,7 +65,7 @@ export class Engine {
         this.application.init()
 
         if (this._config.offlineMode) {
-            let room: Room = this._roomsService.setRoom("prova", "0000000000/0111111111/01111111011111/0111111111001/0111111", new Point(2, 0), 200)
+            let room: Room = this._roomsService.setRoom("prova", "0000000000/0111001101/01111111011111/0111111111001/0111111", new Point(2, 0), 200)
 
             let entity = new UserEntity("id", "prova", "hd-180-1.ch-255-66.lg-280-110.sh-305-62.ha-1012-110.hr-828-61", room)
             entity.visualization.render()
