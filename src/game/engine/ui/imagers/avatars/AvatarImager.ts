@@ -13,7 +13,7 @@ import AvatarImageData from "./AvatarImageData";
 import AvatarSpriteComponent from "./AvatarSpriteComponent";
 import AvatarData from "./enum/AvatarData";
 import { IAnimation, IAnimationFrame, OffsetDirection, OffsetFrame } from "./gamedata/IAvatarAnimations";
-import { Spritesheet } from "./gamedata/IAvatarResource";
+import { AssetData, Spritesheet } from "./gamedata/IAvatarResource";
 import { IPart } from "./gamedata/IFigureData";
 import AvatarStructure from "./structure/AvatarStructure";
 
@@ -196,7 +196,7 @@ export default class AvatarImager {
 
 
     private async drawSpriteComponent(component: AvatarSpriteComponent, assetName: string, avatar: Avatar, animationOffsets: { x: number, y: number }) {
-        let spritesheet: any = await this.data.SpriteSheets.get(assetName) as Spritesheet;
+        let spritesheet: Spritesheet = await this.data.SpriteSheets.get(assetName) as Spritesheet;
 
         if(!spritesheet) return;
 
@@ -204,9 +204,9 @@ export default class AvatarImager {
 
         component.IsFlipped = isFlipped;
 
-        //console.log(this.getTextureId(assetName, component.ResourceName))
+        let assetData: AssetData = spritesheet[component.ResourceName] as AssetData
 
-        if(spritesheet[component.ResourceName] !== undefined) {
+        if(assetData !== undefined) {
             let downloadedTexture: PIXI.Texture | null = await this.data.getTexture(assetName)
 
             if(!downloadedTexture) {
@@ -216,13 +216,18 @@ export default class AvatarImager {
                 return;
             }
 
-            let asset = spritesheet[component.ResourceName];
-            let texture = RenderingUtils.cropTexture(downloadedTexture, asset.height, asset.width, asset.left , asset.top);
+           
+            if(assetData.link != undefined) {
+                assetData = await this.data.SpriteSheets.get(assetData.link)
+            }
+
+            let asset = spritesheet[component.ResourceName] as AssetData;
+            let texture = RenderingUtils.cropTexture(downloadedTexture, parseInt(asset.height), parseInt(asset.width), parseInt(asset.left) , parseInt(asset.top));
     
             let sprite = new Sprite(texture);
 
-            sprite.width = asset.width;
-            sprite.height = asset.height
+            sprite.width = parseInt(asset.width);
+            sprite.height = parseInt(asset.height)
 
             sprite.interactive = true;
             sprite.buttonMode = true;
@@ -240,7 +245,7 @@ export default class AvatarImager {
 
             if(offsets) {
 
-                const offset = new Point(offsets[0], offsets[1])
+                const offset = new Point(parseInt(offsets[0]), parseInt(offsets[1]))
 
                 sprite.pivot.x = offset.getX()
                 sprite.pivot.y = offset.getY()

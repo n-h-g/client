@@ -7,16 +7,19 @@ export interface OffsetResource {
 }
 
 export interface Spritesheet {
-    meta: {},
-    frames: Frames
+    [key: string]: AssetData
 }
 
 export interface Asset {
     [key: string]: AssetData
 }
 export interface AssetData {
-    x: number,
-    y: number
+    offset: string,
+    left: string,
+    top: string,
+    width: string,
+    height: string,
+    link: string
 }
 
 export interface Frames {
