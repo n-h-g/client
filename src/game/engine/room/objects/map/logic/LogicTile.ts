@@ -35,17 +35,10 @@ export default class LogicTile extends RoomObjectLogic {
     }
 
     public onClick(): void {
-        let room: Room | null = this.tile.getPlane().getRoom().getRoom();
-
-        if (Engine.getInstance().config.debug) {
-            Logger.debug('Clicked: ' + this.tile.position.getX() + ' | ' + this.tile.position.getY())
-        }
-
         Engine.getInstance().networkingManager.packetManager.applyOut(OutgoingPacket.UserMove, {
             x: this.tile.position.getX(),
             y: this.tile.position.getY()
         })
-
     }
 
     public onMove(delta: number): void {

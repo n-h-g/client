@@ -141,7 +141,7 @@ function toggle(ui: string) {
       cursor: pointer;
       outline: none;
       filter: drop-shadow(1px 1px 0 rgba(0, 0, 0, .30));
-      margin: 0 11px;
+      margin: 0 9px;
 
       &:hover {
         top: -1px;
