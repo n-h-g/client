@@ -1,4 +1,4 @@
-export type PreviewUserModeEvent = {
+export type PreviewModeEventData = {
     mode: string
     username: string
     motto: string

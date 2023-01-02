@@ -1,5 +1,6 @@
 <template>
     <div class="topBar">
+      
         <div class="coinsBox credits">{{  credits  }}</div>
         <div class="coinsBox points">0</div>
     </div>
@@ -24,24 +25,23 @@ EventManager.read(UIEvents.SET_TOPBAR, (event: TopBarEvent) => {
 @import '@/assets/scss/game.scss';
 
 .topBar {
-    position: fixed;
-    width: 190px;
-	right: 4px;
-	top: 0;
-	z-index: 1;
-	background-color: rgba(40,40,40,0.65);
-	border: 2px solid rgba(255,255,255,0.2);
-	border-radius: 6px;
-	box-shadow: 0 2px 0 0 rgba(0,0,0,0.7), 1px 0 0 0 rgba(0,0,0,0.7), -1px 0 0 0 rgba(0,0,0,0.7);
-	padding: 3px;
+    width: 210px;
+	background-color: #33332F;
+	border: 2px solid #424C4E;
 	border-top: 0;
-	border-top-left-radius: 0;
-	border-top-right-radius: 0;
-	display: flex;
-	flex-direction: row;
-	justify-content: space-between;
-	font-size: 11px;
-	font-weight: 600;
+	position: fixed;
+	border-bottom-left-radius: 6px;
+	border-bottom-right-radius: 6px;
+	right: 10px;
+	z-index: 10;
+	top: 0px;
+	padding: 5px;
+	box-shadow: 0px 2px 0px 0px #000;
+
+    &* {
+        float: left;
+	    width: 33.3%;
+    }
     
 
     & .coinsBox {
@@ -60,6 +60,21 @@ EventManager.read(UIEvents.SET_TOPBAR, (event: TopBarEvent) => {
         &.points {
             color: #a60e73;
         }
+    }
+
+    & .hc {
+        padding: 3px;
+        width: 25%;
+        background-color: #3B423F;
+        border-radius: 6px;
+        text-align: center;
+        font-size: 13px;
+        font-weight: 600;
+        height: 63px;
+        padding-top: 10px;
+        color: #00C0C3;
+        cursor: pointer;
+        display:inline-block;
     }
 }
 

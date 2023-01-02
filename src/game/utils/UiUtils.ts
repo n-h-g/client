@@ -52,7 +52,7 @@ export default class UiUtils {
             }
     }
 
-    static renderComponent(component, name) {
+    static mountComponent(component, name) {
         try {
             var ComponentApp = createApp(component)
             const wrapper = document.createElement('div')
@@ -68,7 +68,7 @@ export default class UiUtils {
         }
     }
     
-    static unrenderComponent(name) {
+    static dismountComponent(name) {
         try {
             document.getElementById(name).remove()
         } catch(e) {

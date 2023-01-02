@@ -26,18 +26,17 @@ import { BoxEvent } from '../../../../game/engine/ui/events/general/BoxEvent'
 import { EventManager } from '../../../../game/engine/ui/events/EventManager'
 import { UIEvents } from '../../../../game/engine/ui/events/UIEvents'
 import { UIEventsType } from '../../../../game/engine/ui/events/UIEventsType';
+import { Engine } from '../../../../game/Engine';
+import { UIComponent } from '../../../../game/engine/ui/components/UIComponent';
+import { IComponentShowableUI } from '../../../../game/core/ui/IComponentShowableUI';
 
 function toggle(ui: string) {
   switch(ui) {
     case 'navigator':
-      EventManager.emit<BoxEvent>(UIEvents.OPEN, {
-        type: UIEventsType.NAVIGATOR
-      })
+      (Engine.getInstance().userInterfaceManager.componentsManager.getComponent(UIComponent.NavigatorUI) as IComponentShowableUI).toggle()
     break;
     case 'inventory':
-      EventManager.emit<BoxEvent>(UIEvents.OPEN, {
-        type: UIEventsType.INVENTORY
-      })
+    (Engine.getInstance().userInterfaceManager.componentsManager.getComponent(UIComponent.InventoryUI) as IComponentShowableUI).toggle()
     break;
   }
 }

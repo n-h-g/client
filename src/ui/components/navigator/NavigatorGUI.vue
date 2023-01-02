@@ -75,25 +75,25 @@
 <script setup lang="ts">
 import { ref } from "vue"
 import { Engine } from "../../../game/Engine"
-import { BoxEvent } from "../../../game/engine/ui/events/general/BoxEvent"
 import { EventManager } from "../../../game/engine/ui/events/EventManager"
-import { NavigatorRoomsAdded } from "../../../game/engine/ui/events/navigator/NavigatorRoomsAdded"
 import { UIEvents } from "../../../game/engine/ui/events/UIEvents"
 import { OutgoingPacket } from "../../../game/networking/packets/outgoing/OutgoingPacket"
 import { UIEventsType } from "../../../game/engine/ui/events/UIEventsType"
 import Card from '../card/Card.vue'
+import { NavigatorRoomsEventData } from "../../../game/engine/ui/events/data/navigator/NavigatorRooms"
+import { DialogEventData } from "../../../game/engine/ui/events/data/general/Dialog"
+import { UIComponent } from "../../../game/engine/ui/components/UIComponent"
+import { IComponentShowableUI } from "../../../game/core/ui/IComponentShowableUI"
 
 let rooms = ref([])
 let currentTab = ref("public");
 
-EventManager.read(UIEvents.NAVIGATOR_ROOMS_ADDED, (event: NavigatorRoomsAdded) => {
+EventManager.read(UIEvents.NAVIGATOR_ROOMS_ADDED, (event: NavigatorRoomsEventData) => {
   rooms.value = event.rooms
 })
 
 function hide() {
-  EventManager.emit<BoxEvent>(UIEvents.CLOSE, {
-    type: UIEventsType.NAVIGATOR
-  })
+  (Engine.getInstance().userInterfaceManager.componentsManager.getComponent(UIComponent.NavigatorUI) as IComponentShowableUI).hide()
 }
 
 function enterRoom(roomId: number) {
@@ -148,7 +148,7 @@ function changeTab(tab: string) {
 
     .navigatorBtn {
       outline: none;
-      padding: 10px;
+
       border-radius: 8px;
       width: 44%;
       box-shadow: 1px #000;
@@ -170,7 +170,8 @@ function changeTab(tab: string) {
   }
 
   .content {
-    width: calc(100% - 50px);
+    width: calc(100% - 10px);
+    height: calc(100% - 10px);
     margin: 0 auto;
     height: auto;
 
@@ -198,48 +199,6 @@ function changeTab(tab: string) {
     }
   }
 
-  .titleBar {
-    width: 100%;
-    height: 26px;
-    padding: 10px 25px;
-    padding-bottom: 25px;
-    position: relative;
-
-    .titleBarBg {
-      width: 100%;
-      height: 100%;
-      display: flex;
-      margin: 0;
-      padding: 0;
-      align-items: center;
-      flex-direction: column;
-
-      .title {
-        font-family: "Quicksand", sans-serif;
-        font-size: 16px;
-        font-weight: bold;
-        color: #272727;
-        padding-left: 6px;
-        padding-right: 6px;
-      }
-    }
-
-    .closeIcon {
-      position: absolute;
-      right: 60px;
-      top: 15px;
-      color: #272727;
-      width: 13px;
-      height: 13px;
-      cursor: pointer;
-      font-family: "Quicksand", sans-serif;
-      font-size: 20px;
-      text-align: center;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-    }
-  }
 
   .roomContainer {
     position: relative;

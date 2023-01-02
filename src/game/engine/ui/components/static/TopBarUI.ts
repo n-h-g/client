@@ -3,7 +3,7 @@ import TopBarGUI from '../../../../../ui/components/static/topBar/TopBarGUI.vue'
 import UiUtils from '../../../../utils/UiUtils'
 import { EventManager } from '../../events/EventManager'
 import { UIEvents } from '../../events/UIEvents'
-import { LoadProgressEvent } from '../../events/loader/LoadProgressEvent'
+import { LoadingProgressEventData } from '../../events/data/loader/LoadingProgress'
 import { UIComponent } from '../UIComponent'
 
 export class TopBarUI implements IComponentUI { 
@@ -14,9 +14,9 @@ export class TopBarUI implements IComponentUI {
     }
 
     init(): void {
-        EventManager.read(UIEvents.LOAD, (event: LoadProgressEvent) => {
+        EventManager.read(UIEvents.LOAD, (event: LoadingProgressEventData) => {
             if (event.width == 100) {
-                UiUtils.renderComponent(this.topBarUI, UIComponent.TopBarUI)
+                UiUtils.mountComponent(this.topBarUI, UIComponent.TopBarUI)
             }
         })
     }

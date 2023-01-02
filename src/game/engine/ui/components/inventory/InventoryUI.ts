@@ -2,35 +2,18 @@ import InventoryGUI from '../../../../../ui/components/inventory/InventoryGUI.vu
 import { EventManager } from '../../events/EventManager'
 import { UIEvents } from '../../events/UIEvents'
 import { IComponentShowableUI } from '../../../../core/ui/IComponentShowableUI'
-import { BoxEvent } from '../../events/general/BoxEvent'
 import UiUtils from '../../../../utils/UiUtils'
 import { UIComponent } from '../UIComponent'
+import { ShowableComponent } from '../../../../core/ui/ShowableComponent'
+import { UIEventsType } from '../../events/UIEventsType'
 
-export class InventoryUI implements IComponentShowableUI { 
-    private inventoryGUI: typeof InventoryGUI
-
+export class InventoryUI extends ShowableComponent { 
+  
     constructor() {
-        this.inventoryGUI = InventoryGUI
+        super(InventoryGUI, UIComponent.InventoryUI)
     }
 
-    init(): void {
-        this.show()
-        this.hide()
-    }
-
-    hide(): void {
-        EventManager.read(UIEvents.CLOSE, (event: BoxEvent) => {
-            if (event.type == 'inventory') {
-                UiUtils.unrenderComponent(UIComponent.InventoryUI)
-            }
-        })
-    }
-
-    show(): void {
-        EventManager.read(UIEvents.OPEN, (event: BoxEvent) => {
-            if (event.type == 'inventory') {
-                UiUtils.renderComponent(this.inventoryGUI, UIComponent.InventoryUI)
-            }
-        })
+    public getEventTypeFromComponent(): UIEventsType {
+        return UIEventsType.INVENTORY
     }
 }

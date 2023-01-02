@@ -2,7 +2,7 @@ import { IComponentUI } from '../../../../core/ui/IComponentUI'
 import BottomBarGUI from '../../../../../ui/components/static/bottomBar/BottomBarGUI.vue'
 import UiUtils from '../../../../utils/UiUtils'
 import { EventManager } from '../../events/EventManager'
-import { LoadProgressEvent } from '../../events/loader/LoadProgressEvent'
+import { LoadingProgressEventData } from '../../events/data/loader/LoadingProgress'
 import { UIEvents } from '../../events/UIEvents'
 import { UIComponent } from '../UIComponent'
 
@@ -14,9 +14,9 @@ export class BottomBarUI implements IComponentUI {
     }
 
     init(): void {
-        EventManager.read(UIEvents.LOAD, (event: LoadProgressEvent) => {
+        EventManager.read(UIEvents.LOAD, (event: LoadingProgressEventData) => {
             if (event.width == 100) {
-                let component = UiUtils.renderComponent(this.bottomBarGUI, UIComponent.BottomBarUI)
+                let component = UiUtils.mountComponent(this.bottomBarGUI, UIComponent.BottomBarUI)
             }
         })
     }

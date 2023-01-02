@@ -30,32 +30,42 @@ function hide() {
 
 <style lang="scss">
 #card {
-    position: relative;
-    pointer-events: all;
-    display: flex;
-    width: 100%;
-    background-color: #F1EEE7;
-    overflow: hidden;
-    border-radius: 8px;
-    flex-flow: column;
-    font-family: 'Ubuntu', sans-serif;
-    z-index: 10000;
+    border: 1px solid #000;
+	border-radius: 8px;
+	background-color: #367897;
+	color: #000;
+	text-align: center;
+	font-size: 14px;
+	z-index: 10;
+
+    &::before {
+        position: absolute;
+        display: block;
+        content: '';
+        top: 2px;
+        height: 100%;
+        width: 100%;
+        border-radius: 6px;
+    }
 
     .title-bar {
-        background-color: transparent;
-        height: 30px;
-        display: flex;
-        flex-flow: row;
-        justify-content: center;
-        align-items: center;
+        
         width: 100%;
-        font-weight: 700;
-        color: #272727;
+        border: 2px solid #408CAF;
+        color: #fff;
+        padding: 10px;
+        background-color: #367897;
+        font-weight: 600;
+        font-size: 14px;
+        border-top-left-radius: 8px;
+        border-top-right-radius: 8px;
+        text-align: center;
+
 
         .closeIcon {
             position: absolute;
             right: 8px;
-            top: 6px;
+            top: 10px;
             width: 19px;
             height: 20px;
             cursor: pointer;
@@ -65,6 +75,11 @@ function hide() {
                 background: url("@/assets/images/closeIconHover.png") no-repeat;
             }
         }
+    }
+    .content {
+        background-color: #ebebeb;
+        width: calc(100% - 10px);
+        margin: 0 auto;
     }
 }
 </style>

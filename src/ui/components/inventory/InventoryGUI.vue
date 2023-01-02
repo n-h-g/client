@@ -77,12 +77,13 @@ import { onMounted, ref } from "vue"
 import ItemVisualization from "../../../game/core/room/object/items/visualization/ItemVisualization"
 import { Engine } from "../../../game/Engine"
 import Item from "../../../game/engine/room/objects/items/Item"
-import { BoxEvent } from "../../../game/engine/ui/events/general/BoxEvent"
 import { EventManager } from "../../../game/engine/ui/events/EventManager"
 import { UIEvents } from "../../../game/engine/ui/events/UIEvents"
 import { OutgoingPacket } from "../../../game/networking/packets/outgoing/OutgoingPacket"
 import { UIEventsType } from "../../../game/engine/ui/events/UIEventsType"
 import Card from '../card/Card.vue'
+import { UIComponent } from "../../../game/engine/ui/components/UIComponent"
+import { IComponentShowableUI } from "../../../game/core/ui/IComponentShowableUI"
 
 const tradeMode = ref(false)
 const myTradeItems = ref([])
@@ -159,9 +160,7 @@ function cancelTrade() {
 }
 
 function hide() {
-    EventManager.emit<BoxEvent>(UIEvents.CLOSE, {
-        type: UIEventsType.INVENTORY,
-    })
+    (Engine.getInstance().userInterfaceManager.componentsManager.getComponent(UIComponent.InventoryUI) as IComponentShowableUI).hide()
 }
 onMounted(() => {
     Engine.getInstance().networkingManager.packetManager.applyOut(OutgoingPacket.RequestInventoryItemsEvent)
@@ -177,26 +176,22 @@ onMounted(() => {
     top: 20vh;
     pointer-events: all;
     display: flex;
-    background-color: #F1EEE7;
     overflow: hidden;
     border-radius: 8px;
     flex-wrap: wrap;
     flex-flow: column;
-    font-family: 'Ubuntu', sans-serif;
     z-index: 10000;
 
     .inventoryContainer {
         position: relative;
         margin-top: 0px;
-        width: 100%;
-        height: 100%;
+        width: calc(100% - 10px);
+        height: calc(100% - 10px);
 
         .inventoryContainerBg {
             padding-left: 4px;
             padding-right: 4px;
             padding-bottom: 4px;
-            height: 100%;
-            width: 100%;
             display: flex;
             flex-direction: column;
 
@@ -218,7 +213,7 @@ onMounted(() => {
                     border-bottom: 0;
                     padding: 3px;
                     color: #272727;
-                    background-color: #D5D5D5;
+                    background-color: #ebebeb;
                     position: relative;
                     cursor: pointer;
                     user-select: none;
@@ -241,8 +236,6 @@ onMounted(() => {
             }
 
             .inventoryListAndButtonsContainer {
-                margin-left: 5px;
-                margin-right: 5px;
 
                 display: flex;
                 flex-direction: row;
@@ -250,7 +243,7 @@ onMounted(() => {
                 height: 100%;
 
                 overflow-y: auto;
-                background-color: #F1EEE7;
+                background-color: #ebebeb;
 
                 .listContainer {
                     width: 65%;
@@ -262,6 +255,7 @@ onMounted(() => {
                     width: 35%;
                     padding: 4px;
                     display: flex;
+                    margin-right: 10px;
                     flex-direction: column;
                     justify-content: flex-start;
 
