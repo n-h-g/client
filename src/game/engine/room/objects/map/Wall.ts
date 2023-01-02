@@ -15,9 +15,10 @@ export default class Wall extends RoomObjectController implements IRoomMapObject
     private color: ColorRGB
 
     private corner: boolean
+    private last: boolean
 
 
-    constructor(plane: RoomPlane, id: string, position: Point3d, type: WallType, isCorner: boolean, color: ColorRGB) {
+    constructor(plane: RoomPlane, id: string, position: Point3d, type: WallType, isCorner: boolean, isLast: boolean, color: ColorRGB) {
         super(id, position, null, null)
 
         this.plane = plane
@@ -26,6 +27,7 @@ export default class Wall extends RoomObjectController implements IRoomMapObject
         this.color = color
 
         this.corner = isCorner
+        this.last = isLast;
 
         this.visualization = (new VisualizationWall(this))
         this.logic = (new LogicWall(this))
@@ -41,6 +43,10 @@ export default class Wall extends RoomObjectController implements IRoomMapObject
 
     public isCorner() : boolean {
         return this.corner
+    }
+
+    public isLast() : boolean {
+        return this.last
     }
 
     public getPlane(): RoomPlane {

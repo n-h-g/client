@@ -126,7 +126,7 @@ export default class VisualizationWall extends RoomObjectVisualization {
         if (drawDepth) {
             ctx.beginFill(wallRight); // depth right
             //console.log(this.wall.getPlane().getRoom().getMapSizeX())
-            let last: boolean = false;
+            let last: boolean = this.wall.isLast();
 
 
             if(this.wall.position.getX() === this.wall.getPlane().getRoom().getDoorPosition().getX() -1 && this.wall.position.getY() === 1) {

@@ -1,11 +1,13 @@
 import IRoomVisualization from "../../../core/room/IRoomVisualization"
 import RoomLayout from "../RoomLayout"
-import { Container } from 'pixi.js'
+import { Container } from '@pixi/display'
 import Point from "../../../utils/point/Point"
 import MapData from "../objects/map/MapData"
 import UiUtils from "../../../utils/UiUtils"
 import Tile from "../objects/map/Tile"
 import { Engine } from '../../../Engine'
+import Avatar from '../../ui/imagers/avatars/Avatar'
+import { Direction } from '../../../core/objects/Direction'
 
 export default class RoomVisualization implements IRoomVisualization {
 
@@ -24,7 +26,7 @@ export default class RoomVisualization implements IRoomVisualization {
 
     constructor(room: RoomLayout) {
         this.roomLayout = room
-
+   
         this.container = new Container();
 
         this.canvasFloor = new Container();
@@ -32,17 +34,17 @@ export default class RoomVisualization implements IRoomVisualization {
         this.canvasDoorWall = new Container();
         this.canvasPointer = new Container();
         this.canvasDoorTile = new Container();
+        
 
-
-        this.container.addChild(this.canvasDoorTile)
+        this.container.addChild(this.canvasDoorTile) 
         this.container.addChild(this.canvasWall)
-        this.container.addChild(this.canvasDoorWall)
+        this.container.addChild(this.canvasDoorWall) 
         this.container.addChild(this.canvasFloor)
-        this.container.addChild(this.canvasPointer)
+        this.container.addChild(this.canvasPointer) 
 
         this.container.x = window.innerWidth / 2
         this.container.y = window.innerHeight / 2
-
+        
         this.canvasDoorTile.interactive = true;
         this.canvasFloor.interactive = true;
 
@@ -72,7 +74,7 @@ export default class RoomVisualization implements IRoomVisualization {
      * @param event 
      * @returns 
      */
-    public getTileByEvent(event: Event): Tile | undefined {
+    public getTileByEvent(event: Event): Tile | undefined{
         let hitCtx = this.canvasFloor;
         let coords = UiUtils.getPosition(event, hitCtx);
         console.log(coords);
@@ -103,7 +105,7 @@ export default class RoomVisualization implements IRoomVisualization {
      * Flip the room visualization
      */
     public flip() {
-        let scale = this.container.scale.y == 1 ? -1 : 1;
+        let scale = this.container.scale.y == 1 ? -1 : 1 ;
 
         this.container.scale.y = scale;
     }
@@ -113,34 +115,34 @@ export default class RoomVisualization implements IRoomVisualization {
      * @param scale 
      */
     public zoom(scale: number) {
-        if (scale < 0) {
+        if(scale < 0) {
             return;
         }
-
+        
         this.container.scale.x = +scale;
         this.container.scale.y = +scale;
     }
 
-    public getCanvasFloor(): Container {
+    public getCanvasFloor() : Container {
         return this.canvasFloor
     }
 
-    public getCanvasWall(): Container {
+    public getCanvasWall() : Container {
         return this.canvasWall
     }
 
-    public getCanvasDoorWall(): Container {
+    public getCanvasDoorWall() : Container {
         return this.canvasDoorWall
     }
 
-    public getCanvasPointer(): Container {
+    public getCanvasPointer() : Container {
         return this.canvasPointer
     }
-    public getCanvasDoorTile(): Container {
+    public getCanvasDoorTile() : Container {
         return this.canvasDoorTile
     }
 
-    public get Container(): Container {
+    public get Container() : Container {
         return this.container;
     }
 } 
