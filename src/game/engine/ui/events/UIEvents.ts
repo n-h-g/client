@@ -4,4 +4,5 @@ export enum UIEvents {
     NAVIGATOR_ROOMS_ADDED = 'navigator_rooms_added',
     OPEN = 'open_box',
     CLOSE = 'close_box'
+    INVENTORY_ITEMS_ADDED = 'inventory_items_added',
 }

@@ -3,6 +3,7 @@ import { Logger } from '../../utils/Logger'
 import { MessageHandler } from '../handler/MessageHandler'
 import { LoginResponse } from './incoming/handshake/LoginResponse'
 import { PongResponse } from './incoming/handshake/PongResponse'
+import LoadInventoryItems from './incoming/items/LoadInventoryItem'
 import AllRoomsList from './incoming/navigator/AllRoomsList'
 import MyRoomsList from './incoming/navigator/MyRoomsList'
 import AddRoomEntity from './incoming/rooms/entities/AddRoomEntity'
@@ -34,6 +35,7 @@ export class PacketManager {
             12: new UpdateEntity,
             13: new AddRoomEntity,
             17: new UpdateUserInformation,
+            18: new LoadInventoryItems,
             23: new LoadRoomItems,
             24: new RemoveItem,
             25: new AddItem
