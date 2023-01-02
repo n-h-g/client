@@ -42,11 +42,11 @@ export default class VisualizationTile extends RoomObjectVisualization {
     }
 
     private static calculateOffsetY(position: Point3d, type: TileType): number {
-        return (position.getY() * MapData.tileHeight) / 2 + (position.getX() * MapData.tileWidth) / 4 - ((position.getZ() + (type == TileType.Door ? 1 : 0)) * MapData.thickSpace * MapData.stairSteps)
+        return (position.getY() * MapData.tileHeight) / 2 + (position.getX() * MapData.tileWidth) / 4 - ((position.getZ() + (type == TileType.Door && position.getZ() == 0 ? 1 : 0)) * MapData.thickSpace * MapData.stairSteps)
     }
 
     private static calculateZIndex(position: Point3d, type: TileType): number {
-        return (1 * position.getX()) + (1 * position.getY()) + (1 * (position.getZ() + type == TileType.Door ? 1 : 0))
+        return (1 * position.getX()) + (1 * position.getY()) + (1 * (position.getZ() + type == TileType.Door && position.getZ() == 0 ? 1 : 0))
     }
 
     public render(): void {
