@@ -6,7 +6,7 @@ import TileType from "../TileTypeEnum"
 import VisualizationPointer from "../visualization/VisualizationPointer"
 import Room from "../../../Room"
 import RoomVisualization from "../../../visualization/RoomVisualization"
-import { Container } from '@pixi/display'
+import { Container } from 'pixi.js'
 import { Engine } from "../../../../../Engine"
 import { Logger } from "../../../../../utils/Logger"
 import { OutgoingPacket } from "../../../../../networking/packets/outgoing/OutgoingPacket"
@@ -28,7 +28,7 @@ export default class LogicTile extends RoomObjectLogic {
     }
 
     public registerEvents() {
-        setTimeout(() => {          
+        setTimeout(() => {
             this.tile.visualization?.container?.on('pointerdown', () => this.onClick());
             this.tile.visualization?.container?.on('pointerover', () => this.onHover())
         }, 200);
@@ -37,7 +37,7 @@ export default class LogicTile extends RoomObjectLogic {
     public onClick(): void {
         let room: Room | null = this.tile.getPlane().getRoom().getRoom();
 
-        if(Engine.getInstance().config.debug) {
+        if (Engine.getInstance().config.debug) {
             Logger.debug('Clicked: ' + this.tile.position.getX() + ' | ' + this.tile.position.getY())
         }
 
@@ -49,19 +49,19 @@ export default class LogicTile extends RoomObjectLogic {
     }
 
     public onMove(delta: number): void {
-        
+
     }
 
     public onHover() {
         let room: Room | null = this.tile.getPlane().getRoom().getRoom();
-        
+
         let tileContext: Container | null | undefined = this.tile.visualization?.container;
 
         (this.tile.getPlane().getRoom().Visualization as RoomVisualization).getCanvasPointer().zIndex = 5;
         (this.tile.getPlane().getRoom().Visualization as RoomVisualization).getCanvasPointer().visible = true;
         (this.tile.getPlane().getRoom().getPointer().visualization as VisualizationPointer).updatePosition(tileContext!.x, tileContext!.y, this.tile);
 
-        
+
     }
 
     public checkTileAndDrawHitBox() {
@@ -72,7 +72,7 @@ export default class LogicTile extends RoomObjectLogic {
         }
     }
 
-    private drawTileHitBox(hitCtx: CanvasRenderingContext2D) : CanvasRenderingContext2D {
+    private drawTileHitBox(hitCtx: CanvasRenderingContext2D): CanvasRenderingContext2D {
 
         hitCtx.save();
 
@@ -95,7 +95,7 @@ export default class LogicTile extends RoomObjectLogic {
 
         return hitCtx;
     }
-    
-    tick(delta: number) : void {}
+
+    tick(delta: number): void { }
 
 }

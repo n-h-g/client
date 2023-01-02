@@ -5,6 +5,7 @@ import { GameLoaderUI } from './loader/GameLoaderUI'
 import { TopBarUI } from './static/TopBarUI'
 import { NavigatorUI } from './navigator/NavigatorUI'
 import { InventoryUI } from './inventory/InventoryUI'
+import { PreviewBoxUI } from './general/PreviewBoxUI'
 
 export class ComponentsManager {
     private _rootComponent: HTMLElement
@@ -21,6 +22,7 @@ export class ComponentsManager {
         this.addComponent(UIComponent.TopBarUI, new TopBarUI())
         this.addComponent(UIComponent.NavigatorUI, new NavigatorUI())
         this.addComponent(UIComponent.InventoryUI, new InventoryUI())
+        this.addComponent(UIComponent.PreviewBoxUI, new PreviewBoxUI())
     }
 
     public initGameComponents(): void {

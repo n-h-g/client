@@ -36,7 +36,8 @@ export default class UserEntityVisualization extends RoomEntityVisualization {
         this.avatar.Container.interactive = true;
         this.avatar.Container.interactiveChildren = true;
 
-     
+        this.avatar.Container.zIndex = 10
+
         this.container = this.avatar.Container;
         
         (this.entity.logic as UserEntityLogic).registerEvents();
@@ -157,6 +158,7 @@ export default class UserEntityVisualization extends RoomEntityVisualization {
         this.container!.buttonMode = true;
         this.container!.interactive = true;
         this.container!.interactiveChildren = true;
+        this.entity.logic.registerEvents()
     }
 
     public updateDirection(direction: Direction) {

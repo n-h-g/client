@@ -1,5 +1,5 @@
 import IRoomObjectVisualization from "./IRoomObjectVisualization"
-import { Container } from '@pixi/display'
+import { Container } from 'pixi.js'
 
 export default abstract class RoomObjectVisualization implements IRoomObjectVisualization {
 

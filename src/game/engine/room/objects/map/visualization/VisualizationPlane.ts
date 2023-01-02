@@ -4,14 +4,12 @@ import RoomPlane from "../RoomPlane";
 import RoomPlaneType from "../RoomPlaneTypeEnum";
 import RoomVisualization from "../../../visualization/RoomVisualization";
 import MapData from "../MapData";
-import * as PIXI from "pixi.js"
 import Tile from "../Tile";
 import IRoomMapObject from "../../../../../core/room/object/map/IRoomMapObject";
-import { TilingSprite } from '@pixi/sprite-tiling';
-import { ObservablePoint, Point } from '@pixi/math';
-import { Texture } from '@pixi/core';
+import { TilingSprite, ObservablePoint, Texture } from 'pixi.js';
 
 import ImagePatterBase from "../../../../../../assets/images/room/content/floor_texture_64_2_floor_basic.png";
+import { Graphics } from 'pixi.js';
 
 export default class VisualizationPlane extends RoomObjectVisualization {
 
@@ -66,7 +64,7 @@ export default class VisualizationPlane extends RoomObjectVisualization {
 
     private async applyTexture() {
 
-        let ctx = new PIXI.Graphics();
+        let ctx = new Graphics();
         const container = this.getCanvas();
 
         if (!this.useTexture) {

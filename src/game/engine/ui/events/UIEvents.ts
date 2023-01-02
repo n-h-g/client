@@ -3,6 +3,6 @@ export enum UIEvents {
     SET_TOPBAR = 'set_top_bar',
     NAVIGATOR_ROOMS_ADDED = 'navigator_rooms_added',
     OPEN = 'open_box',
-    CLOSE = 'close_box'
+    CLOSE = 'close_box',
     INVENTORY_ITEMS_ADDED = 'inventory_items_added',
 }

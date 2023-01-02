@@ -6,11 +6,9 @@ import WallType from "../WallTypeEnum"
 
 import Point3d from "../../.././../../utils/point/Point3d"
 import ColorRGB from "../../../../../utils/color/ColorRGB"
-import * as PIXI from "pixi.js"
 import NormalType from "../../../visualization/NormalTypeEnum"
 import RoomVisualizationColorData from "../../../visualization/RoomVisualizationColorData"
-import { Container } from '@pixi/display'
-import { Graphics } from '@pixi/graphics'
+import { Container, Graphics } from 'pixi.js'
 
 export default class VisualizationWall extends RoomObjectVisualization {
 
@@ -126,9 +124,9 @@ export default class VisualizationWall extends RoomObjectVisualization {
 
         
         if (drawDepth) {
-            ctx.beginFill(wallRight); // depth right
+            ctx.beginFill(isLeft ? wallRight : wallLeft); // depth right
             //console.log(this.wall.getPlane().getRoom().getMapSizeX())
-            let last: boolean = false;
+            let last: boolean = this.wall.isLast();
 
 
             if(this.wall.position.getX() === this.wall.getPlane().getRoom().getDoorPosition().getX() -1 && this.wall.position.getY() === 1) {
