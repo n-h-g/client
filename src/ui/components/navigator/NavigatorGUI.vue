@@ -1,11 +1,5 @@
 <template>
-  <div id="navigator" ref="navigator" draggable="false">
-    <div class="titleBar" ref="handler">
-      <div class="titleBarBg">
-        <div class="title">Navigator</div>
-      </div>
-      <div class="closeIcon" @click="hide()">X</div>
-    </div>
+  <Card title="Navigator" :box="UIEventsType.NAVIGATOR">
     <div class="content">
       <div class="searchContainer">
         <img src="https://cdn.discordapp.com/attachments/799750747281031228/800333126395232266/btn_search.png" />
@@ -75,7 +69,7 @@
       </button>
       <button type="submit" class="navigatorBtn randomRoom">Random Room</button>
     </div>
-  </div>
+  </Card>
 </template>
 
 <script setup lang="ts">
@@ -87,6 +81,7 @@ import { NavigatorRoomsAdded } from "../../../game/engine/ui/events/navigator/Na
 import { UIEvents } from "../../../game/engine/ui/events/UIEvents"
 import { OutgoingPacket } from "../../../game/networking/packets/outgoing/OutgoingPacket"
 import { UIEventsType } from "../../../game/engine/ui/events/UIEventsType"
+import Card from '../card/Card.vue'
 
 let rooms = ref([])
 let currentTab = ref("public");
@@ -115,15 +110,15 @@ function changeTab(tab: string) {
     case "public":
       this.currentTab = tab
       Engine.getInstance()?.networkingManager?.packetManager.applyOut(OutgoingPacket.NavigatorPublicRooms)
-    break;
+      break;
     case "my":
       this.currentTab = tab;
       Engine.getInstance()?.networkingManager?.packetManager.applyOut(OutgoingPacket.NavigatorMyRooms)
-    break;
+      break;
     case "all":
       this.currentTab = tab;
       Engine.getInstance()?.networkingManager?.packetManager.applyOut(OutgoingPacket.NavigatorAllRooms)
-    break;
+      break;
   }
 }
 </script>
@@ -131,16 +126,18 @@ function changeTab(tab: string) {
 <style lang="scss">
 #navigator {
   position: fixed;
-  min-height: 535px;
+  height: 535px;
   width: 425px;
-  background-color: #f1eee7;
-  border-radius: 16px;
-  box-shadow: 0 5px 8px 0 rgba(0, 0, 0, 0.35);
   left: 20vw;
   top: 10vh;
+  pointer-events: all;
+  display: flex;
+  background-color: #F1EEE7;
   overflow: hidden;
-  pointer-events: all !important;
-  font-family: "Ubuntu", sans-serif;
+  border-radius: 8px;
+  flex-wrap: wrap;
+  flex-flow: column;
+  font-family: 'Ubuntu', sans-serif;
   z-index: 10000;
 
   .footer {
