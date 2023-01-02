@@ -1,4 +1,4 @@
-import { Texture, Rectangle } from 'pixi.js'
+import { Texture, Rectangle, TextureMatrix, Sprite } from 'pixi.js'
 
 export default class RenderingUtils {
     static arrayBufferToBase64(arrayBuffer: ArrayBuffer) {

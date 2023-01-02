@@ -204,21 +204,36 @@ export default class AvatarImager {
 
         component.IsFlipped = isFlipped;
 
+        //console.log(this.getTextureId(assetName, component.ResourceName))
+
         if(spritesheet[component.ResourceName] !== undefined) {
             let downloadedTexture: PIXI.Texture | null = await this.data.getTexture(assetName)
 
-            if(!downloadedTexture) return;
+            if(!downloadedTexture) {
+                if (Engine.getInstance().config.debug) {
+                    Logger.debug('cannot find texture resource ' + assetName);
+                }
+                return;
+            }
 
             let asset = spritesheet[component.ResourceName];
-            let texture = RenderingUtils.cropTexture(downloadedTexture, asset.height, asset.width, asset.left, asset.top);
+            let texture = RenderingUtils.cropTexture(downloadedTexture, asset.height, asset.width, asset.left , asset.top);
     
             let sprite = new Sprite(texture);
+
+            sprite.width = asset.width;
+            sprite.height = asset.height
+
             sprite.interactive = true;
             sprite.buttonMode = true;
     
     
             if (component.Color && component.isColorable) {
                 sprite.tint = avatar.IsPlaceHolder ? 0x00000 : parseInt(component.Color, 16);
+
+                if(component.ResourceType == "ey") {
+                    sprite.tint = 0xFFFFF
+                }
             }
 
             let offsets = asset.offset.split(",");
@@ -232,6 +247,7 @@ export default class AvatarImager {
             }
 
             if (component.IsFlipped) { 
+                
                 sprite.scale.x = -1;
                 sprite.x = this.structure.Geometry?.width! - sprite.x + AvatarData.AVATAR_LEFT_OFFSET;
             }
