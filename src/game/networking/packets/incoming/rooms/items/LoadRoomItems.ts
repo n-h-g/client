@@ -12,13 +12,13 @@ export default class LoadRoomItems extends MessageHandler {
     public handle() {
         let items: ItemsData = this.message;
 
-        for(let itemData of items.data) {
-            
-            if(parseInt(itemData.room_id) == -1) return;
+        for (let itemData of items.data) {
+
+            if (parseInt(itemData.room_id) == -1) return;
 
             let room = Engine.getInstance().roomService?.CurrentRoom;
 
-            if(room?.roomItemRepository.get(itemData.id) !== null) {
+            if (room?.roomItemRepository.get(itemData.id) !== null) {
                 return;
             }
 

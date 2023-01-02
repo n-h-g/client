@@ -11,7 +11,7 @@ export default class RemoveItem extends MessageHandler {
         let currentRoom = Engine.getInstance().roomService?.CurrentRoom;
         let itemToRemove = Engine.getInstance().roomService?.CurrentRoom?.roomItemRepository.get(item.id);
 
-        if(!itemToRemove) {
+        if (!itemToRemove) {
             return;
         }
 

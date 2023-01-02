@@ -1,5 +1,6 @@
 export enum UIEventsType {
     INVENTORY = 'inventory',
     CATALOGUE = 'catalogue',
-    NAVIGATOR = 'navigator'
+    NAVIGATOR = 'navigator',
+    PREVIEWBOX = 'preview_box'
 }

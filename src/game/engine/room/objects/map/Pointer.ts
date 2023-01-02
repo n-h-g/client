@@ -5,7 +5,7 @@ import LogicPointer from "./logic/LogicPointer"
 import RoomVisualization from "../../visualization/RoomVisualization"
 import MapData from "./MapData"
 import RoomLayout from "../../RoomLayout"
-import { Container } from '@pixi/display'
+import { Container } from 'pixi.js'
 
 export default class Pointer extends RoomObjectController {
 

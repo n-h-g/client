@@ -8,11 +8,6 @@ import UserService from './engine/user/UserService'
 import CommandService from './engine/game/commands/CommandService'
 import ChatMessageService from './engine/game/chat/ChatMessageService'
 import Room from './engine/room/Room'
-import Avatar from './engine/ui/imagers/avatars/Avatar'
-import { Direction } from './core/objects/Direction'
-import { EventManager } from './engine/ui/events/EventManager'
-import { UIEvents } from './engine/ui/events/UIEvents'
-
 import * as PIXI from "pixi.js"
 import UserEntity from './engine/room/objects/entities/users/UserEntity'
 
@@ -56,7 +51,6 @@ export class Engine {
             powerPreference: "high-performance",
             resizeTo: window
         })
-
         document.body.appendChild(this._application.view)
 
         this._roomsService = new RoomService()
@@ -71,12 +65,9 @@ export class Engine {
         this.application.init()
 
         if (this._config.offlineMode) {
-            let room: Room = this._roomsService.setRoom("prova", "0000000000/0111111111/01111111011111/0111111111001/0111111", new Point(2, 0), 200)
-
-            let avatar = new Avatar("hd-180-1.ch-255-66.lg-280-110.sh-305-62.ha-1012-110.hr-828-61", Direction.SOUTH, Direction.SOUTH, new Set());
+            let room: Room = this._roomsService.setRoom("prova", "0000000000/0111001101/01111111011111/0111111111001/0111111", new Point(2, 0), 200)
 
             let entity = new UserEntity("id", "prova", "hd-180-1.ch-255-66.lg-280-110.sh-305-62.ha-1012-110.hr-828-61", room)
-
             entity.visualization.render()
         }
     }

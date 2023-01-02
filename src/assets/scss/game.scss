@@ -4,10 +4,20 @@
 
 @import "./variables.scss";
 
-html, body {
+html,
+body {
   overflow: hidden;
   margin: 0;
   font-family: $fontFamily, sans-serif;
+  user-select: none;
+}
+
+#root {
+  pointer-events: none;
+}
+
+.hidden {
+  display: none !important;
 }
 
 #gameContainer {

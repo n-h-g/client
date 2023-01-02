@@ -1,12 +1,10 @@
 import FurniBase from "./FurniBase";
-import * as PIXI from "pixi.js";
 import FurniImager from "./FurniImager";
-
-
 import anime from "animejs";
 import { IOffsets } from "../../../../core/ui/imagers/items/IAsset";
+import { Container, DisplayObject } from 'pixi.js';
 
-export class FurniSprite extends PIXI.Container {
+export class FurniSprite extends Container {
   private _furniBase: FurniBase;
   private isIcon: boolean = false;
   public needsUpdate: boolean = false;
@@ -125,7 +123,7 @@ export class FurniSprite extends PIXI.Container {
 
   public update() {
     if (this.needsUpdate) {
-      this.children.forEach((child: PIXI.DisplayObject) => {
+      this.children.forEach((child: DisplayObject) => {
         child.destroy();
       });
     }
