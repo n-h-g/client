@@ -36,7 +36,6 @@ export default class UserEntityVisualization extends RoomEntityVisualization {
         this.avatar.Container.interactive = true;
         this.avatar.Container.interactiveChildren = true;
 
-        this.avatar.Container.zIndex = 10
 
         this.container = this.avatar.Container;
         
@@ -47,6 +46,8 @@ export default class UserEntityVisualization extends RoomEntityVisualization {
             this.updatePosition(); //todo needs to be refactored 
             this.container?.emit("user-position-changed", 200);
         }
+        this.avatar.Container.zIndex = 10
+
 
     }
     public updateFrame(frame: number): void {
@@ -153,7 +154,7 @@ export default class UserEntityVisualization extends RoomEntityVisualization {
 
         this.container!.x = (((this.entity.position.getY() - this.entity.position.getX()) * MapData.tileWidth / 2) + (MapData.tileWidth / 2)) - MapData.tileWidth / 2
         this.container!.y = ((this.entity.position.getX() + this.entity.position.getY()) * MapData.tileHeight / 2) + (MapData.tileHeight / 2) + offsetFloor;
-        this.container!.zIndex = this.getZIndex();
+        this.container!.zIndex = 10
 
         this.container!.buttonMode = true;
         this.container!.interactive = true;

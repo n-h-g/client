@@ -24,5 +24,5 @@ export default class AvatarData {
     // angles
     public static AVATAR_ANGLES: number[] = [45, 90, 135, 180, 225, 270, 315, 0]
     
-    public static FLIPPED_DIRECTIONS: boolean[] = [true, true, true, false, false, false, false, false];
+    public static FLIPPED_DIRECTIONS: boolean[] = [false, false, false, false, false, true, true, true];
 }
