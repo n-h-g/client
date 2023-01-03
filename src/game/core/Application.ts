@@ -11,7 +11,7 @@ export class ApplicationEngine extends Application {
 
     private timeElapsed: number = 0
 
-    private viewport: Viewport
+    private _viewport: Viewport
 
     constructor(engine: Engine, options?: IApplicationOptions) {
         super(options);
@@ -27,7 +27,7 @@ export class ApplicationEngine extends Application {
     }
 
     private setUpViewport() {
-        this.viewport = new Viewport({
+        this._viewport = new Viewport({
             screenWidth: window.innerWidth,
             screenHeight: window.innerHeight,
             worldWidth: 1000,
@@ -36,9 +36,10 @@ export class ApplicationEngine extends Application {
             interaction: this.renderer.plugins.interaction // the interaction module is important for wheel to work properly when renderer.view is placed or scaled
         })
 
-        this.stage.addChild(this.viewport)
+        this.stage.addChild(this._viewport)
 
-        this.viewport.drag()
+        this._viewport.drag()
+        
     }
 
     /**
@@ -46,7 +47,8 @@ export class ApplicationEngine extends Application {
      * @param object 
      */
     public add(object: DisplayObject) {
-        this.viewport.addChild(object)
+        this._viewport.addChild(object)
+
     }
 
     public init(): void {
@@ -95,5 +97,9 @@ export class ApplicationEngine extends Application {
     private onResize() {
         this.view.style.height = window.innerHeight + "px"
         this.view.style.width = window.innerWidth + "px"
+    }
+
+    public get viewport(): Viewport {
+        return this._viewport
     }
 }

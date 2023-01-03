@@ -8,6 +8,7 @@ import Tile from "../objects/map/Tile"
 import { Engine } from '../../../Engine'
 import Avatar from '../../ui/imagers/avatars/Avatar'
 import { Direction } from '../../../core/objects/Direction'
+import RoomObjectController from "../../../core/room/object/RoomObjectController"
 
 export default class RoomVisualization implements IRoomVisualization {
 
@@ -121,6 +122,24 @@ export default class RoomVisualization implements IRoomVisualization {
         
         this.container.scale.x = +scale;
         this.container.scale.y = +scale;
+    }
+
+    /**
+     * Add a element to the room visualization container, and choose to follow it
+     * @param object 
+     * @param follow 
+     * @returns 
+     */
+    public add(object: RoomObjectController, follow: boolean = false) {
+
+        console.log(object.visualization)
+
+        if(!object) return;
+
+        this.container.addChild(object.visualization.container)
+
+        // TODO follow object
+        //Engine.getInstance().application.viewport.follow(object.visualization.container)
     }
 
     public getCanvasFloor() : Container {

@@ -12,6 +12,7 @@ import Rotation from "../../../../../../utils/Rotation";
 import { Engine } from "../../../../../../Engine";
 import AvatarPlaceHolder from "../../../../../ui/imagers/avatars/AvatarPlaceholder";
 import { ActionId } from "../../../../../ui/imagers/avatars/enum/actions/ActionId";
+import RoomVisualization from "../../../../visualization/RoomVisualization";
 
 export default class UserEntityVisualization extends RoomEntityVisualization {
     declare public entity: UserEntity;
@@ -24,8 +25,9 @@ export default class UserEntityVisualization extends RoomEntityVisualization {
 
     public render(): void {
 
-     
         let avatar = new Avatar(this.entity.Look, this.rotation, this.rotation, this.actions);
+
+        let RoomVisualization = (Engine.getInstance().roomService?.CurrentRoom?.getRoomLayout().Visualization) as RoomVisualization
         
         this.avatar = avatar;
 
@@ -43,7 +45,7 @@ export default class UserEntityVisualization extends RoomEntityVisualization {
         (this.entity.logic as UserEntityLogic).registerEvents();
       
         if(Engine.getInstance().roomService?.CurrentRoom) {
-            (Engine.getInstance().roomService?.CurrentRoom?.getRoomLayout().Visualization.container?.addChild(avatar.Container));
+            RoomVisualization.add(this.entity)
             this.updatePosition(); //todo needs to be refactored 
             this.container?.emit("user-position-changed", 200);
         }
