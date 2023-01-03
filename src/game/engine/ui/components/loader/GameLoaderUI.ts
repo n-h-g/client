@@ -6,25 +6,31 @@ import { EventManager } from '../../events/EventManager'
 import { UIEvents } from '../../events/UIEvents'
 import { UIComponent } from '../UIComponent'
 import { Engine } from '../../../../Engine'
+import { DeletableComponent } from '../../../../core/ui/DeletableComponent'
+import { UIEventsType } from '../../events/UIEventsType'
 
-export class GameLoaderUI implements IComponentDeletableUI { 
-    private gameLoaderGUI: typeof GameLoaderGUI
-    
-    public visible: boolean = true
+export class GameLoaderUI extends DeletableComponent {
 
     constructor() {
-        this.gameLoaderGUI = GameLoaderGUI
+        super(GameLoaderGUI, UIComponent.GameLoaderUI)
     }
 
     init(): void {
-        UiUtils.mountComponent(this.gameLoaderGUI, UIComponent.GameLoaderUI)
+        UiUtils.mountComponent(this.component, UIComponent.GameLoaderUI)
 
+        this.registerEvents()
+    }
+
+    getEventTypeFromComponent(): UIEventsType {
+        return UIEventsType.LOADER
+    }
+    registerEvents(): void {
         EventManager.read(UIEvents.LOAD, (event: LoadingProgressEventData) => {
             if (event.width == 100 || Engine.getInstance().config.offlineMode) {
                 this.delete()
             }
         })
-    }
+    } 
 
     delete(): void {
         UiUtils.dismountComponent(UIComponent.GameLoaderUI)
