@@ -1,7 +1,7 @@
 
 <template>
     <div class="chatBar" :class="{hidden: !enabled}">
-      <input type="text" class="chatInput" autofocus :placeholder="placeHolder" :v-model="message" @input="onInput()">
+      <input type="text" class="chatInput" autofocus :placeholder="placeHolder" v-model="message" v-on:keydown="onInput()" @keyup.enter="sendMessage">
     </div>
 </template>
 <script setup lang="ts">
@@ -15,13 +15,33 @@ import { OutgoingPacket } from "../../../../game/networking/packets/outgoing/Out
 
 let placeHolder = ref("Type here to talk..")
 let typed = ref(false)
-let message = ""
+let message = ref("")
 
 let enabled = ref(false)
 
 EventManager.read(UIEvents.ROOM_UI, (payload: RoomUIEventData) => {
     enabled.value = payload.enabled
 })
+
+function sendMessage(e) {
+    let shout = false;
+
+    if(e.shiftKey) {
+        shout = true;
+    }
+
+    console.log(shout)
+
+    Engine.getInstance().chatService.computeMessage(message.value, shout, false)
+        Engine.getInstance().networkingManager.packetManager.applyOut(OutgoingPacket.UserTypeStatus, {
+        roomId: Engine.getInstance().roomService.CurrentRoom.Id,
+        typing: false
+    })
+
+    typed.value = false
+    message.value = ""
+
+}
 
 function onInput() {
     Engine.getInstance().networkingManager.packetManager.applyOut(OutgoingPacket.UserTypeStatus, {
