@@ -1,6 +1,7 @@
 import { Matrix, Container, DisplayObject } from 'pixi.js'
-import { createApp } from 'vue'
+import { Component, createApp } from 'vue'
 import { Engine } from '../Engine'
+import { UIComponent } from '../engine/ui/components/UIComponent';
 import { Logger } from './Logger'
 
 export default class UiUtils {
@@ -52,8 +53,11 @@ export default class UiUtils {
             }
     }
 
-    static mountComponent(component, name) {
+    static mountComponent(component: Component, name: UIComponent) {
         try {
+            if (document.getElementById(name) != null)
+                return
+
             var ComponentApp = createApp(component)
             const wrapper = document.createElement('div')
             wrapper.id = name
@@ -68,8 +72,11 @@ export default class UiUtils {
         }
     }
     
-    static dismountComponent(name) {
+    static dismountComponent(name: UIComponent) {
         try {
+            if (document.getElementById(name) == null)
+                return
+
             document.getElementById(name).remove()
         } catch(e) {
             if (Engine.getInstance().config.debug) {

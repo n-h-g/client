@@ -8,7 +8,6 @@ import { UIEventsType } from '../../events/UIEventsType'
 import { ShowableComponent } from '../../../../core/ui/ShowableComponent'
 
 export class NavigatorUI extends ShowableComponent {
-
     constructor() {
         super(NavigatorGUI, UIComponent.NavigatorUI)
     }

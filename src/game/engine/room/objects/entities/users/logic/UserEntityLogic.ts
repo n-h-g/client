@@ -4,9 +4,9 @@ import { OutgoingPacket } from "../../../../../../networking/packets/outgoing/Ou
 import Point from "../../../../../../utils/point/Point";
 import UiUtils from "../../../../../../utils/UiUtils";
 import ChatData from "../../../../../game/chat/ChatData";
+import { DialogEventData } from '../../../../../ui/events/data/general/Dialog';
+import { PreviewModeEventData } from '../../../../../ui/events/data/general/PreviewUserData';
 import { EventManager } from '../../../../../ui/events/EventManager';
-import { BoxEvent } from '../../../../../ui/events/data/general';
-import { PreviewUserModeEvent } from '../../../../../ui/events/data/general/PreviewUserData';
 import { UIEvents } from '../../../../../ui/events/UIEvents';
 import { UIEventsType } from '../../../../../ui/events/UIEventsType';
 import { ActionId } from "../../../../../ui/imagers/avatars/enum/actions/ActionId";
@@ -94,13 +94,13 @@ export default class UserEntityLogic extends EntityLogic {
 
     public togglePreview() {
         let entity: UserEntity = this.entity as UserEntity
-        EventManager.emit<PreviewUserModeEvent>(UIEvents.PREVIEW_BOX_MODE, {
+        EventManager.emit<PreviewModeEventData>(UIEvents.PREVIEW_BOX_MODE, {
             mode: 'user',
             username: entity.Name,
             motto: entity.user?.userInfo.motto,
             look: UiUtils.generateImageFromObject(this.entity.visualization?.container!).src
         })
-        EventManager.emit<BoxEvent>(UIEvents.OPEN, {
+        EventManager.emit<DialogEventData>(UIEvents.OPEN, {
             type: UIEventsType.PREVIEWBOX
         })
     }

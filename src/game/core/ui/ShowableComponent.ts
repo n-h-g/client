@@ -2,16 +2,14 @@ import { UIComponent } from "../../engine/ui/components/UIComponent";
 import { EventManager } from "../../engine/ui/events/EventManager";
 import { DialogEventData } from "../../engine/ui/events/data/general/Dialog";
 import { UIEvents } from "../../engine/ui/events/UIEvents";
-import { UIEventsType } from "../../engine/ui/events/UIEventsType";
 import UiUtils from "../../utils/UiUtils";
 import { InteractiveComponent } from "./InteractiveComponent";
 import { IComponentShowableUI } from "./IComponentShowableUI";
 import { Component } from "vue";
 
-export abstract class ShowableComponent extends InteractiveComponent implements IComponentShowableUI{
-
+export abstract class ShowableComponent extends InteractiveComponent implements IComponentShowableUI {
     public visible: boolean = false
-    
+
     public constructor(component: Component, type: UIComponent) {
         super(component, type)
 
@@ -19,8 +17,7 @@ export abstract class ShowableComponent extends InteractiveComponent implements 
     }
 
     public init(): void {
-        //this.hide()
-        //this.show()
+
     }
 
     public toggle() {
@@ -45,11 +42,10 @@ export abstract class ShowableComponent extends InteractiveComponent implements 
             }
         })
 
-        EventManager.read(UIEvents.OPEN, (event: DialogEventData) => {
-            if (event.type == this.eventType) {
-                this.hide()
+        EventManager.read(UIEvents.OPEN, (payload: DialogEventData) => {
+            if (payload.type == this.eventType) {
+                this.show()
             }
         })
     }
-
 }

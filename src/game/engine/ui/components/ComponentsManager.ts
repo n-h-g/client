@@ -35,7 +35,7 @@ export class ComponentsManager {
         return this._rootComponent
     }
 
-    public addComponent(componentKey: UIComponent, component: IComponentUI): void {
+    private addComponent(componentKey: UIComponent, component: IComponentUI): void {
         if (this._gameComponents.has(componentKey))
             return
 

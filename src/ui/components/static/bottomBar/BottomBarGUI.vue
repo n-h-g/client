@@ -1,43 +1,39 @@
 <template>
-    <div class="bottomBar">
-        <div class="leftOptions">
-            <div class="menuButton home"></div>
-            <div class="menuButton inventory" @click="toggle('inventory')">
-            </div>
-            <div class="menuButton navigator" @click="toggle('navigator')">
-            </div>
-            <div class="menuButton catalog" @click="toggle('catalog')">
-            </div>
-            <div class="menuButton friends" @click="toggle('friends')">
-            </div>
-        </div>
-        <div class="chatBar">
-            <input type="text" class="chatInput" autofocus placeholder="Type here to talk...">
-        </div>
-        <div class="rightOptions">
-          <div class="menuButton search_friends" @click="toggle('search_friends')"></div>
+  <div class="bottomBar">
+    <div class="leftOptions">
+      <div class="menuButton home"></div>
+      <div class="menuButton inventory" @click="toggle('inventory')">
+      </div>
+      <div class="menuButton navigator" @click="toggle('navigator')">
+      </div>
+      <div class="menuButton catalog" @click="toggle('catalog')">
+      </div>
+      <div class="menuButton friends" @click="toggle('friends')">
       </div>
     </div>
+    <div class="chatBar">
+      <input type="text" class="chatInput" autofocus placeholder="Type here to talk...">
+    </div>
+    <div class="rightOptions">
+      <div class="menuButton search_friends" @click="toggle('search_friends')"></div>
+    </div>
+  </div>
 
 </template>
 
 <script setup lang="ts">
-import { BoxEvent } from '../../../../game/engine/ui/events/general/BoxEvent'
-import { EventManager } from '../../../../game/engine/ui/events/EventManager'
-import { UIEvents } from '../../../../game/engine/ui/events/UIEvents'
-import { UIEventsType } from '../../../../game/engine/ui/events/UIEventsType';
 import { Engine } from '../../../../game/Engine';
 import { UIComponent } from '../../../../game/engine/ui/components/UIComponent';
 import { IComponentShowableUI } from '../../../../game/core/ui/IComponentShowableUI';
 
 function toggle(ui: string) {
-  switch(ui) {
+  switch (ui) {
     case 'navigator':
-      (Engine.getInstance().userInterfaceManager.componentsManager.getComponent(UIComponent.NavigatorUI) as IComponentShowableUI).toggle()
-    break;
+      Engine.getInstance().userInterfaceManager?.componentsManager.getComponent<IComponentShowableUI>(UIComponent.NavigatorUI).toggle()
+      break;
     case 'inventory':
-    (Engine.getInstance().userInterfaceManager.componentsManager.getComponent(UIComponent.InventoryUI) as IComponentShowableUI).toggle()
-    break;
+      Engine.getInstance().userInterfaceManager?.componentsManager.getComponent<IComponentShowableUI>(UIComponent.InventoryUI).toggle()
+      break;
   }
 }
 </script>
@@ -50,11 +46,13 @@ function toggle(ui: string) {
     -moz-transform: rotate(360deg);
   }
 }
+
 @-webkit-keyframes spin {
   100% {
     -webkit-transform: rotate(360deg);
   }
 }
+
 @keyframes spin {
   100% {
     -webkit-transform: rotate(360deg);
@@ -64,52 +62,52 @@ function toggle(ui: string) {
 
 .bottomBar {
   position: fixed;
-	z-index: 1;
-	bottom: 0;
-	left: 0;
-	right: 0;
-	display: flex;
-	flex-direction: row;
-	justify-content: space-between;
-	padding: 2px 0;
-	height: 50px;
-	border-top: 2px solid #53524f;
-	border-bottom: 1px solid #53524f;
-	background-color: #2e2e2c;
-	box-shadow: 0 -1px 0 0 rgba(0, 0, 0, .6);
+  z-index: 1;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  padding: 2px 0;
+  height: 50px;
+  border-top: 2px solid #53524f;
+  border-bottom: 1px solid #53524f;
+  background-color: #2e2e2c;
+  box-shadow: 0 -1px 0 0 rgba(0, 0, 0, .6);
 
   .chatBar {
-    position:fixed;
+    position: fixed;
     width: 100%;
     bottom: 0;
     height: auto;
 
-      .chatInput {
-        font-family: 'Ubuntu';
-        width: 580px;
-        height: 38px;
-        border: 2px solid #000;
-        border-radius: 8px;
-        margin: auto 0;
-        background-color: #e4e4e4;
-        display: flex;
-        flex-direction: row;
+    .chatInput {
+      font-family: 'Ubuntu';
+      width: 580px;
+      height: 38px;
+      border: 2px solid #000;
+      border-radius: 8px;
+      margin: auto 0;
+      background-color: #e4e4e4;
+      display: flex;
+      flex-direction: row;
+      position: absolute;
+      left: 50%;
+      bottom: 5px;
+      transform: translateX(-50%);
+      z-index: 10000;
+      outline: none;
+      pointer-events: all !important;
+
+      .chatInput::before {
+        height: 40px;
+        width: 50px;
+        background-color: red;
         position: absolute;
-        left: 50%;
-        bottom: 5px;
-        transform: translateX(-50%);
-        z-index: 10000;
-        outline:none;
-        pointer-events: all !important;
-    
-    .chatInput::before {
-      height: 40px;
-      width: 50px;
-      background-color: red;
-      position:absolute;
+      }
     }
   }
-}
 
   .muted {
     color: red;
@@ -144,54 +142,55 @@ function toggle(ui: string) {
 
       &:hover {
         top: -1px;
-			  left: -1px;
+        left: -1px;
         filter: drop-shadow(2px 2px 0 rgba(0, 0, 0, .50))
       }
 
 
-     
 
-  
+
+
       &.navigator {
         background-image: url("../../../../assets/images/bottom-bar/rooms.png");
         width: 44px;
-			  height: 30px;
+        height: 30px;
       }
 
       &.inventory {
         background-image: url("../../../../assets/images/bottom-bar/inventory.png");
         width: 44px;
-			  height: 41px;
+        height: 41px;
         top: 5px;
       }
 
       &.catalog {
         background-image: url("@/assets/images/bottom-bar/catalog.png");
         width: 37px;
-			  height: 36px
+        height: 36px
       }
 
       &.friends {
         background-image: url("@/assets/images/bottom-bar/friend_all.png");
         height: 33px;
-			  width: 32px;
+        width: 32px;
       }
 
       &.home {
         background-image: url("@/assets/images/bottom-bar/home.png");
-        height:30px;
+        height: 30px;
         width: 32px;
       }
 
       &.search_friends {
         background-image: url("../../../../assets/images/bottom-bar/friend_search.png");
         width: 29px;
-			  height: 33px;
+        height: 33px;
         top: 10px;
       }
 
     }
   }
+
   & .rightOptions .friend {
     width: 500px;
     padding: 10px 15px;
@@ -207,10 +206,12 @@ function toggle(ui: string) {
     pointer-events: all;
     margin-left: 5px;
   }
+
   & .rightOptions .friend .optionVisible {
     margin: 0 auto;
     text-align: center;
   }
+
   & .rightOptions .friend .optionVisible button {
     display: block;
     margin-top: 2px;
@@ -311,6 +312,7 @@ function toggle(ui: string) {
               &.settings {
                 background-image: url("~@/assets/images/bottom-bar/settings_hover.png");
               }
+
               &.zoom {
                 background-image: url("~@/assets/images/bottom-bar/zoom_hover.png");
               }
@@ -322,6 +324,7 @@ function toggle(ui: string) {
 
     &.open {
       height: 147px;
+
       .roomInfoIconContainer {
         .roomInfoIcon {
           background-image: url("~@/assets/images/bottom-bar/room_infoIconLeft.png");
@@ -334,5 +337,4 @@ function toggle(ui: string) {
     }
   }
 }
-
 </style>
