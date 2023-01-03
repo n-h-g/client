@@ -6,7 +6,7 @@ import User from '../user/User';
 export default class RoomUserRepository extends Repository<number, User> implements IRoomUserRepository {
     private users: Map<number, User> = new Map()
 
-    public findByUsername(userName: string): IUserController | null {
+    public findByUsername(userName: string): User {
         for(let user of this.users.values()) {
             if(user.userInfo.username == userName)
                 return user; 
@@ -16,7 +16,7 @@ export default class RoomUserRepository extends Repository<number, User> impleme
     }
 
     public tick(delta: number) {
-        this.users.forEach((user: IUserController) => {
+        this.users.forEach((user: User) => {
             user.logic.tick(delta);
         })
     }
