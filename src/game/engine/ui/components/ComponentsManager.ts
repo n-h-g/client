@@ -7,6 +7,7 @@ import { NavigatorUI } from './navigator/NavigatorUI'
 import { InventoryUI } from './inventory/InventoryUI'
 import { PreviewBoxUI } from './general/PreviewBoxUI'
 import { CreateRoomUI } from './navigator/CreateRoomUI'
+import { CatalogueUI } from './catalogue/CatalogueUI'
 
 export class ComponentsManager {
     private _rootComponent: HTMLElement
@@ -25,6 +26,7 @@ export class ComponentsManager {
         this.addComponent(UIComponent.InventoryUI, new InventoryUI())
         this.addComponent(UIComponent.PreviewBoxUI, new PreviewBoxUI())
         this.addComponent(UIComponent.CreateRoomUI, new CreateRoomUI())
+        this.addComponent(UIComponent.CatalogueUI, new CatalogueUI())
     }
 
     public initGameComponents(): void {

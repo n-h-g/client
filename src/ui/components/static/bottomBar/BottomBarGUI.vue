@@ -6,7 +6,7 @@
       </div>
       <div class="menuButton navigator" @click="toggle('navigator')">
       </div>
-      <div class="menuButton catalog" @click="toggle('catalog')">
+      <div class="menuButton catalog" @click="toggle('catalogue')">
       </div>
       <div class="menuButton friends" @click="toggle('friends')">
       </div>
@@ -33,6 +33,9 @@ function toggle(ui: string) {
       break;
     case 'inventory':
       Engine.getInstance()?.userInterfaceManager?.componentsManager.getComponent<IComponentShowableUI>(UIComponent.InventoryUI).toggle()
+      break;
+    case 'catalogue':
+      Engine.getInstance()?.userInterfaceManager?.componentsManager.getComponent<IComponentShowableUI>(UIComponent.CatalogueUI).toggle()
       break;
   }
 }
