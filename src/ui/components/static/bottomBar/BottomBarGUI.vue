@@ -11,9 +11,7 @@
       <div class="menuButton friends" @click="toggle('friends')">
       </div>
     </div>
-    <div class="chatBar">
-      <input type="text" class="chatInput" autofocus placeholder="Type here to talk...">
-    </div>
+    <ChatBar />
     <div class="rightOptions">
       <div class="menuButton search_friends" @click="toggle('search_friends')"></div>
     </div>
@@ -28,6 +26,7 @@ import { IComponentShowableUI } from '../../../../game/core/ui/IComponentShowabl
 import { EventManager } from '../../../../game/engine/ui/events/EventManager';
 import { HotelViewData } from '../../../../game/engine/ui/events/data/static/HotelView';
 import { UIEvents } from '../../../../game/engine/ui/events/UIEvents';
+import ChatBar from "./ChatBar.vue"
 
 function toggle(ui: string) {
   switch (ui) {

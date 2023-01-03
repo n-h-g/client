@@ -1,6 +1,9 @@
 import IRoomLogic from "../../../core/room/IRoomLogic"
 import RoomLayout from "../RoomLayout"
 import Room from "../Room"
+import { EventManager } from "../../ui/events/EventManager"
+import { UIEvents } from "../../ui/events/UIEvents"
+import { RoomUIEventData } from "../../ui/events/data/room/RoomUIEventData"
 
 class RoomLogic implements IRoomLogic {
 
@@ -23,6 +26,10 @@ class RoomLogic implements IRoomLogic {
         roomVisualization.getCanvasFloor().on('pointerover', this.onMouseOver.bind(this));
         roomVisualization.Container.on('pointerdown', this.onMouseClick.bind(this));
         roomVisualization.getCanvasFloor().on('pointerout', this.onMouseOut.bind(this));
+
+        EventManager.emit<RoomUIEventData>(UIEvents.ROOM_UI, {
+            enabled: true
+        })
 
         this.room.getFloorPlane().logic?.registerEvents()
         this.room.getWallPlane().logic?.registerEvents()

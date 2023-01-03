@@ -6,5 +6,6 @@ export enum UIEvents {
     CLOSE = 'close_box',
     INVENTORY_ITEMS_ADDED = 'inventory_items_added',
     PREVIEW_BOX_MODE = 'preview_box_mode',
-    HOTEL_VIEW = 'hotel_view'
+    HOTEL_VIEW = 'hotel_view',
+    ROOM_UI = 'room_ui'
 }

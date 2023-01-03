@@ -4,6 +4,7 @@ import { Engine } from "../../Engine";
 import { EventManager } from "../ui/events/EventManager";
 import { UIEvents } from "../ui/events/UIEvents";
 import { HotelViewData } from "../ui/events/data/static/HotelView";
+import { RoomUIEventData } from "../ui/events/data/room/RoomUIEventData";
 
 export default class RoomService {
     private currentRoom: Room
