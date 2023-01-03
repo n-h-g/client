@@ -1,11 +1,12 @@
 import * as PIXI from "pixi.js";
-import { Sprite } from "pixi.js";
+import { ImageResource, Sprite } from "pixi.js";
 import { Direction } from "../../../../core/objects/Direction";
 import { Engine } from '../../../../Engine';
 import { Logger } from '../../../../utils/Logger';
 import Point from "../../../../utils/point/Point";
 import RenderingUtils from "../../../../utils/RenderingUtils";
 import Action from "./actions/Action";
+import Asset from './assets/Asset';
 import Avatar from "./Avatar";
 import AvatarFigure from "./AvatarFigure";
 import AvatarFigureComponent from "./AvatarFigureComponent";
@@ -202,12 +203,12 @@ export default class AvatarImager {
 
         component.IsFlipped = isFlipped;
 
-        let assetData: AssetData = spritesheet[component.ResourceName] as AssetData
+        let assetData: AssetData = spritesheet[component.ResourceName]
 
         //console.log(this.getTextureId(assetName, component.ResourceName))
 
         if (assetData !== undefined) {
-            let downloadedTexture: PIXI.Texture | null = await this.data.getTexture(assetName)
+            let downloadedTexture: PIXI.Texture = this.data.getTexture(assetName)
 
             if (!downloadedTexture) {
                 if (Engine.getInstance().config.debug) {
@@ -216,12 +217,13 @@ export default class AvatarImager {
                 return;
             }
 
-
+            let asset: AssetData;
             if (assetData.link != undefined) {
-                assetData = await this.data.SpriteSheets.get(assetData.link)
+                asset = spritesheet[assetData.link]
+            } else {
+                asset = spritesheet[component.ResourceName]
             }
-
-            let asset = spritesheet[component.ResourceName] as AssetData;
+            
             let texture = RenderingUtils.cropTexture(downloadedTexture, parseInt(asset.height), parseInt(asset.width), parseInt(asset.left), parseInt(asset.top));
 
             let sprite = new Sprite(texture);
@@ -252,7 +254,6 @@ export default class AvatarImager {
             }
 
             if (component.IsFlipped) {
-
                 sprite.scale.x = -1;
                 sprite.x = this.structure.Geometry?.width! - sprite.x + AvatarData.AVATAR_LEFT_OFFSET;
             }
@@ -294,7 +295,6 @@ export default class AvatarImager {
     }
 
     private getTextureId(assetName: string, resourceName: string) {
-        console.log(assetName)
         return resourceName + ".png";
     }
 
