@@ -69,7 +69,9 @@ function enterRoom(roomId: number) {
   })
 }
 
-function createRoom() { }
+function createRoom() { 
+  Engine.getInstance()?.userInterfaceManager?.componentsManager.getComponent<IComponentShowableUI>(UIComponent.CreateRoomUI).toggle()
+}
 
 function changeTab(tab: string) {
   switch (tab) {
