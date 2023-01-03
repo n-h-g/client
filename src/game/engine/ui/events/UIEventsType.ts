@@ -3,5 +3,6 @@ export enum UIEventsType {
     CATALOGUE = 'catalogue',
     NAVIGATOR = 'navigator',
     LOADER = 'loader',
-    PREVIEWBOX = 'preview_box'
+    PREVIEWBOX = 'preview_box',
+    HOTELVIEW = 'hotelview'
 }

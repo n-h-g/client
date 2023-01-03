@@ -174,6 +174,7 @@ onMounted(() => {
     left: 20vw;
     top: 20vh;
     pointer-events: all;
+    z-index: 100;
 
     .inventoryContainer {
         position: relative;

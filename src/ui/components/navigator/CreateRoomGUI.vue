@@ -108,6 +108,7 @@ function toggle() {
   left: 30vw;
   top: 20vh;
   pointer-events: all;
+  z-index: 100;
 
   .createRoomContainer {
     background-color: #fff;

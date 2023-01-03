@@ -99,6 +99,7 @@ function changeTab(tab: string) {
   left: 20vw;
   top: 10vh;
   pointer-events: all;
+  z-index: 100;
 
   .searchContainer {
     margin-top: 10px;

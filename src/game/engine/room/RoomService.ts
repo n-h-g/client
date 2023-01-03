@@ -1,5 +1,9 @@
 import Room from "./Room";
 import Point from "../../utils/point/Point";
+import { Engine } from "../../Engine";
+import { EventManager } from "../ui/events/EventManager";
+import { UIEvents } from "../ui/events/UIEvents";
+import { HotelViewData } from "../ui/events/data/static/HotelView";
 
 export default class RoomService {
     private currentRoom: Room
@@ -13,7 +17,9 @@ export default class RoomService {
     }
 
     public toggleUI() {
-        
+        EventManager.emit<HotelViewData>(UIEvents.HOTEL_VIEW, {
+            mode: false
+        })
     }
 
     public unsetRoom() : void {

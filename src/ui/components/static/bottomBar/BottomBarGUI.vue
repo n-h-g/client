@@ -25,6 +25,9 @@
 import { Engine } from '../../../../game/Engine';
 import { UIComponent } from '../../../../game/engine/ui/components/UIComponent';
 import { IComponentShowableUI } from '../../../../game/core/ui/IComponentShowableUI';
+import { EventManager } from '../../../../game/engine/ui/events/EventManager';
+import { HotelViewData } from '../../../../game/engine/ui/events/data/static/HotelView';
+import { UIEvents } from '../../../../game/engine/ui/events/UIEvents';
 
 function toggle(ui: string) {
   switch (ui) {

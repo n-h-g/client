@@ -6,6 +6,7 @@ export enum UIComponent {
     NavigatorUI = "navigator",
     FriendsMenuUI = "friends",
     PreviewBoxUI = "preview",
+    StaticContainerUI = "static",
     ListUI = "list",
     CreateRoomUI = "createRoom",
     CatalogueUI = "catalogue",

@@ -35,6 +35,7 @@ function hide() {
     box-shadow: #408caf 5px 5px inset,  #408caf -5px -5px inset;
     height: 100%;
 
+
     .title-bar {
         position: relative;
         height: 31px;
