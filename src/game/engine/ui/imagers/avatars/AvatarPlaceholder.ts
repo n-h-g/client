@@ -13,6 +13,6 @@ export default class AvatarPlaceHolder extends Avatar {
         headFrame: number = 0,
         placeholder: boolean = true
     ) {
-        super("hd-180-1.lg-3216-110", bodyDirection, headDirecton, actions, bodyFrame, headFrame, false, placeholder)
+        super("hd-180-1.lg-3216-110", bodyDirection, headDirecton, actions, bodyFrame, headFrame, false, true)
     }
 }

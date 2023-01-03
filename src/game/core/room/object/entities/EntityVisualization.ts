@@ -44,7 +44,6 @@ export default abstract class EntityVisualization extends RoomObjectVisualizatio
     public addAction(action: ActionId) {
         this.removeActions([ActionId.STAND, ActionId.WALK, ActionId.SIT, ActionId.LAY])
         this.actions.add(action);
-
     }
 
     public removeAction(action: ActionId) {

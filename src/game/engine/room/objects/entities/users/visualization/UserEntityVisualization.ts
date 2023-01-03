@@ -11,6 +11,7 @@ import UserEntityLogic from "../logic/UserEntityLogic";
 import Rotation from "../../../../../../utils/Rotation";
 import { Engine } from "../../../../../../Engine";
 import AvatarPlaceHolder from "../../../../../ui/imagers/avatars/AvatarPlaceholder";
+import { ActionId } from "../../../../../ui/imagers/avatars/enum/actions/ActionId";
 
 export default class UserEntityVisualization extends RoomEntityVisualization {
     declare public entity: UserEntity;
@@ -62,7 +63,9 @@ export default class UserEntityVisualization extends RoomEntityVisualization {
     }
     public draw(): void {
         this.container!.destroy();
-        let avatar = new Avatar(this.entity.Look, this.rotation, this.rotation, this.actions, this.frame);
+        // uncomment this for showing real avatar
+        //let avatar = new Avatar(this.entity.Look, this.rotation, this.rotation, this.actions, this.frame);
+        let avatar = new AvatarPlaceHolder("", this.rotation, this.rotation, this.actions!, this.frame)
         Engine.getInstance().userInterfaceManager?.avatarImager.drawAvatar(avatar);
         this.avatar = avatar;
 

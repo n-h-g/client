@@ -236,7 +236,7 @@ export default class AvatarImager {
     
     
             if (component.Color && component.isColorable) {
-                sprite.tint = avatar.IsPlaceHolder ? 0x00000 : parseInt(component.Color, 16);
+                sprite.tint = avatar.IsPlaceHolder ? 0xFFFFFF : parseInt(component.Color, 16);
 
                 if(component.ResourceType == "ey") {
                     sprite.tint = 0xFFFFF
@@ -262,8 +262,11 @@ export default class AvatarImager {
     
             if(component.ResourceType == "sh") {
                 avatar.ShoesContainer.addChild(sprite);
-            } else if(component.ResourceType == "hd" || component.ResourceType == "ey" || component.ResourceType == "fc" || component.ResourceType == "fa" || component.ResourceType == "ea") { 
+            } else if(component.ResourceType == "hd") { 
                 avatar.HeadContainer.addChild(sprite);
+            }
+            else if(component.ResourceType == "ey" || component.ResourceType == "fc" || component.ResourceType == "fa" || component.ResourceType == "ea") {
+                !avatar.IsPlaceHolder ?? avatar.FaceContainer.addChild(sprite)
             } else if(component.ResourceType == "lg") {
                 avatar.LegContainer.addChild(sprite);
             } else if(component.ResourceType == "hrb" || component.ResourceType == "ha" ||component.ResourceType == "hbr") {
