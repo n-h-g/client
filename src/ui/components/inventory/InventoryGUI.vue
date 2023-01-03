@@ -8,62 +8,60 @@
                 Wall
             </div>
         </div>
-        <div class="content">
-            <div class="inventoryContainer" v-on:click="deselectItem()">
-                <div class="inventoryContainerBg">
-                    <div class="inventoryListAndButtonsContainer">
-                        <div class="listContainer itemsContainer" v-if="currentTab == 'floor'">
-                            <div class="itemInventory" :class="{ selected: selectedItem && selectedItem.id == item.Id }"
-                                v-for="item in floorItems" @click.stop="selectItem(item)" v-bind:key="item.Id">
-                                <img v-bind:src="item.objectVisualization.iconImage" :alt="item.Name" />
-                                <span class="stackSize">{{ item.qty }}</span>
-                            </div>
-                        </div>
-                        <div class="listContainer itemsContainer" v-if="currentTab == 'wall'">
-                            <div class="itemInventory" :class="{ selected: selectedItem && selectedItem.id == item.Id }"
-                                v-for="item in wallItems" @click.stop="selectItem(item)" v-bind:key="item.Id">
-                                <img :src="item.objectVisualization.iconImage" alt="item.Name" />
-                                <span class="stackSize">{{ item.qty }}</span>
-                            </div>
-                        </div>
-                        <div class="buttonsContainer">
-                            <div class="itemPreivew">
-                                <img v-if="selectedItem" v-bind:src="getImagePreview(selectedItem)" />
-                            </div>
-                            <div class="ui-button small" :class="{ hidden: !showPlaceItemButton }" ref="PlaceItemButton"
-                                @click.stop="placeItem()">Place</div>
-                            <div class="ui-button small" :class="{ hidden: !showAddAllItemsToTradeButton }"
-                                ref="AddItemToTradeButton" @click.stop="addAllItemsToTrade">
-                                Trade</div>
-                            <div class="ui-button small" :class="{ hidden: !showAddAllItemsToTradeButton }"
-                                ref="AddAllItemsToTradeButton" @click.stop="addAllItemsToTrade()">
-                                Trade</div>
+        <div class="inventoryContainer" v-on:click="deselectItem()">
+            <div class="inventoryContainerBg">
+                <div class="inventoryListAndButtonsContainer">
+                    <div class="listContainer itemsContainer" v-if="currentTab == 'floor'">
+                        <div class="itemInventory" :class="{ selected: selectedItem && selectedItem.id == item.Id }"
+                            v-for="item in floorItems" @click.stop="selectItem(item)" v-bind:key="item.Id">
+                            <img v-bind:src="item.objectVisualization.iconImage" :alt="item.Name" />
+                            <span class="stackSize">{{ item.qty }}</span>
                         </div>
                     </div>
-                    <div class="tradeContainer" :class="{ hidden: !tradeMode }">
-                        <div class="trade-container">
-                            <div>
-                                <span>Your offer</span>
-                                <ul id="mytradeitems" ref="mytradeitems" class="itemsContainer">
-                                    <div class="itemInventory" v-for="item in myTradeItems" v-bind:key="item.id">
-                                        <img :src="item.icon" :alt="item.name" />
-                                        <span class="stackSize">{{ item.qty }}</span>
-                                    </div>
-                                </ul>
-                            </div>
-                            <div>
-                                <button id="acceptTradeButton" class="tradeButton"
-                                    v-on:click.stop="acceptTrade()">Accept</button>
-                                <button id="declineTradeButton" class="tradeButton"
-                                    v-on:click.stop="cancelTrade()">Decline</button>
-                            </div>
-                            <div>
-                                <span id="targetTradeName">{{ trade.targetTradeName }}</span>
-                                <div id="targettradeitems" ref="targettradeitems" class="itemsContainer">
-                                    <div class="itemInventory" v-for="item in targetTradeItems" v-bind:key="item.id">
-                                        <img :src="item.icon" :alt="item.name" />
-                                        <span class="stackSize">{{ item.qty }}</span>
-                                    </div>
+                    <div class="listContainer itemsContainer" v-if="currentTab == 'wall'">
+                        <div class="itemInventory" :class="{ selected: selectedItem && selectedItem.id == item.Id }"
+                            v-for="item in wallItems" @click.stop="selectItem(item)" v-bind:key="item.Id">
+                            <img :src="item.objectVisualization.iconImage" alt="item.Name" />
+                            <span class="stackSize">{{ item.qty }}</span>
+                        </div>
+                    </div>
+                    <div class="buttonsContainer">
+                        <div class="itemPreivew">
+                            <img v-if="selectedItem" v-bind:src="getImagePreview(selectedItem)" />
+                        </div>
+                        <div class="ui-button small" :class="{ hidden: !showPlaceItemButton }" ref="PlaceItemButton"
+                            @click.stop="placeItem()">Place</div>
+                        <div class="ui-button small" :class="{ hidden: !showAddAllItemsToTradeButton }"
+                            ref="AddItemToTradeButton" @click.stop="addAllItemsToTrade">
+                            Trade</div>
+                        <div class="ui-button small" :class="{ hidden: !showAddAllItemsToTradeButton }"
+                            ref="AddAllItemsToTradeButton" @click.stop="addAllItemsToTrade()">
+                            Trade</div>
+                    </div>
+                </div>
+                <div class="tradeContainer" :class="{ hidden: !tradeMode }">
+                    <div class="trade-container">
+                        <div>
+                            <span>Your offer</span>
+                            <ul id="mytradeitems" ref="mytradeitems" class="itemsContainer">
+                                <div class="itemInventory" v-for="item in myTradeItems" v-bind:key="item.id">
+                                    <img :src="item.icon" :alt="item.name" />
+                                    <span class="stackSize">{{ item.qty }}</span>
+                                </div>
+                            </ul>
+                        </div>
+                        <div>
+                            <button id="acceptTradeButton" class="tradeButton"
+                                v-on:click.stop="acceptTrade()">Accept</button>
+                            <button id="declineTradeButton" class="tradeButton"
+                                v-on:click.stop="cancelTrade()">Decline</button>
+                        </div>
+                        <div>
+                            <span id="targetTradeName">{{ trade.targetTradeName }}</span>
+                            <div id="targettradeitems" ref="targettradeitems" class="itemsContainer">
+                                <div class="itemInventory" v-for="item in targetTradeItems" v-bind:key="item.id">
+                                    <img :src="item.icon" :alt="item.name" />
+                                    <span class="stackSize">{{ item.qty }}</span>
                                 </div>
                             </div>
                         </div>
@@ -109,7 +107,7 @@ function addAllItemsToTrade() {
 }
 
 function placeItem() {
-    this.hide()
+    hide()
     Engine.getInstance().networkingManager.packetManager.applyOut(OutgoingPacket.RoomPlaceItemEvent, {
         id: this.selectedItem.id,
         name: this.selectedItem.name,
@@ -141,7 +139,7 @@ function changeTab(tab: string) {
 function selectItem(item: Item) {
     this.selectedItem = item
 
-    if (Engine.getInstance().roomService.CurrentRoom != undefined) {
+    if (Engine.getInstance()?.roomService?.CurrentRoom != undefined) {
         this.showPlaceItemButton = true
     }
 
@@ -160,10 +158,11 @@ function cancelTrade() {
 }
 
 function hide() {
-    (Engine.getInstance().userInterfaceManager.componentsManager.getComponent(UIComponent.InventoryUI) as IComponentShowableUI).hide()
+    Engine.getInstance()?.userInterfaceManager?.componentsManager.getComponent<IComponentShowableUI>(UIComponent.InventoryUI).hide()
 }
+
 onMounted(() => {
-    Engine.getInstance().networkingManager.packetManager.applyOut(OutgoingPacket.RequestInventoryItemsEvent)
+    Engine.getInstance()?.networkingManager?.packetManager.applyOut(OutgoingPacket.RequestInventoryItemsEvent)
 })
 </script>
 
@@ -175,12 +174,6 @@ onMounted(() => {
     left: 20vw;
     top: 20vh;
     pointer-events: all;
-    display: flex;
-    overflow: hidden;
-    border-radius: 8px;
-    flex-wrap: wrap;
-    flex-flow: column;
-    z-index: 10000;
 
     .inventoryContainer {
         position: relative;

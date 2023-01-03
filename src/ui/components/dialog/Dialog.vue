@@ -30,10 +30,10 @@ function hide() {
 
 <style lang="scss">
 #card {
-	border-radius: 8px;
-    border: 1px solid rgba(0, 0, 0, 0.4);
-	z-index: 10;
-    box-shadow: #408caf 0px 2px 0px inset, #408caf 2px 0px 0px inset, #408caf -2px 0px 0px inset;
+	border-radius: 6px;
+    border: 6px inset #367897;
+    box-shadow: #408caf 5px 5px inset,  #408caf -5px -5px inset;
+    height: 100%;
 
     .title-bar {
         position: relative;
@@ -89,11 +89,12 @@ function hide() {
 
     .content {
         position: relative;
-        color: #222;
-        background-color: #e9e9e1;
         font-size: 13px;
-        padding: 5px;
+        background-color: #e9e9e1;
+        border-radius: 6px;
+        padding: 0 5px 0 5px;
         height: calc(100% - 31px);
+        bottom: 0px;
         cursor: default;
     }
 }

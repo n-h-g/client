@@ -29,10 +29,10 @@ import { IComponentShowableUI } from '../../../../game/core/ui/IComponentShowabl
 function toggle(ui: string) {
   switch (ui) {
     case 'navigator':
-      Engine.getInstance().userInterfaceManager?.componentsManager.getComponent<IComponentShowableUI>(UIComponent.NavigatorUI).toggle()
+      Engine.getInstance()?.userInterfaceManager?.componentsManager.getComponent<IComponentShowableUI>(UIComponent.NavigatorUI).toggle()
       break;
     case 'inventory':
-      Engine.getInstance().userInterfaceManager?.componentsManager.getComponent<IComponentShowableUI>(UIComponent.InventoryUI).toggle()
+      Engine.getInstance()?.userInterfaceManager?.componentsManager.getComponent<IComponentShowableUI>(UIComponent.InventoryUI).toggle()
       break;
   }
 }
