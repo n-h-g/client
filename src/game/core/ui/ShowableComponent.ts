@@ -22,7 +22,6 @@ export abstract class ShowableComponent extends InteractiveComponent implements 
 
     public toggle() {
         this.visible ? this.hide() : this.show();
-        this.visible = !this.visible;
     }
 
     public hide(): void {
