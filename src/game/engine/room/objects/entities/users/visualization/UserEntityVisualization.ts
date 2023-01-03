@@ -97,6 +97,8 @@ export default class UserEntityVisualization extends RoomEntityVisualization {
             Engine.getInstance().roomService?.CurrentRoom?.getRoomLayout().Visualization.container?.addChild(this.container)
         }
 
+        this.entity.logic.registerEvents()
+
         this.updatePosition();
     }
 
