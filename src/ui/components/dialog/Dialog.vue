@@ -1,5 +1,5 @@
 <template>
-    <div id="card">
+    <div id="dialog">
         <div class="title-bar" ref="handler">
             {{ props.title }}
             <div class="closeIcon" @click="hide()"></div>
@@ -29,9 +29,9 @@ function hide() {
 </script>
 
 <style lang="scss">
-#card {
+#dialog {
 	border-radius: 6px;
-    border: 6px inset #367897;
+    border: 6px solid#367897;
     box-shadow: #408caf 5px 5px inset,  #408caf -5px -5px inset;
     height: 100%;
 
