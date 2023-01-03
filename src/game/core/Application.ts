@@ -1,4 +1,6 @@
 import { Application, IApplicationOptions } from '@pixi/app'
+import { Viewport } from 'pixi-viewport';
+import { DisplayObject } from 'pixi.js';
 import { Engine } from '../Engine';
 
 export class ApplicationEngine extends Application {
@@ -9,6 +11,8 @@ export class ApplicationEngine extends Application {
 
     private timeElapsed: number = 0
 
+    private viewport: Viewport
+
     constructor(engine: Engine, options?: IApplicationOptions) {
         super(options);
 
@@ -16,9 +20,33 @@ export class ApplicationEngine extends Application {
 
         this.view.style.height = window.innerHeight + "px"
         this.view.style.width = window.innerWidth + "px"
-        
+
+        this.setUpViewport()
 
         this.engine = engine
+    }
+
+    private setUpViewport() {
+        this.viewport = new Viewport({
+            screenWidth: window.innerWidth,
+            screenHeight: window.innerHeight,
+            worldWidth: 1000,
+            worldHeight: 1000,
+        
+            interaction: this.renderer.plugins.interaction // the interaction module is important for wheel to work properly when renderer.view is placed or scaled
+        })
+
+        this.stage.addChild(this.viewport)
+
+        this.viewport.drag()
+    }
+
+    /**
+     * Add a display object to viewport
+     * @param object 
+     */
+    public add(object: DisplayObject) {
+        this.viewport.addChild(object)
     }
 
     public init(): void {

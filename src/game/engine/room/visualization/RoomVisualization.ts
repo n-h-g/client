@@ -56,7 +56,7 @@ export default class RoomVisualization implements IRoomVisualization {
 
         this.container.interactive = true
 
-        Engine.getInstance().application?.stage.addChild(this.container);
+        Engine.getInstance().application.add(this.container)
     }
 
 

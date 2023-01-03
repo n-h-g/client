@@ -11,6 +11,7 @@
   "dependencies": {
     "@pixi/app": "^6.4.2",
     "animejs": "^3.2.1",
+    "pixi-viewport": "^4.38.0",
     "pixi.js": "^6.4.2",
     "vue": "^3.2.45",
     "vue-router": "^4.1.6"
