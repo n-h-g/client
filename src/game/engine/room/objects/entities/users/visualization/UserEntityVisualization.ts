@@ -62,7 +62,6 @@ export default class UserEntityVisualization extends RoomEntityVisualization {
     }
     public draw(): void {
         this.container!.destroy();
-        this.updateDirection(this.rotation);
         let avatar = new Avatar(this.entity.Look, this.rotation, this.rotation, this.actions, this.frame);
         Engine.getInstance().userInterfaceManager?.avatarImager.drawAvatar(avatar);
         this.avatar = avatar;
@@ -131,14 +130,12 @@ export default class UserEntityVisualization extends RoomEntityVisualization {
 
 
     public setPosition(point: Point3d)  {
-        //console.log(this.headDirection);
         this.nextX = point.getX();
         this.nextY = point.getY();
         this.nextZ = point.getZ();
-        this.rotation = Rotation.calculateDirection(new Point(point.getX(), point.getY()), new Point(this.entity.position.getX(), this.entity.position.getY()), this.rotation);
-        this.headDirection = Rotation.calculateDirection(new Point(point.getX(), point.getY()), new Point(this.entity.position.getX(), this.entity.position.getY()), this.rotation);
+        this.rotation = Rotation.calculateDirection(new Point(point.getX(), point.getY()), new Point(this.entity.position.getX(), this.entity.position.getY()));
+        this.headDirection = Rotation.calculateDirection(new Point(point.getX(), point.getY()), new Point(this.entity.position.getX(), this.entity.position.getY()));
         this.updatePosition()
-        this.draw();
         this.container?.emit("user-position.changed");
         
     }

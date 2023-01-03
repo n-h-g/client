@@ -31,26 +31,32 @@ export default class Rotation {
         return false;
     }
 
-    public static calculateDirection(a: Point, b: Point, defaultDirection: Direction): Direction {
-        if (a.getX() === b.getX() && a.getY() === b.getY())
-            return defaultDirection;
-
-        if (b.getX() < a.getX() && b.getY() > a.getY())
-            return Direction.NORTH_EAST;
-        else if (b.getX() === a.getX() && b.getY() > a.getY())
-            return Direction.NORTH;
-        else if (b.getX() > a.getX() && b.getY() > a.getY())
-            return Direction.NORTH_WEST;
-        else if (b.getX() > a.getX() && b.getY() === a.getY())
-            return Direction.WEST;
-        else if (b.getX() > a.getX() && b.getY() < a.getY())
-            return Direction.SOUTH_WEST;
-        else if (b.getX() === a.getX() && b.getY() < a.getY())
-            return Direction.SOUTH;
-        else if (b.getX() < a.getX() && b.getY() < a.getY())
-            return Direction.SOUTH_EAST;
-        else
+    public static calculateDirection(point1: Point, point2: Point): Direction {
+        if (point1.getX() > point2.getX()) {
+            if (point1.getY() > point2.getY()) {
+                return Direction.NORTH_EAST;
+            }
+            if (point1.getY() < point2.getY()) {
+                return Direction.SOUTH_EAST;
+            }
             return Direction.EAST;
+        }
+
+        if (point1.getX() < point2.getX()) {
+            if (point1.getY() > point2.getY()) {
+                return Direction.NORTH_WEST;
+            }
+            if (point1.getY() < point2.getY()) {
+                return Direction.SOUTH_WEST;
+            }
+            return Direction.WEST;
+        }
+
+        if (point1.getY() > point2.getY()) {
+            return Direction.NORTH;
+        }
+
+        return Direction.SOUTH;
 
 
     }

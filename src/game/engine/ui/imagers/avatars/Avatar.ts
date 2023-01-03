@@ -103,7 +103,7 @@ export default class Avatar {
     }
 
     public setDirection(direction: Direction) {
-        if(direction < Direction.WEST)
+        /*if(direction < Direction.WEST)
         {
             direction = (Direction.NORTH_WEST + (direction + 1));
         }
@@ -111,7 +111,7 @@ export default class Avatar {
         if(direction > Direction.NORTH_WEST)
         {
             direction = (direction - (Direction.NORTH_WEST + 1));
-        }
+        }*/
     }
 
     public assemble(): void {
