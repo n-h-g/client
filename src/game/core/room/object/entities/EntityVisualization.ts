@@ -8,8 +8,6 @@ export default abstract class EntityVisualization extends RoomObjectVisualizatio
 
     protected entity: Entity;
 
-    public container: Container | null = null
-
     protected rotation: Direction = Direction.SOUTH;
     protected headDirection: Direction = Direction.SOUTH;
 

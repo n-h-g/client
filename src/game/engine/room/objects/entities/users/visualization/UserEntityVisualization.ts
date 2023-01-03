@@ -12,29 +12,41 @@ import Rotation from "../../../../../../utils/Rotation";
 import { Engine } from "../../../../../../Engine";
 import AvatarPlaceHolder from "../../../../../ui/imagers/avatars/AvatarPlaceholder";
 import { ActionId } from "../../../../../ui/imagers/avatars/enum/actions/ActionId";
-import RoomVisualization from "../../../../visualization/RoomVisualization";
+import { AvatarEventsType } from "../../../../../ui/imagers/avatars/enum/events/AvatarEventsType";
 
 export default class UserEntityVisualization extends RoomEntityVisualization {
     declare public entity: UserEntity;
     private avatar: Avatar | null = null;
 
+    private avatarCache: Avatar | null = null;
+
     constructor(entity: UserEntity) {
         super(entity)
         this.entity = entity
     }
+    
+    public async loadAvatar(): Promise<Avatar> {
+        return new Promise((resolve, reject) => {
+            let avatar = new Avatar(this.entity.Look, this.rotation, this.rotation, this.actions, this.frame)
 
-    public render(): void {
+            Engine.getInstance()?.userInterfaceManager?.avatarImager.loadAvatar(avatar).then(async () => {
+                await Engine.getInstance().userInterfaceManager?.avatarImager.drawAvatar(avatar)
+                this.avatarCache = avatar
+                resolve(avatar)
+            }).catch(() => {
+                reject()
+            })
+        })
+    }
 
-     
-        let avatar = new Avatar(this.entity.Look, this.rotation, this.rotation, this.actions);
-        
-        this.avatar = avatar;
+    public async render(): Promise<void> {
+        let placeholder = new AvatarPlaceHolder("", this.rotation, this.rotation, this.actions);
 
-        Engine.getInstance().userInterfaceManager?.avatarImager.loadAvatar(this.avatar!).then(() => {
-            Engine.getInstance().userInterfaceManager?.avatarImager.drawAvatar(this.avatar!)
+        Engine.getInstance()?.userInterfaceManager?.avatarImager.loadAvatar(placeholder).then(() => {
+            Engine.getInstance()?.userInterfaceManager?.avatarImager.drawAvatar(placeholder)
         });
 
-        this.avatar = avatar
+        this.avatar = placeholder
 
         this.avatar.Container.buttonMode = true;
         this.avatar.Container.interactive = true;
@@ -42,14 +54,19 @@ export default class UserEntityVisualization extends RoomEntityVisualization {
 
         this.container = this.avatar.Container;
 
+        this.loadAvatar().then((avatar: Avatar) => {
+            this.avatar = avatar
+            this.container.destroy()
+            this.draw()
+        });
+
         (this.entity.logic as UserEntityLogic).registerEvents();
-      
+        
         if(Engine.getInstance().roomService?.CurrentRoom) {
-            (Engine.getInstance().roomService?.CurrentRoom?.getRoomLayout().Visualization.container?.addChild(avatar.Container));
+            (Engine.getInstance().roomService?.CurrentRoom?.getRoomLayout().Visualization.container?.addChild(this.container));
             this.updatePosition(); //todo needs to be refactored 
             this.container?.emit("user-position-changed", 200);
         }
-        this.avatar.Container.zIndex = 10
     }
 
     public updateFrame(frame: number): void {
@@ -64,23 +81,20 @@ export default class UserEntityVisualization extends RoomEntityVisualization {
         }
     }
 
-    public draw(): void {
-        this.container!.destroy();
+    public async draw(): Promise<void> {
 
-        let avatar = new Avatar(this.entity.Look, this.rotation, this.rotation, this.actions, this.frame)
+        this.container.destroy()
+        
+        this.avatar = new Avatar(this.entity.Look, this.rotation, this.rotation, this.actions, this.frame)
 
-        Engine.getInstance()?.userInterfaceManager?.avatarImager.loadAvatar(this.avatar!).then(() => {
-            Engine.getInstance().userInterfaceManager?.avatarImager.drawAvatar(avatar)
-        })
-
-        this.avatar = avatar
+        Engine.getInstance().userInterfaceManager?.avatarImager.drawAvatar(this.avatar);
 
         this.container = this.avatar.Container
 
         this.container!.zIndex = 10
 
         if (Engine.getInstance().roomService?.CurrentRoom) {
-            Engine.getInstance().roomService?.CurrentRoom?.getRoomLayout().Visualization.container?.addChild(this.container!)
+            Engine.getInstance().roomService?.CurrentRoom?.getRoomLayout().Visualization.container?.addChild(this.container)
         }
 
         this.updatePosition();
@@ -186,5 +200,4 @@ export default class UserEntityVisualization extends RoomEntityVisualization {
 
         return (1 + Math.round(this.entity.position.getX()) + Math.round(this.entity.position.getY()) + ((Math.round(this.entity.position.getX()) + Math.round(this.entity.position.getY())) * 1000) + 4);
     }
-
 }

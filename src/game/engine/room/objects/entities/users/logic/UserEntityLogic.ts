@@ -27,12 +27,17 @@ export default class UserEntityLogic extends EntityLogic {
     }
 
     public registerEvents() {
-
         this.entity.visualization?.container?.on('pointerdown', () => this.onClick())
         this.entity.visualization?.container?.on('user-position-changed', () => this.onPositionChanged())
         this.entity.visualization?.container?.on('user-started-typing', () => this.userToggleTyping(true))
         this.entity.visualization?.container?.on('user-stop-typing', () => this.userToggleTyping(false))
         this.entity.visualization?.container?.on('user-look-changed', () => this.userLookChanged())
+        this.entity.visualization?.container?.on('user-avatar-loading-completed', () => this.onLoad())
+    }
+
+    public onLoad(): void {
+        this.entity.visualization.draw()
+        console.log('loaded')
     }
 
     public onTalk(length?: number): void {
