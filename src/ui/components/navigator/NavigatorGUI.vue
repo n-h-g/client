@@ -1,5 +1,16 @@
 <template>
-  <Card title="Navigator" :box="UIEventsType.NAVIGATOR">
+  <Dialog title="Navigator" :box="UIEventsType.NAVIGATOR">
+    <div class="sub">
+      <div class="item" :class="{ active: currentTab == 'public' }" @click="changeTab('public')">
+        Public
+      </div>
+      <div class="item" :class="{ active: currentTab == 'all' }" @click="changeTab('all')">
+        All
+      </div>
+      <div class="item" :class="{ active: currentTab == 'my' }" @click="changeTab('my')">
+        My
+      </div>
+    </div>
     <div class="content">
       <div class="searchContainer">
         <img src="https://cdn.discordapp.com/attachments/799750747281031228/800333126395232266/btn_search.png" />
@@ -7,17 +18,6 @@
       </div>
       <div class="roomContainer">
         <div class="roomContainerBg">
-          <div class="navigatorTabs">
-            <div class="tab" :class="{ active: currentTab == 'public' }" @click="changeTab('public')">
-              Public
-            </div>
-            <div class="tab" :class="{ active: currentTab == 'all' }" @click="changeTab('all')">
-              All
-            </div>
-            <div class="tab" :class="{ active: currentTab == 'my' }" @click="changeTab('my')">
-              My
-            </div>
-          </div>
           <div class="roomsListContainer">
             <ul class="easyRoomsListUl" v-if="currentTab == 'my' || currentTab == 'all'">
               <li class="roomLi" v-for="room in rooms" :key="room.id" v-on:click="enterRoom(room.id)">
@@ -63,13 +63,7 @@
         </div>
       </div>
     </div>
-    <div class="footer">
-      <button type="submit" class="navigatorBtn newRoom" @click="createRoom()">
-        New Room
-      </button>
-      <button type="submit" class="navigatorBtn randomRoom">Random Room</button>
-    </div>
-  </Card>
+  </Dialog>
 </template>
 
 <script setup lang="ts">
@@ -79,11 +73,8 @@ import { EventManager } from "../../../game/engine/ui/events/EventManager"
 import { UIEvents } from "../../../game/engine/ui/events/UIEvents"
 import { OutgoingPacket } from "../../../game/networking/packets/outgoing/OutgoingPacket"
 import { UIEventsType } from "../../../game/engine/ui/events/UIEventsType"
-import Card from '../card/Card.vue'
+import Dialog from '../dialog/Dialog.vue'
 import { NavigatorRoomsEventData } from "../../../game/engine/ui/events/data/navigator/NavigatorRooms"
-import { DialogEventData } from "../../../game/engine/ui/events/data/general/Dialog"
-import { UIComponent } from "../../../game/engine/ui/components/UIComponent"
-import { IComponentShowableUI } from "../../../game/core/ui/IComponentShowableUI"
 
 let rooms = ref([])
 let currentTab = ref("public");
@@ -92,12 +83,7 @@ EventManager.read(UIEvents.NAVIGATOR_ROOMS_ADDED, (event: NavigatorRoomsEventDat
   rooms.value = event.rooms
 })
 
-function hide() {
-  (Engine.getInstance().userInterfaceManager.componentsManager.getComponent(UIComponent.NavigatorUI) as IComponentShowableUI).hide()
-}
-
 function enterRoom(roomId: number) {
-  this.hide()
   Engine.getInstance()?.networkingManager?.packetManager.applyOut(OutgoingPacket.UserEnterRoom, {
     id: roomId
   })
@@ -170,11 +156,6 @@ function changeTab(tab: string) {
   }
 
   .content {
-    width: calc(100% - 10px);
-    height: calc(100% - 10px);
-    margin: 0 auto;
-    height: auto;
-
     .searchContainer {
       margin-top: 10px;
 

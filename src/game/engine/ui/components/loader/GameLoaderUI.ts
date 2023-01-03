@@ -27,6 +27,6 @@ export class GameLoaderUI implements IComponentDeletableUI {
     }
 
     delete(): void {
-        UiUtils.dismountComponent('gameLoader')
+        UiUtils.dismountComponent(UIComponent.GameLoaderUI)
     }
 }
