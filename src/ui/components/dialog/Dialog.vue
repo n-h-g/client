@@ -31,7 +31,11 @@ function hide() {
 <style lang="scss">
 #dialog {
 	border-radius: 6px;
+<<<<<<< HEAD
     border: 6px solid #367897;
+=======
+    border: 6px #367897;
+>>>>>>> d77b6e9dbaf72ca22085f2418b2cee3c14ed6f11
     box-shadow: #408caf 5px 5px inset,  #408caf -5px -5px inset;
     height: 100%;
 
