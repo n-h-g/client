@@ -25,9 +25,8 @@ export default class UserEntityVisualization extends RoomEntityVisualization {
 
     public render(): void {
 
+     
         let avatar = new Avatar(this.entity.Look, this.rotation, this.rotation, this.actions);
-
-        let RoomVisualization = (Engine.getInstance().roomService?.CurrentRoom?.getRoomLayout().Visualization) as RoomVisualization
         
         this.avatar = avatar;
 
@@ -35,60 +34,65 @@ export default class UserEntityVisualization extends RoomEntityVisualization {
             Engine.getInstance().userInterfaceManager?.avatarImager.drawAvatar(this.avatar!)
         });
 
+        this.avatar = avatar
+
         this.avatar.Container.buttonMode = true;
         this.avatar.Container.interactive = true;
         this.avatar.Container.interactiveChildren = true;
 
-
         this.container = this.avatar.Container;
-        
+
         (this.entity.logic as UserEntityLogic).registerEvents();
       
         if(Engine.getInstance().roomService?.CurrentRoom) {
-            RoomVisualization.add(this.entity)
+            (Engine.getInstance().roomService?.CurrentRoom?.getRoomLayout().Visualization.container?.addChild(avatar.Container));
             this.updatePosition(); //todo needs to be refactored 
             this.container?.emit("user-position-changed", 200);
         }
         this.avatar.Container.zIndex = 10
-
-
     }
+
     public updateFrame(frame: number): void {
         this.frame = frame;
     }
+
     public nextFrame(): void {
-        if(this.frame > this.avatar!.Frames) {
+        if (this.frame > this.avatar!.Frames) {
             this.frame = 0;
         } else {
             this.frame++;
         }
     }
+
     public draw(): void {
         this.container!.destroy();
-        // uncomment this for showing real avatar
-        //let avatar = new Avatar(this.entity.Look, this.rotation, this.rotation, this.actions, this.frame);
-        let avatar = new AvatarPlaceHolder("", this.rotation, this.rotation, this.actions!, this.frame)
-        Engine.getInstance().userInterfaceManager?.avatarImager.drawAvatar(avatar);
-        this.avatar = avatar;
 
-        this.container = this.avatar.Container;
+        let avatar = new Avatar(this.entity.Look, this.rotation, this.rotation, this.actions, this.frame)
 
-        this.container!.zIndex = this.getZIndex();
+        Engine.getInstance()?.userInterfaceManager?.avatarImager.loadAvatar(this.avatar!).then(() => {
+            Engine.getInstance().userInterfaceManager?.avatarImager.drawAvatar(avatar)
+        })
 
-        if(Engine.getInstance().roomService?.CurrentRoom) {
-            (Engine.getInstance().roomService?.CurrentRoom?.getRoomLayout().Visualization.container?.addChild(this.container!));
+        this.avatar = avatar
+
+        this.container = this.avatar.Container
+
+        this.container!.zIndex = 10
+
+        if (Engine.getInstance().roomService?.CurrentRoom) {
+            Engine.getInstance().roomService?.CurrentRoom?.getRoomLayout().Visualization.container?.addChild(this.container!)
         }
 
         this.updatePosition();
     }
 
     public talk(): void {
-        
+
     }
 
     public move(delta: number): void {
         delta = delta / 1000;
- 
+
         if (this.entity.position.getX() < this.nextX) {
             this.entity.position.setX(this.entity.position.getX() + delta * AvatarData.AVATAR_WALK_SPEED);
             if (this.entity.position.getX() > this.nextX) {
@@ -134,7 +138,7 @@ export default class UserEntityVisualization extends RoomEntityVisualization {
 
 
 
-    public setPosition(point: Point3d)  {
+    public setPosition(point: Point3d) {
         this.nextX = point.getX();
         this.nextY = point.getY();
         this.nextZ = point.getZ();
@@ -142,7 +146,7 @@ export default class UserEntityVisualization extends RoomEntityVisualization {
         this.headDirection = Rotation.calculateDirection(new Point(point.getX(), point.getY()), new Point(this.entity.position.getX(), this.entity.position.getY()));
         this.updatePosition()
         this.container?.emit("user-position.changed");
-        
+
     }
 
     public updatePosition() {
@@ -150,7 +154,7 @@ export default class UserEntityVisualization extends RoomEntityVisualization {
 
         let tile: Tile | null = currentRoom?.getRoomLayout().getFloorPlane().getTilebyPosition(new Point(Math.round(this.entity.position.getX()), Math.round(this.entity.position.getY()))); // get the tile where you want to set avatar
 
-        if(tile == null) return;
+        if (tile == null) return;
 
         let offsetFloor = tile!.position.getZ() > 0 ? -MapData.thickSpace * MapData.stepHeight * tile!.position.getZ() : -AvatarData.AVATAR_TOP_OFFSET;
 
@@ -170,17 +174,17 @@ export default class UserEntityVisualization extends RoomEntityVisualization {
         avatar!.Direction = direction;
     }
 
-    public get Avatar(): Avatar | null{
+    public get Avatar(): Avatar | null {
         return this.avatar;
     }
-    
+
     public getZIndex(): number {
 
-        if(this.entity.position.getX() === Engine.getInstance().roomService?.CurrentRoom?.getRoomLayout().getDoorPosition().getX() && this.entity.position.getY() === Engine.getInstance().roomService?.CurrentRoom?.getRoomLayout().getDoorPosition().getY()) {
+        if (this.entity.position.getX() === Engine.getInstance().roomService?.CurrentRoom?.getRoomLayout().getDoorPosition().getX() && this.entity.position.getY() === Engine.getInstance().roomService?.CurrentRoom?.getRoomLayout().getDoorPosition().getY()) {
             return 3;
         }
 
         return (1 + Math.round(this.entity.position.getX()) + Math.round(this.entity.position.getY()) + ((Math.round(this.entity.position.getX()) + Math.round(this.entity.position.getY())) * 1000) + 4);
     }
-    
+
 }

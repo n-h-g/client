@@ -26,9 +26,9 @@
 
 <script setup lang="ts">
 import { ref } from 'vue'
+import { DialogEventData } from '../../../game/engine/ui/events/data/general/Dialog';
+import { PreviewModeEventData } from '../../../game/engine/ui/events/data/general/PreviewUserData';
 import { EventManager } from '../../../game/engine/ui/events/EventManager';
-import { BoxEvent } from '../../../game/engine/ui/events/general/BoxEvent';
-import { PreviewUserModeEvent } from '../../../game/engine/ui/events/general/PreviewUserModeEvent';
 import { UIEvents } from '../../../game/engine/ui/events/UIEvents';
 import { UIEventsType } from '../../../game/engine/ui/events/UIEventsType';
 
@@ -39,7 +39,7 @@ const user = ref({
     motto: ''
 })
 
-EventManager.read(UIEvents.PREVIEW_BOX_MODE, (evt: PreviewUserModeEvent) => {
+EventManager.read(UIEvents.PREVIEW_BOX_MODE, (evt: PreviewModeEventData) => {
     mode.value = evt.mode
     user.value.username = evt.username
     user.value.image = evt.look
@@ -47,7 +47,7 @@ EventManager.read(UIEvents.PREVIEW_BOX_MODE, (evt: PreviewUserModeEvent) => {
 })
 
 function hide(): void {
-    EventManager.emit<BoxEvent>(UIEvents.CLOSE, {
+    EventManager.emit<DialogEventData>(UIEvents.CLOSE, {
         type: UIEventsType.PREVIEWBOX
     })
 }
