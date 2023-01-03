@@ -98,9 +98,9 @@ export default class Avatar {
         this.headAccessoryContainer = new Container();
         this.faceContainer = new Container();
 
-        this.events.on(AvatarEventsType.LOAD_COMPLETE, () => {
+        /*this.events.on(AvatarEventsType.LOAD_COMPLETE, () => {
             this.assemble()
-        })
+        })*/
  
     }
 
@@ -140,6 +140,8 @@ export default class Avatar {
         for(let object of this.container.children) {
             object.interactive = true;
         }
+
+        this.events.emit(AvatarEventsType.LOAD_COMPLETE)
     }
 
     public addAction(action: ActionId) {
