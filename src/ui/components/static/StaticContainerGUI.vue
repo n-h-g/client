@@ -1,5 +1,7 @@
 
 <template>
+    <BubbleAlertContainer />
+
     <div id="staticContainer" :class="{hidden: !hotelView}">
         <HotelView />  
     </div>
@@ -13,6 +15,7 @@ import { EventManager } from "../../../game/engine/ui/events/EventManager";
 import { UIEvents } from "../../../game/engine/ui/events/UIEvents";
 
 import HotelView from "./HotelView.vue"
+import BubbleAlertContainer from "./BubbleAlertContainer.vue";
 
 let hotelView = ref(true)
 

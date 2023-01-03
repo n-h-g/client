@@ -1,7 +1,7 @@
 
 <template>
     <div class="bubbleAlertContainer">
-            <div class="bubbleAlert" v-for="bubbleAlert in this.bubbleMessages" v-bind:key="bubbleAlert.id">
+            <div class="bubbleAlert" v-for="bubbleAlert in bubbleMessages" v-bind:key="bubbleAlert.id">
                 <img src="~@/assets/images/bottom-bar/avatar.png"/>
                 {{ bubbleAlert.message }}
                 <div class="bubbleAlertButtons" v-if="isClickable(bubbleAlert)">
@@ -20,6 +20,8 @@
 <script setup lang="ts">
 
 import { ref } from "vue"
+import { BubbleAlertData } from "../../../game/core/communication/incoming/generic/BubbleAlertData"
+import BubbleMessage from "../../../game/core/game/BubbleMessage"
 
 
 let bubbleMessages = ref([])
