@@ -4,5 +4,6 @@ export enum UIEventsType {
     NAVIGATOR = 'navigator',
     LOADER = 'loader',
     PREVIEWBOX = 'preview_box',
-    HOTELVIEW = 'hotelview'
+    HOTELVIEW = 'hotelview',
+    ROOM = 'room'
 }

@@ -27,10 +27,6 @@ class RoomLogic implements IRoomLogic {
         roomVisualization.Container.on('pointerdown', this.onMouseClick.bind(this));
         roomVisualization.getCanvasFloor().on('pointerout', this.onMouseOut.bind(this));
 
-        EventManager.emit<RoomUIEventData>(UIEvents.ROOM_UI, {
-            enabled: true
-        })
-
         this.room.getFloorPlane().logic?.registerEvents()
         this.room.getWallPlane().logic?.registerEvents()
     }
