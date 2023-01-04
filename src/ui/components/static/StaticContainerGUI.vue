@@ -1,6 +1,6 @@
 <template>
     <BubbleAlertContainer />
-    <div id="staticContainer" :class="{ hidden: !hotelView }">
+    <div id="staticContainer" v-if="hotelView" :class="{ hidden: !hotelView }">
         <HotelView />
     </div>
 </template>

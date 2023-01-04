@@ -20,7 +20,6 @@ export default class RoomService {
     }
 
     public toggleUI() {
-
         Engine.getInstance().userInterfaceManager.componentsManager.getComponent<IComponentShowableUI>(UIComponent.RoomUI).toggle()
 
         EventManager.emit<HotelViewData>(UIEvents.HOTEL_VIEW, {
