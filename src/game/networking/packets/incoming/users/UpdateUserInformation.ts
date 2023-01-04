@@ -3,7 +3,7 @@ import { Engine } from '../../../../Engine';
 import { EventManager } from '../../../../engine/ui/events/EventManager';
 import { TopbarEventData } from '../../../../engine/ui/events/data/static/Topbar';
 import { UIEvents } from '../../../../engine/ui/events/UIEvents';
-import User from '../../../../engine/user/User';
+import { User } from '../../../../engine/user/User';
 import { MessageHandler } from '../../../handler/MessageHandler';
 
 export class UpdateUserInformation extends MessageHandler {

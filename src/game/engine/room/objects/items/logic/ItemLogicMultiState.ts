@@ -1,4 +1,4 @@
-import ItemLogic from "../../../../../core/room/object/items/logic/ItemLogic";
+import { ItemLogic } from "../../../../../core/room/object/items/logic/ItemLogic";
 import Item from "../Item";
 
 export default class ItemLogicMultiState extends ItemLogic {
@@ -14,7 +14,7 @@ export default class ItemLogicMultiState extends ItemLogic {
 
     public registerEvents() {
         super.registerEvents();
-        this.item.base.addListener("click", () => {
+        this._item.base.addListener("click", () => {
             //this.changeState()
         })
     }
@@ -23,31 +23,29 @@ export default class ItemLogicMultiState extends ItemLogic {
 
         let animation = this.animation;
 
-        if (this.animation > this.item.base.furniBase.getAnimations().length) {
+        if (this.animation > this._item.base.furniBase.getAnimations().length) {
             animation = 0;
-            this.item.visualization!.needsUpdate = false;
+            this._item.visualization!.needsUpdate = false;
         }
         else {
             animation++
         }
 
-        this.item.base.setAnimation(animation)
-        this.item.visualization!.needsUpdate = true;
+        this._item.base.setAnimation(animation)
+        this._item.visualization!.needsUpdate = true;
         this.animation = animation;
     }
 
     public tick(delta: number) {
-
-        if(this.item.visualization?.needsUpdate) {
+        if (this._item.visualization?.needsUpdate) {
             super.tick(delta);
 
-            this.frameTracker += delta;
+            this._frameTracker += delta;
 
-            if (this.item.base.furniBase.data.visualization.type === "furniture_animated") {
-
-                if (this.frameTracker >= 100) {
-                    this.item.visualization.render();
-                    this.frameTracker = 0
+            if (this._item.base.furniBase.data.visualization.type === "furniture_animated") {
+                if (this._frameTracker >= 100) {
+                    this._item.visualization.render();
+                    this._frameTracker = 0
                 }
             }
         }

@@ -1,14 +1,13 @@
-import RoomObjectLogic from "../RoomObjectLogic";
-import Entity from "./Entity";
+import { RoomObjectLogic } from '../RoomObjectLogic';
+import { Entity } from "./Entity";
 
-export default abstract class EntityLogic extends RoomObjectLogic {
-
-    protected entity: Entity;
-    public frameTracker: number = 0;
+export abstract class EntityLogic extends RoomObjectLogic {
+    protected _entity: Entity
+    public frameTracker: number = 0
 
     public constructor(entity: Entity) {
-        super();
-        this.entity = entity;
+        super()
+        this._entity = entity
     }
 
     public abstract onPositionChanged(): void
@@ -17,5 +16,7 @@ export default abstract class EntityLogic extends RoomObjectLogic {
 
     public abstract onTalk(): void
 
-    public get Entity(): Entity { return this.entity; }
+    public get entity(): Entity {
+        return this._entity
+    }
 }

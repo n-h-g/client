@@ -1,6 +1,6 @@
 import { IRepository } from "./IRepository";
 
-export default class Repository<S, T> implements IRepository<S, T> {
+export class Repository<S, T> implements IRepository<S, T> {
     public map: Map<S, T>
 
     public constructor() {
@@ -27,10 +27,10 @@ export default class Repository<S, T> implements IRepository<S, T> {
     public get(s: S): T | null {
         const value = this.map.get(s)
 
-        if(!value) return null;
+        if (!value) return null;
 
         return value;
     }
 
-    public tick(delta: number): void {}
+    public tick(delta: number): void { }
 }

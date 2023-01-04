@@ -1,40 +1,47 @@
-import IRoomObjectVisualization from "./IRoomObjectVisualization"
 import { Container } from 'pixi.js'
 
-export default abstract class RoomObjectVisualization implements IRoomObjectVisualization {
-
-    protected offsetX: number
-    protected offsetY: number
-    protected zIndex: number
-
-    /**
-     * The graphic container of room object visualization
-     */
-    public container: Container | null = null;
-
-    
-    public needsUpdate: boolean = false;
+export default abstract class RoomObjectVisualization {
+    protected _offsetX: number
+    protected _offsetY: number
+    protected _zIndex: number
+    private _container: Container
+    private _needsUpdate: boolean
 
     constructor(offsetX: number, offsetY: number, zIndex: number) {
-        this.offsetX = offsetX
-        this.offsetY = offsetY
-        this.zIndex = zIndex
-        this.container = null;
-        this.needsUpdate = false;
+        this._offsetX = offsetX
+        this._offsetY = offsetY
+        this._zIndex = zIndex
+        this._container = null
+        this._needsUpdate = false
     }
 
-    getOffsetX() : number {
-        return this.offsetX
+    public set needsUpdate(update: boolean) {
+        this._needsUpdate = update
     }
 
-    getOffsetY() : number {
-        return this.offsetY
-    }
-    
-    getZIndex() : number {
-        return this.zIndex
+    public get needsUpdate(): boolean {
+        return this._needsUpdate
     }
 
-    abstract render() : void
-    
+    public get offsetX(): number {
+        return this._offsetX
+    }
+
+    public get offsetY(): number {
+        return this._offsetY
+    }
+
+    public get zIndex(): number {
+        return this._zIndex
+    }
+
+    public get container(): Container {
+        return this._container
+    }
+
+    public set container(container: Container) {
+        this._container = container
+    }
+
+    abstract render(): void
 }

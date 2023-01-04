@@ -1,18 +1,13 @@
-import Tile from "../Tile"
-import RoomLogic from "../../../logic/RoomLogic"
-import RoomObjectLogic from "../../../../../core/room/object/RoomObjectLogic"
 import MapData from "../MapData"
 import TileType from "../TileTypeEnum"
-import VisualizationPointer from "../visualization/VisualizationPointer"
 import Room from "../../../Room"
-import RoomVisualization from "../../../visualization/RoomVisualization"
 import { Container } from 'pixi.js'
 import { Engine } from "../../../../../Engine"
-import { Logger } from "../../../../../utils/Logger"
 import { OutgoingPacket } from "../../../../../networking/packets/outgoing/OutgoingPacket"
+import { RoomObjectLogic } from '../../../../../core/room/object/RoomObjectLogic'
+import { Tile } from '../Tile'
 
 export default class LogicTile extends RoomObjectLogic {
-
     private tile: Tile
     private hitContext: CanvasRenderingContext2D | null
 
@@ -21,7 +16,7 @@ export default class LogicTile extends RoomObjectLogic {
 
         this.tile = tile
 
-        let canvas = (this.tile.getPlane().getRoom().Logic as RoomLogic).getCanvasFloorHit()
+        let canvas = this.tile.plane.room.Logic.getCanvasFloorHit()
         this.hitContext = canvas.getContext("2d")
 
         this.checkTileAndDrawHitBox()
@@ -46,19 +41,17 @@ export default class LogicTile extends RoomObjectLogic {
     }
 
     public onHover() {
-        let room: Room | null = this.tile.getPlane().getRoom().getRoom();
+        let room: Room | null = this.tile.plane.room.getRoom();
 
         let tileContext: Container | null | undefined = this.tile.visualization?.container;
 
-        (this.tile.getPlane().getRoom().Visualization as RoomVisualization).getCanvasPointer().zIndex = 5;
-        (this.tile.getPlane().getRoom().Visualization as RoomVisualization).getCanvasPointer().visible = true;
-        (this.tile.getPlane().getRoom().getPointer().visualization as VisualizationPointer).updatePosition(tileContext!.x, tileContext!.y, this.tile);
-
-
+        this.tile.plane.room.Visualization.getCanvasPointer().zIndex = 5;
+        this.tile.plane.room.Visualization.getCanvasPointer().visible = true;
+        this.tile.plane.room.getPointer().visualization.updatePosition(tileContext!.x, tileContext!.y, this.tile);
     }
 
     public checkTileAndDrawHitBox() {
-        if (this.tile.getType() != TileType.Hole) {
+        if (this.tile.type != TileType.Hole) {
             if (this.hitContext != null) {
                 this.drawTileHitBox(this.hitContext)
             }
@@ -71,17 +64,17 @@ export default class LogicTile extends RoomObjectLogic {
 
         hitCtx.beginPath();
         hitCtx.moveTo(
-            this.tile.visualization!.getOffsetX() + MapData.tileWidth / 2,
-            this.tile.visualization!.getOffsetY()
+            this.tile.visualization!.offsetX + MapData.tileWidth / 2,
+            this.tile.visualization!.offsetY
         );
         hitCtx.lineTo(
-            this.tile.visualization!.getOffsetX() + MapData.tileWidth,
-            this.tile.visualization!.getOffsetY() + MapData.tileHeight / 2
+            this.tile.visualization!.offsetX + MapData.tileWidth,
+            this.tile.visualization!.offsetY + MapData.tileHeight / 2
         );
-        hitCtx.lineTo(this.tile.visualization!.getOffsetX() + MapData.tileWidth / 2, this.tile.visualization!.getOffsetY() + MapData.tileHeight);
-        hitCtx.lineTo(this.tile.visualization!.getOffsetX(), this.tile.visualization!.getOffsetY() + MapData.tileHeight / 2);
+        hitCtx.lineTo(this.tile.visualization!.offsetX + MapData.tileWidth / 2, this.tile.visualization!.offsetY + MapData.tileHeight);
+        hitCtx.lineTo(this.tile.visualization!.offsetX, this.tile.visualization!.offsetY + MapData.tileHeight / 2);
         hitCtx.closePath();
-        hitCtx.fillStyle = this.tile.getColor().toString();
+        hitCtx.fillStyle = this.tile.color.toString();
         hitCtx.fill();
 
         hitCtx.restore();
@@ -89,6 +82,7 @@ export default class LogicTile extends RoomObjectLogic {
         return hitCtx;
     }
 
-    tick(delta: number): void { }
+    tick(delta: number): void {
 
+    }
 }

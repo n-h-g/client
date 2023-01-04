@@ -1,12 +1,8 @@
-import IRoomLogic from "../../../core/room/IRoomLogic"
 import RoomLayout from "../RoomLayout"
 import Room from "../Room"
-import { EventManager } from "../../ui/events/EventManager"
-import { UIEvents } from "../../ui/events/UIEvents"
-import { RoomUIEventData } from "../../ui/events/data/room/RoomUIEventData"
+import { IRoomLogic } from '../../../core/room/IRoomLogic'
 
-class RoomLogic implements IRoomLogic {
-
+export class RoomLogic implements IRoomLogic {
     private room: RoomLayout
 
     private canvasFloorHit: HTMLCanvasElement
@@ -20,9 +16,9 @@ class RoomLogic implements IRoomLogic {
         this.canvasWallHit = this.room.createOrGetRoomCanvas("wallHit")
     }
 
-    public registerEvents() : void {
+    public registerEvents(): void {
         let roomVisualization = this.room.Visualization;
-        
+
         roomVisualization.getCanvasFloor().on('pointerover', this.onMouseOver.bind(this));
         roomVisualization.Container.on('pointerdown', this.onMouseClick.bind(this));
         roomVisualization.getCanvasFloor().on('pointerout', this.onMouseOut.bind(this));
@@ -50,18 +46,16 @@ class RoomLogic implements IRoomLogic {
     }
 
 
-    public tick(delta: number) : void {
+    public tick(delta: number): void {
         this.room.getWallPlane().logic?.tick(delta)
         this.room.getFloorPlane().logic?.tick(delta)
     }
 
-    public getCanvasFloorHit() : HTMLCanvasElement {
+    public getCanvasFloorHit(): HTMLCanvasElement {
         return this.canvasFloorHit
     }
 
-    public getCanvasWallHit() : HTMLCanvasElement {
+    public getCanvasWallHit(): HTMLCanvasElement {
         return this.canvasWallHit
     }
 }
-
-export default RoomLogic

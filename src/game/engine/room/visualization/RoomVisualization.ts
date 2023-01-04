@@ -1,17 +1,15 @@
-import IRoomVisualization from "../../../core/room/IRoomVisualization"
 import RoomLayout from "../RoomLayout"
 import { Container } from '@pixi/display'
 import Point from "../../../utils/point/Point"
 import MapData from "../objects/map/MapData"
 import UiUtils from "../../../utils/UiUtils"
-import Tile from "../objects/map/Tile"
+import { Tile } from "../objects/map/Tile"
 import { Engine } from '../../../Engine'
-import Avatar from '../../ui/imagers/avatars/Avatar'
-import { Direction } from '../../../core/objects/Direction'
-import RoomObjectController from "../../../core/room/object/RoomObjectController"
+import { IRoomVisualization } from '../../../core/room/IRoomVisualization'
+import { RoomObjectController } from '../../../core/room/object/RoomObjectController'
+import { RoomLogic } from '../logic/RoomLogic'
 
 export default class RoomVisualization implements IRoomVisualization {
-
     private roomLayout: RoomLayout
 
     private canvasFloor: Container
@@ -57,7 +55,7 @@ export default class RoomVisualization implements IRoomVisualization {
 
         this.container.interactive = true
 
-        Engine.getInstance().application.add(this.container)
+        Engine.getInstance()?.application?.viewport.addChild(this.container)
     }
 
 
@@ -130,8 +128,7 @@ export default class RoomVisualization implements IRoomVisualization {
      * @param follow 
      * @returns 
      */
-    public add(object: RoomObjectController, follow: boolean = false) {
-
+    public add(object: RoomObjectController<RoomVisualization, RoomLogic>, follow: boolean = false) {
         console.log(object.visualization)
 
         if(!object) return;

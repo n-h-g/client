@@ -1,12 +1,9 @@
-import IUserVisualization from "../../../core/users/IUserVisualization";
-import UserEntity from "../../room/objects/entities/users/UserEntity";
-import User from "../User";
+import { UserEntity } from '../../room/objects/entities/users/UserEntity';
+import { User } from '../User';
 
-export default class UserVisualization implements IUserVisualization {
-
+export class UserVisualization {
     public user: User
-
-    public userEntity: UserEntity | null
+    public userEntity: UserEntity
 
     public constructor(user: User) {
         this.user = user;

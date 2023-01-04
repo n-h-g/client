@@ -4,12 +4,11 @@ import Point from './utils/point/Point'
 import generalConfig from './configuration/general.json'
 import { NetworkingManager } from './networking/NetworkingManager'
 import UserInterfaceManager from './engine/ui/UserInterfaceManager'
-import UserService from './engine/user/UserService'
-import CommandService from './engine/game/commands/CommandService'
-import ChatMessageService from './engine/game/chat/ChatMessageService'
+import { UserService } from './engine/user/UserService'
+import { CommandService } from './engine/game/commands/CommandService'
 import Room from './engine/room/Room'
 import * as PIXI from "pixi.js"
-import UserEntity from './engine/room/objects/entities/users/UserEntity'
+import { UserEntity } from './engine/room/objects/entities/users/UserEntity'
 import { Direction } from './core/objects/Direction'
 
 export class Engine {
@@ -20,7 +19,6 @@ export class Engine {
     private _networkingManager: NetworkingManager | null
     private _usersService: UserService | null
     private _commandService: CommandService | null
-    private _chatService: ChatMessageService | null
 
     private _config = generalConfig
 
@@ -57,7 +55,6 @@ export class Engine {
         this._roomsService = new RoomService()
         this._usersService = new UserService()
         this._commandService = new CommandService()
-        this._chatService = new ChatMessageService()
 
         this._networkingManager = new NetworkingManager()
         this._userInterfaceManager = new UserInterfaceManager()
@@ -90,10 +87,6 @@ export class Engine {
 
     public get application(): ApplicationEngine {
         return this._application || null
-    }
-
-    public get chatService(): ChatMessageService {
-        return this._chatService
     }
 
     public get commandService(): CommandService {

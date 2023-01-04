@@ -1,11 +1,10 @@
-import RoomObjectLogic from "../../../../../core/room/object/RoomObjectLogic";
-import Pointer from "../Pointer";
-import Point from "../../../../../utils/point/Point";
-import ColorRGB from "../../../../../utils/color/ColorRGB";
+import { RoomObjectLogic } from '../../../../../core/room/object/RoomObjectLogic'
+import ColorRGB from '../../../../../utils/color/ColorRGB'
+import Pointer from '../Pointer'
 
 export default class LogicPointer extends RoomObjectLogic {
     private pointer: Pointer
-    private currentColor: ColorRGB = new ColorRGB(0,0,0)
+    private currentColor: ColorRGB = new ColorRGB(0, 0, 0)
 
     constructor(pointer: Pointer) {
         super()
@@ -14,7 +13,7 @@ export default class LogicPointer extends RoomObjectLogic {
     }
 
     public registerEvents() {
-        
+
     }
 
     public onMove() {
@@ -22,12 +21,12 @@ export default class LogicPointer extends RoomObjectLogic {
     }
 
     public hidePointer() {
-        this.currentColor = new ColorRGB(0,0,0)
+        this.currentColor = new ColorRGB(0, 0, 0)
         this.pointer.getCanvas().visible = false;
     }
 
     public onHover(): void {
-        
+
     }
 
     public getCurrentColor() {
@@ -35,9 +34,10 @@ export default class LogicPointer extends RoomObjectLogic {
     }
 
     public onClick(): void {
-        throw new Error("Method not implemented.");
+        
     }
 
-    tick(delta: number): void {}
-    
+    tick(delta: number): void {
+
+    }
 }

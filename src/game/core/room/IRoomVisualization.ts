@@ -1,6 +1,6 @@
 import { Container } from 'pixi.js'
 
-export default interface IRoomVisualization {
+export interface IRoomVisualization {
     render(): void
     needsUpdate: boolean
     container: Container

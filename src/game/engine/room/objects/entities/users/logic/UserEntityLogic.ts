@@ -1,9 +1,9 @@
-import EntityLogic from "../../../../../../core/room/object/entities/EntityLogic";
+import { EntityLogic } from '../../../../../../core/room/object/entities/EntityLogic';
 import { Engine } from "../../../../../../Engine";
 import { OutgoingPacket } from "../../../../../../networking/packets/outgoing/OutgoingPacket";
 import Point from "../../../../../../utils/point/Point";
 import UiUtils from "../../../../../../utils/UiUtils";
-import ChatData from "../../../../../game/chat/ChatData";
+import { ChatData } from '../../../../../game/chat/ChatData';
 import { DialogEventData } from '../../../../../ui/events/data/general/Dialog';
 import { PreviewModeEventData } from '../../../../../ui/events/data/general/PreviewUserData';
 import { EventManager } from '../../../../../ui/events/EventManager';
@@ -11,19 +11,13 @@ import { UIEvents } from '../../../../../ui/events/UIEvents';
 import { UIEventsType } from '../../../../../ui/events/UIEventsType';
 import { ActionId } from "../../../../../ui/imagers/avatars/enum/actions/ActionId";
 import AvatarData from "../../../../../ui/imagers/avatars/enum/AvatarData";
-import UserEntity from "../UserEntity";
-import UserEntityVisualization from "../visualization/UserEntityVisualization";
+import { UserEntity } from '../UserEntity';
 
 export default class UserEntityLogic extends EntityLogic {
-
     public frameTracker: number = 0;
 
-    public constructor(entity: UserEntity) {
-        super(entity)
-    }
-
     public onDance(): void {
-        throw new Error("Method not implemented.");
+
     }
 
     public registerEvents() {
@@ -37,7 +31,6 @@ export default class UserEntityLogic extends EntityLogic {
 
     public onLoad(): void {
         this.entity.visualization.draw()
-        console.log('loaded')
     }
 
     public onTalk(length?: number): void {
@@ -50,7 +43,7 @@ export default class UserEntityLogic extends EntityLogic {
     }
 
     public onMove(delta: number): void {
-        let userVisualization = (this.entity.visualization as UserEntityVisualization)
+        let userVisualization = this.entity.visualization
 
         if (userVisualization.Actions.has(ActionId.WALK)) {
             userVisualization.move(delta);
@@ -66,7 +59,7 @@ export default class UserEntityLogic extends EntityLogic {
     }
 
     public onClick() {
-        let roomId = Engine.getInstance().roomService?.CurrentRoom?.Id;
+        let roomId = Engine.getInstance().roomService?.CurrentRoom?.id;
         let x = this.entity.position.getX();
         let y = this.entity.position.getY();
 
@@ -101,7 +94,7 @@ export default class UserEntityLogic extends EntityLogic {
         let entity: UserEntity = this.entity as UserEntity
         EventManager.emit<PreviewModeEventData>(UIEvents.PREVIEW_BOX_MODE, {
             mode: 'user',
-            username: entity.Name,
+            username: entity.name,
             motto: entity.user?.userInfo.motto,
             look: UiUtils.generateImageFromObject(this.entity.visualization?.container!).src
         })
@@ -117,16 +110,15 @@ export default class UserEntityLogic extends EntityLogic {
     }
 
     public tick(delta: number): void {
-        let userVisualization = (this.entity.visualization as UserEntityVisualization)
+        let userVisualization = this.entity.visualization
 
         if (userVisualization.needsUpdate) {
-
             this.frameTracker += delta;
 
             if (this.frameTracker >= AvatarData.AVATAR_FRAME_SPEED) {
                 userVisualization.nextFrame();
                 this.frameTracker = 0;
-                (userVisualization as UserEntityVisualization).draw();
+                userVisualization.draw();
             }
             if (userVisualization.Actions.has(ActionId.WALK)) {
                 this.onMove(delta);

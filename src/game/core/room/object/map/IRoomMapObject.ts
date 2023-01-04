@@ -1,7 +1,9 @@
+import { FloorPlane } from '../../../../engine/room/objects/map/FloorPlane';
+import { RoomPlane } from '../../../../engine/room/objects/map/RoomPlane';
+import { WallPlane } from '../../../../engine/room/objects/map/WallPlane';
 import ColorRGB from "../../../../utils/color/ColorRGB"
-import IRoomMapPlane from "./IRoomMapPlane";
 
-export default interface IRoomMapObject {
-    getColor() : ColorRGB 
-    getPlane() : IRoomMapPlane
+export interface IRoomMapObject {
+    get color(): ColorRGB 
+    get plane(): FloorPlane | WallPlane | RoomPlane
 }

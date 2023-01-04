@@ -1,9 +1,9 @@
 import { IEntityData } from "../../../../../core/communication/incoming/rooms/entities/IEntityData"
 import { EntityType } from "../../../../../core/room/object/entities/EntityType"
 import { Engine } from "../../../../../Engine"
-import UserEntity from "../../../../../engine/room/objects/entities/users/UserEntity"
-import UserEntityVisualization from "../../../../../engine/room/objects/entities/users/visualization/UserEntityVisualization"
-import User from "../../../../../engine/user/User"
+import { UserEntity } from "../../../../../engine/room/objects/entities/users/UserEntity"
+import UserEntityVisualization from '../../../../../engine/room/objects/entities/users/visualization/UserEntityVisualization'
+import { User } from "../../../../../engine/user/User"
 import Rotation from "../../../../../utils/Rotation"
 import { MessageHandler } from "../../../../handler/MessageHandler"
 
@@ -11,16 +11,13 @@ export default class AddRoomEntity extends MessageHandler {
     public handle(): void {
         let entityData: IEntityData = this.message
 
-        let entity: UserEntity
-        let entityVisualization: UserEntityVisualization
-
+        let entity
         if (Engine.getInstance().roomService?.CurrentRoom?.roomEntityRepository.get(entityData.id.toString()) !== undefined) {
             return
         }
 
         if (entityData.type === EntityType.HUMAN && entityData.user_id != undefined) {
             entity = new UserEntity(entityData.id.toString(), entityData.name, entityData.look, Engine.getInstance().roomService?.CurrentRoom!)
-            entityVisualization = entity.visualization as UserEntityVisualization
 
             entity.position.setX(entityData.x)
             entity.position.setY(entityData.y)
@@ -29,7 +26,7 @@ export default class AddRoomEntity extends MessageHandler {
             entity.visualization!.Rot = Rotation.parseRotation(entityData.rot)
             entity.visualization!.HeadRot = Rotation.parseRotation(entityData.rot)
             entity.Look = entityData.look
-            entityVisualization.inRoom = true
+            entity.visualization.inRoom = true
 
             let user = Engine.getInstance().roomService?.CurrentRoom.roomUserRepository.get(entityData.user_id)
 
@@ -48,8 +45,7 @@ export default class AddRoomEntity extends MessageHandler {
 
         if (entity) {
             Engine.getInstance().roomService?.CurrentRoom?.roomEntityRepository.add(entity.id, entity)
-            entityVisualization?.render()
+            entity.visualization.render()
         }
-
     }
 }

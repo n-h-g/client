@@ -15,7 +15,7 @@ export default class RemoveItem extends MessageHandler {
             return;
         }
 
-        (currentRoom?.getRoomLayout().Visualization as RoomVisualization).Container.removeChild(itemToRemove?.base);
+        currentRoom?.roomLayout.Visualization.Container.removeChild(itemToRemove?.base);
         itemToRemove?.base.destroy();
         Engine.getInstance().roomService?.CurrentRoom?.roomItemRepository.delete(item.id);
     }

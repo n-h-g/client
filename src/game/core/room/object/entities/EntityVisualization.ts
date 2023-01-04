@@ -1,37 +1,32 @@
 import { Direction } from "../../../objects/Direction";
 import RoomObjectVisualization from "../RoomObjectVisualization";
-import Entity from "./Entity";
+import { Entity } from "./Entity";
 import { ActionId } from "../../../../engine/ui/imagers/avatars/enum/actions/ActionId";
-import { Container } from "pixi.js";
+import Point3d from '../../../../utils/point/Point3d';
 
-export default abstract class EntityVisualization extends RoomObjectVisualization {
-
-    protected entity: Entity;
-
-    protected rotation: Direction = Direction.SOUTH;
-    protected headDirection: Direction = Direction.SOUTH;
-
-    protected isWalking: boolean = false;
-    protected isDancing: boolean = false;
-    protected isTyping: boolean = false;
-
-    public actions: Set<ActionId>;
-
+export abstract class EntityVisualization extends RoomObjectVisualization {
+    protected entity: Entity
+    protected rotation: Direction = Direction.SOUTH
+    protected headDirection: Direction = Direction.SOUTH
+    protected isWalking: boolean = false
+    protected isDancing: boolean = false
+    protected isTyping: boolean = false
+    public actions: Set<ActionId>
     public inRoom: boolean = false;
+    public nextY: number = 0
+    public nextX: number = 0
+    public nextZ: number = 0
+    public frame: number = 0
 
-    public nextY: number = 0;
-    public nextX: number = 0;
-    public nextZ: number = 0;
-
-    public frame: number = 0;
-
-
-    public constructor(entity: Entity) {
+    constructor(entity: Entity) {
         super(0, 0, 0);
         this.entity = entity;
         this.actions = new Set();
     }
 
+    public abstract setPosition(point: Point3d): void
+
+    public abstract move(delta: number): void
 
     public abstract draw(): void
 
@@ -57,8 +52,9 @@ export default abstract class EntityVisualization extends RoomObjectVisualizatio
         this.rotation = direction; 
     }
 
-    public get Entity(): Entity { return this.entity; }
-
+    public get Entity(): Entity {
+        return this.entity;
+    }
 
     public get Actions(): Set<ActionId> {
         return this.actions

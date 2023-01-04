@@ -1,17 +1,17 @@
-import Repository from "./Repository";
+import { Repository } from "./Repository";
 
-export default abstract class Service<IRepository> {
-    public _repository?: Repository<any, any>
+export abstract class Service<S, T> {
+    public _repository?: Repository<S, T>
 
     public constructor() {
         this._repository = new Repository();
     }
 
-    public get repository(): Repository<any, any> {
+    public get repository(): Repository<S, T> {
         return this._repository
     }
 
-    public set repository(repository: Repository<any, any>) {
+    public set repository(repository: Repository<S, T>) {
         this._repository = repository
     }
 }

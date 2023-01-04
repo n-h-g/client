@@ -1,80 +1,72 @@
-import { Engine } from '../../../../../Engine';
-import Item from "../../../../../engine/room/objects/items/Item";
-import RoomVisualization from "../../../../../engine/room/visualization/RoomVisualization";
-import { UIComponent } from '../../../../../engine/ui/components/UIComponent';
-import FurniImager from "../../../../../engine/ui/imagers/items/FurniImager";
-import { OutgoingPacket } from '../../../../../networking/packets/outgoing/OutgoingPacket';
-import RoomObjectLogic from "../../RoomObjectLogic";
-import ItemVisualization from "../visualization/ItemVisualization";
+import { Engine } from '../../../../../Engine'
+import Item from "../../../../../engine/room/objects/items/Item"
+import FurniImager from "../../../../../engine/ui/imagers/items/FurniImager"
+import { OutgoingPacket } from '../../../../../networking/packets/outgoing/OutgoingPacket'
+import { RoomObjectLogic } from '../../RoomObjectLogic'
 
-export default abstract class ItemLogic extends RoomObjectLogic {
-    protected item: Item;
-    public frameTracker: number = 0;
-
-    public roll: boolean = false;
+export abstract class ItemLogic extends RoomObjectLogic {
+    protected _item: Item
+    public _frameTracker: number = 0
+    public _roll: boolean = false
 
     constructor(item: Item) {
-        super();
-        this.item = item;
+        super()
+        this._item = item
     }
 
     public registerEvents() {
-        this.item.base.addListener("pointerdown", () => this.onClick())
-        this.item.base.addListener("mouseup", this.onHover.bind(this))
+        this._item.base.addListener("pointerdown", () => this.onClick())
+        this._item.base.addListener("mouseup", this.onHover.bind(this))
     }
 
     public placeItem() {
         Engine.getInstance().networkingManager?.packetManager.applyOut(OutgoingPacket.RoomPickupItemEvent, {
-            id: this.item.id
+            id: this._item.id
         })
-        
+
         Engine.getInstance().networkingManager?.packetManager.applyOut(OutgoingPacket.RoomPlaceItemEvent, {
-            id: this.item.id,
-            name: this.item.name,
-            x: this.item.position.getX(),
-            y: this.item.position.getY(),
-            z: this.item.position.getZ()
+            id: this._item.id,
+            name: this._item.name,
+            x: this._item.position.getX(),
+            y: this._item.position.getY(),
+            z: this._item.position.getZ()
         });
 
         this.toggleMovement(false);
     }
 
-    public onHover(): void { }
+    public onHover(): void {
+
+    }
 
     public onClick(): void {
-        let movingItem = Engine.getInstance().roomService.CurrentRoom!.roomItemRepository.movingItem 
-        let moving = movingItem?.id === this.item.id
+        let movingItem = Engine.getInstance().roomService.CurrentRoom!.roomItemRepository.movingItem
+        let moving = movingItem?.id === this._item.id
 
-        if(moving) {
+        if (moving) {
             this.placeItem();
         } else {
             this.togglePreview();
         }
-
-    
     }
 
     public toggleMovement(value: boolean): void {
-        this.roll = value;
-        this.item.visualization!.needsUpdate = value;
-        this.item.base.alpha = value ? FurniImager.LOADING_ALPHA : FurniImager.DEFAULT_ALPHA;
-        Engine.getInstance().roomService!.CurrentRoom!.roomItemRepository.movingItem = value ? this.item : null;
+        this._roll = value;
+        this._item.visualization!.needsUpdate = value;
+        this._item.base.alpha = value ? FurniImager.LOADING_ALPHA : FurniImager.DEFAULT_ALPHA;
+        Engine.getInstance()!.roomService!.CurrentRoom.roomItemRepository.movingItem = value ? this._item : null;
     }
-    
+
     public onMove(delta: number): void {
-        let itemVisualization = this.item.visualization as ItemVisualization;
-        itemVisualization.move(delta * 1000);
+        this._item.visualization.move(delta * 1000);
     }
 
     public togglePreview() {
-        let preview = Engine.getInstance().userInterfaceManager?.componentsManager.getComponent(UIComponent.PreviewBoxUI)
 
-        /*preview.setItem(this.item)
-        preview.show()*/
     }
 
     public tick(delta: number) {
-        if(this.roll) {
+        if (this._roll) {
             this.onMove(delta);
         }
     }

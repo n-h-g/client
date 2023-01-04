@@ -1,20 +1,18 @@
-import RoomEntityVisualization from "../../../../../../core/room/object/entities/EntityVisualization";
 import Point3d from "../../../../../../utils/point/Point3d";
 import Avatar from "../../../../../ui/imagers/avatars/Avatar";
 import { Direction } from "../../../../../../core/objects/Direction";
 import AvatarData from "../../../../../ui/imagers/avatars/enum/AvatarData";
 import MapData from "../../../map/MapData";
-import Tile from "../../../map/Tile";
-import UserEntity from "../UserEntity";
 import Point from "../../../../../../utils/point/Point";
 import UserEntityLogic from "../logic/UserEntityLogic";
 import Rotation from "../../../../../../utils/Rotation";
 import { Engine } from "../../../../../../Engine";
 import AvatarPlaceHolder from "../../../../../ui/imagers/avatars/AvatarPlaceholder";
-import { ActionId } from "../../../../../ui/imagers/avatars/enum/actions/ActionId";
-import { AvatarEventsType } from "../../../../../ui/imagers/avatars/enum/events/AvatarEventsType";
+import { EntityVisualization } from '../../../../../../core/room/object/entities/EntityVisualization';
+import { UserEntity } from '../UserEntity';
+import { Tile } from '../../../map/Tile';
 
-export default class UserEntityVisualization extends RoomEntityVisualization {
+export default class UserEntityVisualization extends EntityVisualization {
     declare public entity: UserEntity;
     private avatar: Avatar | null = null;
 
@@ -63,7 +61,7 @@ export default class UserEntityVisualization extends RoomEntityVisualization {
         (this.entity.logic as UserEntityLogic).registerEvents();
         
         if(Engine.getInstance().roomService?.CurrentRoom) {
-            (Engine.getInstance().roomService?.CurrentRoom?.getRoomLayout().Visualization.container?.addChild(this.container));
+            (Engine.getInstance().roomService?.CurrentRoom?.roomLayout.Visualization.container?.addChild(this.container));
             this.updatePosition(); //todo needs to be refactored 
             this.container?.emit("user-position-changed", 200);
         }
@@ -94,7 +92,7 @@ export default class UserEntityVisualization extends RoomEntityVisualization {
         this.container!.zIndex = 10
 
         if (Engine.getInstance().roomService?.CurrentRoom) {
-            Engine.getInstance().roomService?.CurrentRoom?.getRoomLayout().Visualization.container?.addChild(this.container)
+            Engine.getInstance().roomService?.CurrentRoom?.roomLayout.Visualization.container?.addChild(this.container)
         }
 
         this.entity.logic.registerEvents()
@@ -152,8 +150,6 @@ export default class UserEntityVisualization extends RoomEntityVisualization {
         this.updatePosition()
     }
 
-
-
     public setPosition(point: Point3d) {
         this.nextX = point.getX();
         this.nextY = point.getY();
@@ -162,13 +158,12 @@ export default class UserEntityVisualization extends RoomEntityVisualization {
         this.headDirection = Rotation.calculateDirection(new Point(point.getX(), point.getY()), new Point(this.entity.position.getX(), this.entity.position.getY()));
         this.updatePosition()
         this.container?.emit("user-position.changed");
-
     }
 
     public updatePosition() {
         const currentRoom = Engine.getInstance().roomService?.CurrentRoom; // current user room
 
-        let tile: Tile | null = currentRoom?.getRoomLayout().getFloorPlane().getTilebyPosition(new Point(Math.round(this.entity.position.getX()), Math.round(this.entity.position.getY()))); // get the tile where you want to set avatar
+        let tile: Tile = currentRoom?.roomLayout.getFloorPlane().getTilebyPosition(new Point(Math.round(this.entity.position.getX()), Math.round(this.entity.position.getY()))); // get the tile where you want to set avatar
 
         if (tile == null) return;
 
@@ -196,7 +191,7 @@ export default class UserEntityVisualization extends RoomEntityVisualization {
 
     public getZIndex(): number {
 
-        if (this.entity.position.getX() === Engine.getInstance().roomService?.CurrentRoom?.getRoomLayout().getDoorPosition().getX() && this.entity.position.getY() === Engine.getInstance().roomService?.CurrentRoom?.getRoomLayout().getDoorPosition().getY()) {
+        if (this.entity.position.getX() === Engine.getInstance().roomService?.CurrentRoom?.roomLayout.getDoorPosition().getX() && this.entity.position.getY() === Engine.getInstance().roomService?.CurrentRoom?.roomLayout.getDoorPosition().getY()) {
             return 3;
         }
 

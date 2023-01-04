@@ -1,20 +1,14 @@
-import User from "./User";
-import UserRepository from "./UserRepository";
-import Service from "../../core/Service";
-import IUserRepository from "../../core/users/IUserRepository";
+import { User } from "./User";
+import { Service } from '../../core/Service';
 
-export default class UserService extends Service<IUserRepository> {
+export class UserService extends Service<number, User> {
     /**
      *  The current user in the game
      */
-    private currentUser: User | null
+    private currentUser: User
 
-    public _repository: UserRepository = null
-
-    public constructor() {
+    constructor() {
         super()
-
-        this._repository = new UserRepository()
     }
 
     public setUp(): void {
@@ -30,9 +24,11 @@ export default class UserService extends Service<IUserRepository> {
     public get CurrentUser(): User | null {
         return this.currentUser;
     }
+
     public set CurrentUser(user: User | null) {
         this.currentUser = user;
     }
+
     public tick(delta: number) {
        
     }

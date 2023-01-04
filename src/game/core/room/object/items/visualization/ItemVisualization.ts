@@ -2,19 +2,17 @@ import { DisplayObject } from "pixi.js";
 import { Engine } from "../../../../../Engine";
 import Item from "../../../../../engine/room/objects/items/Item";
 import MapData from "../../../../../engine/room/objects/map/MapData";
-import Tile from "../../../../../engine/room/objects/map/Tile";
-import RoomVisualization from "../../../../../engine/room/visualization/RoomVisualization";
+import { Tile } from "../../../../../engine/room/objects/map/Tile";
 import AvatarData from "../../../../../engine/ui/imagers/avatars/enum/AvatarData";
 import { FurniSprite } from "../../../../../engine/ui/imagers/items/FurniSprite";
 import Point from "../../../../../utils/point/Point";
 import Point3d from "../../../../../utils/point/Point3d";
 import UiUtils from "../../../../../utils/UiUtils";
-import RoomObjectVisualization from "../../RoomObjectVisualization";
+import { IRoomObjectVisualization } from '../../IRoomObjectVisualization';
+import RoomObjectVisualization from '../../RoomObjectVisualization';
 
-export default abstract class ItemVisualization extends RoomObjectVisualization {
-
+export default abstract class ItemVisualization extends RoomObjectVisualization implements IRoomObjectVisualization {
     protected item: Item;
-
     private position: Point3d;
 
     public imagePreview: string | undefined;
@@ -36,12 +34,9 @@ export default abstract class ItemVisualization extends RoomObjectVisualization 
     }
 
     public updatePosition() {
-
-        let currentRoom = Engine.getInstance().roomService?.CurrentRoom;
-        
-        let tile: Tile | undefined = currentRoom?.getRoomLayout().getFloorPlane().getTilebyPosition(new Point(Math.round(this.position.getX()), Math.round(this.position.getY()))); // get the tile where you want to set avatar
+        let currentRoom = Engine.getInstance().roomService?.CurrentRoom
+        let tile: Tile = currentRoom.roomLayout.getFloorPlane().getTilebyPosition(new Point(Math.round(this.position.getX()), Math.round(this.position.getY())))
         let offsetFloor = tile!.position.getZ() > 0 ? -MapData.thickSpace * MapData.stepHeight * tile!.position.getZ() : -AvatarData.AVATAR_TOP_OFFSET;
-
 
         this.item.base.x = (((tile!.position.getY() - tile!.position.getX()) * MapData.tileWidth / 2) + (MapData.tileWidth / 2))
         this.item.base.y = ((tile!.position.getY() + tile!.position.getX()) * MapData.tileHeight / 2 + MapData.tileHeight / 2) + offsetFloor;
@@ -54,8 +49,7 @@ export default abstract class ItemVisualization extends RoomObjectVisualization 
         
         }
 
-        (currentRoom?.getRoomLayout().Visualization as RoomVisualization).Container.addChild(this.item.base)
-
+        currentRoom.roomLayout.Visualization.Container.addChild(this.item.base)
     
         this.item.base.buttonMode = true;
         this.item.base.interactive = true;
@@ -169,4 +163,7 @@ export default abstract class ItemVisualization extends RoomObjectVisualization 
         return 1 + this.item.position.getX() + this.item.position.getY()+ ((this.item.position.getX() + this.item.position.getY()) * 1000) + this.item.position.getZ ()
     }
 
+    public set needsUpdate(update: boolean) {
+        this.needsUpdate = update
+    }
 }

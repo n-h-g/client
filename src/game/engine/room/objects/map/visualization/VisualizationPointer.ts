@@ -2,8 +2,8 @@ import RoomObjectVisualization from "../../../../../core/room/object/RoomObjectV
 import Pointer from "../Pointer";
 import MapData from "../MapData";
 import ColorRGB from "../../../../../utils/color/ColorRGB";
-import Tile from "../Tile";
 import { Container, Graphics, Point } from 'pixi.js';
+import { Tile } from '../Tile';
 
 export default class VisualizationPointer extends RoomObjectVisualization {
     private pointerContext: Container
@@ -26,8 +26,8 @@ export default class VisualizationPointer extends RoomObjectVisualization {
     }
 
     public updatePosition(x: number, y: number, tile: Tile) {
-        let xpos = ((x - y) * (MapData.tileWidth / 2)) + tile!.visualization!.getOffsetX();
-        let ypos = ((x + y) * (MapData.tileHeight / 2)) + tile!.visualization!.getOffsetY();
+        let xpos = ((x - y) * (MapData.tileWidth / 2)) + tile!.visualization!.offsetX
+        let ypos = ((x + y) * (MapData.tileHeight / 2)) + tile!.visualization!.offsetY
 
         this.pointerContext.visible = true;
 

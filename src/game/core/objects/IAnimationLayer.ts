@@ -1,12 +1,12 @@
 export interface IAnimationLayer {
     loopCount?: number
     frameRepeat?: number
-    frameSequences: { [index: number] : IAnimationLayerFrameSequence }
+    frameSequences: { [index: number]: IAnimationLayerFrameSequence }
 }
 
 export interface IAnimationLayerFrameSequence {
     frames: {
-        [index: string] : {
+        [index: string]: {
             id: number
         }
     }

@@ -31,22 +31,12 @@ function sendMessage(e) {
 
     console.log(shout)
 
-    Engine.getInstance().chatService.computeMessage(message.value, shout, false)
-        Engine.getInstance().networkingManager.packetManager.applyOut(OutgoingPacket.UserTypeStatus, {
-        roomId: Engine.getInstance().roomService.CurrentRoom.Id,
-        typing: false
-    })
-
     typed.value = false
     message.value = ""
 
 }
 
 function onInput() {
-    Engine.getInstance().networkingManager.packetManager.applyOut(OutgoingPacket.UserTypeStatus, {
-        roomId: Engine.getInstance().roomService.CurrentRoom.Id,
-        typing: false
-    })
 
     this.typing = false;
 }

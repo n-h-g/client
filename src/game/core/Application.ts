@@ -1,16 +1,10 @@
 import { Application, IApplicationOptions } from '@pixi/app'
 import { Viewport } from 'pixi-viewport';
-import { DisplayObject } from 'pixi.js';
 import { Engine } from '../Engine';
 
 export class ApplicationEngine extends Application {
-
-    private engine: Engine;
-
-    private lastFrameTime: number = 0
-
-    private timeElapsed: number = 0
-
+    private _engine: Engine
+    private _lastFrameTime: number
     private _viewport: Viewport
 
     constructor(engine: Engine, options?: IApplicationOptions) {
@@ -23,7 +17,7 @@ export class ApplicationEngine extends Application {
 
         this.setUpViewport()
 
-        this.engine = engine
+        this._engine = engine
     }
 
     private setUpViewport() {
@@ -32,23 +26,13 @@ export class ApplicationEngine extends Application {
             screenHeight: window.innerHeight,
             worldWidth: 1000,
             worldHeight: 1000,
-        
+
             interaction: this.renderer.plugins.interaction // the interaction module is important for wheel to work properly when renderer.view is placed or scaled
         })
 
         this.stage.addChild(this._viewport)
 
         this._viewport.drag()
-        
-    }
-
-    /**
-     * Add a display object to viewport
-     * @param object 
-     */
-    public add(object: DisplayObject) {
-        this._viewport.addChild(object)
-
     }
 
     public init(): void {
@@ -58,21 +42,20 @@ export class ApplicationEngine extends Application {
 
     private setUpGameLoop(): void {
         let fpsInterval = 1000 / Engine.getInstance().config.fps
-        this.lastFrameTime = Date.now()
+        this._lastFrameTime = Date.now()
 
         let gameLoop = () => {
             window.requestAnimationFrame(gameLoop)
-            
+
             let currentTime = Date.now()
 
-            this.timeElapsed = currentTime - this.lastFrameTime; 
+            this._lastFrameTime = currentTime - this._lastFrameTime;
 
-            if (this.timeElapsed > fpsInterval) {
-                this.engine.roomService.tick(this.timeElapsed)
-                this.engine.usersService.tick(this.timeElapsed)
-
-                this.lastFrameTime = currentTime //- (this.timeElapsed % fpsInterval)
-            }            
+            if (this._lastFrameTime > fpsInterval) {
+                this._engine.roomService.tick(this._lastFrameTime)
+                this._engine.usersService.tick(this._lastFrameTime)
+                this._lastFrameTime = currentTime
+            }
         }
 
         gameLoop()

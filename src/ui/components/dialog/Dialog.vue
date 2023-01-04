@@ -34,6 +34,7 @@ function hide() {
     border: 6px solid #367897;
     box-shadow: #408caf 5px 5px inset,  #408caf -5px -5px inset;
     pointer-events: all;
+    z-index: 1;
 
     .title-bar {
         position: relative;

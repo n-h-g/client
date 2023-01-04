@@ -1,8 +1,7 @@
-import IRoomVisualization from "./IRoomVisualization"
-import IRoomLogic from "./IRoomLogic"
+import { IRoomLogic } from './IRoomLogic'
+import { IRoomVisualization } from './IRoomVisualization'
 
 export default interface IRoomController {
-
-    Visualization : IRoomVisualization
-    Logic : IRoomLogic
+    _visualization: IRoomVisualization
+    _logic: IRoomLogic
 }

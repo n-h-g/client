@@ -13,8 +13,8 @@ export default class RoomService {
 
     public setRoom(roomName: string, roomModel: string, doorPosition: Point, roomId: number) : Room {
         this.currentRoom = new Room(roomName, roomModel, doorPosition, roomId);
-        this.currentRoom.getRoomLayout().Visualization.render();
-        this.currentRoom.getRoomLayout().Logic.registerEvents();
+        this.currentRoom.roomLayout.Visualization.render();
+        this.currentRoom.roomLayout.Logic.registerEvents();
         this.toggleUI();
         return this.currentRoom;
     }
@@ -32,7 +32,7 @@ export default class RoomService {
     }
 
     public unsetRoom() : void {
-        this.currentRoom?.getRoomLayout().Visualization.container.destroy();
+        this.currentRoom.roomLayout.Visualization.container.destroy();
         this.currentRoom = null
         this.toggleUI()
     }
@@ -44,7 +44,7 @@ export default class RoomService {
     }
 
     public tick(delta: number): void {
-        this.currentRoom?.getRoomLayout().Logic.tick(delta)
+        this.currentRoom?.roomLayout.Logic.tick(delta)
         this.CurrentRoom?.roomUserRepository.tick(delta)
         this.currentRoom?.roomItemRepository.tick(delta);
         this.currentRoom?.roomEntityRepository.tick(delta);
