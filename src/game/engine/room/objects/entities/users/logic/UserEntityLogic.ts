@@ -44,7 +44,7 @@ export default class UserEntityLogic extends EntityLogic {
     }
 
     public onMove(delta: number): void {
-        let userVisualization = this.entity.visualization as UserEntityVisualization
+        let userVisualization = this.entity.visualization
 
         if (userVisualization.Actions.has(ActionId.WALK)) {
             userVisualization.move(delta);
