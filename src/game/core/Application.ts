@@ -1,12 +1,16 @@
 import { Application, IApplicationOptions } from '@pixi/app'
 import { Viewport } from 'pixi-viewport';
+import { Container, Text, Ticker } from 'pixi.js';
 import { Engine } from '../Engine';
+
 
 export class ApplicationEngine extends Application {
     private _engine: Engine
     private _lastFrameTime: number
     private _timeElapsed: number = 0
     private _viewport: Viewport
+
+    private debugInfoContainer: Container
 
     constructor(engine: Engine, options?: IApplicationOptions) {
         super(options);
@@ -15,6 +19,8 @@ export class ApplicationEngine extends Application {
 
         this.view.style.height = window.innerHeight + "px"
         this.view.style.width = window.innerWidth + "px"
+
+        this.debugInfoContainer = new Container()
 
         this.setUpViewport()
 
@@ -33,7 +39,24 @@ export class ApplicationEngine extends Application {
 
         this.stage.addChild(this._viewport)
 
+        this._viewport.addChild(this.debugInfoContainer)
+
         this._viewport.drag()
+    }
+
+    public showDebugInfo(fps: number = this.ticker.FPS) {
+        for(let children of this.debugInfoContainer.children) {
+            this.debugInfoContainer.removeChild(children)
+        }
+
+        const fpsText = new Text(fps, {
+            fontFamily: 'Arial',
+            fontSize: 16,
+            fill: 0xff1010,
+            align: 'center',
+        });
+
+        this.debugInfoContainer.addChild(fpsText)
     }
 
     public init(): void {
@@ -56,6 +79,10 @@ export class ApplicationEngine extends Application {
                 this._engine.roomService.tick(this._timeElapsed)
                 this._engine.usersService.tick(this._timeElapsed)
                 this._lastFrameTime = currentTime
+
+                if(this._engine.config.debug) {
+                    this.showDebugInfo()
+                }
             }
         }
 
