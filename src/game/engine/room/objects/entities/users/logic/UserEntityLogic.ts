@@ -36,17 +36,20 @@ export default class UserEntityLogic extends EntityLogic {
 
     public onTalk(length?: number): void {
         setTimeout(() => {
-            this.entity.visualization?.removeAction(ActionId.TALK)
-            this.entity.visualization!.needsUpdate = false;
-            this.entity.visualization?.updateFrame(0);
-            this.entity.visualization?.draw()
+
+            let EntityVisualization = this._entity.visualization as UserEntityVisualization
+
+            EntityVisualization.addAction(ActionId.TALK)
+            EntityVisualization.needsUpdate = false;
+            EntityVisualization.frame = 0
+            EntityVisualization.draw()
         }, length ?? 100 * ChatData.SPEAK_SPEED)
     }
 
     public onMove(delta: number): void {
         let userVisualization = this.entity.visualization as UserEntityVisualization
 
-        if (userVisualization.Actions.has(ActionId.WALK)) {
+        if (userVisualization.actions.has(ActionId.WALK)) {
             userVisualization.move(delta);
         }
     }
@@ -111,7 +114,7 @@ export default class UserEntityLogic extends EntityLogic {
     }
 
     public tick(delta: number): void {
-        let userVisualization = this.entity.visualization
+        let userVisualization = this.entity.visualization as UserEntityVisualization
 
         if (userVisualization.needsUpdate) {
             this.frameTracker += delta;
@@ -121,7 +124,7 @@ export default class UserEntityLogic extends EntityLogic {
                 this.frameTracker = 0;
                 userVisualization.draw();
             }
-            if (userVisualization.Actions.has(ActionId.WALK)) {
+            if (userVisualization.actions.has(ActionId.WALK)) {
                 this.onMove(delta);
             }
         }

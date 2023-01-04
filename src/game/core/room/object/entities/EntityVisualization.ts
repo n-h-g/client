@@ -3,105 +3,134 @@ import RoomObjectVisualization from "../RoomObjectVisualization";
 import { Entity } from "./Entity";
 import { ActionId } from "../../../../engine/ui/imagers/avatars/enum/actions/ActionId";
 import Point3d from '../../../../utils/point/Point3d';
+import IPoint3d from "../../../../utils/point/IPoint3d";
+import Rotation from "../../../../utils/Rotation";
+import Point from "../../../../utils/point/Point";
+import AvatarData from "../../../../engine/ui/imagers/avatars/enum/AvatarData";
+import { Engine } from "../../../../Engine";
+import { Tile } from "../../../../engine/room/objects/map/Tile";
+import { DisplayObject } from "pixi.js";
+import MapData from "../../../../engine/room/objects/map/MapData";
 
 export abstract class EntityVisualization extends RoomObjectVisualization {
 
-    protected entity: Entity
+    protected _entity: Entity
+
     protected rotation: Direction = Direction.SOUTH
-    protected headDirection: Direction = Direction.SOUTH
-    protected isWalking: boolean = false
-    protected isDancing: boolean = false
-    protected isTyping: boolean = false
-    public actions: Set<ActionId>
-    public inRoom: boolean = false;
-    public nextY: number = 0
-    public nextX: number = 0
-    public nextZ: number = 0
+
+    protected _headDirection: Direction = Direction.SOUTH
+    
+    /**
+     * The next position the entity will reach
+     */
+    private _nextPosition: Point3d
+
     public frame: number = 0
 
     constructor(entity: Entity) {
         super(0, 0, 0);
-        this.entity = entity;
-        this.actions = new Set();
+        this._entity = entity;
+        this._nextPosition = new Point3d(0, 0, 0);
     }
 
-    public abstract setPosition(point: Point3d): void
+    public setPosition(point: Point3d) {
+        this.nextPosition.setX(point.getX());
+        this.nextPosition.setY(point.getY());
+        this.nextPosition.setZ(point.getZ());
+        this.rotation = Rotation.calculateDirection(new Point(this._entity.position.getX(), this._entity.position.getY()), new Point(this.entity.position.getX(), this.entity.position.getY()));
+        this.headRotation = Rotation.calculateDirection(new Point(this.entity.position.getX(), this._entity.position.getY()), new Point(this.entity.position.getX(), this.entity.position.getY()));
+        this.updatePosition()
+        this.container?.emit("position-changed");
+    }
 
-    public abstract move(delta: number): void
+    public move(delta: number): void {
+        delta = delta / 1000;
+ 
+        if (this._entity.position.getX() < this._nextPosition.getX()) {
+            this._entity.position.setX(this._entity.position.getX() + delta * AvatarData.AVATAR_WALK_SPEED);
+            if (this._entity.position.getX() > this._nextPosition.getX()) {
+                //this.isWalking = false;
+                this._entity.position.setX(this._nextPosition.getX());
+            }
+        } else if (this._entity.position.getX() > this._nextPosition.getX()) {
+            this._entity.position.setX(this._entity.position.getX() - delta * AvatarData.AVATAR_WALK_SPEED);
+            if (this._entity.position.getX() < this._nextPosition.getX()) {
+                //this.isWalking = false;
+                this._entity.position.setX(this._nextPosition.getX());
+            }
+        }
+
+        if (this._entity.position.getY() < this._nextPosition.getY()) {
+            this._entity.position.setY(this._entity.position.getY() + delta * AvatarData.AVATAR_WALK_SPEED);
+            if (this._entity.position.getY() > this._nextPosition.getY()) {
+                //this.isWalking = false;
+                this._entity.position.setY(this._nextPosition.getY());
+            }
+        } else if (this._entity.position.getY() > this._nextPosition.getY()) {
+            this._entity.position.setY(this._entity.position.getY() - delta * AvatarData.AVATAR_WALK_SPEED);
+            if (this._entity.position.getY() < this._nextPosition.getY()) {
+                //this.isWalking = false;
+                this._entity.position.setY(this._nextPosition.getY());
+            }
+        }
+
+        if (this._nextPosition.getZ() > this._entity.position.getZ()) {
+            this._entity.position.setZ(this._entity.position.getZ() + ((Math.abs(this.entity.position.getZ() - this.nextPosition.getZ()) > 1.5) ? 9.8 : AvatarData.AVATAR_WALK_SPEED) * delta);
+            if (this._entity.position.getZ() > this._nextPosition.getZ()) {
+                this._entity.position.setZ(this._nextPosition.getZ());
+            }
+        } else if (this.nextPosition.getZ() < this._entity.position.getZ()) {
+            this._entity.position.setZ(this._entity.position.getZ() - ((Math.abs(this._entity.position.getZ() - this._nextPosition.getZ()) > 1.5) ? 9.8 : AvatarData.AVATAR_WALK_SPEED) * delta);
+            if (this._entity.position.getZ() < this._nextPosition.getZ()) {
+                this._entity.position.setZ(this._nextPosition.getZ());
+            }
+        }
+
+        this.updatePosition()
+    }
 
     public abstract draw(): void
 
     public abstract nextFrame(): void
 
-    public abstract updateFrame(frame: number): void
+    public abstract calculateOffsetX()
 
-    public addAction(action: ActionId) {
-        this.removeActions([ActionId.STAND, ActionId.WALK, ActionId.SIT, ActionId.LAY])
-        this.actions.add(action);
+    public abstract calculateOffsetY()
+
+    public updatePosition() {
+
+        this.container.x = this.calculateOffsetX()
+        this.container.y = this.calculateOffsetY()
+        this.container.zIndex = 10
+    
+        this.container.buttonMode = true;
+        this.container.interactive = true;
+        this.container.interactiveChildren = true;
+
+
+        this.entity.logic.registerEvents()
     }
 
-    public removeAction(action: ActionId) {
-        this.actions.delete(action)
-    }
-    public removeActions(actions: ActionId[]) {
-        for(let action of actions) {
-            this.removeAction(action)
-        }
-    }
-
-    public setDirection(direction: Direction) {
+    public set direction(direction: Direction) {
         this.rotation = direction; 
     }
 
-    public get Entity(): Entity {
-        return this.entity;
-    }
-
-    public get Actions(): Set<ActionId> {
-        return this.actions
-    }
-
-    public get IsInRoom(): boolean {
-        return this.inRoom;
-    }
-
-    public set InRoom(value: boolean) {
-        this.inRoom = value;
-    }
-
-    public set IsWalking(value: boolean) {
-        this.isWalking = value;
-    }
-    public get IsWalking(): boolean {
-        return this.isWalking;
+    public get entity(): Entity {
+        return this._entity;
     }
 
     public set Rot(direction: Direction) {
         this.rotation = direction;
     }
-    public set HeadRot(direction: Direction) {
-        this.headDirection = direction;
+    public set headRotation(direction: Direction) {
+        this._headDirection = direction;
     }
 
-    public get IsTyping(): boolean {
-        return this.isTyping
+    public get nextPosition(): Point3d {
+        return this._nextPosition
     }
 
-    public set IsDancing(value: boolean) {
-        this.isDancing = value;
-    }
-
-    public get IsDancing(): boolean {
-        return this.isDancing;
-    }
-
-    public set NextX(x: number) {
-        this.nextX = x;
-    }
-    public set NextY(y: number) {
-        this.nextY = y;
-    }
-    public set NextZ(z: number) {
-        this.nextZ = z;
+    public set nextPosition(point: Point3d) {
+        this.nextPosition = point
     }
 }

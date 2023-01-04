@@ -2,15 +2,15 @@ import { Engine } from '../../../../../Engine'
 import Item from "../../../../../engine/room/objects/items/Item"
 import FurniImager from "../../../../../engine/ui/imagers/items/FurniImager"
 import { OutgoingPacket } from '../../../../../networking/packets/outgoing/OutgoingPacket'
-import { RoomObjectLogic } from '../../RoomObjectLogic'
+import { EntityLogic } from '../../entities/EntityLogic'
 
-export abstract class ItemLogic extends RoomObjectLogic {
+export abstract class ItemLogic extends EntityLogic {
     protected _item: Item
     public _frameTracker: number = 0
     public _roll: boolean = false
 
     constructor(item: Item) {
-        super()
+        super(item)
         this._item = item
     }
 

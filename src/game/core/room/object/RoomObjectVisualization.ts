@@ -5,7 +5,7 @@ export default abstract class RoomObjectVisualization {
     protected _offsetY: number
     protected _zIndex: number
     private _container: Container
-    private _needsUpdate: boolean = false
+    private _needsUpdate: boolean
 
     constructor(offsetX: number, offsetY: number, zIndex: number) {
         this._offsetX = offsetX
@@ -14,8 +14,6 @@ export default abstract class RoomObjectVisualization {
         this._container = null
         this._needsUpdate = false
     }
-    
-    abstract render(): void
 
     public set needsUpdate(update: boolean) {
         this._needsUpdate = update

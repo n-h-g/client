@@ -1,6 +1,7 @@
 import { IEntityData } from "../../../../../core/communication/incoming/rooms/entities/IEntityData"
 import { Engine } from "../../../../../Engine";
 import { UserEntity } from '../../../../../engine/room/objects/entities/users/UserEntity';
+import UserEntityVisualization from "../../../../../engine/room/objects/entities/users/visualization/UserEntityVisualization";
 import { ActionId } from "../../../../../engine/ui/imagers/avatars/enum/actions/ActionId";
 import { Logger } from "../../../../../utils/Logger";
 import Point3d from "../../../../../utils/point/Point3d";
@@ -23,18 +24,20 @@ export default class UpdateEntity extends MessageHandler {
                     Logger.debug("Unable to find user entity with id [" + entityData.user_id) + "]";
                 }
             }
+
+            let EntityVisualization = entity.visualization as UserEntityVisualization
            
-            entity?.visualization.setPosition(new Point3d(entityData.x, entityData.y, entityData.z));
-            entity!.visualization!.Rot = Rotation.parseRotation(entityData.body_rot);
+            EntityVisualization.setPosition(new Point3d(entityData.x, entityData.y, entityData.z));
+            EntityVisualization.Rot = Rotation.parseRotation(entityData.body_rot);
 
             if (entityData.actions.length == 0) {
-                entity.visualization!.addAction(ActionId.STAND)
+                EntityVisualization.addAction(ActionId.STAND)
                 return;
             }
                 
             for(let action of entityData.actions) {
                 action as ActionId
-                entity.visualization.addAction(action);      
+                EntityVisualization.addAction(action);      
             }
 
                 

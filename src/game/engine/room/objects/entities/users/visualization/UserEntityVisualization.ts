@@ -11,21 +11,26 @@ import AvatarPlaceHolder from "../../../../../ui/imagers/avatars/AvatarPlacehold
 import { EntityVisualization } from '../../../../../../core/room/object/entities/EntityVisualization';
 import { UserEntity } from '../UserEntity';
 import { Tile } from '../../../map/Tile';
+import { ActionId } from "../../../../../ui/imagers/avatars/enum/actions/ActionId";
 
 export default class UserEntityVisualization extends EntityVisualization {
-    declare public entity: UserEntity;
     private avatar: Avatar | null = null;
 
     private avatarCache: Avatar | null = null;
 
+    public _actions: Set<ActionId>
+
+    declare public _entity: UserEntity
+
     constructor(entity: UserEntity) {
         super(entity)
-        this.entity = entity
+        this._entity = entity as UserEntity
+        this._actions = new Set();
     }
-    
+
     public async loadAvatar(): Promise<Avatar> {
         return new Promise((resolve, reject) => {
-            let avatar = new Avatar(this.entity.Look, this.rotation, this.rotation, this.actions, this.frame)
+            let avatar = new Avatar(this._entity.Look, this.rotation, this.rotation, this.actions, this.frame)
 
             Engine.getInstance()?.userInterfaceManager?.avatarImager.loadAvatar(avatar).then(async () => {
                 await Engine.getInstance().userInterfaceManager?.avatarImager.drawAvatar(avatar)
@@ -67,10 +72,6 @@ export default class UserEntityVisualization extends EntityVisualization {
         }
     }
 
-    public updateFrame(frame: number): void {
-        this.frame = frame;
-    }
-
     public nextFrame(): void {
         if (this.frame > this.avatar!.Frames) {
             this.frame = 0;
@@ -83,7 +84,7 @@ export default class UserEntityVisualization extends EntityVisualization {
 
         this.container.destroy()
         
-        this.avatar = new Avatar(this.entity.Look, this.rotation, this.rotation, this.actions, this.frame)
+        this.avatar = new Avatar(this._entity.Look, this.rotation, this.rotation, this.actions, this.frame)
 
         Engine.getInstance().userInterfaceManager?.avatarImager.drawAvatar(this.avatar);
 
@@ -100,83 +101,18 @@ export default class UserEntityVisualization extends EntityVisualization {
         this.updatePosition();
     }
 
-    public talk(): void {
-
+    public addAction(action: ActionId): void {
+        this.removeActions([ActionId.STAND, ActionId.WALK, ActionId.SIT, ActionId.LAY])
+        this._actions.add(action);
     }
 
-    public move(delta: number): void {
-        delta = delta / 1000;
-        
-        if (this.entity.position.getX() < this.nextX) {
-            this.entity.position.setX(this.entity.position.getX() + delta * AvatarData.AVATAR_WALK_SPEED);
-            if (this.entity.position.getX() > this.nextX) {
-                //this.isWalking = false;
-                this.entity.position.setX(this.nextX);
-            }
-        } else if (this.entity.position.getX() > this.nextX) {
-            this.entity.position.setX(this.entity.position.getX() - delta * AvatarData.AVATAR_WALK_SPEED);
-            if (this.entity.position.getX() < this.nextX) {
-                //this.isWalking = false;
-                this.entity.position.setX(this.nextX);
-            }
-        }
-
-        if (this.entity.position.getY() < this.nextY) {
-            this.entity.position.setY(this.entity.position.getY() + delta * AvatarData.AVATAR_WALK_SPEED);
-            if (this.entity.position.getY() > this.nextY) {
-                //this.isWalking = false;
-                this.entity.position.setY(this.nextY);
-            }
-        } else if (this.entity.position.getY() > this.nextY) {
-            this.entity.position.setY(this.entity.position.getY() - delta * AvatarData.AVATAR_WALK_SPEED);
-            if (this.entity.position.getY() < this.nextY) {
-                //this.isWalking = false;
-                this.entity.position.setY(this.nextY);
-            }
-        }
-
-        if (this.nextZ > this.entity.position.getZ()) {
-            this.entity.position.setZ(this.entity.position.getZ() + ((Math.abs(this.entity.position.getZ() - this.nextZ) > 1.5) ? 9.8 : AvatarData.AVATAR_WALK_SPEED) * delta);
-            if (this.entity.position.getZ() > this.nextZ) {
-                this.entity.position.setZ(this.nextZ);
-            }
-        } else if (this.nextZ < this.entity.position.getZ()) {
-            this.entity.position.setZ(this.entity.position.getZ() - ((Math.abs(this.entity.position.getZ() - this.nextZ) > 1.5) ? 9.8 : AvatarData.AVATAR_WALK_SPEED) * delta);
-            if (this.entity.position.getZ() < this.nextZ) {
-                this.entity.position.setZ(this.nextZ);
-            }
-        }
-
-        this.updatePosition()
+    public removeAction(action: ActionId): void {
+        this._actions.delete(action)
     }
-
-    public setPosition(point: Point3d) {
-        this.nextX = point.getX();
-        this.nextY = point.getY();
-        this.nextZ = point.getZ();
-        this.rotation = Rotation.calculateDirection(new Point(point.getX(), point.getY()), new Point(this.entity.position.getX(), this.entity.position.getY()));
-        this.headDirection = Rotation.calculateDirection(new Point(point.getX(), point.getY()), new Point(this.entity.position.getX(), this.entity.position.getY()));
-        this.updatePosition()
-        this.container?.emit("user-position-changed");
-    }
-
-    public updatePosition() {
-        const currentRoom = Engine.getInstance().roomService?.CurrentRoom; // current user room
-
-        let tile: Tile = currentRoom?.roomLayout.getFloorPlane().getTilebyPosition(new Point(Math.round(this.entity.position.getX()), Math.round(this.entity.position.getY()))); // get the tile where you want to set avatar
-
-        if (tile == null) return;
-
-        let offsetFloor = tile!.position.getZ() > 0 ? -MapData.thickSpace * MapData.stepHeight * tile!.position.getZ() : -AvatarData.AVATAR_TOP_OFFSET;
-
-        this.container!.x = (((this.entity.position.getY() - this.entity.position.getX()) * MapData.tileWidth / 2) + (MapData.tileWidth / 2)) - MapData.tileWidth / 2
-        this.container!.y = ((this.entity.position.getX() + this.entity.position.getY()) * MapData.tileHeight / 2) + (MapData.tileHeight / 2) + offsetFloor;
-        this.container!.zIndex = 10
-
-        this.container!.buttonMode = true;
-        this.container!.interactive = true;
-        this.container!.interactiveChildren = true;
-        this.entity.logic.registerEvents()
+    public removeActions(actions: ActionId[]) {
+        for(let action of actions) {
+            this.removeAction(action)
+        }
     }
 
     public updateDirection(direction: Direction) {
@@ -185,9 +121,29 @@ export default class UserEntityVisualization extends EntityVisualization {
         avatar!.Direction = direction;
     }
 
+    public calculateOffsetY() {
+        let tile: Tile = this._entity.room.roomLayout.getFloorPlane().getTilebyPosition(new Point(Math.round(this._entity.position.getX()), Math.round(this.entity.position.getY())))
+        let offsetFloor = tile!.position.getZ() > 0 ? -MapData.thickSpace * MapData.stepHeight * tile!.position.getZ() : -AvatarData.AVATAR_TOP_OFFSET;
+
+
+        return this.container!.y = ((this.entity.position.getX() + this.entity.position.getY()) * MapData.tileHeight / 2) + (MapData.tileHeight / 2) + offsetFloor;
+    }
+
+    public calculateOffsetX() {
+
+
+        return (((this.entity.position.getY() - this.entity.position.getX()) * MapData.tileWidth / 2) + (MapData.tileWidth / 2)) - MapData.tileWidth / 2
+    }
+
     public get Avatar(): Avatar | null {
         return this.avatar;
     }
+
+
+    public get actions(): Set<ActionId> {
+        return this._actions
+    }
+    
 
     public getZIndex(): number {
 

@@ -1,3 +1,4 @@
+import { Entity } from '../../../../core/room/object/entities/Entity';
 import { IRoomObjectLogic } from '../../../../core/room/object/IRoomObjectLogic';
 import { ItemLogic } from "../../../../core/room/object/items/logic/ItemLogic";
 import { RoomObjectController } from "../../../../core/room/object/RoomObjectController";
@@ -9,20 +10,16 @@ import ItemLogicMultiState from "./logic/ItemLogicMultiState";
 import ItemVisualizationAnimated from "./visualization/ItemVisualizationAnimated";
 import { default as ItemVisualization, default as ItemVisualizationStatic } from "./visualization/ItemVisualizationStatic";
 
-export default abstract class Item extends RoomObjectController<ItemVisualization, ItemLogic> {
-    public room: Room | null
+export default abstract class Item extends Entity {
     public base: FurniSprite;
-    public name: string;
 
     constructor(room: Room | null, id: string, name: string, position: Point3d, baseItem: FurniSprite) {
 
-        super(id, position, null, null)
+        super(id, name, room)
 
         this.base = baseItem;
 
-        this.name = name;
-
-        this.room = room;
+        this.position = position
 
         this.visualization = this.getItemVisualizationFromType(this.base.furniBase.data.visualization.type)
         this.logic = this.getItemLogicFromType(this.base.furniBase.data.logic.type)
