@@ -1,17 +1,16 @@
-
 <template>
     <div class="chatBar" :class="{hidden: !enabled}">
       <input type="text" class="chatInput" autofocus :placeholder="placeHolder" v-model="message" v-on:keydown="onInput()" @keyup.enter="sendMessage">
     </div>
 </template>
+
 <script setup lang="ts">
-import { onMounted, ref } from "vue";
+import { ref } from "vue";
 import { Engine } from "../../../../game/Engine";
 import { RoomUIEventData } from "../../../../game/engine/ui/events/data/room/RoomUIEventData";
 import { EventManager } from "../../../../game/engine/ui/events/EventManager";
 import { UIEvents } from "../../../../game/engine/ui/events/UIEvents";
 import { OutgoingPacket } from "../../../../game/networking/packets/outgoing/OutgoingPacket";
-
 
 let placeHolder = ref("Type here to talk..")
 let typed = ref(false)
@@ -51,8 +50,4 @@ function onInput() {
 
     this.typing = false;
 }
-
-onMounted(() => {
-
-})
 </script>

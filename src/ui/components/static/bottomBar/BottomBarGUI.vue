@@ -16,17 +16,13 @@
       <div class="menuButton search_friends" @click="toggle('search_friends')"></div>
     </div>
   </div>
-
 </template>
 
 <script setup lang="ts">
-import { Engine } from '../../../../game/Engine';
-import { UIComponent } from '../../../../game/engine/ui/components/UIComponent';
-import { IComponentShowableUI } from '../../../../game/core/ui/IComponentShowableUI';
-import { EventManager } from '../../../../game/engine/ui/events/EventManager';
-import { HotelViewData } from '../../../../game/engine/ui/events/data/static/HotelView';
-import { UIEvents } from '../../../../game/engine/ui/events/UIEvents';
-import ChatBar from "./ChatBar.vue"
+import { Engine } from '../../../../game/Engine'
+import { UIComponent } from '../../../../game/engine/ui/components/UIComponent'
+import { IComponentShowableUI } from '../../../../game/core/ui/IComponentShowableUI'
+import ChatBar from './ChatBar.vue'
 
 function toggle(ui: string) {
   switch (ui) {

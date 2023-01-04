@@ -1,7 +1,7 @@
 <template>
     <div id="roomGui" ref="roomGui">
         <div id="chatBubbleContainer" ref="chatBubbleContainer">
-            <div class="chatBubble" v-for="message in this.messages" v-bind:key="message.id" :id="message.id" v-bind:style="{top: message.y + 'px', left: message.x + 'px'}" v-bind:class="message.shout ? 'chatBubbleShout' : ''">
+            <div class="chatBubble" v-for="message in messages" :key="message.id" :id="message.id" :style="{top: message.y + 'px', left: message.x + 'px'}" v-bind:class="message.shout ? 'chatBubbleShout' : ''">
                 <div class="chatBubbleContainer">
                 <div class="playerHeadContainer">
                     <img src="" />
@@ -19,14 +19,13 @@
         </div>
     </div>
 </template>
+
 <script setup lang="ts">
-import { ref } from 'vue';
-import { Message } from '../../../../game/core/game/chat/Message';
+import { ref } from 'vue'
 
-
-let messages = ref([] as Message[])
-
+let messages = ref([])
 </script>
+
 <style lang="scss">
 #roomGui {
     position: absolute;

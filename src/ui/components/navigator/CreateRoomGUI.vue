@@ -27,8 +27,8 @@
       </div>
     </div>
   </Dialog>
-
 </template>
+
 <script setup lang="ts">
 import { ref } from "vue"
 import { IComponentShowableUI } from "../../../game/core/ui/IComponentShowableUI";

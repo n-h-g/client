@@ -20,9 +20,9 @@
         <span class="title">{{ room.name }}</span>
         <div class="icons_container">
           <div class="usersNowRoom" :class="{
-  navigatorRoomFull: room.users_count >= room.maxUsers,
-  greenIcon: room.users_count > 0 && room.users_count < room.maxUsers,
-}">
+            navigatorRoomFull: room.users_count >= room.maxUsers,
+            greenIcon: room.users_count > 0 && room.users_count < room.maxUsers,
+          }">
             {{ room.users_count }}
           </div>
         </div>
@@ -69,7 +69,7 @@ function enterRoom(roomId: number) {
   })
 }
 
-function createRoom() { 
+function createRoom() {
   Engine.getInstance()?.userInterfaceManager?.componentsManager.getComponent<IComponentShowableUI>(UIComponent.CreateRoomUI).toggle()
 }
 

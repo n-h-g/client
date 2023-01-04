@@ -1,9 +1,8 @@
-
 <template>
     <Dialog title="catalogue" :box="UIEventsType.CATALOGUE">
         <div class="header">
             <div class="headerImage">
-                <img v-if="activePage  && activePage.rawInfo && activePage.rawInfo.headerImage && activePage.rawInfo.headerImage != ''"
+                <img v-if="activePage && activePage.rawInfo && activePage.rawInfo.headerImage && activePage.rawInfo.headerImage != ''"
                     :src="resourceUrl + activePage.rawInfo.headerImage" />
             </div>
             <div class="iconContainer">
@@ -22,7 +21,7 @@
         <div class="wrapper">
             <div class="catalogueMenu">
                 <ul class="menuUlCatalog">
-                    <TreeMenu :catalogMenu="catalogMenu" :currentMenu="currentMenu" :openPage="openPage"/>
+                    <TreeMenu :catalogMenu="catalogMenu" :currentMenu="currentMenu" :openPage="openPage" />
                 </ul>
             </div>
             <div class="cataloguePageContainer">
@@ -32,18 +31,15 @@
         </div>
     </Dialog>
 </template>
-<script setup lang="ts">
-import { ref } from "vue";
-import { IComponentShowableUI } from "../../../game/core/ui/IComponentShowableUI";
-import { Engine } from "../../../game/Engine";
-import { UIComponent } from "../../../game/engine/ui/components/UIComponent";
-import { UIEventsType } from "../../../game/engine/ui/events/UIEventsType";
-import Dialog from "../dialog/Dialog.vue";
-import TreeMenu from "./TreeMenu.vue";
 
+<script setup lang="ts">
+import { ref } from "vue"
+import { Engine } from "../../../game/Engine"
+import { UIEventsType } from "../../../game/engine/ui/events/UIEventsType"
+import Dialog from "../dialog/Dialog.vue"
+import TreeMenu from "./TreeMenu.vue"
 
 let catalogMenu = ref([])
-
 let activePage = ref({
     rawInfo: {
         headerImage: ""
@@ -62,29 +58,16 @@ let resourceUrl = Engine.getInstance().config.catalogueResourcesUrl
 function openPage() {
 
 }
-
-function close() {
-    Engine.getInstance()?.userInterfaceManager?.componentsManager.getComponent<IComponentShowableUI>(UIComponent.InventoryUI).hide()
-}
-
 </script>
+
 <style lang="scss">
 #catalogue {
     position: fixed;
-    left: 20vw;
-    right: 0;
-    top: 20vh;
-    pointer-events: all !important;
     height: 625px;
     width: 568px;
-    display: flex;
-    background-color: #e9e9e1;
-    overflow: hidden;
-    border-radius: 8px;
-    //border: 1px solid #000;
-    flex-wrap: wrap;
-    flex-flow: column;
-    z-index: 10000;
+    left: 20vw;
+    top: 20vh;
+    pointer-events: all;
 
     &::after {
         content: ' ';
@@ -266,6 +249,7 @@ function close() {
         }
     }
 }
+
 .cataloguePage.default_grid {
     overflow: hidden;
     padding-top: 0px;
@@ -346,36 +330,34 @@ function close() {
 
 .cataloguePage.frontpage {
     //overflow-y: auto !important;
-    
-    .cards-list {
-      padding: 10px;
-    }
-  
-    .card {
-      box-sizing: content-box;
-      margin-bottom: 20px;
-      box-shadow: 0 0 20px 0 #666;
-      border-radius: 10px;
-      overflow: hidden;
-      position: relative;
-      background: #fff;
-    }
-  
-    .card-header {
-      padding: 20px;
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-      height: 300px;
-      color: #fff;
-      background-position: center;
-      background-size: cover;
-    }
-  
-    .card-header>.head-title>h1 {
-      margin-bottom: 10px;
-    }
-  }
-  
 
+    .cards-list {
+        padding: 10px;
+    }
+
+    .card {
+        box-sizing: content-box;
+        margin-bottom: 20px;
+        box-shadow: 0 0 20px 0 #666;
+        border-radius: 10px;
+        overflow: hidden;
+        position: relative;
+        background: #fff;
+    }
+
+    .card-header {
+        padding: 20px;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        height: 300px;
+        color: #fff;
+        background-position: center;
+        background-size: cover;
+    }
+
+    .card-header>.head-title>h1 {
+        margin-bottom: 10px;
+    }
+}
 </style>

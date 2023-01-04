@@ -1,27 +1,28 @@
 <template>
-    <div id="hotel-view">
-        <div class="bg-right"/>
-         <div class="bg-left"/>
-    </div>   
+	<div id="hotel-view">
+		<div class="bg-right" />
+		<div class="bg-left" />
+	</div>
 </template>
+
 <style lang="scss">
 #hotel-view {
-    position: absolute;
+	position: absolute;
 	top: 0;
 	left: 0;
 	min-width: 900px;
 	height: 100%;
 	width: 100%;
 	background-color: #68E5FF;
-    z-index: -1;
+	z-index: -1;
 }
 
 .hotelView {
-    background-color: #68E5FF;
+	background-color: #68E5FF;
 }
 
 #hotel-view .bg-left {
-    position: absolute;
+	position: absolute;
 	left: 0;
 	bottom: 0;
 	width: 413px;
