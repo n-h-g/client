@@ -35,7 +35,6 @@ export default class VisualizationTile extends RoomObjectVisualization {
         this.doorContext = roomV.getCanvasDoorTile();
     }
 
-
     private static calculateOffsetX(position: Point3d, type: TileType): number {
         return (position.getY() * MapData.tileHeight) - (position.getX() * MapData.tileWidth) / 2
     }
