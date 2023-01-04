@@ -2,7 +2,6 @@ import { IEntityData } from "../../../../../core/communication/incoming/rooms/en
 import { EntityType } from "../../../../../core/room/object/entities/EntityType"
 import { Engine } from "../../../../../Engine"
 import { UserEntity } from "../../../../../engine/room/objects/entities/users/UserEntity"
-import UserEntityVisualization from '../../../../../engine/room/objects/entities/users/visualization/UserEntityVisualization'
 import { User } from "../../../../../engine/user/User"
 import Rotation from "../../../../../utils/Rotation"
 import { MessageHandler } from "../../../../handler/MessageHandler"
@@ -11,8 +10,8 @@ export default class AddRoomEntity extends MessageHandler {
     public handle(): void {
         let entityData: IEntityData = this.message
 
-        let entity
-        if (Engine.getInstance().roomService?.CurrentRoom?.roomEntityRepository.get(entityData.id.toString()) !== undefined) {
+        let entity: UserEntity
+        if (Engine.getInstance().roomService?.CurrentRoom?.roomEntityRepository.get(entityData.id.toString()) !== null) {
             return
         }
 
