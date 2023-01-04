@@ -1,5 +1,5 @@
 <template>
-  <Dialog title="Create Room" :box="UIEventsType.NAVIGATOR">
+  <Dialog title="Create Room" class="createRoom" :box="UIEventsType.NAVIGATOR">
     <div class="createRoomContainer">
       <h2>Choose the model</h2>
       <div class="roomGrid">
@@ -101,14 +101,10 @@ function toggle() {
 </script>
 
 <style lang="scss">
-#createRoom {
+.createRoom {
   position: fixed;
   height: 435px;
   width: 320px;
-  left: 30vw;
-  top: 20vh;
-  pointer-events: all;
-  z-index: 100;
 
   .createRoomContainer {
     background-color: #fff;

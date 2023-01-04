@@ -1,5 +1,5 @@
 <template>
-    <Dialog title="Inventory" :box="UIEventsType.INVENTORY">
+    <Dialog title="Inventory" class="inventory" :box="UIEventsType.INVENTORY">
         <div class="sub">
             <div class="item" :class="{ active: currentTab == 'floor' }" @click.stop="changeTab('floor')">
                 Floor
@@ -167,14 +167,10 @@ onMounted(() => {
 </script>
 
 <style lang="scss">
-#inventory {
+.inventory {
     position: fixed;
     height: 340px;
     width: 490px;
-    left: 20vw;
-    top: 20vh;
-    pointer-events: all;
-    z-index: 100;
 
     .inventoryContainer {
         position: relative;

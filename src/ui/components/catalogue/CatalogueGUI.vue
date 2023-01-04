@@ -1,5 +1,5 @@
 <template>
-    <Dialog title="catalogue" :box="UIEventsType.CATALOGUE">
+    <Dialog title="Catalogue" class="catalogue" :box="UIEventsType.CATALOGUE">
         <div class="header">
             <div class="headerImage">
                 <img v-if="activePage && activePage.rawInfo && activePage.rawInfo.headerImage && activePage.rawInfo.headerImage != ''"
@@ -61,24 +61,10 @@ function openPage() {
 </script>
 
 <style lang="scss">
-#catalogue {
+.catalogue {
     position: fixed;
-    height: 625px;
+    height: 620px;
     width: 568px;
-    left: 20vw;
-    top: 20vh;
-    pointer-events: all;
-
-    &::after {
-        content: ' ';
-        box-shadow: inset 0 0 0 2px rgba(255, 255, 255, .15);
-        position: absolute;
-        top: 0;
-        left: 0;
-        height: 100%;
-        width: 100%;
-        pointer-events: none;
-    }
 
     .header {
         height: 90px;

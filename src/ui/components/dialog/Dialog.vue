@@ -33,8 +33,7 @@ function hide() {
 	border-radius: 6px;
     border: 6px solid #367897;
     box-shadow: #408caf 5px 5px inset,  #408caf -5px -5px inset;
-    height: 100%;
-
+    pointer-events: all;
 
     .title-bar {
         position: relative;
