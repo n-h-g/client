@@ -23,9 +23,8 @@ export default class AddRoomEntity extends MessageHandler {
             entity.position.setZ(entityData.z)
 
             entity.visualization!.Rot = Rotation.parseRotation(entityData.rot)
-            entity.visualization!.HeadRot = Rotation.parseRotation(entityData.rot)
+            entity.visualization!.headRotation = Rotation.parseRotation(entityData.rot)
             entity.Look = entityData.look
-            entity.visualization.inRoom = true
 
             let user = Engine.getInstance().roomService?.CurrentRoom.roomUserRepository.get(entityData.user_id)
 
