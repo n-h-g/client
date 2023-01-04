@@ -5,6 +5,7 @@ import { Engine } from '../Engine';
 export class ApplicationEngine extends Application {
     private _engine: Engine
     private _lastFrameTime: number
+    private _timeElapsed: number = 0
     private _viewport: Viewport
 
     constructor(engine: Engine, options?: IApplicationOptions) {
@@ -49,11 +50,11 @@ export class ApplicationEngine extends Application {
 
             let currentTime = Date.now()
 
-            this._lastFrameTime = currentTime - this._lastFrameTime;
+            this._timeElapsed = currentTime - this._lastFrameTime;
 
             if (this._lastFrameTime > fpsInterval) {
-                this._engine.roomService.tick(this._lastFrameTime)
-                this._engine.usersService.tick(this._lastFrameTime)
+                this._engine.roomService.tick(this._timeElapsed)
+                this._engine.usersService.tick(this._timeElapsed)
                 this._lastFrameTime = currentTime
             }
         }

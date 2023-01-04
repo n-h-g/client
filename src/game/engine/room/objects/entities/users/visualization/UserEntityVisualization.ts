@@ -106,7 +106,7 @@ export default class UserEntityVisualization extends EntityVisualization {
 
     public move(delta: number): void {
         delta = delta / 1000;
-
+        
         if (this.entity.position.getX() < this.nextX) {
             this.entity.position.setX(this.entity.position.getX() + delta * AvatarData.AVATAR_WALK_SPEED);
             if (this.entity.position.getX() > this.nextX) {
@@ -157,7 +157,7 @@ export default class UserEntityVisualization extends EntityVisualization {
         this.rotation = Rotation.calculateDirection(new Point(point.getX(), point.getY()), new Point(this.entity.position.getX(), this.entity.position.getY()));
         this.headDirection = Rotation.calculateDirection(new Point(point.getX(), point.getY()), new Point(this.entity.position.getX(), this.entity.position.getY()));
         this.updatePosition()
-        this.container?.emit("user-position.changed");
+        this.container?.emit("user-position-changed");
     }
 
     public updatePosition() {

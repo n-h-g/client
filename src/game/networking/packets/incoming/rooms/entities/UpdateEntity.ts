@@ -34,11 +34,11 @@ export default class UpdateEntity extends MessageHandler {
                 
             for(let action of entityData.actions) {
                 action as ActionId
-                entity.visualization!.addAction(action);      
+                entity.visualization.addAction(action);      
             }
 
-                    
-            entity!.visualization!.needsUpdate = true;
+                
+            entity.visualization.needsUpdate = true;
             
         } else {
             if(Engine.getInstance().config.debug) {

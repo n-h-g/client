@@ -12,6 +12,7 @@ import { UIEventsType } from '../../../../../ui/events/UIEventsType';
 import { ActionId } from "../../../../../ui/imagers/avatars/enum/actions/ActionId";
 import AvatarData from "../../../../../ui/imagers/avatars/enum/AvatarData";
 import { UserEntity } from '../UserEntity';
+import UserEntityVisualization from '../visualization/UserEntityVisualization';
 
 export default class UserEntityLogic extends EntityLogic {
     public frameTracker: number = 0;
@@ -43,7 +44,7 @@ export default class UserEntityLogic extends EntityLogic {
     }
 
     public onMove(delta: number): void {
-        let userVisualization = this.entity.visualization
+        let userVisualization = this.entity.visualization as UserEntityVisualization
 
         if (userVisualization.Actions.has(ActionId.WALK)) {
             userVisualization.move(delta);

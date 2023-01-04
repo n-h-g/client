@@ -5,6 +5,7 @@ import { ActionId } from "../../../../engine/ui/imagers/avatars/enum/actions/Act
 import Point3d from '../../../../utils/point/Point3d';
 
 export abstract class EntityVisualization extends RoomObjectVisualization {
+
     protected entity: Entity
     protected rotation: Direction = Direction.SOUTH
     protected headDirection: Direction = Direction.SOUTH
