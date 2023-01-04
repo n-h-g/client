@@ -15,6 +15,8 @@ export default abstract class RoomObjectVisualization {
         this._needsUpdate = false
     }
 
+    public abstract render(): void
+
     public set needsUpdate(update: boolean) {
         this._needsUpdate = update
     }
