@@ -1,4 +1,4 @@
-import { UserEntity } from '../../room/objects/entities/users/UserEntity';
+import { UserEntity } from '../../room/objects/users/UserEntity';
 import { User } from '../User';
 
 export class UserVisualization {

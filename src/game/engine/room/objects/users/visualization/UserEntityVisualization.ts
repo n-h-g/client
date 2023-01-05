@@ -1,17 +1,17 @@
-import Point3d from "../../../../../../utils/point/Point3d";
-import Avatar from "../../../../../ui/imagers/avatars/Avatar";
-import { Direction } from "../../../../../../core/objects/Direction";
-import AvatarData from "../../../../../ui/imagers/avatars/enum/AvatarData";
-import MapData from "../../../map/MapData";
-import Point from "../../../../../../utils/point/Point";
+import Point3d from "../../../../../utils/point/Point3d";
+import Avatar from "../../../../ui/imagers/avatars/Avatar";
+import { Direction } from "../../../../../core/objects/Direction";
+import AvatarData from "../../../../ui/imagers/avatars/enum/AvatarData";
+import MapData from "../../map/MapData";
+import Point from "../../../../../utils/point/Point";
 import UserEntityLogic from "../logic/UserEntityLogic";
-import Rotation from "../../../../../../utils/Rotation";
-import { Engine } from "../../../../../../Engine";
-import AvatarPlaceHolder from "../../../../../ui/imagers/avatars/AvatarPlaceholder";
-import { EntityVisualization } from '../../../../../../core/room/object/entities/EntityVisualization';
+import Rotation from "../../../../../utils/Rotation";
+import { Engine } from "../../../../../Engine";
+import AvatarPlaceHolder from "../../../../ui/imagers/avatars/AvatarPlaceholder";
+import { EntityVisualization } from '../../../../../core/room/object/entities/EntityVisualization';
 import { UserEntity } from '../UserEntity';
-import { Tile } from '../../../map/Tile';
-import { ActionId } from "../../../../../ui/imagers/avatars/enum/actions/ActionId";
+import { Tile } from '../../map/Tile';
+import { ActionId } from "../../../../ui/imagers/avatars/enum/actions/ActionId";
 
 export default class UserEntityVisualization extends EntityVisualization {
     private avatar: Avatar | null = null;

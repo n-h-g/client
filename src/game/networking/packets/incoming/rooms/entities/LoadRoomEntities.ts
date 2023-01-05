@@ -1,8 +1,8 @@
 import { IEntityData } from "../../../../../core/communication/incoming/rooms/entities/IEntityData";
 import { EntityType } from "../../../../../core/room/object/entities/EntityType";
 import { Engine } from "../../../../../Engine";
-import { UserEntity } from '../../../../../engine/room/objects/entities/users/UserEntity';
-import UserEntityVisualization from '../../../../../engine/room/objects/entities/users/visualization/UserEntityVisualization';
+import { UserEntity } from '../../../../../engine/room/objects/users/UserEntity';
+import UserEntityVisualization from '../../../../../engine/room/objects/users/visualization/UserEntityVisualization';
 import { User } from '../../../../../engine/user/User';
 import Rotation from "../../../../../utils/Rotation";
 import { MessageHandler } from "../../../../handler/MessageHandler";

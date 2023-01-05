@@ -1,7 +1,7 @@
 import { IEntityData } from "../../../../../core/communication/incoming/rooms/entities/IEntityData"
 import { Engine } from "../../../../../Engine";
-import { UserEntity } from '../../../../../engine/room/objects/entities/users/UserEntity';
-import UserEntityVisualization from "../../../../../engine/room/objects/entities/users/visualization/UserEntityVisualization";
+import { UserEntity } from '../../../../../engine/room/objects/users/UserEntity';
+import UserEntityVisualization from "../../../../../engine/room/objects/users/visualization/UserEntityVisualization";
 import { ActionId } from "../../../../../engine/ui/imagers/avatars/enum/actions/ActionId";
 import { Logger } from "../../../../../utils/Logger";
 import Point3d from "../../../../../utils/point/Point3d";

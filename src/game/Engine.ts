@@ -8,9 +8,9 @@ import { UserService } from './engine/user/UserService'
 import { CommandService } from './engine/game/commands/CommandService'
 import Room from './engine/room/Room'
 import * as PIXI from "pixi.js"
-import { UserEntity } from './engine/room/objects/entities/users/UserEntity'
+import { UserEntity } from './engine/room/objects/users/UserEntity'
 import { Direction } from './core/objects/Direction'
-import UserEntityVisualization from './engine/room/objects/entities/users/visualization/UserEntityVisualization'
+import UserEntityVisualization from './engine/room/objects/users/visualization/UserEntityVisualization'
 import { ActionId } from './engine/ui/imagers/avatars/enum/actions/ActionId'
 
 export class Engine {
@@ -72,7 +72,7 @@ export class Engine {
 
             let entity = new UserEntity("id", "prova", "hd-185-10", room)
             entity.visualization.Rot = Direction.WEST;
-            (entity.visualization as UserEntityVisualization).addAction(ActionId.SWIM)
+            (entity.visualization as UserEntityVisualization).addAction(ActionId.USE_ITEM)
             entity.visualization.render()
         }
     }
