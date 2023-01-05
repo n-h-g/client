@@ -1,4 +1,5 @@
-import { Direction } from "../../../../core/objects/Direction"
+
+import { Direction } from "../../../../core/objects/Direction";
 import { IAction } from "./gamedata/IAvatarActions";
 
 

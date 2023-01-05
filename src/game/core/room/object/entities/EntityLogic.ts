@@ -3,7 +3,8 @@ import { Entity } from "./Entity";
 
 export abstract class EntityLogic extends RoomObjectLogic {
     protected _entity: Entity
-    public frameTracker: number = 0
+    
+    protected frameTracker: number = 0
 
     public constructor(entity: Entity) {
         super()
@@ -12,9 +13,7 @@ export abstract class EntityLogic extends RoomObjectLogic {
 
     public abstract onPositionChanged(): void
 
-    public abstract onDance(): void
-
-    public abstract onTalk(): void
+    public abstract onLoad(): void
 
     public get entity(): Entity {
         return this._entity

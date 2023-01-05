@@ -46,7 +46,7 @@ export class Engine {
         this._application = new ApplicationEngine(this, {
             backgroundColor: 0x00000,
             backgroundAlpha: 1,
-            antialias: false,
+            antialias: true,
             resolution: window.devicePixelRatio,
             width: window.innerWidth,
             height: window.innerHeight,
@@ -72,7 +72,7 @@ export class Engine {
 
             let entity = new UserEntity("id", "prova", "hd-185-10", room)
             entity.visualization.Rot = Direction.WEST;
-            (entity.visualization as UserEntityVisualization).addAction(ActionId.USE_ITEM)
+            //(entity.visualization as UserEntityVisualization).addAction(ActionId.USE_ITEM)
             entity.visualization.render()
         }
     }

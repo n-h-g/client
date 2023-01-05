@@ -1,4 +1,5 @@
 import { EntityLogic } from '../../../../../core/room/object/entities/EntityLogic';
+import { HumanLogic } from '../../../../../core/room/object/human/logic/HumanLogic';
 import { Engine } from "../../../../../Engine";
 import { OutgoingPacket } from "../../../../../networking/packets/outgoing/OutgoingPacket";
 import Point from "../../../../../utils/point/Point";
@@ -14,24 +15,23 @@ import AvatarData from "../../../../ui/imagers/avatars/enum/AvatarData";
 import { UserEntity } from '../UserEntity';
 import UserEntityVisualization from '../visualization/UserEntityVisualization';
 
-export default class UserEntityLogic extends EntityLogic {
-    public frameTracker: number = 0;
+export default class UserEntityLogic extends HumanLogic {
 
     public onDance(): void {
 
     }
 
     public registerEvents() {
-        this.entity.visualization?.container?.on('pointerdown', () => this.onClick())
-        this.entity.visualization?.container?.on('user-position-changed', () => this.onPositionChanged())
-        this.entity.visualization?.container?.on('user-started-typing', () => this.userToggleTyping(true))
+        this.entity.visualization?.container?.on('user-started-typing', () => this.onToggleTyping(true))
         this.entity.visualization?.container?.on('user-stop-typing', () => this.userToggleTyping(false))
-        this.entity.visualization?.container?.on('user-look-changed', () => this.userLookChanged())
+        this._entity.visualization?.container?.on('pointerdown', () => this.onClick())
+        this.entity.visualization?.container?.on('user-position-changed', () => this.onPositionChanged())
+        this.entity.visualization?.container?.on('user-look-changed', () => this.figureChanged())
         this.entity.visualization?.container?.on('user-avatar-loading-completed', () => this.onLoad())
     }
 
-    public onLoad(): void {
-        this.entity.visualization.draw()
+    public onToggleTyping(typing: boolean = false): void {
+
     }
 
     public onTalk(length?: number): void {
@@ -73,6 +73,7 @@ export default class UserEntityLogic extends EntityLogic {
             y: y
         })
 
+     
         this.togglePreview();
     }
     public setAvatarContainer() {
@@ -107,26 +108,9 @@ export default class UserEntityLogic extends EntityLogic {
         })
     }
 
-    private userLookChanged() {
+    public figureChanged() {
         let image: HTMLImageElement = UiUtils.generateImageFromObject(this.entity.visualization?.container!);
         //bottomBarGui.$data.look = image?.src;
         //bottomBarGui.$forceUpdate();
-    }
-
-    public tick(delta: number): void {
-        let userVisualization = this.entity.visualization as UserEntityVisualization
-
-        if (userVisualization.needsUpdate) {
-            this.frameTracker += delta;
-
-            if (this.frameTracker >= AvatarData.AVATAR_FRAME_SPEED) {
-                userVisualization.nextFrame();
-                this.frameTracker = 0;
-                userVisualization.draw();
-            }
-            if (userVisualization.actions.has(ActionId.WALK)) {
-                this.onMove(delta);
-            }
-        }
     }
 }
