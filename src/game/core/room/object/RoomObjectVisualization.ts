@@ -33,6 +33,14 @@ export default abstract class RoomObjectVisualization {
         return this._offsetY
     }
 
+    public set offsetX(x: number) {
+        this._offsetX = x
+    }
+
+    public set offsetY(y: number) {
+        this._offsetY = y
+    }
+
     public get zIndex(): number {
         return this._zIndex
     }

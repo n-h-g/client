@@ -2,7 +2,6 @@ import { ItemLogic } from "../../../../../core/room/object/items/logic/ItemLogic
 import Item from "../Item";
 
 export default class ItemLogicMultiState extends ItemLogic {
-
     private animation: number = 0;
 
     constructor(item: Item) {
@@ -51,4 +50,15 @@ export default class ItemLogicMultiState extends ItemLogic {
         }
     }
 
+    public onPositionChanged(): void {
+        
+    }
+
+    public onDance(): void {
+
+    }
+
+    public onTalk(): void {
+
+    }
 }

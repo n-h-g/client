@@ -29,5 +29,4 @@ export class UserEntity extends Entity {
 
     public get Look(): string { return this.look }
     public set Look(look: string) { this.look = look; }
-
 }

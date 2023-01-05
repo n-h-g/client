@@ -13,7 +13,6 @@ import { IRoomObjectVisualization } from '../../IRoomObjectVisualization';
 import RoomObjectVisualization from '../../RoomObjectVisualization';
 
 export default abstract class ItemVisualization extends EntityVisualization {
-
     private position: Point3d;
 
     public imagePreview: string | undefined;
@@ -35,8 +34,6 @@ export default abstract class ItemVisualization extends EntityVisualization {
         throw new Error("Method not implemented.");
     }
     
-
-
     public draw(): void {
         
     }
@@ -68,10 +65,10 @@ export default abstract class ItemVisualization extends EntityVisualization {
         this.isIcon = false;
     }
 
-
     private generateImagePreview() {
         return UiUtils.generateBase64FromObject(this.entity.visualization.container);
     }
+
     private generateIcon(): string | undefined{
         //let icon: FurniSprite = this.entity.visualization.container.turnIntoIcon()
         //this.entity.visualization.container.restore()
@@ -80,10 +77,8 @@ export default abstract class ItemVisualization extends EntityVisualization {
     }
 
     public render(): void {
-
         this.entity.visualization.offsetX = this.calculateOffsetX()
         this.entity.visualization.offsetY = this.calculateOffsetY()
-
         this.entity.logic?.registerEvents();
     }
 
@@ -93,6 +88,7 @@ export default abstract class ItemVisualization extends EntityVisualization {
 
         return (((tile!.position.getY() - tile!.position.getX()) * MapData.tileWidth / 2) + (MapData.tileWidth / 2))
     }
+
     public calculateOffsetY(): number {
         let currentRoom = Engine.getInstance().roomService?.CurrentRoom
         let tile: Tile = currentRoom.roomLayout.getFloorPlane().getTilebyPosition(new Point(Math.round(this.position.getX()), Math.round(this.position.getY())))
@@ -101,6 +97,7 @@ export default abstract class ItemVisualization extends EntityVisualization {
         
         return ((tile!.position.getY() + tile!.position.getX()) * MapData.tileHeight / 2 + MapData.tileHeight / 2) + offsetFloor;
     }
+
     public getZIndex(): number {
         return 1 + this.entity.position.getX() + this.entity.position.getY()+ ((this.entity.position.getX() + this.entity.position.getY()) * 1000) + this.entity.position.getZ ()
     }

@@ -1,16 +1,10 @@
-import { Engine } from "../../Engine";
-import { Logger } from "../../utils/Logger";
 import { ComponentsManager } from "./components/ComponentsManager";
-import { EventManager } from "./events/EventManager";
-import { LoadingProgressEventData } from "./events/data/loader/LoadingProgress";
-import { UIEvents } from "./events/UIEvents";
 import AvatarImager from "./imagers/avatars/AvatarImager";
 import AvatarStructure from "./imagers/avatars/structure/AvatarStructure";
 import FurniImager from "./imagers/items/FurniImager";
 import SoundManager from "./sound/SoundManager";
 
-export default class UserInterfaceManager {
-
+export class UserInterfaceManager {
     private _soundManager: SoundManager
     private _componentsManager: ComponentsManager;
     private _avatarStructure: AvatarStructure
@@ -18,7 +12,6 @@ export default class UserInterfaceManager {
     private _furniImager: FurniImager
 
     constructor() {
-
         this._componentsManager = new ComponentsManager()
         this._componentsManager.loadGameComponents()
         this._componentsManager.initGameComponents()
@@ -28,8 +21,9 @@ export default class UserInterfaceManager {
         this._avatarImager = new AvatarImager(this._avatarStructure)
         this._furniImager = new FurniImager()
     }
+
     public async init(): Promise<void> {
-        await this._avatarImager.Data.loadGameData();
+        await this._avatarImager.Data.loadGameData()
         this._avatarImager.loadStructure()
         await this._furniImager.init()
     }

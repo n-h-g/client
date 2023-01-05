@@ -1,4 +1,4 @@
-import UserInterfaceManager from '../UserInterfaceManager'
+import { UserInterfaceManager } from '../UserInterfaceManager'
 import SoundResource from './SoundResource'
 import { Sound } from './SoundEnum'
 import { Engine } from '../../../Engine'

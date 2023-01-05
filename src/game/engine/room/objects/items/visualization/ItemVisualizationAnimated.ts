@@ -2,14 +2,12 @@ import ItemVisualization from "../../../../../core/room/object/items/visualizati
 import Item from "../Item";
 
 export default class ItemVisualizationAnimated extends ItemVisualization {
-
     constructor(item: Item) {
         super(item)
-
     }
 
     public render() {
-        this.item.base.nextFrame();
+        this._entity.base.nextFrame();
         super.render()
     }
 
