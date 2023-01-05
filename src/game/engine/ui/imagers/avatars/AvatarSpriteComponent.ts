@@ -74,7 +74,7 @@ export default class AvatarSpriteComponent {
 
         if(partType == 'ey') this.colorable = false;
 
-
+      
         this.resourceType = flippedType != undefined && this.isFlipped ? flippedType : partType
     }
 

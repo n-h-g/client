@@ -13,7 +13,7 @@ import AvatarFigureComponent from "./AvatarFigureComponent";
 import AvatarImageData from "./AvatarImageData";
 import AvatarSpriteComponent from "./AvatarSpriteComponent";
 import AvatarData from "./enum/AvatarData";
-import { IAnimation, IAnimationFrame, OffsetDirection, OffsetFrame } from "./gamedata/IAvatarAnimations";
+import { BodyPart, IAnimation, IAnimationFrame, OffsetDirection, OffsetFrame } from "./gamedata/IAvatarAnimations";
 import { AssetData, Spritesheet } from "./gamedata/IAvatarResource";
 import { IPart } from "./gamedata/IFigureData";
 import AvatarStructure from "./structure/AvatarStructure";
@@ -137,6 +137,7 @@ export default class AvatarImager {
             let action = this.getFigureComponentAction(component, actions!)
             let assetName = this.Structure.Assets?.getUniqueName(component.part.type, component.part.id)
 
+           
             if (!action || !assetName) continue
 
             this.data.loadTexture(assetName).then(() => {
@@ -164,6 +165,7 @@ export default class AvatarImager {
     private async drawPart(component: AvatarFigureComponent, action: Action, avatar: Avatar, assetName: string) {
 
         const partFrames: IAnimationFrame[] = this.structure.Animations?.getAnimation(action.id)?.getAnimationPart(component.part.type)?.getFrames() ?? []
+
         avatar.TotalFrames = partFrames.length;
 
         const frame = this.structure.Geometry?.isHeadPart(component.part.type) ? avatar.HeadFrame : avatar.BodyFrame;
@@ -172,7 +174,7 @@ export default class AvatarImager {
         let partAction: string = (partFrames && partFrames[partFrame]) ? partFrames[partFrame].assetPartDefinition : action.assetPartDefiniton;
 
         const direction = avatar.BodyDirection
-        const animationOffsets = this.getAnimationOffsets(action.id, partFrame, direction);
+        const animationOffsets = this.structure.Animations?.getAnimation(action.id)?.getAnimationOffset(action.id, partFrame, direction);
 
         partFrame = partFrames && partFrames[partFrame] ? partFrames[partFrame].number : 0;
 
@@ -194,7 +196,7 @@ export default class AvatarImager {
     }
 
 
-    private async drawSpriteComponent(component: AvatarSpriteComponent, assetName: string, avatar: Avatar, animationOffsets: { x: number, y: number }) {
+    private async drawSpriteComponent(component: AvatarSpriteComponent, assetName: string, avatar: Avatar, bodyPartOffset: BodyPart) {
         let spritesheet: Spritesheet = await this.data.SpriteSheets.get(assetName) as Spritesheet;
 
         if (!spritesheet) return;
@@ -237,10 +239,6 @@ export default class AvatarImager {
 
             if (component.Color && component.isColorable) {
                 sprite.tint = avatar.IsPlaceHolder ? 0xFFFFFF : parseInt(component.Color, 16);
-
-                if (component.ResourceType == "ey") {
-                    sprite.tint = 0xFFFFF
-                }
             }
 
             let offsets = asset.offset.split(",");
@@ -249,8 +247,8 @@ export default class AvatarImager {
 
                 const offset = new Point(parseInt(offsets[0]), parseInt(offsets[1]))
 
-                sprite.pivot.x = offset.getX()
-                sprite.pivot.y = offset.getY()
+                sprite.pivot.x = bodyPartOffset ? bodyPartOffset.dx + offset.getX() : offset.getX()
+                sprite.pivot.y = bodyPartOffset ? bodyPartOffset.dy + offset.getY() : offset.getY()
             }
 
             if (component.IsFlipped) {
@@ -289,31 +287,13 @@ export default class AvatarImager {
             }
         } else {
             if (Engine.getInstance().config.debug) {
-                //Logger.debug('cannot find resource ' + this.getTextureId(assetName, component.ResourceName))
+                Logger.debug('cannot find resource ' + this.getTextureId(assetName, component.ResourceName))
             }
         }
     }
 
     private getTextureId(assetName: string, resourceName: string) {
         return resourceName + ".png";
-    }
-
-    private getAnimationOffsets(actionId: string, frameId: number, directionId: number): { x: number, y: number } {
-
-        Object.values(this.data.avatarAnimations!.animations).forEach((animation: IAnimation) => {
-            if (animation.id.toLowerCase() === actionId.toLowerCase()) {
-                animation.offsets?.frames?.forEach((offset: OffsetFrame) => {
-                    offset.directions.forEach((direction: OffsetDirection) => {
-                        if (direction.id == frameId) {
-                            return { x: direction.bodyParts[0].dx, y: direction.bodyParts[0].dy }
-                        }
-                    })
-                })
-            }
-        })
-
-        return { x: 0, y: 0 }
-
     }
 
     private getDrawParts(state: string, direction: Direction): string[] | undefined {
