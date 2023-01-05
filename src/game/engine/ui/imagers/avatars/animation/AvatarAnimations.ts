@@ -12,12 +12,15 @@ export default class AvatarAnimations {
         this.animations = new Map();
 
         this.loadAnimations(animationsData.animations)
+
+        //console.log(this.animations)
     }
 
     public getAnimation(actionId: string): Animation | null {
         const animation = this.animations.get(actionId) 
 
-        if(!animation) return null;
+        if(!animation)
+            return;
 
         return animation;
     }

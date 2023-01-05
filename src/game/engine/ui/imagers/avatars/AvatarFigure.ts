@@ -154,8 +154,8 @@ export default class AvatarFigure {
 
             const type = parameters[0];
             const id = parameters[1];
-            const primaryColor = Number(parameters[2]);
-            const secondaryColor = Number(parameters[3]);
+            const primaryColor = parseInt(parameters[2]);
+            const secondaryColor = parseInt(parameters[3]);
 
             const colors: number[] = [primaryColor]
 

@@ -6,12 +6,15 @@ import { Logger } from '../../../../utils/Logger';
 import Point from "../../../../utils/point/Point";
 import RenderingUtils from "../../../../utils/RenderingUtils";
 import Action from "./actions/Action";
+import Animation from "./animation/Animation";
 import Asset from './assets/Asset';
 import Avatar from "./Avatar";
 import AvatarFigure from "./AvatarFigure";
 import AvatarFigureComponent from "./AvatarFigureComponent";
 import AvatarImageData from "./AvatarImageData";
 import AvatarSpriteComponent from "./AvatarSpriteComponent";
+import { ActionId } from "./enum/actions/ActionId";
+import AvatatActionId from "./enum/actions/AvatarActionId";
 import AvatarData from "./enum/AvatarData";
 import { BodyPart, IAnimation, IAnimationFrame, OffsetDirection, OffsetFrame } from "./gamedata/IAvatarAnimations";
 import { AssetData, Spritesheet } from "./gamedata/IAvatarResource";
@@ -106,20 +109,22 @@ export default class AvatarImager {
         const actions = this.structure.Actions?.getActionsByIds(avatar.Actions);
 
         let figureComponents = avatar.AvatarFigure.getAllComponents()
+
         let hiddens = avatar.AvatarFigure.getAllHidden()
+
 
         figureComponents.sort((a: AvatarFigureComponent, b: AvatarFigureComponent) => {
 
             let direction = this.structure.Geometry?.isHeadPart(a.part.type) ? avatar.HeadDirection : avatar.BodyDirection
 
-            let order = this.getDrawParts("std", direction)
+            let parts = this.getDrawParts("std", direction)
 
-            if (order == null) order = this.getDrawParts("std", avatar.Direction);
-
-            if (order) {
-                for (let position of order) {
-                    if (position == a.part.type) return -1
-                    if (position == b.part.type) return 1
+            if (parts == null) parts = this.getDrawParts("std", avatar.Direction);
+            
+            if (parts) {
+                for (let part of parts) {
+                    if (part == a.part.type) return -1
+                    if (part == b.part.type) return 1
                 }
             }
 
@@ -136,8 +141,8 @@ export default class AvatarImager {
 
             let action = this.getFigureComponentAction(component, actions!)
             let assetName = this.Structure.Assets?.getUniqueName(component.part.type, component.part.id)
-
-           
+            
+          
             if (!action || !assetName) continue
 
             this.data.loadTexture(assetName).then(() => {
@@ -168,16 +173,53 @@ export default class AvatarImager {
 
         avatar.TotalFrames = partFrames.length;
 
+        const direction = avatar.BodyDirection
+
         const frame = this.structure.Geometry?.isHeadPart(component.part.type) ? avatar.HeadFrame : avatar.BodyFrame;
 
         let partFrame: any = frame % (partFrames ? Object.values(partFrames).length : 1);
         let partAction: string = (partFrames && partFrames[partFrame]) ? partFrames[partFrame].assetPartDefinition : action.assetPartDefiniton;
 
-        const direction = avatar.BodyDirection
-        const animationOffsets = this.structure.Animations?.getAnimation(action.id)?.getAnimationOffset(action.id, partFrame, direction);
+    
+        const offsets = this.structure.Animations?.getAnimation(action.id)?.getAnimationOffset(action.id, partFrame, direction);
 
         partFrame = partFrames && partFrames[partFrame] ? partFrames[partFrame].number : 0;
 
+        /*
+
+        let animationPartState;
+
+        let frameNumber = 0
+
+        let offsets
+
+        console.log(action.id)
+
+        if(action.id) {
+            let animation = this.structure.Animations.getAnimation(action.id)
+
+
+            if(animation) {
+
+                let part = animation.getAnimationPart(component.part.type)
+                    
+                let frames = part.getFrames()
+
+                let animationFrame = avatar.HeadFrame % frames.length
+
+                let frame = frames[animationFrame]
+
+                let frameNumber = frame.number
+
+                offsets = animation ?? animation.offsets.getFrameDirectionParts(frameNumber, direction.valueOf()).bodyParts[0]
+
+                animationPartState = frame.assetPartDefinition
+            }
+        }
+
+        console.log(animationPartState)*/
+
+    
         const flippedType = this.structure.PartSets?.getFlippedSetType(component.part.type)
 
         const spriteComponent = new AvatarSpriteComponent(
@@ -189,10 +231,9 @@ export default class AvatarImager {
             component.color,
             flippedType,
             avatar.IsSmall,
-            partAction
         );
 
-        this.drawSpriteComponent(spriteComponent, assetName, avatar, animationOffsets);
+        this.drawSpriteComponent(spriteComponent, assetName, avatar, offsets);
     }
 
 
@@ -207,8 +248,7 @@ export default class AvatarImager {
 
         let assetData: AssetData = spritesheet[component.ResourceName]
 
-        //console.log(this.getTextureId(assetName, component.ResourceName))
-
+     
         if (assetData !== undefined) {
             let downloadedTexture: PIXI.Texture = this.data.getTexture(assetName)
 

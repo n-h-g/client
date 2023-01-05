@@ -1,5 +1,6 @@
 
 import { ActionId } from "../enum/actions/ActionId";
+import AvatarActionId from "../enum/actions/AvatarActionId";
 import { GeometryType } from "../enum/geometry/GeometryType";
 import { IAction, IActionType } from "../gamedata/IAvatarActions";
 
@@ -38,5 +39,9 @@ export default class Action {
         this.lay = actionData.lay;
         this.preventHeadTurn = actionData.preventHeadTurn;
         this.types = actionData.types;
+    }
+
+    public getActionStateName() {
+        return AvatarActionId.idToAvatarActionState(this.id)
     }
 }

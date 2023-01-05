@@ -39,13 +39,14 @@ export class Engine {
 
         PIXI.settings.SCALE_MODE = PIXI.SCALE_MODES.NEAREST;
         PIXI.settings.ROUND_PIXELS = true;
+        PIXI.settings.FAIL_IF_MAJOR_PERFORMANCE_CAVEAT = false;
 
         console.log("%cNHG Client v" + this._config.version, "font-size:2rem; background-color:#069; color:#fff; padding:10px 45px;")
 
         this._application = new ApplicationEngine(this, {
             backgroundColor: 0x00000,
             backgroundAlpha: 1,
-            antialias: true,
+            antialias: false,
             resolution: window.devicePixelRatio,
             width: window.innerWidth,
             height: window.innerHeight,
@@ -69,9 +70,9 @@ export class Engine {
         if (this._config.offlineMode) {
             let room: Room = this._roomsService.setRoom("prova", "0000000000/0111001101/01111111011111/0111111111001/0111111", new Point(3, 3), 200)
 
-            let entity = new UserEntity("id", "prova", "hd-185-10.hr-3163-61.ch-3030-92.lg-275-110", room)
-            entity.visualization.Rot = Direction.SOUTH;
-            (entity.visualization as UserEntityVisualization).addAction(ActionId.BLOW)
+            let entity = new UserEntity("id", "prova", "hd-185-10", room)
+            entity.visualization.Rot = Direction.WEST;
+            (entity.visualization as UserEntityVisualization).addAction(ActionId.SWIM)
             entity.visualization.render()
         }
     }

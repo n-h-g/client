@@ -32,7 +32,10 @@ export default class AvatatActionId {
                 return 'sleep';
             case ActionId.WALK:
                 return 'wlk';
+            case ActionId.LAUGH:
+                return 'lag';
             default:
+            case ActionId.STAND:
                 return 'std';                             
         }
     }
