@@ -1,5 +1,5 @@
 import { UIComponent } from "../../engine/ui/components/UIComponent";
-import { EventManager } from "../../engine/ui/events/EventManager";
+import { EventManager } from "../events/EventManager";
 import { DialogEventData } from "../../engine/ui/events/data/general/Dialog";
 import { UIEvents } from "../../engine/ui/events/UIEvents";
 import UiUtils from "../../utils/UiUtils";

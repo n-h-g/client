@@ -42,7 +42,6 @@
 <script setup lang="ts">
 import { ref } from "vue"
 import { Engine } from "../../../game/Engine"
-import { EventManager } from "../../../game/engine/ui/events/EventManager"
 import { UIEvents } from "../../../game/engine/ui/events/UIEvents"
 import { OutgoingPacket } from "../../../game/networking/packets/outgoing/OutgoingPacket"
 import { UIEventsType } from "../../../game/engine/ui/events/UIEventsType"
@@ -50,6 +49,7 @@ import Dialog from '../dialog/Dialog.vue'
 import { NavigatorRoomsEventData } from "../../../game/engine/ui/events/data/navigator/NavigatorRooms"
 import { IComponentShowableUI } from '../../../game/core/ui/IComponentShowableUI'
 import { UIComponent } from '../../../game/engine/ui/components/UIComponent'
+import { EventManager } from "../../../game/core/events/EventManager"
 
 let rooms = ref([])
 let currentTab = ref("public");

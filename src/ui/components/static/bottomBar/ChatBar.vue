@@ -6,9 +6,9 @@
 
 <script setup lang="ts">
 import { ref } from "vue";
+import { EventManager } from "../../../../game/core/events/EventManager";
 import { Engine } from "../../../../game/Engine";
 import { RoomUIEventData } from "../../../../game/engine/ui/events/data/room/RoomUIEventData";
-import { EventManager } from "../../../../game/engine/ui/events/EventManager";
 import { UIEvents } from "../../../../game/engine/ui/events/UIEvents";
 import { OutgoingPacket } from "../../../../game/networking/packets/outgoing/OutgoingPacket";
 

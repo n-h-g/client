@@ -1,5 +1,5 @@
 import { Engine } from '../../../../Engine'
-import { EventManager } from '../../../../engine/ui/events/EventManager'
+import { EventManager } from '../../../../core/events/EventManager'
 import { LoadingProgressEventData } from '../../../../engine/ui/events/data/loader/LoadingProgress'
 import { UIEvents } from '../../../../engine/ui/events/UIEvents'
 import { MessageHandler } from '../../../handler/MessageHandler'

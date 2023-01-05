@@ -7,7 +7,7 @@ import UiUtils from "../../../../../utils/UiUtils";
 import { ChatData } from '../../../../game/chat/ChatData';
 import { DialogEventData } from '../../../../ui/events/data/general/Dialog';
 import { PreviewModeEventData } from '../../../../ui/events/data/general/PreviewUserData';
-import { EventManager } from '../../../../ui/events/EventManager';
+import { EventManager } from '../../../../../core/events/EventManager';
 import { UIEvents } from '../../../../ui/events/UIEvents';
 import { UIEventsType } from '../../../../ui/events/UIEventsType';
 import { ActionId } from "../../../../ui/imagers/avatars/enum/actions/ActionId";

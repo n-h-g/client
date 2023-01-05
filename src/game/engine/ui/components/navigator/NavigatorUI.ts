@@ -1,5 +1,5 @@
 import NavigatorGUI from '../../../../../ui/components/navigator/NavigatorGUI.vue'
-import { EventManager } from '../../events/EventManager'
+import { EventManager } from '../../../../core/events/EventManager'
 import { UIEvents } from '../../events/UIEvents'
 import { IComponentShowableUI } from '../../../../core/ui/IComponentShowableUI'
 import UiUtils from '../../../../utils/UiUtils'

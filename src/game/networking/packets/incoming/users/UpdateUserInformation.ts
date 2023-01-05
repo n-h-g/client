@@ -1,6 +1,6 @@
 import { UserData } from '../../../../core/communication/incoming/users/UserData';
 import { Engine } from '../../../../Engine';
-import { EventManager } from '../../../../engine/ui/events/EventManager';
+import { EventManager } from '../../../../core/events/EventManager';
 import { TopbarEventData } from '../../../../engine/ui/events/data/static/Topbar';
 import { UIEvents } from '../../../../engine/ui/events/UIEvents';
 import { User } from '../../../../engine/user/User';

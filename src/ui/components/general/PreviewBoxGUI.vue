@@ -26,9 +26,9 @@
 
 <script setup lang="ts">
 import { ref } from 'vue'
+import { EventManager } from '../../../game/core/events/EventManager';
 import { DialogEventData } from '../../../game/engine/ui/events/data/general/Dialog';
 import { PreviewModeEventData } from '../../../game/engine/ui/events/data/general/PreviewUserData';
-import { EventManager } from '../../../game/engine/ui/events/EventManager';
 import { UIEvents } from '../../../game/engine/ui/events/UIEvents';
 import { UIEventsType } from '../../../game/engine/ui/events/UIEventsType';
 

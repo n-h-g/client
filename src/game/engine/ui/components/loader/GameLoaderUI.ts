@@ -1,7 +1,7 @@
 import GameLoaderGUI from '../../../../../ui/components/loader/GameLoaderGUI.vue'
 import UiUtils from '../../../../utils/UiUtils'
 import { LoadingProgressEventData } from '../../events/data/loader/LoadingProgress'
-import { EventManager } from '../../events/EventManager'
+import { EventManager } from '../../../../core/events/EventManager'
 import { UIEvents } from '../../events/UIEvents'
 import { UIComponent } from '../UIComponent'
 import { Engine } from '../../../../Engine'

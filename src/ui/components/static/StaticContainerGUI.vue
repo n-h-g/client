@@ -8,9 +8,10 @@
 <script setup lang="ts">
 import { ref } from "vue";
 import { HotelViewData } from "../../../game/engine/ui/events/data/static/HotelView";
-import { EventManager } from "../../../game/engine/ui/events/EventManager";
 import { UIEvents } from "../../../game/engine/ui/events/UIEvents";
 import HotelView from "./HotelView.vue"
+import { EventManager } from "../../../game/core/events/EventManager";
+
 import BubbleAlertContainer from "./BubbleAlertContainer.vue";
 
 let hotelView = ref(true)
