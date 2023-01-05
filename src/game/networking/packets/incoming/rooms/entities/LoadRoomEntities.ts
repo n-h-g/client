@@ -2,6 +2,7 @@ import { IEntityData } from "../../../../../core/communication/incoming/rooms/en
 import { EntityType } from "../../../../../core/room/object/entities/EntityType";
 import { Engine } from "../../../../../Engine";
 import { UserEntity } from '../../../../../engine/room/objects/entities/users/UserEntity';
+import UserEntityVisualization from '../../../../../engine/room/objects/entities/users/visualization/UserEntityVisualization';
 import { User } from '../../../../../engine/user/User';
 import Rotation from "../../../../../utils/Rotation";
 import { MessageHandler } from "../../../../handler/MessageHandler";
@@ -29,9 +30,8 @@ export default class LoadRoomEntities extends MessageHandler {
                 entity.position.setY(entityData.y);
                 entity.position.setZ(entityData.z);
 
-                entity.visualization!.Rot = Rotation.parseRotation(entityData.body_rot);
-                entity.visualization!.HeadRot = Rotation.parseRotation(entityData.body_rot);
-                entity.visualization!.inRoom = true;
+                entity.visualization.Rot = Rotation.parseRotation(entityData.body_rot);
+                entity.visualization.headRotation = Rotation.parseRotation(entityData.body_rot);
 
                 user = Engine.getInstance().roomService?.CurrentRoom?.roomUserRepository.get(userId)
 

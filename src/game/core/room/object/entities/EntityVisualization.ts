@@ -122,6 +122,7 @@ export abstract class EntityVisualization extends RoomObjectVisualization {
     public set Rot(direction: Direction) {
         this.rotation = direction;
     }
+
     public set headRotation(direction: Direction) {
         this._headDirection = direction;
     }
