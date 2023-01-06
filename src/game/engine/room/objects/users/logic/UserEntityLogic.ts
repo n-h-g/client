@@ -22,9 +22,10 @@ export default class UserEntityLogic extends HumanLogic {
     }
 
     public registerEvents() {
+        this.entity.visualization.container.on('pointerdown', () => this.onClick())
+
         this.events.on('user-started-typing', () => this.onToggleTyping(true))
         this.events.on('user-stop-typing', () => this.userToggleTyping(false))
-        this.events.on('pointerdown', () => this.onClick())
         this.events.on('user-position-changed', () => this.onPositionChanged())
         this.events.on('user-look-changed', () => this.figureChanged())
         this.events.on('user-avatar-loading-completed', () => this.onLoad())
