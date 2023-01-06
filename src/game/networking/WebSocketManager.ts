@@ -1,10 +1,10 @@
 import { Engine } from '../Engine'
 import { EventManager } from '../core/events/EventManager'
-import { LoadingProgressEventData } from '../engine/ui/events/data/loader/LoadingProgress'
-import { UIEvents } from '../engine/ui/events/UIEvents'
+import { LoadingProgressEventData } from '../engine/events/ui/data/loader/LoadingProgress'
 import { Logger } from '../utils/Logger'
 import { NetworkingManager } from './NetworkingManager'
 import { OutgoingPacket } from './packets/outgoing/OutgoingPacket'
+import { UIEvents } from '../engine/events/ui/UIEvents'
 
 export class WebSocketManager {
     private webSocket: WebSocket

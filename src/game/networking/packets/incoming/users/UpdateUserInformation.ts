@@ -1,10 +1,10 @@
 import { UserData } from '../../../../core/communication/incoming/users/UserData';
 import { Engine } from '../../../../Engine';
 import { EventManager } from '../../../../core/events/EventManager';
-import { TopbarEventData } from '../../../../engine/ui/events/data/static/Topbar';
-import { UIEvents } from '../../../../engine/ui/events/UIEvents';
+import { TopbarEventData } from '../../../../engine/events/ui/data/static/Topbar';
 import { User } from '../../../../engine/user/User';
 import { MessageHandler } from '../../../handler/MessageHandler';
+import { UIEvents } from '../../../../engine/events/ui/UIEvents';
 
 export class UpdateUserInformation extends MessageHandler {
     public handle(): void {

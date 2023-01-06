@@ -1,11 +1,11 @@
 import { UIComponent } from "../../engine/ui/components/UIComponent";
 import { EventManager } from "../events/EventManager";
-import { DialogEventData } from "../../engine/ui/events/data/general/Dialog";
-import { UIEvents } from "../../engine/ui/events/UIEvents";
+import { DialogEventData } from "../../engine/events/ui/data/general/Dialog";
 import UiUtils from "../../utils/UiUtils";
 import { InteractiveComponent } from "./InteractiveComponent";
 import { IComponentShowableUI } from "./IComponentShowableUI";
 import { Component } from "vue";
+import { UIEvents } from "../../engine/events/ui/UIEvents";
 
 export abstract class ShowableComponent extends InteractiveComponent implements IComponentShowableUI {
     public visible: boolean = false

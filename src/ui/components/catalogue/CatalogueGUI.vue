@@ -35,7 +35,7 @@
 <script setup lang="ts">
 import { ref } from "vue"
 import { Engine } from "../../../game/Engine"
-import { UIEventsType } from "../../../game/engine/ui/events/UIEventsType"
+import { UIEventsType } from "../../../game/engine/events/ui/UIEventsType"
 import Dialog from "../dialog/Dialog.vue"
 import TreeMenu from "./TreeMenu.vue"
 

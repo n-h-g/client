@@ -2,11 +2,11 @@ import Room from "./Room";
 import Point from "../../utils/point/Point";
 import { Engine } from "../../Engine";
 import { EventManager } from "../../core/events/EventManager";
-import { UIEvents } from "../ui/events/UIEvents";
-import { HotelViewData } from "../ui/events/data/static/HotelView";
-import { RoomUIEventData } from "../ui/events/data/room/RoomUIEventData";
+import { HotelViewData } from "../events/ui/data/static/HotelView";
+import { RoomUIEventData } from "../events/ui/data/room/RoomUIEventData";
 import { UIComponent } from "../ui/components/UIComponent";
 import { IComponentShowableUI } from "../../core/ui/IComponentShowableUI";
+import { UIEvents } from "../events/ui/UIEvents";
 
 export default class RoomService {
     private currentRoom: Room

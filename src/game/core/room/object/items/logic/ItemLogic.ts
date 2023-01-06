@@ -19,6 +19,14 @@ export abstract class ItemLogic extends EntityLogic {
         this._item.base.addListener("mouseup", this.onHover.bind(this))
     }
 
+    public onPositionChanged(): void {
+        
+    }
+
+    public onLoad() {
+
+    }
+
     public placeItem() {
         Engine.getInstance().networkingManager?.packetManager.applyOut(OutgoingPacket.RoomPickupItemEvent, {
             id: this._item.id

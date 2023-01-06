@@ -34,7 +34,7 @@ import { ref } from "vue"
 import { IComponentShowableUI } from "../../../game/core/ui/IComponentShowableUI";
 import { Engine } from "../../../game/Engine";
 import { UIComponent } from "../../../game/engine/ui/components/UIComponent";
-import { UIEventsType } from "../../../game/engine/ui/events/UIEventsType"
+import { UIEventsType } from "../../../game/engine/events/ui/UIEventsType"
 import { OutgoingPacket } from '../../../game/networking/packets/outgoing/OutgoingPacket';
 import Dialog from "../dialog/Dialog.vue";
 

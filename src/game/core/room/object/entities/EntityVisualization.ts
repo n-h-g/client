@@ -102,12 +102,6 @@ export abstract class EntityVisualization extends RoomObjectVisualization {
         this.container.x = this.calculateOffsetX()
         this.container.y = this.calculateOffsetY()
         this.container.zIndex = 10
-    
-        this.container.buttonMode = true;
-        this.container.interactive = true;
-        this.container.interactiveChildren = true;
-
-
         this.entity.logic.registerEvents()
     }
 

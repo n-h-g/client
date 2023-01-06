@@ -49,16 +49,4 @@ export default class ItemLogicMultiState extends ItemLogic {
             }
         }
     }
-
-    public onPositionChanged(): void {
-        
-    }
-
-    public onDance(): void {
-
-    }
-
-    public onTalk(): void {
-
-    }
 }

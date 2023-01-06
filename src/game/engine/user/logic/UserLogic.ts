@@ -1,6 +1,6 @@
 import { User } from '../User';
 
-export default class UserLogicIUserLogic {
+export default class UserLogic {
   private user: User;
 
   constructor(user: User) {

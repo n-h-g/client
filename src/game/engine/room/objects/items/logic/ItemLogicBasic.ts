@@ -13,16 +13,4 @@ export default class ItemLogicBasic extends ItemLogic {
     public registerEvents(): void {
 
     }
-
-    public onPositionChanged(): void {
-        
-    }
-
-    public onDance(): void {
-
-    }
-
-    public onTalk(): void {
-
-    }
 }

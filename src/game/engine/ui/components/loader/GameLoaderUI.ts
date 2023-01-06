@@ -1,12 +1,12 @@
 import GameLoaderGUI from '../../../../../ui/components/loader/GameLoaderGUI.vue'
 import UiUtils from '../../../../utils/UiUtils'
-import { LoadingProgressEventData } from '../../events/data/loader/LoadingProgress'
+import { LoadingProgressEventData } from '../../../events/ui/data/loader/LoadingProgress'
 import { EventManager } from '../../../../core/events/EventManager'
-import { UIEvents } from '../../events/UIEvents'
 import { UIComponent } from '../UIComponent'
 import { Engine } from '../../../../Engine'
 import { DeletableComponent } from '../../../../core/ui/DeletableComponent'
-import { UIEventsType } from '../../events/UIEventsType'
+import { UIEventsType } from '../../../events/ui/UIEventsType'
+import { UIEvents } from '../../../events/ui/UIEvents'
 
 export class GameLoaderUI extends DeletableComponent {
     constructor() {

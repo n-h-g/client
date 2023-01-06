@@ -5,15 +5,15 @@ import { OutgoingPacket } from "../../../../../networking/packets/outgoing/Outgo
 import Point from "../../../../../utils/point/Point";
 import UiUtils from "../../../../../utils/UiUtils";
 import { ChatData } from '../../../../game/chat/ChatData';
-import { DialogEventData } from '../../../../ui/events/data/general/Dialog';
-import { PreviewModeEventData } from '../../../../ui/events/data/general/PreviewUserData';
 import { EventManager } from '../../../../../core/events/EventManager';
-import { UIEvents } from '../../../../ui/events/UIEvents';
-import { UIEventsType } from '../../../../ui/events/UIEventsType';
 import { ActionId } from "../../../../ui/imagers/avatars/enum/actions/ActionId";
 import AvatarData from "../../../../ui/imagers/avatars/enum/AvatarData";
 import { UserEntity } from '../UserEntity';
 import UserEntityVisualization from '../visualization/UserEntityVisualization';
+import { DialogEventData } from '../../../../events/ui/data/general/Dialog';
+import { PreviewModeEventData } from '../../../../events/ui/data/general/PreviewUserData';
+import { UIEvents } from '../../../../events/ui/UIEvents';
+import { UIEventsType } from '../../../../events/ui/UIEventsType';
 
 export default class UserEntityLogic extends HumanLogic {
 
@@ -22,12 +22,12 @@ export default class UserEntityLogic extends HumanLogic {
     }
 
     public registerEvents() {
-        this.entity.visualization?.container?.on('user-started-typing', () => this.onToggleTyping(true))
-        this.entity.visualization?.container?.on('user-stop-typing', () => this.userToggleTyping(false))
-        this._entity.visualization?.container?.on('pointerdown', () => this.onClick())
-        this.entity.visualization?.container?.on('user-position-changed', () => this.onPositionChanged())
-        this.entity.visualization?.container?.on('user-look-changed', () => this.figureChanged())
-        this.entity.visualization?.container?.on('user-avatar-loading-completed', () => this.onLoad())
+        this.events.on('user-started-typing', () => this.onToggleTyping(true))
+        this.events.on('user-stop-typing', () => this.userToggleTyping(false))
+        this.events.on('pointerdown', () => this.onClick())
+        this.events.on('user-position-changed', () => this.onPositionChanged())
+        this.events.on('user-look-changed', () => this.figureChanged())
+        this.events.on('user-avatar-loading-completed', () => this.onLoad())
     }
 
     public onToggleTyping(typing: boolean = false): void {

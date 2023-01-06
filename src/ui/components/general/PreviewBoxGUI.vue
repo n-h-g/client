@@ -27,10 +27,10 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import { EventManager } from '../../../game/core/events/EventManager';
-import { DialogEventData } from '../../../game/engine/ui/events/data/general/Dialog';
-import { PreviewModeEventData } from '../../../game/engine/ui/events/data/general/PreviewUserData';
-import { UIEvents } from '../../../game/engine/ui/events/UIEvents';
-import { UIEventsType } from '../../../game/engine/ui/events/UIEventsType';
+import { DialogEventData } from '../../../game/engine/events/ui/data/general/Dialog';
+import { PreviewModeEventData } from '../../../game/engine/events/ui/data/general/PreviewUserData';
+import { UIEvents } from '../../../game/engine/events/ui/UIEvents';
+import { UIEventsType } from '../../../game/engine/events/ui/UIEventsType';
 
 const mode = ref('')
 const user = ref({

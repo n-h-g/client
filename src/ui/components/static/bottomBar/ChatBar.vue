@@ -8,8 +8,8 @@
 import { ref } from "vue";
 import { EventManager } from "../../../../game/core/events/EventManager";
 import { Engine } from "../../../../game/Engine";
-import { RoomUIEventData } from "../../../../game/engine/ui/events/data/room/RoomUIEventData";
-import { UIEvents } from "../../../../game/engine/ui/events/UIEvents";
+import { RoomUIEventData } from "../../../../game/engine/events/ui/data/room/RoomUIEventData";
+import { UIEvents } from "../../../../game/engine/events/ui/UIEvents";
 import { OutgoingPacket } from "../../../../game/networking/packets/outgoing/OutgoingPacket";
 
 let placeHolder = ref("Type here to talk..")

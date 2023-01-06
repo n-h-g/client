@@ -42,11 +42,11 @@
 <script setup lang="ts">
 import { ref } from "vue"
 import { Engine } from "../../../game/Engine"
-import { UIEvents } from "../../../game/engine/ui/events/UIEvents"
+import { UIEvents } from "../../../game/engine/events/ui/UIEvents"
 import { OutgoingPacket } from "../../../game/networking/packets/outgoing/OutgoingPacket"
-import { UIEventsType } from "../../../game/engine/ui/events/UIEventsType"
+import { UIEventsType } from "../../../game/engine/events/ui/UIEventsType"
 import Dialog from '../dialog/Dialog.vue'
-import { NavigatorRoomsEventData } from "../../../game/engine/ui/events/data/navigator/NavigatorRooms"
+import { NavigatorRoomsEventData } from "../../../game/engine/events/ui/data/navigator/NavigatorRooms"
 import { IComponentShowableUI } from '../../../game/core/ui/IComponentShowableUI'
 import { UIComponent } from '../../../game/engine/ui/components/UIComponent'
 import { EventManager } from "../../../game/core/events/EventManager"

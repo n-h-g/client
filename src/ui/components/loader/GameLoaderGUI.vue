@@ -13,8 +13,8 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import { EventManager } from '../../../game/core/events/EventManager'
-import { LoadingProgressEventData } from '../../../game/engine/ui/events/data/loader/LoadingProgress'
-import { UIEvents } from '../../../game/engine/ui/events/UIEvents'
+import { LoadingProgressEventData } from '../../../game/engine/events/ui/data/loader/LoadingProgress'
+import { UIEvents } from '../../../game/engine/events/ui/UIEvents'
 
 const progress = ref('0%')
 const message = ref('Loading...')

@@ -78,7 +78,7 @@ import ItemVisualization from "../../../game/core/room/object/items/visualizatio
 import { Engine } from "../../../game/Engine"
 import Item from "../../../game/engine/room/objects/items/Item"
 import { OutgoingPacket } from "../../../game/networking/packets/outgoing/OutgoingPacket"
-import { UIEventsType } from "../../../game/engine/ui/events/UIEventsType"
+import { UIEventsType } from "../../../game/engine/events/ui/UIEventsType"
 import Dialog from '../dialog/Dialog.vue'
 import { UIComponent } from "../../../game/engine/ui/components/UIComponent"
 import { IComponentShowableUI } from "../../../game/core/ui/IComponentShowableUI"

@@ -7,12 +7,13 @@
 
 <script setup lang="ts">
 import { ref } from "vue";
-import { HotelViewData } from "../../../game/engine/ui/events/data/static/HotelView";
-import { UIEvents } from "../../../game/engine/ui/events/UIEvents";
 import HotelView from "./HotelView.vue"
 import { EventManager } from "../../../game/core/events/EventManager";
 
 import BubbleAlertContainer from "./BubbleAlertContainer.vue";
+import { HotelViewData } from "../../../game/engine/events/ui/data/static/HotelView";
+import { UIEvents } from "../../../game/engine/events/ui/UIEvents";
+
 
 let hotelView = ref(true)
 

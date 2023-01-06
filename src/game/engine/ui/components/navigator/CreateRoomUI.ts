@@ -1,7 +1,7 @@
 import CreateRoomGUI from '../../../../../ui/components/navigator/CreateRoomGUI.vue'
 import { UIComponent } from '../UIComponent'
-import { UIEventsType } from '../../events/UIEventsType'
 import { ShowableComponent } from '../../../../core/ui/ShowableComponent'
+import { UIEventsType } from '../../../events/ui/UIEventsType'
 
 export class CreateRoomUI extends ShowableComponent {
     constructor() {
