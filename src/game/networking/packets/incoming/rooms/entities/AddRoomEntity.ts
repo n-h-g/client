@@ -2,7 +2,6 @@ import { IEntityData } from "../../../../../core/communication/incoming/rooms/en
 import { EntityType } from "../../../../../core/room/object/entities/EntityType"
 import { Engine } from "../../../../../Engine"
 import { UserEntity } from "../../../../../engine/room/objects/users/UserEntity"
-import { User } from "../../../../../engine/user/User"
 import Rotation from "../../../../../utils/Rotation"
 import { MessageHandler } from "../../../../handler/MessageHandler"
 
@@ -24,20 +23,6 @@ export default class AddRoomEntity extends MessageHandler {
 
             entity.visualization.Rot = Rotation.parseRotation(entityData.rot)
             entity.visualization.headRotation = Rotation.parseRotation(entityData.rot)
-
-            let user = Engine.getInstance().roomService?.CurrentRoom.roomUserRepository.get(entityData.user_id)
-
-            if (!user) {
-                let currentUser = Engine.getInstance().usersService.repository.get(entityData.user_id)
-
-                if (currentUser == undefined) {
-                    currentUser = new User(entityData.user_id, entityData.name, entityData.look, entityData.gender)
-                }
-
-                Engine.getInstance().roomService?.CurrentRoom?.roomUserRepository.add(currentUser.userInfo.id, currentUser)
-                currentUser.visualization.userEntity = entity
-                entity.user = currentUser
-            }
         }
 
         if (entity) {

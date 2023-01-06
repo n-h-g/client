@@ -98,7 +98,7 @@ export default class UserEntityLogic extends HumanLogic {
         EventManager.emit<PreviewModeEventData>(UIEvents.PREVIEW_BOX_MODE, {
             mode: 'user',
             username: entity.name,
-            motto: entity.user?.userInfo.motto,
+            motto: "dsds",
             look: UiUtils.generateImageFromObject(this.entity.visualization?.container!).src
         })
         EventManager.emit<DialogEventData>(UIEvents.OPEN, {

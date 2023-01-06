@@ -77,7 +77,6 @@ export class ApplicationEngine extends Application {
 
             if (this._lastFrameTime > fpsInterval) {
                 this._engine.roomService.tick(this._timeElapsed)
-                this._engine.usersService.tick(this._timeElapsed)
                 this._lastFrameTime = currentTime
 
                 if(this._engine.config.debug) {

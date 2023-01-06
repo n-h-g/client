@@ -45,7 +45,6 @@ export default class RoomService {
 
     public tick(delta: number): void {
         this.currentRoom?.roomLayout.Logic.tick(delta)
-        this.CurrentRoom?.roomUserRepository.tick(delta)
         this.currentRoom?.roomItemRepository.tick(delta);
         this.currentRoom?.roomEntityRepository.tick(delta);
     }

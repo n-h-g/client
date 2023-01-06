@@ -4,7 +4,6 @@ import Point from './utils/point/Point'
 import generalConfig from './configuration/general.json'
 import { NetworkingManager } from './networking/NetworkingManager'
 import { UserInterfaceManager } from './engine/ui/UserInterfaceManager'
-import { UserService } from './engine/user/UserService'
 import { CommandService } from './engine/game/commands/CommandService'
 import Room from './engine/room/Room'
 import * as PIXI from "pixi.js"
@@ -19,7 +18,6 @@ export class Engine {
     private _userInterfaceManager: UserInterfaceManager | null
     private _roomsService: RoomService | null
     private _networkingManager: NetworkingManager | null
-    private _usersService: UserService | null
     private _commandService: CommandService | null
 
     private _config = generalConfig
@@ -56,7 +54,6 @@ export class Engine {
         document.body.appendChild(this._application.view)
 
         this._roomsService = new RoomService()
-        this._usersService = new UserService()
         this._commandService = new CommandService()
 
         this._networkingManager = new NetworkingManager()
@@ -96,11 +93,6 @@ export class Engine {
     public get commandService(): CommandService {
         return this._commandService
     }
-
-    public get usersService(): UserService {
-        return this._usersService
-    }
-
     public get roomService(): RoomService {
         return this._roomsService
     }

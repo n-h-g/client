@@ -2,7 +2,6 @@ import Point from '../../utils/point/Point'
 import RoomLayout from "./RoomLayout"
 import RoomInfo from "./RoomInfo"
 import { RoomEntityRepository } from './RoomEntityRepository';
-import { RoomUserRepository } from './RoomUserRepository';
 import { RoomItemRepository } from './RoomItemRepository';
 
 export default class Room  {
@@ -11,7 +10,6 @@ export default class Room  {
     private roomName: string;
     private roomId: number;
     private _roomItemRepository: RoomItemRepository
-    private _roomUserRepository: RoomUserRepository
     private _roomEntityRepository: RoomEntityRepository
 
     constructor(roomName: string, roomModel: string, doorPosition: Point, roomId: number) {
@@ -20,7 +18,6 @@ export default class Room  {
         this._roomLayout = new RoomLayout(this, roomModel, doorPosition);
         this.roomInfo = new RoomInfo(roomName);
 
-        this._roomUserRepository = new RoomUserRepository();
         this._roomEntityRepository = new RoomEntityRepository();
         this._roomItemRepository = new RoomItemRepository();
     }
@@ -34,10 +31,6 @@ export default class Room  {
     }
     public getRoomId(): number {
         return this.roomId;
-    }
-
-    public get roomUserRepository(): RoomUserRepository {
-        return this._roomUserRepository
     }
 
     public get roomEntityRepository(): RoomEntityRepository {

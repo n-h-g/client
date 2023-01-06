@@ -16,14 +16,6 @@ export default class UpdateEntity extends MessageHandler {
             
             let isUser = entityData.user_id != undefined;
             let entity: UserEntity
-      
-            if(isUser) {
-                entity = Engine.getInstance().roomService?.CurrentRoom?.roomUserRepository.get(entityData.user_id)?.visualization.userEntity
-            } else {
-                if(Engine.getInstance().config.debug) {
-                    Logger.debug("Unable to find user entity with id [" + entityData.user_id) + "]";
-                }
-            }
 
             let EntityVisualization = entity.visualization as UserEntityVisualization
            

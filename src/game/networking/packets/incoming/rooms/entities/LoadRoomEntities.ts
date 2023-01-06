@@ -2,7 +2,6 @@ import { IEntityData } from "../../../../../core/communication/incoming/rooms/en
 import { EntityType } from "../../../../../core/room/object/entities/EntityType";
 import { Engine } from "../../../../../Engine";
 import { UserEntity } from '../../../../../engine/room/objects/users/UserEntity';
-import { User } from '../../../../../engine/user/User';
 import Rotation from "../../../../../utils/Rotation";
 import { MessageHandler } from "../../../../handler/MessageHandler";
 
@@ -10,8 +9,6 @@ export default class LoadRoomEntities extends MessageHandler {
     public handle(): void {
         for (let i = 0; i < this.message.data.length; i++) {
             let entityData: IEntityData = this.message.data[i];
-
-            let user: User
 
             let userId: number = entityData.user_id
 
@@ -31,21 +28,8 @@ export default class LoadRoomEntities extends MessageHandler {
                 entity.visualization.Rot = Rotation.parseRotation(entityData.body_rot);
                 entity.visualization.headRotation = Rotation.parseRotation(entityData.body_rot);
 
-                user = Engine.getInstance().roomService?.CurrentRoom?.roomUserRepository.get(userId)
-
-                if (!user) {
-                    let currentUser = Engine.getInstance().usersService.repository?.get(userId);
-
-                    if (currentUser == undefined) {
-                        currentUser = new User(userId, entityData.name, entityData.look, entityData.gender);
-                    }
-
-                    Engine.getInstance().roomService?.CurrentRoom?.roomUserRepository.add(userId, currentUser);
-                    currentUser.visualization.userEntity = entity;
-                    entity.user = currentUser;
-                    Engine.getInstance().roomService?.CurrentRoom?.roomEntityRepository.add(entity.id, entity)
-                    currentUser.visualization.userEntity?.visualization?.render()
-                }
+                Engine.getInstance().roomService?.CurrentRoom?.roomEntityRepository.add(entity.id, entity)
+                entity?.visualization?.render()
             }
         }
     }
