@@ -2,7 +2,6 @@ import { IEntityData } from "../../../../../core/communication/incoming/rooms/en
 import { EntityType } from "../../../../../core/room/object/entities/EntityType";
 import { Engine } from "../../../../../Engine";
 import { UserEntity } from '../../../../../engine/room/objects/users/UserEntity';
-import UserEntityVisualization from '../../../../../engine/room/objects/users/visualization/UserEntityVisualization';
 import { User } from '../../../../../engine/user/User';
 import Rotation from "../../../../../utils/Rotation";
 import { MessageHandler } from "../../../../handler/MessageHandler";
@@ -24,7 +23,6 @@ export default class LoadRoomEntities extends MessageHandler {
 
             if (entityData.type === EntityType.HUMAN && isUser) {
                 let entity = new UserEntity(entityData.id.toString(), entityData.name, entityData.look, Engine.getInstance()?.roomService?.CurrentRoom!);
-
 
                 entity.position.setX(entityData.x);
                 entity.position.setY(entityData.y);

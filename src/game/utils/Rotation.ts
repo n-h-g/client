@@ -25,7 +25,7 @@ export default class Rotation {
         }
     }
     public static isFlipped(direction: Direction | undefined): boolean {
-        if(direction === Direction.SOUTH || direction === Direction.SOUTH_WEST || direction == Direction.NORTH_WEST || direction == Direction.SOUTH_EAST || direction == Direction.WEST) {
+        if(direction === Direction.SOUTH || direction === Direction.SOUTH_WEST || direction == Direction.NORTH_WEST || direction == Direction.SOUTH_EAST) {
             return true;
         } 
         return false;

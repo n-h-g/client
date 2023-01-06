@@ -1,5 +1,5 @@
 import { EventEmitter } from 'eventemitter3'
-import { UIEvents } from '../../engine/ui/events/UIEvents'
+import { UIEvents } from '../../engine/events/ui/UIEvents'
 
 export class EventManager {
     private static _event = new EventEmitter()

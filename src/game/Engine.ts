@@ -70,7 +70,7 @@ export class Engine {
         if (this._config.offlineMode) {
             let room: Room = this._roomsService.setRoom("prova", "0000000000/0111001101/01111111011111/0111111111001/0111111", new Point(3, 3), 200)
 
-            let entity = new UserEntity("id", "prova", "hd-185-10", room)
+            let entity = new UserEntity("id", "prova", "hd-185-10.hr-3163-61.ch-3030-92.lg-275-110", room)
             entity.visualization.Rot = Direction.WEST;
             //(entity.visualization as UserEntityVisualization).addAction(ActionId.USE_ITEM)
             entity.visualization.render()

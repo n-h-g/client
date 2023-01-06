@@ -1,6 +1,6 @@
 import { Component as ComponentGUI } from "vue";
+import { UIEventsType } from '../../engine/events/ui/UIEventsType';
 import { UIComponent } from "../../engine/ui/components/UIComponent";
-import { UIEventsType } from "../../engine/ui/events/UIEventsType";
 import Component from "./Component";
 
 export abstract class InteractiveComponent extends Component {
