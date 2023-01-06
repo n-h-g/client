@@ -1,16 +1,10 @@
 import { Direction } from "../../../objects/Direction";
 import RoomObjectVisualization from "../RoomObjectVisualization";
 import { Entity } from "./Entity";
-import { ActionId } from "../../../../engine/ui/imagers/avatars/enum/actions/ActionId";
 import Point3d from '../../../../utils/point/Point3d';
-import IPoint3d from "../../../../utils/point/IPoint3d";
 import Rotation from "../../../../utils/Rotation";
 import Point from "../../../../utils/point/Point";
 import AvatarData from "../../../../engine/ui/imagers/avatars/enum/AvatarData";
-import { Engine } from "../../../../Engine";
-import { Tile } from "../../../../engine/room/objects/map/Tile";
-import { DisplayObject } from "pixi.js";
-import MapData from "../../../../engine/room/objects/map/MapData";
 
 export abstract class EntityVisualization extends RoomObjectVisualization {
 
@@ -19,7 +13,7 @@ export abstract class EntityVisualization extends RoomObjectVisualization {
     protected rotation: Direction = Direction.SOUTH
 
     protected _headDirection: Direction = Direction.SOUTH
-    
+
     /**
      * The next position the entity will reach
      */
@@ -45,7 +39,7 @@ export abstract class EntityVisualization extends RoomObjectVisualization {
 
     public move(delta: number): void {
         delta = delta / 1000;
- 
+
         if (this._entity.position.getX() < this._nextPosition.getX()) {
             this._entity.position.setX(this._entity.position.getX() + delta * AvatarData.AVATAR_WALK_SPEED);
             if (this._entity.position.getX() > this._nextPosition.getX()) {
@@ -98,7 +92,6 @@ export abstract class EntityVisualization extends RoomObjectVisualization {
     public abstract calculateOffsetY()
 
     public updatePosition() {
-
         this.container.x = this.calculateOffsetX()
         this.container.y = this.calculateOffsetY()
         this.container.zIndex = 10
@@ -106,7 +99,7 @@ export abstract class EntityVisualization extends RoomObjectVisualization {
     }
 
     public set direction(direction: Direction) {
-        this.rotation = direction; 
+        this.rotation = direction;
     }
 
     public get entity(): Entity {

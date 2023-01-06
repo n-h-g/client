@@ -18,8 +18,6 @@ export abstract class HumanVisualization extends EntityVisualization {
 
     public _entity: Human | null = null
 
-    private _avatarCache: Avatar | null = null
-
     public constructor(human: Human) {
         super(human)
 
@@ -28,14 +26,12 @@ export abstract class HumanVisualization extends EntityVisualization {
         this._actions = new Set();
     }
 
-    public async loadAvatar(): Promise<Avatar> {
+    public async loadAvatar(): Promise<void> {
         return new Promise((resolve, reject) => {
             let avatar = new Avatar(this._entity.figure, this.rotation, this.rotation, this._actions, this.frame)
 
-            Engine.getInstance()?.userInterfaceManager?.avatarImager.loadAvatar(avatar).then(async () => {
-                await Engine.getInstance().userInterfaceManager?.avatarImager.drawAvatar(avatar)
-                this._avatarCache = avatar
-                resolve(avatar)
+            Engine.getInstance()?.userInterfaceManager?.avatarImager.loadAvatar(avatar).then(() => {
+                resolve()
             }).catch(() => {
                 reject()
             })
@@ -51,7 +47,7 @@ export abstract class HumanVisualization extends EntityVisualization {
         this._actions.delete(action)
     }
     public removeActions(actions: ActionId[]) {
-        for(let action of actions) {
+        for (let action of actions) {
             this.removeAction(action)
         }
     }
@@ -62,18 +58,12 @@ export abstract class HumanVisualization extends EntityVisualization {
         avatar!.Direction = direction;
     }
 
-    
     public async draw(): Promise<void> {
-
-        this._avatar.Container.destroy({
-            texture: true,
-            baseTexture: true
-        })
         this.container.destroy({
             texture: true,
             baseTexture: true
         })
-        
+
         this._avatar = new Avatar(this._entity.figure, this.rotation, this.rotation, this._actions, this.frame)
 
         Engine.getInstance().userInterfaceManager?.avatarImager.drawAvatar(this._avatar);
@@ -84,12 +74,10 @@ export abstract class HumanVisualization extends EntityVisualization {
 
         if (Engine.getInstance().roomService?.CurrentRoom) {
             Engine.getInstance().roomService?.CurrentRoom?.roomLayout.Visualization.container?.addChild(this.container)
+            this.updatePosition()
         }
-
-        this.entity.logic.registerEvents()
-
-        this.updatePosition();
     }
+
     public async render(): Promise<void> {
         let placeholder = new AvatarPlaceHolder("", this.rotation, this.rotation, this._actions);
 
@@ -97,26 +85,20 @@ export abstract class HumanVisualization extends EntityVisualization {
             Engine.getInstance()?.userInterfaceManager?.avatarImager.drawAvatar(placeholder)
         });
 
-        this._avatar = placeholder
+        placeholder.Container.buttonMode = true;
+        placeholder.Container.interactive = true;
+        placeholder.Container.interactiveChildren = true;
 
-        this._avatar.Container.buttonMode = true;
-        this._avatar.Container.interactive = true;
-        this._avatar.Container.interactiveChildren = true;
+        this.container = placeholder.Container;
 
-        this.container = this._avatar.Container;
-
-        this.loadAvatar().then((avatar: Avatar) => {
-            this._avatar = avatar
+        this.loadAvatar().then(() => {
             this.container.destroy()
             this.draw()
         });
 
-        this._entity.logic.registerEvents()
-        
-        if(Engine.getInstance().roomService?.CurrentRoom) {
-            (Engine.getInstance().roomService?.CurrentRoom?.roomLayout.Visualization.container?.addChild(this.container));
-            this.updatePosition(); //todo needs to be refactored 
-            this.container?.emit("user-position-changed", 200);
+        if (Engine.getInstance().roomService?.CurrentRoom) {
+            Engine.getInstance().roomService?.CurrentRoom?.roomLayout.Visualization.container?.addChild(this.container)
+            this.updatePosition();
         }
     }
 
@@ -127,11 +109,11 @@ export abstract class HumanVisualization extends EntityVisualization {
             this.frame++;
         }
     }
-    
+
     public calculateOffsetY() {
         let tile: Tile = this._entity.room.roomLayout.getFloorPlane().getTilebyPosition(new Point(Math.round(this._entity.position.getX()), Math.round(this.entity.position.getY())))
         let offsetFloor = tile!.position.getZ() > 0 ? -MapData.thickSpace * MapData.stepHeight * tile!.position.getZ() : -AvatarData.AVATAR_TOP_OFFSET;
-        
+
         return this.container!.y = ((this.entity.position.getX() + this.entity.position.getY()) * MapData.tileHeight / 2) + (MapData.tileHeight / 2) + offsetFloor;
     }
 

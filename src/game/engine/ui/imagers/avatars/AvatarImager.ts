@@ -247,11 +247,8 @@ export default class AvatarImager {
         component.IsFlipped = isFlipped;
 
         let assetData: AssetData = spritesheet[component.ResourceName]
-
-     
         if (assetData !== undefined) {
             let downloadedTexture: PIXI.Texture = this.data.getTexture(assetName)
-
             if (!downloadedTexture) {
                 if (Engine.getInstance().config.debug) {
                     Logger.debug('cannot find texture resource ' + assetName);
@@ -272,10 +269,8 @@ export default class AvatarImager {
 
             sprite.width = parseInt(asset.width);
             sprite.height = parseInt(asset.height)
-
             sprite.interactive = true;
             sprite.buttonMode = true;
-
 
             if (component.Color && component.isColorable) {
                 sprite.tint = avatar.IsPlaceHolder ? 0xFFFFFF : parseInt(component.Color, 16);
