@@ -65,7 +65,14 @@ export abstract class HumanVisualization extends EntityVisualization {
     
     public async draw(): Promise<void> {
 
-        this.container.destroy()
+        this._avatar.Container.destroy({
+            texture: true,
+            baseTexture: true
+        })
+        this.container.destroy({
+            texture: true,
+            baseTexture: true
+        })
         
         this._avatar = new Avatar(this._entity.figure, this.rotation, this.rotation, this._actions, this.frame)
 

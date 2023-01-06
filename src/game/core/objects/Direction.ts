@@ -4,7 +4,7 @@ export enum Direction {
     SOUTH = 2,
     SOUTH_EAST = 1,
     EAST = 0,
-    NORTH_EAST = 5,
+    NORTH_EAST = 7,
     NORTH = 6,
-    NORTH_WEST = 4,
+    NORTH_WEST = 5,
 }

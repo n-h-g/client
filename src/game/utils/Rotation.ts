@@ -24,12 +24,6 @@ export default class Rotation {
                 return Direction.SOUTH;
         }
     }
-    public static isFlipped(direction: Direction | undefined): boolean {
-        if(direction === Direction.SOUTH || direction === Direction.SOUTH_WEST || direction == Direction.NORTH_WEST || direction == Direction.SOUTH_EAST) {
-            return true;
-        } 
-        return false;
-    }
 
     public static calculateDirection(point1: Point, point2: Point): Direction {
         if (point1.getX() > point2.getX()) {
