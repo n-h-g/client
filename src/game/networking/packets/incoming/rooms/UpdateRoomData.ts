@@ -13,12 +13,6 @@ export class UpdateRoomData extends MessageHandler {
             return;
         }
 
-        if (room.users_count == 0) {
-            Engine.getInstance()?.networkingManager?.packetManager.applyOut(OutgoingPacket.UserEnterRoom, {
-                id: room.id
-            })
-        }
-
         if (Engine.getInstance()?.roomService?.CurrentRoom != null) {
             if (Engine.getInstance()?.roomService?.CurrentRoom?.getRoomId() != room.id) {
                 Engine.getInstance()?.roomService?.unsetRoom();
