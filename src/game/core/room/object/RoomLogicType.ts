@@ -1,0 +1,11 @@
+export enum RoomLogicType {
+    HUMAN,
+    ITEM,
+    BOT,
+    PET,
+    PET_ANIMATED,
+    FURNITURE_STATIC,
+    FURNITURE_MULTISTATE,
+    FURNITURE_CRACKABLE,
+    FURNITURE_MULTIHEIGHT
+}
