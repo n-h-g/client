@@ -8,8 +8,8 @@ import { MessageHandler } from "../../../../handler/MessageHandler"
 export default class AddRoomEntity extends MessageHandler {
     public handle(): void {
         let entityData: IEntityData = this.message
-
         let entity: UserEntity
+        
         if (Engine.getInstance().roomService?.CurrentRoom?.roomEntityRepository.get(entityData.id.toString()) !== null) {
             return
         }
