@@ -12,8 +12,6 @@ export abstract class EntityVisualization extends RoomObjectVisualization {
 
     protected rotation: Direction = Direction.SOUTH
 
-    protected _headDirection: Direction = Direction.SOUTH
-
     /**
      * The next position the entity will reach
      */
@@ -32,7 +30,6 @@ export abstract class EntityVisualization extends RoomObjectVisualization {
         this.nextPosition.setY(point.getY());
         this.nextPosition.setZ(point.getZ());
         this.rotation = Rotation.calculateDirection(new Point(this._entity.position.getX(), this._entity.position.getY()), new Point(this.entity.position.getX(), this.entity.position.getY()));
-        this.headRotation = Rotation.calculateDirection(new Point(this.entity.position.getX(), this._entity.position.getY()), new Point(this.entity.position.getX(), this.entity.position.getY()));
         this.updatePosition()
         this.container?.emit("position-changed");
     }
@@ -108,10 +105,6 @@ export abstract class EntityVisualization extends RoomObjectVisualization {
 
     public set Rot(direction: Direction) {
         this.rotation = direction;
-    }
-
-    public set headRotation(direction: Direction) {
-        this._headDirection = direction;
     }
 
     public get nextPosition(): Point3d {
