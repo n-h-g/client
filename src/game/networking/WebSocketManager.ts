@@ -17,7 +17,7 @@ export class WebSocketManager {
 
         this._networkingManager = networkingManager;
 
-        if (Engine.getInstance().config.debug) {
+        if (Engine.getInstance()?.config.debug) {
             Logger.debug('Connection url: ' + this.webSocketUrl);
         }
 
