@@ -6,6 +6,8 @@ import AvatarPlaceHolder from "../../../../../engine/ui/imagers/avatars/AvatarPl
 import { ActionId } from "../../../../../engine/ui/imagers/avatars/enum/actions/ActionId";
 import AvatarData from "../../../../../engine/ui/imagers/avatars/enum/AvatarData";
 import Point from "../../../../../utils/point/Point";
+import Point3d from "../../../../../utils/point/Point3d";
+import Rotation from "../../../../../utils/Rotation";
 import { Direction } from "../../../../objects/Direction";
 import { EntityVisualization } from "../../entities/EntityVisualization";
 import Human from "../Human";
@@ -18,12 +20,18 @@ export abstract class HumanVisualization extends EntityVisualization {
 
     public _entity: Human | null = null
 
+    protected _headDirection: Direction = Direction.SOUTH
+
     public constructor(human: Human) {
         super(human)
 
         this._entity = human;
 
         this._actions = new Set();
+    }
+
+    public setPosition(point: Point3d): void {
+        this.headRotation = Rotation.calculateDirection(new Point(this.entity.position.getX(), this._entity.position.getY()), new Point(this.entity.position.getX(), this.entity.position.getY()));
     }
 
     public async loadAvatar(): Promise<void> {
@@ -36,6 +44,10 @@ export abstract class HumanVisualization extends EntityVisualization {
                 reject()
             })
         })
+    }
+
+    public set headRotation(direction: Direction) {
+        this._headDirection = direction;
     }
 
     public addAction(action: ActionId): void {
@@ -111,7 +123,7 @@ export abstract class HumanVisualization extends EntityVisualization {
     }
 
     public calculateOffsetY() {
-        let tile: Tile = this._entity.room.roomLayout.getFloorPlane().getTilebyPosition(new Point(Math.round(this._entity.position.getX()), Math.round(this.entity.position.getY())))
+        let tile: Tile = Engine.getInstance().roomService.CurrentRoom.roomLayout.getFloorPlane().getTilebyPosition(new Point(Math.round(this._entity.position.getX()), Math.round(this.entity.position.getY())))
         let offsetFloor = tile!.position.getZ() > 0 ? -MapData.thickSpace * MapData.stepHeight * tile!.position.getZ() : -AvatarData.AVATAR_TOP_OFFSET;
 
         return this.container!.y = ((this.entity.position.getX() + this.entity.position.getY()) * MapData.tileHeight / 2) + (MapData.tileHeight / 2) + offsetFloor;

@@ -9,9 +9,6 @@ import MyRoomsList from './incoming/navigator/MyRoomsList'
 import AddRoomEntity from './incoming/rooms/entities/AddRoomEntity'
 import LoadRoomEntities from './incoming/rooms/entities/LoadRoomEntities'
 import UpdateEntity from './incoming/rooms/entities/UpdateEntity'
-import AddItem from './incoming/rooms/items/AddItem'
-import LoadRoomItems from './incoming/rooms/items/LoadRoomItems'
-import RemoveItem from './incoming/rooms/items/RemoveItem'
 import { UpdateRoomData } from './incoming/rooms/UpdateRoomData'
 import { UpdateUserInformation } from './incoming/users/UpdateUserInformation'
 import { OutgoingPacket } from './outgoing/OutgoingPacket'
@@ -36,9 +33,6 @@ export class PacketManager {
             204: new AddRoomEntity,
             400: new UpdateUserInformation,
             18: new LoadInventoryItems,
-            23: new LoadRoomItems,
-            24: new RemoveItem,
-            25: new AddItem
         }
 
         Object.keys(incomingPacketsHeader).forEach((index) => {

@@ -3,17 +3,24 @@ import { Gender } from "../../../../../engine/ui/imagers/avatars/gamedata/IFigur
 import { EntityType } from "../../../../room/object/entities/EntityType"
 
 export interface IEntityData {
-    id: number
-    user_id: number
-    gender: Gender
+    id: string
+    user: {
+        id: number
+    }
+    aspect: {
+        gender: Gender,
+        look: string
+    }
     name: string
-    x: number
-    y: number
-    z: number
-    body_rot: string
-    rot: string
-    head_rot: string
+    position: {
+        x: number
+        y: number
+        z: number
+    }
+    bh_rot: {
+        body_rot: number,
+        head_rot: number
+    }
     type: EntityType
-    look: string
     actions: ActionId[]
 }

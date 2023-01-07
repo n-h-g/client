@@ -7,11 +7,9 @@ import UserEntityVisualization from "./visualization/UserEntityVisualization";
 
 export class UserEntity extends Human{
 
-    public constructor(id: string, name: string, look: string, room: Room) {
-        super(id, name, look, room);
-
-        this.position = new Point3d(room.roomLayout.getDoorPosition().getX(), room.roomLayout.getDoorPosition().getY(), 0)
-
+    public constructor(id: string = "", name: string = "", look: string = "") {
+        super(id, name, look);
+        
         this.visualization = new UserEntityVisualization(this)
         this.logic = new UserEntityLogic(this)
     }

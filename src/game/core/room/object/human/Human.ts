@@ -5,8 +5,8 @@ export default class Human extends Entity {
 
     protected _figure: string
 
-    public constructor(id: string, name: string, figure: string, room: Room) {
-        super(id, name, room);
+    public constructor(id: string, name: string, figure: string) {
+        super(id, name);
 
         this._figure = figure;
     }

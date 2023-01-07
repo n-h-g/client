@@ -9,6 +9,7 @@ import { IComponentShowableUI } from "../../core/ui/IComponentShowableUI";
 import { UIEvents } from "../events/ui/UIEvents";
 
 export default class RoomService {
+    
     private currentRoom: Room
 
     public setRoom(roomName: string, roomModel: string, doorPosition: Point, roomId: number) : Room {

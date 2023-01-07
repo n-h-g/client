@@ -1,8 +1,9 @@
 import Point3d from "../../../utils/point/Point3d"
+import { Positionable } from "./entities/Positionable"
 import { IRoomObjectLogic } from './IRoomObjectLogic'
 import { IRoomObjectVisualization } from './IRoomObjectVisualization'
 
-export abstract class RoomObjectController<IRoomObjectVisualization, IRoomObjectLogic> {
+export abstract class RoomObjectController<IRoomObjectVisualization, IRoomObjectLogic> implements Positionable {
     public readonly _id: string
     protected _objectPosition: Point3d
     protected _objectVisualization: IRoomObjectVisualization
@@ -17,6 +18,10 @@ export abstract class RoomObjectController<IRoomObjectVisualization, IRoomObject
 
     public get id(): string {
         return this._id
+    }
+
+    setPosition(position: Point3d) {
+        throw new Error("Method not implemented.")
     }
 
     get position(): Point3d {

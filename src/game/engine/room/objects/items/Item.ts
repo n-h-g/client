@@ -13,9 +13,9 @@ import { default as ItemVisualization, default as ItemVisualizationStatic } from
 export default abstract class Item extends Entity {
     public base: FurniSprite;
 
-    constructor(room: Room | null, id: string, name: string, position: Point3d, baseItem: FurniSprite) {
+    constructor(id: string, name: string, position: Point3d, baseItem: FurniSprite) {
 
-        super(id, name, room)
+        super(id, name)
 
         this.base = baseItem;
 
