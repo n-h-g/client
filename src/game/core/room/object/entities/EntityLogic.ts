@@ -1,3 +1,4 @@
+import { EntityEvents } from '../../../../engine/events/room/objects/entities/EntityEvents';
 import { RoomObjectLogic } from '../RoomObjectLogic';
 import { Entity } from "./Entity";
 
@@ -9,6 +10,10 @@ export abstract class EntityLogic extends RoomObjectLogic {
     public constructor(entity: Entity) {
         super()
         this._entity = entity
+    }
+
+    public registerEvents(): void {
+        this.events.on(EntityEvents.POSITION_CHANGED, () => this.onPositionChanged())
     }
 
     public abstract onPositionChanged(): void

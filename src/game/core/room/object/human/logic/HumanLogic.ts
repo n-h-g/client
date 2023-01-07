@@ -1,3 +1,4 @@
+import { HumanEvents } from "../../../../../engine/events/room/objects/entities/HumanEvents";
 import { ActionId } from "../../../../../engine/ui/imagers/avatars/enum/actions/ActionId";
 import AvatarData from "../../../../../engine/ui/imagers/avatars/enum/AvatarData";
 import { EntityLogic } from "../../entities/EntityLogic";
@@ -8,6 +9,11 @@ export abstract class HumanLogic extends EntityLogic {
 
     public constructor(human: Human) {
         super(human)
+    }
+
+    public registerEvents(): void {
+        this.events.on(HumanEvents.FIGURE_CHANGED, () => this.figureChanged())
+        this.events.on(HumanEvents.FIGURE_LOADING_COMPLETE, () => this.onLoad())
     }
 
     protected abstract figureChanged(): void

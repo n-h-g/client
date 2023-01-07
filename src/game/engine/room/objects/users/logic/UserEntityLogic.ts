@@ -14,8 +14,11 @@ import { DialogEventData } from '../../../../events/ui/data/general/Dialog';
 import { PreviewModeEventData } from '../../../../events/ui/data/general/PreviewUserData';
 import { UIEvents } from '../../../../events/ui/UIEvents';
 import { UIEventsType } from '../../../../events/ui/UIEventsType';
+import { UserEvents } from '../../../../events/room/objects/entities/UserEvents';
 
 export default class UserEntityLogic extends HumanLogic {
+
+    private _typing: boolean = false
 
     public onDance(): void {
 
@@ -23,15 +26,11 @@ export default class UserEntityLogic extends HumanLogic {
 
     public registerEvents() {
         this.entity.visualization.container.on('pointerdown', () => this.onClick())
-        this.events.on('user-started-typing', () => this.onToggleTyping(true))
-        this.events.on('user-stop-typing', () => this.userToggleTyping(false))
-        this.events.on('user-position-changed', () => this.onPositionChanged())
-        this.events.on('user-look-changed', () => this.figureChanged())
-        this.events.on('user-avatar-loading-completed', () => this.onLoad())
+        this.events.on(UserEvents.USER_TOGGLE_TYPING, () => this.onToggleTyping())
     }
 
-    public onToggleTyping(typing: boolean = false): void {
-
+    public onToggleTyping(): void {
+        this._typing = !this._typing
     }
 
     public onTalk(length?: number): void {
