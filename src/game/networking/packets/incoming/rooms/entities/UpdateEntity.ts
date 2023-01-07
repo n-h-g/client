@@ -5,38 +5,33 @@ import UserEntityVisualization from "../../../../../engine/room/objects/users/vi
 import { ActionId } from "../../../../../engine/ui/imagers/avatars/enum/actions/ActionId";
 import { Logger } from "../../../../../utils/Logger";
 import Point3d from "../../../../../utils/point/Point3d";
-import Rotation from "../../../../../utils/Rotation";
 import { MessageHandler } from "../../../../handler/MessageHandler";
 
 export default class UpdateEntity extends MessageHandler {
     public handle(): void {
         let entityData: IEntityData = this.message;
 
-        if(Engine.getInstance().roomService?.CurrentRoom) {
-            
-            let isUser = entityData.user_id != undefined;
+        if (Engine.getInstance().roomService?.CurrentRoom) {
             let entity: UserEntity
-
             let EntityVisualization = entity.visualization as UserEntityVisualization
-           
-            EntityVisualization.setPosition(new Point3d(entityData.x, entityData.y, entityData.z));
-            EntityVisualization.Rot = Rotation.parseRotation(entityData.body_rot);
+
+            EntityVisualization.setPosition(new Point3d(entityData.position.x, entityData.position.y, entityData.position.z))
+            EntityVisualization.direction = entityData.bh_rot.body_rot
 
             if (entityData.actions.length == 0) {
                 EntityVisualization.addAction(ActionId.STAND)
                 return;
             }
-                
-            for(let action of entityData.actions) {
-                action as ActionId
-                EntityVisualization.addAction(action);      
+
+            for (let action of entityData.actions) {
+                EntityVisualization.addAction(action);
             }
 
-                
+
             entity.visualization.needsUpdate = true;
-            
+
         } else {
-            if(Engine.getInstance().config.debug) {
+            if (Engine.getInstance().config.debug) {
                 Logger.debug("Invalid current room");
             }
         }

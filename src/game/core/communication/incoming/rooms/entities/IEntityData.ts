@@ -8,7 +8,7 @@ export interface IEntityData {
         id: number
     }
     aspect: {
-        gender: Gender,
+        gender: Gender
         look: string
     }
     name: string
@@ -18,7 +18,7 @@ export interface IEntityData {
         z: number
     }
     bh_rot: {
-        body_rot: number,
+        body_rot: number
         head_rot: number
     }
     type: EntityType

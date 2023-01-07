@@ -9,7 +9,6 @@ import { EntityType } from "./EntityType";
 
 export class EntityFactory  {
     public static createEntity(data: IEntityData): Entity {
-
         let type: EntityType = data.type 
         let entity: Entity
 
@@ -21,6 +20,7 @@ export class EntityFactory  {
                     entity = new UserEntity(data.id, data.name, data.aspect.look);
                     (entity.visualization as UserEntityVisualization).direction = bodyRotation;
                     (entity.visualization as UserEntityVisualization).headRotation = headRotation
+                    
                 }
                 break;
             case EntityType.ITEM:
