@@ -4,8 +4,8 @@ export default abstract class RoomObjectVisualization {
     protected _offsetX: number
     protected _offsetY: number
     protected _zIndex: number
-    private _container: Container
-    private _needsUpdate: boolean
+    protected _container: Container
+    protected _needsUpdate: boolean
 
     constructor(offsetX: number, offsetY: number, zIndex: number) {
         this._offsetX = offsetX

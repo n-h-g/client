@@ -1,9 +1,11 @@
 import { DisplayObject } from "pixi.js";
 import { Engine } from "../../../../../Engine";
+import { ItemEvents } from "../../../../../engine/events/room/objects/entities/ItemEvents";
 import Item from "../../../../../engine/room/objects/items/Item";
 import MapData from "../../../../../engine/room/objects/map/MapData";
 import { Tile } from "../../../../../engine/room/objects/map/Tile";
 import AvatarData from "../../../../../engine/ui/imagers/avatars/enum/AvatarData";
+import { ItemType } from "../../../../../engine/ui/imagers/items/FurniImager";
 import { FurniSprite } from "../../../../../engine/ui/imagers/items/FurniSprite";
 import Point from "../../../../../utils/point/Point";
 import Point3d from "../../../../../utils/point/Point3d";
@@ -23,13 +25,12 @@ export default abstract class ItemVisualization extends EntityVisualization {
 
     declare public _entity: Item
 
+    private sprite: FurniSprite
+
     constructor(item: Item) {
         super(item);
-
         this.position = item.position
         this.iconImage = this.generateIcon();
-
-        this.container = item.base
     }
 
 
@@ -45,12 +46,12 @@ export default abstract class ItemVisualization extends EntityVisualization {
     }
 
     public generateImages() {
-        this.entity.visualization.container.on("furni-sprite-created", () =>{
+        this.entity.logic.events.on(ItemEvents.FURNI_SPRITE_LOADED, () =>{
             this.imagePreview = UiUtils.generateBase64FromObject(this.entity.visualization.container)
         })
 
         if(this.isIcon) {
-            let icon = this._entity.base.turnIntoIcon();
+            let icon = this.sprite.turnIntoIcon();
         
             setTimeout(() => {
                 this.iconImage = UiUtils.generateBase64FromObject(icon);
@@ -59,14 +60,14 @@ export default abstract class ItemVisualization extends EntityVisualization {
     }
 
     public turnIntoIcon() {
-        let icon = this._entity.base.turnIntoIcon();
+        let icon = this.sprite.turnIntoIcon();
         this.entity.visualization.container = icon;
         this.needsUpdate = false;
         this.isIcon = true;
     }
 
     public restore() {
-        this.entity.visualization.container = this._entity.base.restore();
+        this.entity.visualization.container = this.container
         this.needsUpdate = false;
         this.isIcon = false;
     }
@@ -82,9 +83,18 @@ export default abstract class ItemVisualization extends EntityVisualization {
         return ""
     }
 
-    public render(): void {
-        this.entity.visualization.offsetX = this.calculateOffsetX()
-        this.entity.visualization.offsetY = this.calculateOffsetY()
+    public async render(): Promise<void> {
+
+        let entity = this.entity as Item
+
+        let sprite = await Engine.getInstance().userInterfaceManager.furniImager.loadFurniSprite(ItemType.FloorItem, this.entity.name)
+        
+        sprite.start()
+
+        this.container = sprite
+
+        this.container.interactive = true
+        this.container.interactiveChildren = true
 
         if (Engine.getInstance().roomService?.CurrentRoom) {
             Engine.getInstance().roomService?.CurrentRoom?.roomLayout.Visualization.container?.addChild(this.container)

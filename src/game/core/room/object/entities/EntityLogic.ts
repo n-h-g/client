@@ -20,6 +20,7 @@ export abstract class EntityLogic extends RoomObjectLogic {
 
     public registerEvents(): void {
         this.events.on(EntityEvents.POSITION_CHANGED, () => this.onPositionChanged())
+        this.entity.visualization.container.on('pointerdown', () => this.onClick())
     }
 
     public onClick(): void {
@@ -27,6 +28,7 @@ export abstract class EntityLogic extends RoomObjectLogic {
     }
 
     public togglePreview() {
+        console.log('preview')
         let entity: Entity = this.entity
         EventManager.emit<PreviewModeEventData>(UIEvents.PREVIEW_BOX_MODE, {
             mode: 'user',

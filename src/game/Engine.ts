@@ -77,12 +77,11 @@ export class Engine {
             entity.visualization.render()
 
             
-            let item = await this.userInterfaceManager!.furniImager.loadFurniSprite(ItemType.FloorItem, "habbocake");
-            item.start();
+            let base = await this.userInterfaceManager!.furniImager.loadFurniBase(ItemType.FloorItem, "habbocake");
             let roomV = this._roomsService.CurrentRoom.roomLayout.Visualization as RoomVisualization;
-            let furni = new FloorItem("habbocake", "Door C", new Point3d(3, 4, 1), item);
-            furni.visualization?.render()
-            this.roomService.CurrentRoom.roomItemRepository.add(furni.id, furni)
+            let item = new FloorItem("473674-34dfbnasb-43423", "habbocake", new Point3d(3, 4, 1), base);
+            item.visualization?.render()
+            this.roomService.CurrentRoom.roomItemRepository.add(item.id, item)
         }
     }
 

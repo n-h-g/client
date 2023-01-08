@@ -93,8 +93,11 @@ export abstract class EntityVisualization extends RoomObjectVisualization {
     public updatePosition() {
         this.container.x = this.calculateOffsetX()
         this.container.y = this.calculateOffsetY()
+        
         this.container.zIndex = 10
-        this.entity.logic.registerEvents()
+        this.container.interactive = true
+        this.container.interactiveChildren = true
+        this.container.buttonMode = true
     }
 
     public set direction(direction: Direction) {

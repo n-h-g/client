@@ -87,7 +87,7 @@ export default class FurniImager {
         return null;
     }
 
-    private loadFurniBase(type: ItemType, furniBaseName: string): Promise<FurniBase> {
+    public loadFurniBase(type: ItemType, furniBaseName: string): Promise<FurniBase> {
 
         let rawItem = this.findItemByName(furniBaseName);
 
@@ -111,6 +111,8 @@ export default class FurniImager {
                     const furniBase = new FurniBase(data as IFurnidata, itemName)
                     furniBase.init()
                     resolve(furniBase);
+                }).catch(() => {
+                    Logger.debug("[Furni] Unable to find item " + itemName)
                 })
             })
         }

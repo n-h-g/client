@@ -6,7 +6,7 @@ export default class ItemVisualizationStatic extends ItemVisualization {
         super(item);
     }
 
-    public render(): void {
+    public async render(): Promise<void> {
         super.render()
     }
 }
