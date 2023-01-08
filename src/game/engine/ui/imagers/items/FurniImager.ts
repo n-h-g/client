@@ -125,7 +125,6 @@ export default class FurniImager {
 
         return new Promise((res, _rej) => {
             this.loadFurniBase(type, name).then((furnibase) => {
-                //console.log(furnibase)
                 const furniSprite = new FurniSprite(furnibase);
                 res(furniSprite);
             })

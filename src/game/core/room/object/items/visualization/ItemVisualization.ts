@@ -28,14 +28,20 @@ export default abstract class ItemVisualization extends EntityVisualization {
 
         this.position = item.position
         this.iconImage = this.generateIcon();
+
+        this.container = item.base
     }
+
 
     public nextFrame(): void {
         throw new Error("Method not implemented.");
     }
     
     public draw(): void {
-        
+        if (Engine.getInstance().roomService?.CurrentRoom) {
+            Engine.getInstance().roomService?.CurrentRoom?.roomLayout.Visualization.container?.addChild(this.container)
+            this.updatePosition()
+        }
     }
 
     public generateImages() {
@@ -79,6 +85,12 @@ export default abstract class ItemVisualization extends EntityVisualization {
     public render(): void {
         this.entity.visualization.offsetX = this.calculateOffsetX()
         this.entity.visualization.offsetY = this.calculateOffsetY()
+
+        if (Engine.getInstance().roomService?.CurrentRoom) {
+            Engine.getInstance().roomService?.CurrentRoom?.roomLayout.Visualization.container?.addChild(this.container)
+            this.updatePosition()
+        }
+
         this.entity.logic?.registerEvents();
     }
 

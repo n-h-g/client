@@ -11,6 +11,10 @@ import { UserEntity } from './engine/room/objects/users/UserEntity'
 import { Direction } from './core/objects/Direction'
 import UserEntityVisualization from './engine/room/objects/users/visualization/UserEntityVisualization'
 import { ActionId } from './engine/ui/imagers/avatars/enum/actions/ActionId'
+import { ItemType } from './engine/ui/imagers/items/FurniImager'
+import RoomVisualization from './engine/room/visualization/RoomVisualization'
+import FloorItem from './engine/room/objects/items/FloorItem'
+import Point3d from './utils/point/Point3d'
 
 export class Engine {
     private static _instance: Engine
@@ -73,6 +77,12 @@ export class Engine {
             entity.visualization.render()
 
             
+            let item = await this.userInterfaceManager!.furniImager.loadFurniSprite(ItemType.FloorItem, "habbocake");
+            item.start();
+            let roomV = this._roomsService.CurrentRoom.roomLayout.Visualization as RoomVisualization;
+            let furni = new FloorItem("habbocake", "Door C", new Point3d(3, 4, 1), item);
+            furni.visualization?.render()
+            this.roomService.CurrentRoom.roomItemRepository.add(furni.id, furni)
         }
     }
 
