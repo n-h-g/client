@@ -41,7 +41,9 @@ export class ApplicationEngine extends Application {
 
         this._viewport.addChild(this.debugInfoContainer)
 
-        this._viewport.drag()
+        this._viewport.drag({
+            wheel: false
+        })
     }
 
     public showDebugInfo(fps: number = this.ticker.FPS) {
