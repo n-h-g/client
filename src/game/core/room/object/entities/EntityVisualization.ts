@@ -5,6 +5,7 @@ import Point3d from '../../../../utils/point/Point3d';
 import Rotation from "../../../../utils/Rotation";
 import Point from "../../../../utils/point/Point";
 import AvatarData from "../../../../engine/ui/imagers/avatars/enum/AvatarData";
+import { EntityEvents } from "../../../../engine/events/room/objects/entities/EntityEvents";
 
 export abstract class EntityVisualization extends RoomObjectVisualization {
 
@@ -31,12 +32,12 @@ export abstract class EntityVisualization extends RoomObjectVisualization {
         this.nextPosition.setZ(point.getZ());
         this.rotation = Rotation.calculateDirection(new Point(this._entity.position.getX(), this._entity.position.getY()), new Point(this.entity.position.getX(), this.entity.position.getY()));
         this.updatePosition()
-        this.container?.emit("position-changed");
+        this.entity.logic.events.emit(EntityEvents.POSITION_CHANGED);
     }
 
     public move(delta: number): void {
         delta = delta / 1000;
-
+        
         if (this._entity.position.getX() < this._nextPosition.getX()) {
             this._entity.position.setX(this._entity.position.getX() + delta * AvatarData.AVATAR_WALK_SPEED);
             if (this._entity.position.getX() > this._nextPosition.getX()) {

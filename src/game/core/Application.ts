@@ -79,9 +79,9 @@ export class ApplicationEngine extends Application {
                 this._engine.roomService.tick(this._timeElapsed)
                 this._lastFrameTime = currentTime
 
-                if(this._engine.config.debug) {
+                /*if(this._engine.config.debug) {
                     this.showDebugInfo()
-                }
+                }*/
             }
         }
 

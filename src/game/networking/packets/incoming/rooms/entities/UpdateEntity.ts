@@ -1,5 +1,7 @@
 import { IEntityData } from "../../../../../core/communication/incoming/rooms/entities/IEntityData"
+import { HumanVisualization } from "../../../../../core/room/object/human/visualization/HumanVisualization";
 import { Engine } from "../../../../../Engine";
+import { ActionId } from "../../../../../engine/ui/imagers/avatars/enum/actions/ActionId";
 import { Logger } from "../../../../../utils/Logger";
 import Point3d from "../../../../../utils/point/Point3d";
 import { MessageHandler } from "../../../../handler/MessageHandler";
@@ -10,9 +12,14 @@ export default class UpdateEntity extends MessageHandler {
 
         if (Engine.getInstance().roomService?.CurrentRoom) {
             let entity = Engine.getInstance().roomService?.CurrentRoom?.roomEntityRepository.get(entityData.id)
+            
+            console.log(entity)
 
-            entity.visualization.setPosition(new Point3d(entityData.position.x, entityData.position.y, entityData.position.z))
-            entity.visualization.direction = entityData.bh_rot.body_rot
+            if(!entity) return;
+
+            if(entityData.position) {
+                entity.visualization.setPosition(new Point3d(entityData.position.x, entityData.position.y, entityData.position.z))
+                entity.visualization.direction = entityData.bh_rot.body_rot
 
             /*if (entityData.actions.length == 0) {
                 EntityVisualization.addAction(ActionId.STAND)
@@ -22,6 +29,9 @@ export default class UpdateEntity extends MessageHandler {
             for (let action of entityData.actions) {
                 EntityVisualization.addAction(action);
             }*/
+            }
+
+            //(entity.visualization as HumanVisualization).addAction(ActionId.WALK)
 
             entity.visualization.needsUpdate = true
         } else {
@@ -29,5 +39,7 @@ export default class UpdateEntity extends MessageHandler {
                 Logger.debug("Invalid current room");
             }
         }
+
+        
     }
 }
