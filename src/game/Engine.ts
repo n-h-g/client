@@ -71,6 +71,8 @@ export class Engine {
             entity.visualization.Rot = Direction.WEST;
             //(entity.visualization as UserEntityVisualization).addAction(ActionId.USE_ITEM)
             entity.visualization.render()
+
+            
         }
     }
 
