@@ -4,20 +4,20 @@
             <div class="previewBoxContainerInfo">
                 <div class="titleBar">
                     <span class="title">
-                        {{ user.username }}
+                        {{ entity.name }}
                     </span>
                     <span class="closeIcon" @click="hide()">-</span>
                 </div>
                 <div class="userInfoContainer">
                     <div class="imageContainer">
-                        <img ref="playerImage" :src="user.image" />
+                        <img ref="playerImage" :src="entity.image" />
                     </div>
                     <div class="badgeContainer">
 
                     </div>
                 </div>
                 <div class="additionalInfoContainer">
-                    <p>{{ user.motto }}</p>
+                    <p>{{ entity.motto }}</p>
                 </div>
             </div>
         </div>
@@ -33,17 +33,17 @@ import { UIEvents } from '../../../game/engine/events/ui/UIEvents';
 import { UIEventsType } from '../../../game/engine/events/ui/UIEventsType';
 
 const mode = ref('')
-const user = ref({
-    username: '',
+const entity = ref({
+    name: '',
     image: '',
     motto: ''
 })
 
 EventManager.read(UIEvents.PREVIEW_BOX_MODE, (evt: PreviewModeEventData) => {
     mode.value = evt.mode
-    user.value.username = evt.username
-    user.value.image = evt.look
-    user.value.motto = evt.motto
+    entity.value.name = evt.name
+    entity.value.image = evt.image
+    entity.value.motto = evt.motto
 })
 
 function hide(): void {

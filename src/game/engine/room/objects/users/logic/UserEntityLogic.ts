@@ -70,8 +70,7 @@ export default class UserEntityLogic extends HumanLogic {
             y: y
         })
 
-     
-        this.togglePreview();
+        super.onClick()
     }
     public setAvatarContainer() {
         //let avatarContainerUI = Engine.getInstance().userInterfaceManager?..getComponent(UIComponent.AvatarContainerUI) as AvatarContainerUI
@@ -90,19 +89,6 @@ export default class UserEntityLogic extends HumanLogic {
         this.setAvatarContainer()
         //let avatarContainerUI = Engine.getInstance().userInterfaceManager?.componentsManager.getComponent(UIComponent.AvatarContainerUI) as AvatarContainerUI
         //avatarContainerUI.toggleTyping(value)
-    }
-
-    public togglePreview() {
-        let entity: UserEntity = this.entity as UserEntity
-        EventManager.emit<PreviewModeEventData>(UIEvents.PREVIEW_BOX_MODE, {
-            mode: 'user',
-            username: entity.name,
-            motto: "dsds",
-            look: UiUtils.generateImageFromObject(this.entity.visualization?.container!).src
-        })
-        EventManager.emit<DialogEventData>(UIEvents.OPEN, {
-            type: UIEventsType.PREVIEWBOX
-        })
     }
 
     public figureChanged() {

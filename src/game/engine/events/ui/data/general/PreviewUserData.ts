@@ -1,6 +1,6 @@
 export type PreviewModeEventData = {
     mode: string
-    username: string
-    motto: string
-    look: string
+    name: string
+    motto?: string
+    image: string
 }
