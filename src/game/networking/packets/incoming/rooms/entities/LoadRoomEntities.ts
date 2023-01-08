@@ -9,6 +9,10 @@ export default class LoadRoomEntities extends MessageHandler {
         for (let readed of this.message.data) {
             let data: IEntityData = readed
 
+            if(Engine.getInstance().roomService.CurrentRoom.roomEntityRepository.get(data.id) != null) {
+                return;
+            }
+
             let entity: Entity = EntityFactory.createEntity(data)
 
             Engine.getInstance().roomService?.CurrentRoom?.roomEntityRepository.add(entity.id, entity)

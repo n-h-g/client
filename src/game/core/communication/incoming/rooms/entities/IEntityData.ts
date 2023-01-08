@@ -22,5 +22,7 @@ export interface IEntityData {
         head_rot: number
     }
     type: EntityType
-    actions: ActionId[]
+    action: {
+        actions: ActionId[]
+    }
 }
