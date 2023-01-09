@@ -33,11 +33,12 @@ export abstract class EntityLogic extends RoomObjectLogic {
     public togglePreview() {
         let entity: Entity = this.entity
 
-        let isHuman = typeof Human
+        let isHuman = entity instanceof Human
 
         let mode = isHuman ? "user" : "item"
 
         EventManager.emit<PreviewModeEventData>(UIEvents.PREVIEW_BOX_MODE, {
+            id: entity.id,
             mode: mode,
             name: entity.name,
             motto: "dsds",

@@ -1,6 +1,6 @@
 <template>
     <div id="previewBox" ref="previewBox" draggable="false">
-        <div v-if="mode == 'user'" class="previewBoxContainer userPreview">
+        <div class="previewBoxContainer" v-bind:class="((mode == 'item'))?'itemPreview':'userPreview'">
             <div class="previewBoxContainerInfo">
                 <div class="titleBar">
                     <span class="title">
@@ -20,6 +20,23 @@
                     <p>{{ entity.motto }}</p>
                 </div>
             </div>
+            <div class="previewBoxContainerButtons" v-if="mode == 'item'" >
+                <div class="previewButton" ref="moveItemButton" id="moveItemButton"
+                    :class="{hidden: false}" @click.stop="moveItem()">
+                    Move</div>
+
+                <div class="previewButton" ref="rotateItemButton" id="rotateItemButton"
+                    :class="{hidden: false}" @click.stop="rotateItem">
+                    Rotate</div>
+
+                <div class="previewButton" ref="pickItemButton" id="pickItemButton"
+                    :class="{hidden: false}" @click.stop="pickItem">
+                    Pick</div>
+
+                <div class="previewButton" ref="useItemButton" id="useItemButton"
+                    :class="{hidden: false}" @click.stop="useItem()" v-if="entity ? isAnimated(): true">
+                    Use</div>
+            </div>
         </div>
     </div>
 </template>
@@ -27,13 +44,17 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import { EventManager } from '../../../game/core/events/EventManager';
+import { Engine } from '../../../game/Engine';
 import { DialogEventData } from '../../../game/engine/events/ui/data/general/Dialog';
 import { PreviewModeEventData } from '../../../game/engine/events/ui/data/general/PreviewUserData';
 import { UIEvents } from '../../../game/engine/events/ui/UIEvents';
 import { UIEventsType } from '../../../game/engine/events/ui/UIEventsType';
+import Item from '../../../game/engine/room/objects/items/Item';
 
 const mode = ref('')
+
 const entity = ref({
+    id: '',
     name: '',
     image: '',
     motto: ''
@@ -44,7 +65,31 @@ EventManager.read(UIEvents.PREVIEW_BOX_MODE, (evt: PreviewModeEventData) => {
     entity.value.name = evt.name
     entity.value.image = evt.image
     entity.value.motto = evt.motto
+    entity.value.id = evt.id
 })
+
+function isAnimated() {
+
+    let item = Engine.getInstance().roomService.CurrentRoom.roomEntityRepository.get(entity.value.id) as Item
+
+    return item.base.data.visualizationType == "furniture_animated"
+}
+
+function moveItem() {
+
+}
+
+function pickItem() {
+
+}
+
+function rotateItem() {
+
+}
+
+function useItem() {
+
+}
 
 function hide(): void {
     EventManager.emit<DialogEventData>(UIEvents.CLOSE, {
