@@ -12,8 +12,13 @@ export abstract class HumanLogic extends EntityLogic {
     }
 
     public registerEvents(): void {
+        super.registerEvents()
         this.events.on(HumanEvents.FIGURE_CHANGED, () => this.figureChanged())
         this.events.on(HumanEvents.FIGURE_LOADING_COMPLETE, () => this.onLoad())
+    }
+
+    public onClick(): void {
+        super.onClick()
     }
 
     protected abstract figureChanged(): void

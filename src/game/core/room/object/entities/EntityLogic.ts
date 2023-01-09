@@ -3,8 +3,11 @@ import { DialogEventData } from '../../../../engine/events/ui/data/general/Dialo
 import { PreviewModeEventData } from '../../../../engine/events/ui/data/general/PreviewUserData';
 import { UIEvents } from '../../../../engine/events/ui/UIEvents';
 import { UIEventsType } from '../../../../engine/events/ui/UIEventsType';
+import Item from '../../../../engine/room/objects/items/Item';
 import UiUtils from '../../../../utils/UiUtils';
 import { EventManager } from '../../../events/EventManager';
+import Human from '../human/Human';
+import { HumanLogic } from '../human/logic/HumanLogic';
 import { RoomObjectLogic } from '../RoomObjectLogic';
 import { Entity } from "./Entity";
 
@@ -29,8 +32,13 @@ export abstract class EntityLogic extends RoomObjectLogic {
 
     public togglePreview() {
         let entity: Entity = this.entity
+
+        let isHuman = typeof Human
+
+        let mode = isHuman ? "user" : "item"
+
         EventManager.emit<PreviewModeEventData>(UIEvents.PREVIEW_BOX_MODE, {
-            mode: 'user',
+            mode: mode,
             name: entity.name,
             motto: "dsds",
             image: UiUtils.generateImageFromObject(this.entity.visualization?.container!).src
