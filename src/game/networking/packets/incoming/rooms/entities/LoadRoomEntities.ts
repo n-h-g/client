@@ -13,11 +13,12 @@ export default class LoadRoomEntities extends MessageHandler {
                 return;
             }
 
-            let entity: Entity = EntityFactory.createEntity(data)
-
-            Engine.getInstance().roomService?.CurrentRoom?.roomEntityRepository.add(entity.id, entity)
-
-            entity.visualization.render()
+            EntityFactory.createEntity(data).then((entity: Entity) => {
+                if(entity) {
+                    Engine.getInstance().roomService?.CurrentRoom?.roomEntityRepository.add(entity.id, entity)
+                    entity.visualization.render()
+                }
+            })
         }
     }
 }

@@ -92,7 +92,9 @@ export abstract class HumanVisualization extends EntityVisualization {
     }
 
     public async render(): Promise<void> {
-        let placeholder = new AvatarPlaceHolder("", this.rotation, this.rotation, this._actions);
+        let placeholder = new AvatarPlaceHolder("", this.rotation, this.rotation, this._actions, 0, 0);
+
+        this._avatar = placeholder
 
         Engine.getInstance()?.userInterfaceManager?.avatarImager.loadAvatar(placeholder).then(() => {
             Engine.getInstance()?.userInterfaceManager?.avatarImager.drawAvatar(placeholder)

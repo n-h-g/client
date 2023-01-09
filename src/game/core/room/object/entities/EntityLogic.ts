@@ -28,7 +28,6 @@ export abstract class EntityLogic extends RoomObjectLogic {
     }
 
     public togglePreview() {
-        console.log('preview')
         let entity: Entity = this.entity
         EventManager.emit<PreviewModeEventData>(UIEvents.PREVIEW_BOX_MODE, {
             mode: 'user',

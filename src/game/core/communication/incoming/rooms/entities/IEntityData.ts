@@ -11,7 +11,9 @@ export interface IEntityData {
     id: string
     user: IUserComponent
     aspect: IAspectComponent
-    name: string
+    name: {
+        name: string
+    }
     position: IPositionComponent
     bh_rot: IHeadBodyRotationComponent
     type: EntityType
