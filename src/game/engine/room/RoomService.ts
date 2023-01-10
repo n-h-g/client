@@ -7,8 +7,10 @@ import { RoomUIEventData } from "../events/ui/data/room/RoomUIEventData";
 import { UIComponent } from "../ui/components/UIComponent";
 import { IComponentShowableUI } from "../../core/ui/IComponentShowableUI";
 import { UIEvents } from "../events/ui/UIEvents";
+import { Service } from "../../core/Service";
+import { IDisposable } from "../../core/room/IDisposable";
 
-export default class RoomService {
+export default class RoomService extends Service<null, null> implements IDisposable{
     
     private currentRoom: Room
 
@@ -32,16 +34,15 @@ export default class RoomService {
         })
     }
 
-    public unsetRoom() : void {
-        this.currentRoom.roomLayout.Visualization.container.destroy();
-        this.currentRoom = null
-        this.toggleUI()
-    }
 
     public dispose(): void {
         if (!this.currentRoom) {
             return;
         }
+
+        this.currentRoom.roomLayout.Visualization.dispose()
+        this.currentRoom = null
+        this.toggleUI()
     }
 
     public tick(delta: number): void {

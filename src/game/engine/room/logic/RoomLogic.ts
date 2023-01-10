@@ -16,6 +16,10 @@ export class RoomLogic implements IRoomLogic {
         this.canvasWallHit = this.room.createOrGetRoomCanvas("wallHit")
     }
 
+    public dispose(): void {
+        
+    }
+
     public registerEvents(): void {
         let roomVisualization = this.room.Visualization;
 
