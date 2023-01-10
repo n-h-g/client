@@ -4,8 +4,9 @@ import Point3d from "../../../../utils/point/Point3d"
 import { RoomObjectController } from "../RoomObjectController"
 import { EntityLogic } from './EntityLogic'
 import { EntityVisualization } from './EntityVisualization'
-import { Moveable } from "./Moveable"
-import { Rotatable } from "./Rotatable"
+import { Moveable } from "../IMoveable"
+import { IRotatable } from "../IRotatable"
+import RoomObjectVisualization from "../RoomObjectVisualization"
 
 export abstract class Entity extends RoomObjectController<EntityVisualization, EntityLogic>{
     protected _name: string

@@ -1,3 +1,4 @@
+import { Container } from 'pixi.js';
 import { IRoomVisualization } from '../IRoomVisualization';
 
 export interface IRoomObjectVisualization extends IRoomVisualization {

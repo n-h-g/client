@@ -4,18 +4,16 @@ import { EntityFactory } from "../../../../../core/room/object/entities/EntityFa
 import { Engine } from "../../../../../Engine"
 import { MessageHandler } from "../../../../handler/MessageHandler"
 
-export default class AddRoomEntity extends MessageHandler {
+export default class RemoveEntity extends MessageHandler {
     public handle(): void {
         let data: IEntityData = this.message
 
-        if(Engine.getInstance().roomService.CurrentRoom.roomEntityRepository.get(data.id) != null) {
+        let entity: Entity = Engine.getInstance().roomService.CurrentRoom.roomEntityRepository.get(data.id)
+
+        if(entity != null) {
             return;
         }
 
-        EntityFactory.createEntity(data).then((entity: Entity) => {
-            Engine.getInstance().roomService?.CurrentRoom?.roomEntityRepository.add(entity.id, entity)
-
-            entity.visualization.render()
-        })
+        entity.dispose()
     }
 }

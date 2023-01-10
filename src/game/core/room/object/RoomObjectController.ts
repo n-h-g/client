@@ -1,10 +1,12 @@
 import Point3d from "../../../utils/point/Point3d"
-import { Positionable } from "./entities/Positionable"
+import { IDisposable } from "../IDisposable"
+import { Positionable } from "./IPositionable"
 import { IRoomObjectLogic } from './IRoomObjectLogic'
 import { IRoomObjectVisualization } from './IRoomObjectVisualization'
 
-export abstract class RoomObjectController<IRoomObjectVisualization, IRoomObjectLogic> implements Positionable {
+export abstract class RoomObjectController<IRoomObjectVisualization extends IDisposable, IRoomObjectLogic extends IDisposable> implements Positionable,IDisposable {
     public readonly _id: string
+
     protected _objectPosition: Point3d
     protected _objectVisualization: IRoomObjectVisualization
     protected _objectLogic: IRoomObjectLogic
@@ -18,6 +20,11 @@ export abstract class RoomObjectController<IRoomObjectVisualization, IRoomObject
 
     public get id(): string {
         return this._id
+    }
+
+    public dispose(): void {
+       this._objectVisualization.dispose()
+       this._objectLogic.dispose()
     }
 
     setPosition(position: Point3d) {

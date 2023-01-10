@@ -15,6 +15,10 @@ export default abstract class RoomObjectVisualization {
         this._needsUpdate = false
     }
 
+    public dispose(): void {
+        this.container.destroy()
+    }
+
     public abstract render(): void
 
     public set needsUpdate(update: boolean) {

@@ -50,6 +50,7 @@ import { PreviewModeEventData } from '../../../game/engine/events/ui/data/genera
 import { UIEvents } from '../../../game/engine/events/ui/UIEvents';
 import { UIEventsType } from '../../../game/engine/events/ui/UIEventsType';
 import Item from '../../../game/engine/room/objects/items/Item';
+import { OutgoingPacket } from '../../../game/networking/packets/outgoing/OutgoingPacket';
 
 const mode = ref('')
 
@@ -80,7 +81,9 @@ function moveItem() {
 }
 
 function pickItem() {
-
+    Engine.getInstance().networkingManager.packetManager.applyOut(OutgoingPacket.RoomPickupItemEvent, {
+        id: entity.value.id
+    })
 }
 
 function rotateItem() {
@@ -88,7 +91,7 @@ function rotateItem() {
 }
 
 function useItem() {
-
+    
 }
 
 function hide(): void {

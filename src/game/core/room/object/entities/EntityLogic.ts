@@ -48,6 +48,7 @@ export abstract class EntityLogic extends RoomObjectLogic {
             type: UIEventsType.PREVIEWBOX
         })
     }
+    abstract onMove?(delta: number): void
 
     public abstract onPositionChanged(): void
 
