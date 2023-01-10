@@ -9,7 +9,7 @@ export class UpdateRoomData extends MessageHandler {
         let room: RoomData = this.message
 
         if (room.id == -1) {
-            Engine.getInstance()?.roomService?.unsetRoom();
+            Engine.getInstance()?.roomService?.dispose();
             return;
         }
 

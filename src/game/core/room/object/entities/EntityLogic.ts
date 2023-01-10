@@ -24,6 +24,15 @@ export abstract class EntityLogic extends RoomObjectLogic {
     public registerEvents(): void {
         this.events.on(EntityEvents.POSITION_CHANGED, () => this.onPositionChanged())
         this.entity.visualization.container.on('pointerdown', () => this.onClick())
+
+    }
+
+    public dispose(): void {
+        
+    }
+
+    public onHover(): void {
+        console.log('hover')
     }
 
     public onClick(): void {

@@ -1,6 +1,9 @@
 import RoomLayout from "../RoomLayout"
 import Room from "../Room"
 import { IRoomLogic } from '../../../core/room/IRoomLogic'
+import { Engine } from "../../../Engine"
+import { InteractionEvent, Point } from "pixi.js"
+import { Viewport } from "pixi-viewport"
 
 export class RoomLogic implements IRoomLogic {
     private room: RoomLayout
@@ -26,9 +29,31 @@ export class RoomLogic implements IRoomLogic {
         roomVisualization.getCanvasFloor().on('pointerover', this.onMouseOver.bind(this));
         roomVisualization.Container.on('pointerdown', this.onMouseClick.bind(this));
         roomVisualization.getCanvasFloor().on('pointerout', this.onMouseOut.bind(this));
+        Engine.getInstance().application.viewport.on('drag-end', this.onCameraMove.bind(this));
 
         this.room.getFloorPlane().logic?.registerEvents()
         this.room.getWallPlane().logic?.registerEvents()
+    }
+
+    private onCameraMove(e: any) {
+        let screen: Point = e.screen
+        let viewport: Viewport = e.viewport
+
+        let rect = viewport.getVisibleBounds()
+
+        let out: boolean = false
+
+        if(this.room.Visualization.container.x + this.room.Visualization.container.width < 0) {
+            out = true
+        }
+    
+        if(rect.x > window.innerWidth) {
+            out = true
+        }
+        if(rect.y > window.innerHeight) {
+            out = true
+        }
+
     }
 
     private onMouseClick(e: any) {

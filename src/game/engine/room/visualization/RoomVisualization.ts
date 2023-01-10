@@ -57,6 +57,7 @@ export default class RoomVisualization implements IRoomVisualization {
 
         Engine.getInstance()?.application?.viewport.addChild(this.container)
     }
+    
 
     public dispose(): void {
         this.container.destroy()

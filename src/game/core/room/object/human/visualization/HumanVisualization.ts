@@ -89,6 +89,10 @@ export abstract class HumanVisualization extends EntityVisualization {
             Engine.getInstance().roomService?.CurrentRoom?.roomLayout.Visualization.container?.addChild(this.container)
             this.updatePosition()
         }
+
+        this.container.interactive = true
+
+        this.entity.logic.registerEvents()
     }
 
     public async render(): Promise<void> {

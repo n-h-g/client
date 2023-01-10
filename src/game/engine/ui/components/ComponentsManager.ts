@@ -10,6 +10,7 @@ import { CreateRoomUI } from './navigator/CreateRoomUI'
 import { CatalogueUI } from './catalogue/CatalogueUI'
 import StaticContainerUI from './static/StaticContainerUI'
 import RoomUI from './room/RoomUI'
+import { AvatarContainerUI } from './avatar/AvatarContainerUI'
 
 export class ComponentsManager {
     private _rootComponent: HTMLElement
@@ -31,6 +32,7 @@ export class ComponentsManager {
         this.addComponent(UIComponent.CreateRoomUI, new CreateRoomUI())
         this.addComponent(UIComponent.CatalogueUI, new CatalogueUI())
         this.addComponent(UIComponent.RoomUI, new RoomUI())
+        this.addComponent(UIComponent.AvatarContainerUI, new AvatarContainerUI())
     }
 
     public initGameComponents(): void {
