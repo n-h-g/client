@@ -1,6 +1,7 @@
 import EventEmitter from "eventemitter3";
+import { IDisposable } from "../IDisposable";
 
-export abstract class RoomObjectLogic {
+export abstract class RoomObjectLogic implements IDisposable {
 
     /**
      *  A event emitter for each logic
@@ -14,6 +15,8 @@ export abstract class RoomObjectLogic {
         this._events.addListener
     }
 
+    abstract dispose(): void
+
     abstract tick(delta: number): void
 
     abstract registerEvents(): void
@@ -21,8 +24,6 @@ export abstract class RoomObjectLogic {
     abstract onClick(): void
 
     abstract onHover?(): void
-
-    abstract onMove?(delta: number): void
 
     public get events(): EventEmitter {
         return this._events
