@@ -22,6 +22,8 @@ export abstract class HumanVisualization extends EntityVisualization {
 
     protected _headDirection: Direction = Direction.SOUTH
 
+    protected loaded: boolean = false
+
     public constructor(human: Human) {
         super(human)
 
@@ -72,12 +74,15 @@ export abstract class HumanVisualization extends EntityVisualization {
     }
 
     public async draw(): Promise<void> {
-        this.container.destroy({
-            texture: true,
-            baseTexture: true
-        })
+        this.container.destroy()
 
-        this._avatar = new Avatar(this._entity.figure, this.rotation, this.rotation, this._actions, this.frame)
+        if(this.loaded) {
+
+            this._avatar = new Avatar(this._entity.figure, this.rotation, this.rotation, this._actions, this.frame)
+
+        } else {
+            this._avatar = new AvatarPlaceHolder("", this.rotation, this.rotation, this._actions, this.frame, this.frame);
+        }
 
         Engine.getInstance().userInterfaceManager?.avatarImager.drawAvatar(this._avatar);
 
@@ -96,7 +101,7 @@ export abstract class HumanVisualization extends EntityVisualization {
     }
 
     public async render(): Promise<void> {
-        let placeholder = new AvatarPlaceHolder("", this.rotation, this.rotation, this._actions, 0, 0);
+        let placeholder = new AvatarPlaceHolder("", this.rotation, this.rotation, this._actions, this.rotation, this.frame);
 
         this._avatar = placeholder
 
@@ -108,10 +113,11 @@ export abstract class HumanVisualization extends EntityVisualization {
         placeholder.Container.interactive = true;
         placeholder.Container.interactiveChildren = true;
 
-        this.container = placeholder.Container;
+        this.container = this._avatar.Container;
 
         this.loadAvatar().then(() => {
             this.container.destroy()
+            this.loaded = true
             this.draw()
         });
 
