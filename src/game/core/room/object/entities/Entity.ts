@@ -20,6 +20,10 @@ export abstract class Entity extends RoomObjectController<EntityVisualization, E
         this._name = name
     }
 
+    public dispose(): void {
+        super.dispose()
+    }
+
     public get name(): string {
         return this._name
     }

@@ -6,11 +6,11 @@ import { MessageHandler } from "../../../../handler/MessageHandler"
 
 export default class RemoveEntity extends MessageHandler {
     public handle(): void {
-        let data: IEntityData = this.message
+        let data: string = this.message.data
 
-        let entity: Entity = Engine.getInstance().roomService.CurrentRoom.roomEntityRepository.get(data.id)
+        let entity: Entity = Engine.getInstance().roomService.CurrentRoom.roomEntityRepository.get(data)
 
-        if(entity != null) {
+        if(entity == null) {
             return;
         }
 
