@@ -3,11 +3,9 @@ import { DialogEventData } from '../../../../engine/events/ui/data/general/Dialo
 import { PreviewModeEventData } from '../../../../engine/events/ui/data/general/PreviewUserData';
 import { UIEvents } from '../../../../engine/events/ui/UIEvents';
 import { UIEventsType } from '../../../../engine/events/ui/UIEventsType';
-import Item from '../../../../engine/room/objects/items/Item';
 import UiUtils from '../../../../utils/UiUtils';
 import { EventManager } from '../../../events/EventManager';
 import Human from '../human/Human';
-import { HumanLogic } from '../human/logic/HumanLogic';
 import { RoomObjectLogic } from '../RoomObjectLogic';
 import { Entity } from "./Entity";
 

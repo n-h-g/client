@@ -1,7 +1,6 @@
 import { IEntityData } from "../../../../../core/communication/incoming/rooms/entities/IEntityData"
 import { Entity } from "../../../../../core/room/object/entities/Entity"
 import { EntityBuilder } from "../../../../../core/room/object/entities/EntityBuilder"
-import { EntityFactory } from "../../../../../core/room/object/entities/EntityFactory"
 import { Engine } from "../../../../../Engine"
 import { MessageHandler } from "../../../../handler/MessageHandler"
 
