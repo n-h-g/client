@@ -8,5 +8,7 @@ export enum UIEvents {
     PREVIEW_BOX_MODE = 'preview_box_mode',
     HOTEL_VIEW = 'hotel_view',
     ROOM_UI = 'room_ui',
-    AVATAR_CONTAINER_UPDATED = 'avatar_container_updated'
+    AVATAR_CONTAINER_UPDATED = 'avatar_container_updated',
+    CATALOGUE_PAGES_UPDATED = 'catalog_pages_updated',
+    CATALOG_ITEMS_UPDATED = 'catalog_items_updated'
 }

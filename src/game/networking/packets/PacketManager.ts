@@ -1,6 +1,8 @@
 import { Engine } from '../../Engine'
 import { Logger } from '../../utils/Logger'
 import { MessageHandler } from '../handler/MessageHandler'
+import { CataloguePage } from './incoming/catalogue/CataloguePage'
+import { CataloguePages } from './incoming/catalogue/CataloguePages'
 import { LoginResponse } from './incoming/handshake/LoginResponse'
 import { PongResponse } from './incoming/handshake/PongResponse'
 import LoadInventoryItems from './incoming/items/LoadInventoryItem'
@@ -34,6 +36,8 @@ export class PacketManager {
             204: new AddRoomEntity,
             205: new RemoveEntity,
             400: new UpdateUserInformation,
+            800: new CataloguePages,
+            801: new CataloguePage,
             18: new LoadInventoryItems,
         }
 

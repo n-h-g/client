@@ -42,7 +42,7 @@ export enum OutgoingPacket {
 
     //#region catalogue
     CatalogPagesListEvent = 800,
-    RequestCatalogPageEvent = 26,
+    RequestCatalogPageEvent = 801,
     StartNewTrade = 27,
     AddItemToTrade = 28,
     DeclineTrade = 30,
