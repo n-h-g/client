@@ -32,7 +32,7 @@ export abstract class HumanVisualization extends EntityVisualization {
         this._actions = new Set();
     }
 
-    public setPosition(point: Point3d): void {
+    public setNextPosition(point: Point3d): void {
         super.setNextPosition(point)
         this.headRotation = Rotation.calculateDirection(new Point(this.entity.position.getX(), this._entity.position.getY()), new Point(this.entity.position.getX(), this.entity.position.getY()));
     }
@@ -81,14 +81,14 @@ export abstract class HumanVisualization extends EntityVisualization {
             this._avatar = new Avatar(this._entity.figure, this.rotation, this.rotation, this._actions, this.frame)
 
         } else {
-            this._avatar = new AvatarPlaceHolder("", this.rotation, this.rotation, this._actions, this.frame, this.frame);
+            this._avatar = new AvatarPlaceHolder("", this.rotation, this.rotation, this._actions, this.frame);
         }
 
         Engine.getInstance().userInterfaceManager?.avatarImager.drawAvatar(this._avatar);
 
         this.container = this._avatar.Container
 
-        this.container!.zIndex = 10
+        this.container.zIndex = 10
 
         if (Engine.getInstance().roomService?.CurrentRoom) {
             Engine.getInstance().roomService?.CurrentRoom?.roomLayout.Visualization.container?.addChild(this.container)
@@ -125,6 +125,8 @@ export abstract class HumanVisualization extends EntityVisualization {
             Engine.getInstance().roomService?.CurrentRoom?.roomLayout.Visualization.container?.addChild(this.container)
             this.updatePosition();
         }
+
+        this.entity.logic.registerEvents()
     }
 
     public nextFrame(): void {

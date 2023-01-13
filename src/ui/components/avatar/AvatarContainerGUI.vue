@@ -1,8 +1,8 @@
 
 <template>
-    <div v-if="!showLabel" id="avatarContainerGui" ref="avatarContainerGui" v-bind:style="{top: bounds.x + 'px', left: bounds.y + 'px', height: bounds.h, width: bounds.w}">
+    <div v-if="!showLabel" id="avatarContainerGui" ref="avatarContainerGui" v-bind:style="{top: bounds.y + 'px', left: bounds.x + 'px'}">
         <img src="~@/assets/images/chat/typing.png" :class="{hidden: !typing}"/>
-        <div class="label">{name}</div>
+        <div class="label">{{ label }}</div>
     </div>
 </template>
 
@@ -35,16 +35,18 @@ EventManager.read(UIEvents.AVATAR_CONTAINER_UPDATED, (event: AvatarContainerData
 <style lang="scss">
 #avatarContainer {
     z-index: 1000;
+    pointer-events: all !important;
+    position:absolute;
 
     #avatarContainerGui {
-        pointer-events: all !important;
         position:absolute;
     
         .label {
             background-color: #333;
-            padding: 5px 4px;
+            padding: 2px 1px;
             color:#fff;
             margin: 0 auto;
+            font-size: 12px;
             text-align:center;
         }
     }

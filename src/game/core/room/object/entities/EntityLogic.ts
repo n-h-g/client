@@ -66,7 +66,9 @@ export abstract class EntityLogic extends RoomObjectLogic {
     }
     abstract onMove?(delta: number): void
 
-    public abstract onPositionChanged(): void
+    public  onPositionChanged(){
+        console.log('dasd')
+    }
 
     public async onLoad(){
         this.generateImages()

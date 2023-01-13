@@ -10,6 +10,7 @@ import { UserEntity } from '../UserEntity';
 import { Tile } from '../../map/Tile';
 import { ActionId } from "../../../../ui/imagers/avatars/enum/actions/ActionId";
 import { HumanVisualization } from "../../../../../core/room/object/human/visualization/HumanVisualization";
+import Point3d from "../../../../../utils/point/Point3d";
 
 export default class UserEntityVisualization extends HumanVisualization {
 

@@ -23,9 +23,6 @@ export abstract class HumanLogic extends EntityLogic {
 
     protected abstract figureChanged(): void
 
-    public onLoad(): void {
-        //this.entity.visualization.draw()
-    }
 
     public tick(delta: number): void {
         let humanVisualization = this.entity.visualization as HumanVisualization

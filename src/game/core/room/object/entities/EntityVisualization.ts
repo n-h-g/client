@@ -26,9 +26,10 @@ export abstract class EntityVisualization extends RoomObjectVisualization {
     }
 
     public setNextPosition(point: Point3d) {
-        this.nextPosition.setX(point.getX());
-        this.nextPosition.setY(point.getY());
-        this.nextPosition.setZ(point.getZ());
+
+        this._nextPosition.setX(point.getX());
+        this._nextPosition.setY(point.getY());
+        this._nextPosition.setZ(point.getZ());
         //this.rotation = Rotation.calculateDirection(new Point(this._entity.position.getX(), this._entity.position.getY()), new Point(this.entity.position.getX(), this.entity.position.getY()));
         this.updatePosition()
         this.entity.logic.events.emit(EntityEvents.POSITION_CHANGED);
