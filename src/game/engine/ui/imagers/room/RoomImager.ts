@@ -1,4 +1,6 @@
+import { Engine } from "../../../../Engine";
 import UiUtils from "../../../../utils/UiUtils";
+import Room from "../../../room/Room";
 import { RoomImagerBuilder } from "./RoomImagerBuilder";
 
 export class RoomImager {
@@ -10,14 +12,20 @@ export class RoomImager {
 
     public constructor() {
         this._roomImagerBuilder = new RoomImagerBuilder()
+
     }
 
-    public async generateRoomPreview(room) {
+    public generateRoomPreview(room: Room) {
+
+        if(!room) return;
+
         let generatedRoom = this._roomImagerBuilder.setRoom(room).build()
+
+        generatedRoom.roomLayout.Visualization.render()
 
         let container = generatedRoom.roomLayout.Visualization.Container
         
-        let renderingImage = UiUtils.generateImageFromObject(container)
+        let renderingImage = UiUtils.generateBase64FromObject(container)
 
         generatedRoom.dispose()
 

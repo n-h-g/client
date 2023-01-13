@@ -27,9 +27,12 @@
             <div class="cataloguePageContainer" v-if="currentCataloguePage && currentCataloguePage.items">
                 <div class="cataloguePage" ref="cataloguePage">
                     <div class="default_grid">
+                        <div id="placeHolder" v-if="{selectedItem}">
+                            <img/>
+                        </div>
                         <div class="defaultGridLayoutItemContainer">
                             <div class="itemCell catalogItemCell" id="catalogItem${items[i].id}" data-credits="${items[i].credits}" data-itemid="${items[i].id}" data-publicname="${items[i].itemBase.publicName}" v-for="item in currentCataloguePage.items" :key="item.id">
-                                <span class="itemIcon"><img id="catalogItem${items[i].id}_iconimage" :src="getIcon(item)"></span>  
+                                <span class="itemIcon"><img id="catalogItem${items[i].id}_iconimage" :src="getIcon(item)" onclick="selectItem(item)"></span>  
                                 <span class="price">{{item.credits}}<img src='@/assets/images/catalogue/creditIcon.png' /></span>
                             </div>
                         </div>
@@ -64,6 +67,8 @@ let activePage = ref({
     }
 })
 
+const selectedItem = ref()
+
 const currentCataloguePage = ref({items: []} as {
     items: CataloguePageItem[]
 })
@@ -97,6 +102,14 @@ EventManager.read(UIEvents.CATALOG_ITEMS_UPDATED, (data: CataloguePageData) => {
     })
 
 })
+
+function selectItem(item) {
+    this.selectedItem.value = item
+}
+
+function generatePlaceHolder(item: CataloguePageItem) {
+    return Engine.getInstance().userInterfaceManager.roomImager.generateRoomPreview(Engine.getInstance().roomService.CurrentRoom)
+}
 
 function getIcon(catalogItem: CataloguePageItem) {
     return resourceUrl + catalogItem.id

@@ -4,6 +4,7 @@ import RoomInfo from "./RoomInfo"
 import { RoomEntityRepository } from './RoomEntityRepository';
 import { RoomItemRepository } from './RoomItemRepository';
 import { IDisposable } from '../../core/room/IDisposable';
+import { Engine } from '../../Engine';
 
 export default class Room implements IDisposable {
     private _roomLayout: RoomLayout;

@@ -21,13 +21,15 @@ export class RoomImagerBuilder {
 
     public setObject(object: RoomObjectController<RoomObjectVisualization, RoomObjectLogic>) {
         this.objects.push(object)
+        return this
     }
 
     public build() {
         for(let object of this.objects) {
             object.visualization.render()
         }
-        this._room.roomLayout.Visualization.render()
+        this._room.roomLayout.Visualization.render();
+        this._room.roomLayout.Logic.registerEvents();
         return this._room
     }
 }
