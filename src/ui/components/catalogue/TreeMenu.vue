@@ -7,7 +7,6 @@
         <span class="catalogLiIcon">
           <img :src="
             resourceUrl +
-            'icon_' +
             menu.iconImage +
             '.png'
           " />
@@ -25,16 +24,20 @@
 <script setup lang="ts">
 import { Engine } from "../../../game/Engine"
 
-const props = defineProps(['currentMenu', 'openPage'])
+const props = defineProps<{
+    catalogMenu
+    currentMenu
+    openPage
+}>()
 
-let resourceUrl = Engine.getInstance().config.catalogueResourcesUrl
+const resourceUrl = Engine.getInstance().config.catalogueResourcesUrl + "icons/"
 
 function openEvent(menu: string) {
 
 }
 
 function filteredMenu() {
-  return []
+  return props.catalogMenu.filter((menu) => menu.isEnabled !== -1);
 }
 </script>
 

@@ -7,7 +7,7 @@
             </div>
             <div class="iconContainer">
                 <img v-if="currentMenu && currentMenu.iconImage"
-                    :src="resourceUrl + 'icon_' + currentMenu.iconImage + '.png'" />
+                    :src="resourceUrl + currentMenu.iconImage + '.png'" />
             </div>
             <div class="menuTitleWrapper">
                 <span class="menuTitle">
@@ -36,8 +36,13 @@
 import { ref } from "vue"
 import { Engine } from "../../../game/Engine"
 import { UIEventsType } from "../../../game/engine/events/ui/UIEventsType"
+import { OutgoingPacket } from "../../../game/networking/packets/outgoing/OutgoingPacket"
 import Dialog from "../dialog/Dialog.vue"
 import TreeMenu from "./TreeMenu.vue"
+
+Engine.getInstance().networkingManager.packetManager.applyOut(OutgoingPacket.CatalogPagesListEvent)
+
+const resourceUrl = Engine.getInstance().config.catalogueResourcesUrl + "icons/"
 
 let catalogMenu = ref([])
 let activePage = ref({
@@ -46,17 +51,42 @@ let activePage = ref({
     }
 })
 
+catalogMenu.value.push({id: 1,
+                     iconColor: "#000",
+                     isEnabled: 1,
+                     title: "Front",
+                     isVisible: true,
+                     openSubMenu: false,
+                         subPages: [{
+                         id: 2,
+                         iconColor: "#ff001b",
+                         isEnabled: 1,
+                         title: "asdas",
+                         isVisible: true,
+                         openSubMenu: false,
+                         subPages: [{
+                             id: 3,
+                             iconColor: "#1f7f32",
+                             isEnabled: 1,
+                             title: "12321",
+                             isVisible: true,
+                             openSubMenu: false,
+                             subPages: [
+
+                             ]
+                         }]
+                     }]
+                 })
+
+
 let currentMenu = ref({
-    id: -1,
+    id: 1,
     title: "titolo",
     description: "",
-    iconImage: ""
+    iconImage: "1"
 })
 
-let resourceUrl = Engine.getInstance().config.catalogueResourcesUrl
-
 function openPage() {
-
 }
 </script>
 
