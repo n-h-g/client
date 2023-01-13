@@ -1,12 +1,11 @@
 import FurniBase from "./FurniBase";
-import * as PIXI from "pixi.js";
 import FurniImager from "./FurniImager";
-
-
 import anime from "animejs";
 import { IOffsets } from "../../../../core/ui/imagers/items/IAsset";
+import { Container, DisplayObject } from 'pixi.js';
+import { Logger } from "../../../../utils/Logger";
 
-export class FurniSprite extends PIXI.Container {
+export class FurniSprite extends Container {
   private _furniBase: FurniBase;
   private isIcon: boolean = false;
   public needsUpdate: boolean = false;
@@ -30,7 +29,7 @@ export class FurniSprite extends PIXI.Container {
     this.interactive = true;
     this.visible = true;
     this.sortableChildren = true;
-    this.direction = 2;
+    this.direction = 0;
   }
 
   public getUIDirection(): number {
@@ -125,7 +124,7 @@ export class FurniSprite extends PIXI.Container {
 
   public update() {
     if (this.needsUpdate) {
-      this.children.forEach((child: PIXI.DisplayObject) => {
+      this.children.forEach((child: DisplayObject) => {
         child.destroy();
       });
     }
@@ -186,7 +185,7 @@ export class FurniSprite extends PIXI.Container {
               this.addChild(spriteElement);
             }
           } else {
-            //console.log('no asset');
+            Logger.debug("[Furni] No asset found: "+ assetName)
           }
         }
       })

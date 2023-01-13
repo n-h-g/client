@@ -1,4 +1,3 @@
-import Tile from "../Tile"
 import RoomVisualization from "../../../visualization/RoomVisualization"
 import RoomObjectVisualization from "../../../../../core/room/object/RoomObjectVisualization"
 import MapData from "../MapData"
@@ -8,14 +7,10 @@ import TileType from "../TileTypeEnum"
 import Point3d from "../../.././../../utils/point/Point3d"
 import ColorRGB from "../../../../../utils/color/ColorRGB"
 import NormalType from "../../../visualization/NormalTypeEnum"
-
-import * as PIXI from "pixi.js"
-import { Container } from '@pixi/display'
-import { Graphics } from '@pixi/graphics'
-import { ObservablePoint } from '@pixi/math'
+import { Container, Graphics, ObservablePoint } from 'pixi.js'
+import { Tile } from '../Tile'
 
 export default class VisualizationTile extends RoomObjectVisualization {
-
     private tile: Tile
     private floorContext: Container
     private doorContext: Container
@@ -24,54 +19,46 @@ export default class VisualizationTile extends RoomObjectVisualization {
     private strokeColor: ColorRGB = ColorRGB.getColorFromNumber(0x7E7E52)
     private useStroke: boolean = true
 
-    private doorTileContext: Container
-
-    private stairsContext: Graphics | null;
+    private stairsContext: Graphics
 
     constructor(tile: Tile) {
-        super(VisualizationTile.calculateOffsetX(tile.position, tile.getType()),
-            VisualizationTile.calculateOffsetY(tile.position, tile.getType()),
-            VisualizationTile.calculateZIndex(tile.position, tile.getType()))
+        super(VisualizationTile.calculateOffsetX(tile.position, tile.type),
+            VisualizationTile.calculateOffsetY(tile.position, tile.type),
+            VisualizationTile.calculateZIndex(tile.position, tile.type))
 
         this.tile = tile
 
         this.stairsContext = null;
 
-        let roomV = (tile.getPlane().getRoom().Visualization as RoomVisualization)
+        let roomV = (tile.plane.room.Visualization as RoomVisualization)
         this.floorContext = roomV.getCanvasFloor()
-        this.doorContext = roomV.getCanvasDoorFloor()
-        this.doorTileContext = roomV.getCanvasDoorTile();
+        this.doorContext = roomV.getCanvasDoorTile();
     }
-
 
     private static calculateOffsetX(position: Point3d, type: TileType): number {
         return (position.getY() * MapData.tileHeight) - (position.getX() * MapData.tileWidth) / 2
     }
 
     private static calculateOffsetY(position: Point3d, type: TileType): number {
-        return (position.getY() * MapData.tileHeight) / 2 + (position.getX() * MapData.tileWidth) / 4 - ((position.getZ() + (type == TileType.DoorTile ? 1 : 0)) * MapData.thickSpace * MapData.stairSteps)
+        return (position.getY() * MapData.tileHeight) / 2 + (position.getX() * MapData.tileWidth) / 4 - ((position.getZ() + (type == TileType.Door && position.getZ() == 0 ? 1 : 0)) * MapData.thickSpace * MapData.stairSteps)
     }
 
     private static calculateZIndex(position: Point3d, type: TileType): number {
-        return (1 * position.getX()) + (1 * position.getY()) + (1 * (position.getZ() + type == TileType.DoorTile ? 1 : 0))
+        return (1 * position.getX()) + (1 * position.getY()) + (1 * (position.getZ() + type == TileType.Door && position.getZ() == 0 ? 1 : 0))
     }
 
     public render(): void {
         this.checkTypeAndDraw()
-
     }
-    private checkTypeAndDraw(): void {
 
+    private checkTypeAndDraw(): void {
         if (this.floorContext == null) {
             return
         }
 
-        switch (this.tile.getType()) {
-
-            case TileType.DoorTile:
+        switch (this.tile.type) {
             case TileType.Door:
-
-                this.drawTile(this.doorTileContext, true)
+                this.drawTile(this.doorContext, true)
                 break
             case TileType.Flat:
                 this.drawTile(this.floorContext)
@@ -79,23 +66,18 @@ export default class VisualizationTile extends RoomObjectVisualization {
             case TileType.StairLeft:
                 this.drawStair(this.floorContext)
                 break
-
             case TileType.StairRight:
                 this.drawStair(this.floorContext, true)
                 break
-
             case TileType.StairCornerLeft:
                 //this.drawStairCorner(this.floorContext)
                 break
-
             case TileType.StairCornerRight:
                 //this.drawStairCorner(this.floorContext, true)
                 break
-
             case TileType.StairCornerFront:
                 this.drawFrontCorner(this.floorContext)
                 break
-
             default:
                 return
         }
@@ -105,9 +87,9 @@ export default class VisualizationTile extends RoomObjectVisualization {
 
         const ctx = new Graphics();
         ctx.interactive = true;
-        let roomV = (this.tile.getPlane().getRoom().Visualization as RoomVisualization)
+        let roomV = (this.tile.plane.room.Visualization as RoomVisualization)
 
-        let fullHeightTick = this.tile.getPlane().getRoom().HasFullHeightTick ? MapData.thickSpace * MapData.stepHeight * (this.tile.position.getZ() + (isDoor ? 1 : 0)) : 0
+        let fullHeightTick = this.tile.plane.room.HasFullHeightTick ? MapData.thickSpace * MapData.stepHeight * (this.tile.position.getZ() + (isDoor ? 1 : 0)) : 0
 
 
         let floorColor = RoomVisualizationColorData.getNormal(this.color, NormalType.LIGHT).toHex()
@@ -120,18 +102,18 @@ export default class VisualizationTile extends RoomObjectVisualization {
 
         //thick left
         ctx.beginFill(leftColor);
-        ctx.moveTo(this.getOffsetX(), this.getOffsetY() + MapData.tileHeight / 2);
-        ctx.lineTo(this.getOffsetX() + MapData.tileWidth / 2, this.getOffsetY() + MapData.tileHeight);
+        ctx.moveTo(this.offsetX, this.offsetY + MapData.tileHeight / 2);
+        ctx.lineTo(this.offsetX + MapData.tileWidth / 2, this.offsetY + MapData.tileHeight);
         ctx.lineTo(
-            this.getOffsetX() + MapData.tileWidth / 2,
-            this.getOffsetY() +
+            this.offsetX + MapData.tileWidth / 2,
+            this.offsetY +
             MapData.tileHeight +
             fullHeightTick +
             MapData.thickSpace
         );
         ctx.lineTo(
-            this.getOffsetX(),
-            this.getOffsetY() +
+            this.offsetX,
+            this.offsetY +
             MapData.tileHeight / 2 +
             fullHeightTick +
             MapData.thickSpace
@@ -141,18 +123,18 @@ export default class VisualizationTile extends RoomObjectVisualization {
         ctx.endFill();
         //thick right
         ctx.beginFill(rightColor);
-        ctx.moveTo(this.getOffsetX() + MapData.tileWidth, this.getOffsetY() + MapData.tileHeight / 2);
-        ctx.lineTo(this.getOffsetX() + MapData.tileWidth / 2, this.getOffsetY() + MapData.tileHeight);
+        ctx.moveTo(this.offsetX + MapData.tileWidth, this.offsetY + MapData.tileHeight / 2);
+        ctx.lineTo(this.offsetX + MapData.tileWidth / 2, this.offsetY + MapData.tileHeight);
         ctx.lineTo(
-            this.getOffsetX() + MapData.tileWidth / 2,
-            this.getOffsetY() +
+            this.offsetX + MapData.tileWidth / 2,
+            this.offsetY +
             MapData.tileHeight +
             fullHeightTick +
             MapData.thickSpace
         );
         ctx.lineTo(
-            this.getOffsetX() + MapData.tileWidth,
-            this.getOffsetY() +
+            this.offsetX + MapData.tileWidth,
+            this.offsetY +
             MapData.tileHeight / 2 +
             fullHeightTick +
             MapData.thickSpace
@@ -165,31 +147,31 @@ export default class VisualizationTile extends RoomObjectVisualization {
 
         ctx.beginFill(floorColor); // floor color
         ctx.moveTo(
-            this.getOffsetX() + MapData.tileWidth / 2, //TopX
-            this.getOffsetY()//TopY
+            this.offsetX + MapData.tileWidth / 2, //TopX
+            this.offsetY//TopY
         );
         ctx.lineTo(
-            this.getOffsetX() + MapData.tileWidth, //RightX
-            this.getOffsetY() + MapData.tileHeight / 2 //RightY
+            this.offsetX + MapData.tileWidth, //RightX
+            this.offsetY + MapData.tileHeight / 2 //RightY
         );
         ctx.lineTo(
-            this.getOffsetX() + MapData.tileWidth / 2, //BottomX
-            this.getOffsetY() + MapData.tileHeight //BottomY
+            this.offsetX + MapData.tileWidth / 2, //BottomX
+            this.offsetY + MapData.tileHeight //BottomY
         );
         ctx.lineTo(
-            this.getOffsetX(), //LeftX
-            this.getOffsetY() + MapData.tileHeight / 2  //LeftY
+            this.offsetX, //LeftX
+            this.offsetY + MapData.tileHeight / 2  //LeftY
         );
 
         ctx.closePath();
 
-    
+
 
         ctx.endFill();
 
-    
+
         this.container = ctx;
-        
+
         container.addChild(ctx);
         return container;
     }
@@ -199,9 +181,9 @@ export default class VisualizationTile extends RoomObjectVisualization {
         const ctx = new Graphics();
         ctx.interactive = true;
 
-        let fullHeightTick = this.tile.getPlane().getRoom().HasFullHeightTick ? MapData.thickSpace * MapData.stepHeight * this.tile.position.getZ() : 0
+        let fullHeightTick = this.tile.plane.room.HasFullHeightTick ? MapData.thickSpace * MapData.stepHeight * this.tile.position.getZ() : 0
 
-        let _offsetX = this.getOffsetX()
+        let _offsetX = this.offsetX
 
         ctx.pivot.x = 0.2;
 
@@ -212,7 +194,7 @@ export default class VisualizationTile extends RoomObjectVisualization {
             _offsetX = -_offsetX - MapData.tileWidth;
         }
 
-        ctx.transform.position = new ObservablePoint(() => {}, 1, 0, -MapData.thickSpace * MapData.stepHeight);
+        ctx.transform.position = new ObservablePoint(() => { }, 1, 0, -MapData.thickSpace * MapData.stepHeight);
 
         let floorColor = RoomVisualizationColorData.getNormal(this.color, NormalType.LIGHT).toHex()
         let leftColor = RoomVisualizationColorData.getNormal(this.color, NormalType.MEDIUM).toHex()
@@ -226,15 +208,15 @@ export default class VisualizationTile extends RoomObjectVisualization {
 
         let stairPoints = [{
             x: _offsetX + MapData.tileWidth / 2,
-            y: this.getOffsetY()
+            y: this.offsetY
         },
         {
             x: _offsetX,
-            y: this.getOffsetY() + MapData.tileHeight / 2
+            y: this.offsetY + MapData.tileHeight / 2
         },
         {
             x: _offsetX + (MapData.tileWidth / 2 / 8) * 2,
-            y: this.getOffsetY() +
+            y: this.offsetY +
                 MapData.tileHeight / 2 +
                 ((MapData.tileHeight - MapData.tileHeight / 2) / 8) * 2
         },
@@ -242,7 +224,7 @@ export default class VisualizationTile extends RoomObjectVisualization {
             x: _offsetX +
                 MapData.tileWidth / 2 +
                 ((MapData.tileWidth - MapData.tileWidth / 2) / 8) * 2,
-            y: this.getOffsetY() + (MapData.tileHeight / 2 / 8) * 2
+            y: this.offsetY + (MapData.tileHeight / 2 / 8) * 2
         }
         ];
 
@@ -251,7 +233,7 @@ export default class VisualizationTile extends RoomObjectVisualization {
         ctx.interactive = true;
         //ctx.buttonMode = true;
 
-        if(this.useStroke)
+        if (this.useStroke)
             ctx.lineStyle(MapData.strokeDepth, 0x8a8a5c);
 
         this.container = ctx;
@@ -259,7 +241,7 @@ export default class VisualizationTile extends RoomObjectVisualization {
         for (let i = 0; i < MapData.stairSteps; i++) {
             let offsetX = (MapData.tileWidth / 2 / 8) * 2 * i;
             let offsetY = thickness + (thickness + (MapData.tileHeight / 2 / 8) * 2) * i;
-            let fullHeightTickStair = (this.tile.getPlane().getRoom().HasFullHeightTick ? (MapData.thickSpace * (MapData.stairSteps - i)) : MapData.thickSpace)
+            let fullHeightTickStair = (this.tile.plane.room.HasFullHeightTick ? (MapData.thickSpace * (MapData.stairSteps - i)) : MapData.thickSpace)
 
             //ctx.fillStyle = floorColor;
             ctx.beginFill(floorColor);
@@ -326,35 +308,35 @@ export default class VisualizationTile extends RoomObjectVisualization {
 
         const ctx = new Graphics();
 
-        let fullHeightTick = this.tile.getPlane().getRoom().HasFullHeightTick ? MapData.thickSpace * MapData.stepHeight * this.tile.position.getZ() : 0
+        let fullHeightTick = this.tile.plane.room.HasFullHeightTick ? MapData.thickSpace * MapData.stepHeight * this.tile.position.getZ() : 0
         //ctx.translate(0, -MapData.thickSpace * MapData.stepHeight /** (parseInt(_z) + 1)*/ );
-        ctx.transform.position = new ObservablePoint(() => {}, 1, 0, -MapData.thickSpace * MapData.stepHeight /** (parseInt(_z) + 1)*/);
+        ctx.transform.position = new ObservablePoint(() => { }, 1, 0, -MapData.thickSpace * MapData.stepHeight /** (parseInt(_z) + 1)*/);
 
         let blockPointLeft = [{
-            x: this.getOffsetX() + MapData.tileWidth / 2,
-            y: this.getOffsetY() + 0
+            x: this.offsetX + MapData.tileWidth / 2,
+            y: this.offsetY + 0
         },
         {
-            x: this.getOffsetX() + MapData.tileWidth / 2 - (MapData.tileWidth / 2 / 8) * 2,
-            y: this.getOffsetY() + (MapData.tileHeight / 2 / 8) * 2
+            x: this.offsetX + MapData.tileWidth / 2 - (MapData.tileWidth / 2 / 8) * 2,
+            y: this.offsetY + (MapData.tileHeight / 2 / 8) * 2
         },
         {
-            x: this.getOffsetX() + MapData.tileWidth / 2,
-            y: this.getOffsetY() + (MapData.tileHeight / 2 / 8) * 2 * 2
+            x: this.offsetX + MapData.tileWidth / 2,
+            y: this.offsetY + (MapData.tileHeight / 2 / 8) * 2 * 2
         }
         ];
 
         let blockPointRight = [{
-            x: this.getOffsetX() + MapData.tileWidth / 2,
-            y: this.getOffsetY() + 0
+            x: this.offsetX + MapData.tileWidth / 2,
+            y: this.offsetY + 0
         },
         {
-            x: this.getOffsetX() + MapData.tileWidth / 2 + (MapData.tileWidth / 2 / 8) * 2,
-            y: this.getOffsetY() + (MapData.tileHeight / 2 / 8) * 2
+            x: this.offsetX + MapData.tileWidth / 2 + (MapData.tileWidth / 2 / 8) * 2,
+            y: this.offsetY + (MapData.tileHeight / 2 / 8) * 2
         },
         {
-            x: this.getOffsetX() + MapData.tileWidth / 2,
-            y: this.getOffsetY() + (MapData.tileHeight / 2 / 8) * 2 * 2
+            x: this.offsetX + MapData.tileWidth / 2,
+            y: this.offsetY + (MapData.tileHeight / 2 / 8) * 2 * 2
         }
         ];
 
@@ -364,7 +346,7 @@ export default class VisualizationTile extends RoomObjectVisualization {
         for (let i = 0; i < MapData.stairSteps; i++) {
             let offsetX = -((MapData.tileWidth / 2 / 8) * 2 * i);
             let offsetY = thickness + (thickness + (MapData.tileHeight / 2 / 8) * 2) * i;
-            let fullHeightTickStair = (this.tile.getPlane().getRoom().HasFullHeightTick ? (MapData.thickSpace * (MapData.stairSteps - i)) : MapData.thickSpace)
+            let fullHeightTickStair = (this.tile.plane.room.HasFullHeightTick ? (MapData.thickSpace * (MapData.stairSteps - i)) : MapData.thickSpace)
 
 
             ctx.beginFill(0x989865);
@@ -456,8 +438,8 @@ export default class VisualizationTile extends RoomObjectVisualization {
     }
 
     drawStairCorner(ctx: CanvasRenderingContext2D, isRight: boolean = false) {
-        let fullHeightTick = this.tile.getPlane().getRoom().HasFullHeightTick ? MapData.thickSpace * MapData.stepHeight * this.tile.position.getZ() : 0
-        let _offsetX = this.getOffsetX()
+        let fullHeightTick = this.tile.plane.room.HasFullHeightTick ? MapData.thickSpace * MapData.stepHeight * this.tile.position.getZ() : 0
+        let _offsetX = this.offsetX
         ctx.save();
         ctx.translate(0, -MapData.thickSpace * MapData.stepHeight);
 
@@ -478,19 +460,19 @@ export default class VisualizationTile extends RoomObjectVisualization {
 
         let cornerPoints = [{
             x: _offsetX + MapData.tileWidth,
-            y: this.getOffsetY() + MapData.tileHeight / 2
+            y: this.offsetY + MapData.tileHeight / 2
         },
         {
             x: _offsetX + MapData.tileWidth - (MapData.tileWidth / 2 / 8) * 2 - 1,
-            y: this.getOffsetY() + MapData.tileHeight / 2 - (MapData.tileHeight / 2 / 8) * 2 - 1
+            y: this.offsetY + MapData.tileHeight / 2 - (MapData.tileHeight / 2 / 8) * 2 - 1
         },
         {
             x: _offsetX + MapData.tileWidth - (MapData.tileWidth / 2 / 8) * 4,
-            y: this.getOffsetY() + MapData.tileHeight / 2
+            y: this.offsetY + MapData.tileHeight / 2
         },
         {
             x: _offsetX + MapData.tileWidth - (MapData.tileWidth / 2 / 8) * 2,
-            y: this.getOffsetY() + MapData.tileHeight / 2 + (MapData.tileHeight / 2 / 8) * 2
+            y: this.offsetY + MapData.tileHeight / 2 + (MapData.tileHeight / 2 / 8) * 2
         }
         ];
 
@@ -577,5 +559,5 @@ export default class VisualizationTile extends RoomObjectVisualization {
         return ctx;
     }
 
-    public get FloorContext(): Container { return this.floorContext; }
+
 }

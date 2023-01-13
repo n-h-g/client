@@ -7,7 +7,6 @@ enum TileType {
     StairCornerFront,
     StairCornerLeft,
     StairCornerRight,
-    DoorTile
 }
 
 export default TileType

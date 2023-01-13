@@ -1,43 +1,39 @@
-import IRoomMapObject from "../../../../core/room/object/map/IRoomMapObject";
-import IRoomMapPlane from "../../../../core/room/object/map/IRoomMapPlane";
 import RoomPlaneType from "./RoomPlaneTypeEnum";
-import RoomObjectController from "../../../../core/room/object/RoomObjectController";
 import Point3d from "../../../../utils/point/Point3d";
 import LogicPlane from "./logic/LogicPlane";
 import VisualizationPlane from "./visualization/VisualizationPlane"
 import RoomLayout from "../../RoomLayout";
+import { RoomObjectController } from '../../../../core/room/object/RoomObjectController';
+import { IRoomMapPlane } from '../../../../core/room/object/map/IRoomMapPlane';
+import { IRoomMapObject } from '../../../../core/room/object/map/IRoomMapObject';
 
-export default abstract class RoomPlane extends RoomObjectController implements IRoomMapPlane {
+export abstract class RoomPlane extends RoomObjectController<VisualizationPlane, LogicPlane> {
+    private _room: RoomLayout
+    private _type: RoomPlaneType
 
-    private room: RoomLayout
-    private type: RoomPlaneType
-    
-    private mapObjects: Array<IRoomMapObject> = new Array()
+    private objectList: Array<IRoomMapObject> = new Array<IRoomMapObject>()
 
     constructor(room: RoomLayout, type: RoomPlaneType) {
-        super("plane" + type, new Point3d(0,0,0), null, null)
-        this.room = room
-        this.type = type
-
-        this.logic = (new LogicPlane(this))
-        this.visualization = (new VisualizationPlane(this))
+        super("plane" + type, new Point3d(0, 0, 0), null, null)
+        this._room = room
+        this._type = type
+        this.logic = new LogicPlane(this)
+        this.visualization = new VisualizationPlane(this)
     }
 
-    public addMapObject(obj: IRoomMapObject) : void {
-        this.mapObjects.push(obj)
+    public addObject(obj: IRoomMapObject): void {
+        this.objectList.push(obj)
     }
 
-    public getMapObjects() : Array<IRoomMapObject> {
-        return this.mapObjects
+    public get mapObjects(): Array<IRoomMapObject> {
+        return this.objectList
     }
 
-    public getType() : RoomPlaneType {
-        return this.type
+    public get type(): RoomPlaneType {
+        return this._type
     }
 
-    public getRoom() : RoomLayout {
-        return this.room
+    public get room(): RoomLayout {
+        return this._room
     }
-
-    
 }

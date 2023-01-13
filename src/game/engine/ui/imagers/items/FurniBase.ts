@@ -134,6 +134,7 @@ export default class FurniBase {
     }
 
     public getSprite(texture: PIXI.Texture, framePart: IAsset): PIXI.Sprite {
+        
         texture = new PIXI.Texture(texture.baseTexture, new PIXI.Rectangle(framePart.sprite.left, framePart.sprite.top, framePart.sprite.width, framePart.sprite.height))
         let sprite = new PIXI.Sprite(texture);
         return sprite;

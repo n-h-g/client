@@ -6,10 +6,9 @@ export default class MapTypeChecker {
 
     public static checkTileType(position: Point3d, doorPosition: Point, modelMatrix: Array<Array<number>>) : TileType {
 
-       // console.log(position);
-
-        if (doorPosition.getY() == position.getY() && doorPosition.getX() == position.getX() && modelMatrix[position.getX()][position.getY()] == 0) {
-            return TileType.DoorTile
+    
+        if (doorPosition.getY() == position.getY() && doorPosition.getX() == position.getX()) {
+            return TileType.Door
         } else if (modelMatrix[position.getX()][position.getY()] == 0) {
             return TileType.Hole
         } else if (
@@ -57,13 +56,13 @@ export default class MapTypeChecker {
     }
 
     public static checkWallCorner(x: number, y: number, modelMatrix: Array<Array<number>>) {
-        let i;
+        let i : number;
         let isCorner =
             (x == 0 && y == 0) ||
-            (modelMatrix[x - 1] &&
-                modelMatrix[x][y - 1] &&
-                modelMatrix[x - 1][y] == 0 &&
-                modelMatrix[x][y - 1] == 0) ?
+            (modelMatrix[x - 1] && modelMatrix[x - 1][y] == 0 && modelMatrix[x][y - 1] && modelMatrix[x][y - 1] == 0) ||
+            (modelMatrix[x - 1] && modelMatrix[x - 1][y] == 0 && !modelMatrix[x][y - 1]) ||
+            (modelMatrix[x][y - 1] && modelMatrix[x][y - 1] == 0 && !modelMatrix[x - 1])
+             ?
             true :
             false;
 

@@ -3,6 +3,14 @@ import { UIComponent } from './UIComponent'
 import { BottomBarUI } from './static/BottomBarUI'
 import { GameLoaderUI } from './loader/GameLoaderUI'
 import { TopBarUI } from './static/TopBarUI'
+import { NavigatorUI } from './navigator/NavigatorUI'
+import { InventoryUI } from './inventory/InventoryUI'
+import { PreviewBoxUI } from './general/PreviewBoxUI'
+import { CreateRoomUI } from './navigator/CreateRoomUI'
+import { CatalogueUI } from './catalogue/CatalogueUI'
+import StaticContainerUI from './static/StaticContainerUI'
+import RoomUI from './room/RoomUI'
+import { AvatarContainerUI } from './avatar/AvatarContainerUI'
 
 export class ComponentsManager {
     private _rootComponent: HTMLElement
@@ -16,7 +24,15 @@ export class ComponentsManager {
     public loadGameComponents(): void {
         this.addComponent(UIComponent.GameLoaderUI, new GameLoaderUI())
         this.addComponent(UIComponent.BottomBarUI, new BottomBarUI())
+        this.addComponent(UIComponent.StaticContainerUI, new StaticContainerUI())
         this.addComponent(UIComponent.TopBarUI, new TopBarUI())
+        this.addComponent(UIComponent.NavigatorUI, new NavigatorUI())
+        this.addComponent(UIComponent.InventoryUI, new InventoryUI())
+        this.addComponent(UIComponent.PreviewBoxUI, new PreviewBoxUI())
+        this.addComponent(UIComponent.CreateRoomUI, new CreateRoomUI())
+        this.addComponent(UIComponent.CatalogueUI, new CatalogueUI())
+        this.addComponent(UIComponent.RoomUI, new RoomUI())
+        this.addComponent(UIComponent.AvatarContainerUI, new AvatarContainerUI())
     }
 
     public initGameComponents(): void {
@@ -29,14 +45,14 @@ export class ComponentsManager {
         return this._rootComponent
     }
 
-    public addComponent(componentKey: UIComponent, component: IComponentUI): void {
+    private addComponent(componentKey: UIComponent, component: IComponentUI): void {
         if (this._gameComponents.has(componentKey))
             return
 
         this._gameComponents.set(componentKey, component)
     }
 
-    public getComponent<IComponentUI>(componentKey: UIComponent): IComponentUI {
-        return this._gameComponents.get(componentKey) as IComponentUI
+    public getComponent<T>(componentKey: UIComponent): T {
+        return this._gameComponents.get(componentKey) as T
     }
 }

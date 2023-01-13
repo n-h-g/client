@@ -1,17 +1,14 @@
-import Repository from "../../core/Repository";
-import IRoomEntityRepository from "../../core/room/IRoomEntityRepository";
-import Entity from "../../core/room/object/entities/Entity";
-import EntityLogic from "../../core/room/object/entities/EntityLogic";
+import { Repository } from '../../core/Repository';
+import { Entity } from '../../core/room/object/entities/Entity';
 
-export default class RoomEntityRepository extends Repository<string, Entity> implements IRoomEntityRepository {
-
+export class RoomEntityRepository extends Repository<string, Entity> {
     public constructor() {
         super()
     }
 
     public tick(delta: number) {
         this.map.forEach((entity: Entity) => {
-            (entity.logic as EntityLogic).tick(delta);
+            entity.logic.tick(delta);
         })
     }
 }

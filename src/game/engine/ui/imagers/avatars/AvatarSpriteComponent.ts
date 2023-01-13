@@ -1,4 +1,5 @@
-import { Direction } from "../../../../core/objects/Direction"
+
+import { Direction } from "../../../../core/objects/Direction";
 import { IAction } from "./gamedata/IAvatarActions";
 
 
@@ -13,38 +14,35 @@ export default class AvatarSpriteComponent {
     private color: string | null;
     private isFlipped: boolean = false
     private isSmall: boolean;
-    private action: string;
 
     private colorable: boolean = true; 
 
-    constructor(state: string, partType: string, partId: string, direction: Direction, frame: number, color: string | null, flippedType: string | undefined, isSmall = false, action: string) {
+    constructor(state: string, partType: string, partId: string, direction: Direction, frame: number, color: string | null, flippedType: string | undefined, isSmall = false) {
         
         if (partType === "hd" && isSmall)
             this.partId = "1";
-        if (partType === "ey" && action === "std" && partId === "1" && direction === 3)
-            action = "sml";
-        if (partType === "fa" && action === "std" && partId === "2" && (direction === 2 || direction === 4))
+        if (partType === "ey" && state === "std" && partId === "1" && direction === 3)
+            state = "sml";
+        if (partType === "fa" && state === "std" && partId === "2" && (direction === 2 || direction === 4))
             this.resourceDirection = 1;
-        if (partType === "he" && action === "std" && partId === "1") {
+        if (partType === "he" && state === "std" && partId === "1") {
             if (direction === 2) {
                 this.resourceDirection = 0;
             }
     
         }
-        if (partType === "he" && action === "std" && partId === "8")
+        if (partType === "he" && state === "std" && partId === "8")
             this.resourceDirection = direction % 2 === 0 ? 1 : this.resourceDirection;
-        if (partType === "he" && action === "std" && (partId === "2131" || partId === "2132") && (direction >= 2 && direction <= 6))
+        if (partType === "he" && state === "std" && (partId === "2131" || partId === "2132") && (direction >= 2 && direction <= 6))
             this.resourceDirection = 1;
-        if (partType === "ha" && action === "std" && partId === "2518")
+        if (partType === "ha" && state === "std" && partId === "2518")
             this.resourceDirection = direction % 2 === 0 ? 2 : 1;
-        if (partType === "ha" && action === "std" && partId === "2519")
+        if (partType === "ha" && state === "std" && partId === "2519")
             this.resourceDirection = direction % 2 === 0 ? 2 : 3;
-        if (partType === "ha" && action === "std" && partId === "2588")
+        if (partType === "ha" && state === "std" && partId === "2588")
             this.resourceDirection = 7;
-        if (partType === "ha" && action === "std" && partId === "2589")
+        if (partType === "ha" && state === "std" && partId === "2589")
             this.resourceDirection = 3;
-        
-        
         
         
         this.state = state;
@@ -62,8 +60,6 @@ export default class AvatarSpriteComponent {
 
         this.resourceDirection = direction
 
-        this.action = action;
-
         this.isFlipped = false;
 
         if(this.resourceDirection > 3 && this.resourceDirection < 7) {
@@ -74,7 +70,7 @@ export default class AvatarSpriteComponent {
 
         if(partType == 'ey') this.colorable = false;
 
-
+      
         this.resourceType = flippedType != undefined && this.isFlipped ? flippedType : partType
     }
 

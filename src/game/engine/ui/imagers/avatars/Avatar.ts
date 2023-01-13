@@ -46,6 +46,7 @@ export default class Avatar {
     private torsoContainer: Container;
     private headAccessoryContainer: Container;
     private armsContainer: Container;
+    private faceContainer: Container;
 
     private totalFrames: number = 0;
 
@@ -95,23 +96,12 @@ export default class Avatar {
         this.hairContainer = new Container();
         this.hatContainer = new Container();
         this.headAccessoryContainer = new Container();
+        this.faceContainer = new Container();
 
-        this.events.on(AvatarEventsType.LOAD_COMPLETE, () => {
+        /*this.events.on(AvatarEventsType.LOAD_COMPLETE, () => {
             this.assemble()
-        })
+        })*/
  
-    }
-
-    public setDirection(direction: Direction) {
-        if(direction < Direction.WEST)
-        {
-            direction = (Direction.NORTH_WEST + (direction + 1));
-        }
-
-        if(direction > Direction.NORTH_WEST)
-        {
-            direction = (direction - (Direction.NORTH_WEST + 1));
-        }
     }
 
     public assemble(): void {
@@ -124,6 +114,7 @@ export default class Avatar {
         this.container.addChild(this.headAccessoryContainer);
         this.container.addChild(this.armsContainer);
         this.container.addChild(this.torsoContainer);
+        this.container.addChild(this.faceContainer)
 
         this.container.sortableChildren = true;
 
@@ -135,11 +126,12 @@ export default class Avatar {
         this.hairContainer.zIndex = 5;
         this.shoesContainer.zIndex = 6;
         this.hatContainer.zIndex = 7;
-        this.headAccessoryContainer.zIndex = 8;
+        this.faceContainer.zIndex = 8
+        this.headAccessoryContainer.zIndex = 9;
         
         this.container.sortChildren()
 
-        this.container.alpha = 1;
+        this.container.alpha = this.placeHolder ? 0.5 : 1;
         
         this.container.buttonMode = true;
         this.container.interactive = true;
@@ -148,6 +140,8 @@ export default class Avatar {
         for(let object of this.container.children) {
             object.interactive = true;
         }
+
+        this.events.emit(AvatarEventsType.LOAD_COMPLETE)
     }
 
     public addAction(action: ActionId) {
@@ -168,6 +162,10 @@ export default class Avatar {
 
     public get BodyDirection() {
         return this.bodyDirection;
+    }
+
+    public get FaceContainer() {
+        return this.faceContainer;
     }
 
     public get HeadDirection() {

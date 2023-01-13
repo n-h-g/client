@@ -1,14 +1,31 @@
-import IRoomObjectLogic from "./IRoomObjectLogic"
+import EventEmitter from "eventemitter3";
+import { IDisposable } from "../IDisposable";
 
-export default abstract class RoomObjectLogic implements IRoomObjectLogic {
+export abstract class RoomObjectLogic implements IDisposable {
 
-    abstract tick(delta: number) : void
+    /**
+     *  A event emitter for each logic
+     *  Use this for dispatching events.
+     */
+    private _events: EventEmitter
 
-    abstract registerEvents() : void
+    public constructor() {
+        this._events = new EventEmitter()
+
+        this._events.addListener
+    }
+
+    abstract dispose(): void
+
+    abstract tick(delta: number): void
+
+    abstract registerEvents(): void
 
     abstract onClick(): void
 
     abstract onHover?(): void
 
-    abstract onMove?(delta: number): void
+    public get events(): EventEmitter {
+        return this._events
+    } 
 }

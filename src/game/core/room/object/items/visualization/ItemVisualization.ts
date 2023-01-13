@@ -1,77 +1,57 @@
 import { DisplayObject } from "pixi.js";
 import { Engine } from "../../../../../Engine";
+import { ItemEvents } from "../../../../../engine/events/room/objects/entities/ItemEvents";
 import Item from "../../../../../engine/room/objects/items/Item";
 import MapData from "../../../../../engine/room/objects/map/MapData";
-import Tile from "../../../../../engine/room/objects/map/Tile";
-import RoomVisualization from "../../../../../engine/room/visualization/RoomVisualization";
+import { Tile } from "../../../../../engine/room/objects/map/Tile";
 import AvatarData from "../../../../../engine/ui/imagers/avatars/enum/AvatarData";
+import { ItemType } from "../../../../../engine/ui/imagers/items/FurniImager";
 import { FurniSprite } from "../../../../../engine/ui/imagers/items/FurniSprite";
 import Point from "../../../../../utils/point/Point";
 import Point3d from "../../../../../utils/point/Point3d";
 import UiUtils from "../../../../../utils/UiUtils";
-import RoomObjectVisualization from "../../RoomObjectVisualization";
+import { EntityVisualization } from "../../entities/EntityVisualization";
+import { IRoomObjectVisualization } from '../../IRoomObjectVisualization';
+import RoomObjectVisualization from '../../RoomObjectVisualization';
 
-export default abstract class ItemVisualization extends RoomObjectVisualization {
-
-    protected item: Item;
-
+export default abstract class ItemVisualization extends EntityVisualization {
     private position: Point3d;
 
     public imagePreview: string | undefined;
 
     public iconImage: string | undefined;
 
-    public nextY: number = 0;
-    public nextX: number = 0;
-    public nextZ: number = 0;
-
     public isIcon: boolean = false;
 
-    constructor(item: Item) {
-        super(0, 0, 0);
+    declare public _entity: Item
 
-        this.item = item;
+    private sprite: FurniSprite
+
+    constructor(item: Item) {
+        super(item);
         this.position = item.position
         this.iconImage = this.generateIcon();
     }
 
-    public updatePosition() {
 
-        let currentRoom = Engine.getInstance().roomService?.CurrentRoom;
-        
-        let tile: Tile | undefined = currentRoom?.getRoomLayout().getFloorPlane().getTilebyPosition(new Point(Math.round(this.position.getX()), Math.round(this.position.getY()))); // get the tile where you want to set avatar
-        let offsetFloor = tile!.position.getZ() > 0 ? -MapData.thickSpace * MapData.stepHeight * tile!.position.getZ() : -AvatarData.AVATAR_TOP_OFFSET;
-
-
-        this.item.base.x = (((tile!.position.getY() - tile!.position.getX()) * MapData.tileWidth / 2) + (MapData.tileWidth / 2))
-        this.item.base.y = ((tile!.position.getY() + tile!.position.getX()) * MapData.tileHeight / 2 + MapData.tileHeight / 2) + offsetFloor;
-        this.item.base.zIndex = this.getZIndex();
-     
-        for(let children of this.item.base.children) {
-            children as DisplayObject
-
-            children.zIndex = 1 + this.item.position.getX() + this.item.position.getY() + ((this.item.position.getX() + this.item.position.getY()) * 1000) + this.item.position.getZ() + 5;
-        
-        }
-
-        (currentRoom?.getRoomLayout().Visualization as RoomVisualization).Container.addChild(this.item.base)
-
+    public nextFrame(): void {
+        throw new Error("Method not implemented.");
+    }
     
-        this.item.base.buttonMode = true;
-        this.item.base.interactive = true;
-        this.item.base.interactiveChildren = true;
-        
-        this.generateImages();
-
+    public draw(): void {
+        if (Engine.getInstance().roomService?.CurrentRoom) {
+            Engine.getInstance().roomService?.CurrentRoom?.roomLayout.Visualization.container?.addChild(this.container)
+            this.updatePosition()
+        }
     }
 
     public generateImages() {
-        this.item.base.on("furni-sprite-created", () =>{
-            this.imagePreview = UiUtils.generateBase64FromObject(this.item.base)
+        this.entity.logic.events.on(ItemEvents.FURNI_SPRITE_LOADED, () =>{
+            this.imagePreview = UiUtils.generateBase64FromObject(this.entity.visualization.container)
         })
 
         if(this.isIcon) {
-            let icon = this.item.base.turnIntoIcon();
+            let icon = this.sprite.turnIntoIcon();
         
             setTimeout(() => {
                 this.iconImage = UiUtils.generateBase64FromObject(icon);
@@ -80,93 +60,67 @@ export default abstract class ItemVisualization extends RoomObjectVisualization 
     }
 
     public turnIntoIcon() {
-        let icon = this.item.base.turnIntoIcon();
-        this.item.base = icon;
+        let icon = this.sprite.turnIntoIcon();
+        this.entity.visualization.container = icon;
         this.needsUpdate = false;
         this.isIcon = true;
     }
 
     public restore() {
-        this.item.base = this.item.base.restore();
+        this.entity.visualization.container = this.container
         this.needsUpdate = false;
         this.isIcon = false;
     }
 
-    public move(delta: number): void {
-        delta = delta / 1000;
- 
-        if (this.item.position.getX() < this.nextX) {
-            this.item.position.setX(this.item.position.getX() + delta * AvatarData.AVATAR_WALK_SPEED);
-            if (this.item.position.getX() > this.nextX) {
-                //this.isWalking = false;
-                this.item.position.setX(this.nextX);
-            }
-        } else if (this.item.position.getX() > this.nextX) {
-            this.item.position.setX(this.item.position.getX() - delta * AvatarData.AVATAR_WALK_SPEED);
-            if (this.item.position.getX() < this.nextX) {
-                //this.isWalking = false;
-                this.item.position.setX(this.nextX);
-            }
-        }
-
-        if (this.item.position.getY() < this.nextY) {
-            this.item.position.setY(this.item.position.getY() + delta * AvatarData.AVATAR_WALK_SPEED);
-            if (this.item.position.getY() > this.nextY) {
-                //this.isWalking = false;
-                this.item.position.setY(this.nextY);
-            }
-        } else if (this.item.position.getY() > this.nextY) {
-            this.item.position.setY(this.item.position.getY() - delta * AvatarData.AVATAR_WALK_SPEED);
-            if (this.item.position.getY() < this.nextY) {
-                //this.isWalking = false;
-                this.item.position.setY(this.nextY);
-            }
-        }
-
-        if (this.nextZ > this.item.position.getZ()) {
-            this.item.position.setZ(this.item.position.getZ() + ((Math.abs(this.item.position.getZ() - this.nextZ) > 1.5) ? 9.8 : AvatarData.AVATAR_WALK_SPEED) * delta);
-            if (this.item.position.getZ() > this.nextZ) {
-                this.item.position.setZ(this.nextZ);
-            }
-        } else if (this.nextZ < this.item.position.getZ()) {
-            this.item.position.setZ(this.item.position.getZ() - ((Math.abs(this.item.position.getZ() - this.nextZ) > 1.5) ? 9.8 : AvatarData.AVATAR_WALK_SPEED) * delta);
-            if (this.item.position.getZ() < this.nextZ) {
-                this.item.position.setZ(this.nextZ);
-            }
-        }
-
-        this.updatePosition()
-    }
-
     private generateImagePreview() {
-        return UiUtils.generateBase64FromObject(this.item.base);
+        return UiUtils.generateBase64FromObject(this.entity.visualization.container);
     }
+
     private generateIcon(): string | undefined{
-        let icon: FurniSprite = this.item.base.turnIntoIcon()
-        this.item.base.restore()
-        return UiUtils.generateBase64FromObject(icon);
+        //let icon: FurniSprite = this.entity.visualization.container.turnIntoIcon()
+        //this.entity.visualization.container.restore()
+        //return UiUtils.generateBase64FromObject(icon);
+        return ""
     }
 
-    public render(): void {
-        this.item.logic?.registerEvents();
+    public async render(): Promise<void> {
+
+        let entity = this.entity as Item
+
+        let sprite = await Engine.getInstance().userInterfaceManager.furniImager.loadFurniSprite(ItemType.FloorItem, this.entity.name)
+        
+        sprite.start()
+
+        this.container = sprite
+
+        this.container.interactive = true
+        this.container.interactiveChildren = true
+
+        if (Engine.getInstance().roomService?.CurrentRoom) {
+            Engine.getInstance().roomService?.CurrentRoom?.roomLayout.Visualization.container?.addChild(this.container)
+            this.updatePosition()
+        }
+
+        this.entity.logic?.registerEvents();
     }
 
-    public getItem() : Item {
-        return this.item;
+    public calculateOffsetX(): number {
+        let currentRoom = Engine.getInstance().roomService?.CurrentRoom
+        let tile: Tile = currentRoom.roomLayout.getFloorPlane().getTilebyPosition(new Point(Math.round(this.position.getX()), Math.round(this.position.getY())))
+
+        return (((tile!.position.getY() - tile!.position.getX()) * MapData.tileWidth / 2) + (MapData.tileWidth / 2))
     }
 
-    public getVisualizationType() : string  {
-        return this.item.base.furniBase.visualizationType;
+    public calculateOffsetY(): number {
+        let currentRoom = Engine.getInstance().roomService?.CurrentRoom
+        let tile: Tile = currentRoom.roomLayout.getFloorPlane().getTilebyPosition(new Point(Math.round(this.position.getX()), Math.round(this.position.getY())))
+
+        let offsetFloor = tile!.position.getZ() > 0 ? -MapData.thickSpace * MapData.stepHeight * tile!.position.getZ() : -AvatarData.AVATAR_TOP_OFFSET;
+        
+        return ((tile!.position.getY() + tile!.position.getX()) * MapData.tileHeight / 2 + MapData.tileHeight / 2) + offsetFloor;
     }
 
-    public getOffsetX(): number {
-        throw new Error("Method not implemented.");
-    }
-    public getOffsetY(): number {
-        throw new Error("Method not implemented.");
-    }
     public getZIndex(): number {
-        return 1 + this.item.position.getX() + this.item.position.getY()+ ((this.item.position.getX() + this.item.position.getY()) * 1000) + this.item.position.getZ ()
+        return 1 + this.entity.position.getX() + this.entity.position.getY()+ ((this.entity.position.getX() + this.entity.position.getY()) * 1000) + this.entity.position.getZ ()
     }
-
 }

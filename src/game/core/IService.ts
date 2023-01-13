@@ -1,6 +1,5 @@
-import { IRepository } from "./IRepository";
-import Repository from "./Repository";
+import { Repository } from "./Repository";
 
-export default interface IService<S, T> {
+export interface IService<S, T> {
     repository?: Repository<S, T>
 }

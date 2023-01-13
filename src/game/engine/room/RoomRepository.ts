@@ -1,10 +1,8 @@
-import Repository from "../../core/Repository";
-import IRoomRepository from "../../core/room/IRoomRepository";
+import { Repository } from '../../core/Repository';
 import Room from "./Room";
 
-export default class RoomRepository extends Repository<number, Room> implements IRoomRepository {
-    
+export class RoomRepository extends Repository<number, Room> {
     tick(delta: number): void {
-        throw new Error("Method not implemented.");
+
     }    
 }

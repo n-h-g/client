@@ -1,7 +1,8 @@
-import IRoomVisualization from "../IRoomVisualization"
+import { Container } from 'pixi.js';
+import { IRoomVisualization } from '../IRoomVisualization';
 
-export default interface IRoomObjectVisualization extends IRoomVisualization {
-    getOffsetX(): number
-    getOffsetY(): number
-    getZIndex(): number
+export interface IRoomObjectVisualization extends IRoomVisualization {
+    get offsetX(): number
+    get offsetY(): number
+    get zIndex(): number
 }

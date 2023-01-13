@@ -2,15 +2,10 @@ import RoomObjectVisualization from "../../../../../core/room/object/RoomObjectV
 import Pointer from "../Pointer";
 import MapData from "../MapData";
 import ColorRGB from "../../../../../utils/color/ColorRGB";
-import * as PIXI from "pixi.js"
-import Tile from "../Tile";
-import { Container } from '@pixi/display';
-import { Graphics } from '@pixi/graphics';
-import { Point } from '@pixi/math';
-
+import { Container, Graphics, Point } from 'pixi.js';
+import { Tile } from '../Tile';
 
 export default class VisualizationPointer extends RoomObjectVisualization {
-
     private pointerContext: Container
     private pointerColor: ColorRGB = new ColorRGB(255, 255, 255)
     private pointerPosition: number = 0
@@ -31,8 +26,8 @@ export default class VisualizationPointer extends RoomObjectVisualization {
     }
 
     public updatePosition(x: number, y: number, tile: Tile) {
-        let xpos = ((x - y) * (MapData.tileWidth / 2)) + tile!.visualization!.getOffsetX();
-        let ypos = ((x + y) * (MapData.tileHeight / 2)) + tile!.visualization!.getOffsetY();
+        let xpos = ((x - y) * (MapData.tileWidth / 2)) + tile!.visualization!.offsetX
+        let ypos = ((x + y) * (MapData.tileHeight / 2)) + tile!.visualization!.offsetY
 
         this.pointerContext.visible = true;
 
@@ -54,7 +49,7 @@ export default class VisualizationPointer extends RoomObjectVisualization {
             new Point(0, MapData.tileHeight / 2)
         ];
 
-        ctx.lineStyle(this.pointerWidth, this.pointerColor.toHex(),this.pointerAlpha, this.pointerPosition);
+        ctx.lineStyle(this.pointerWidth, this.pointerColor.toHex(), this.pointerAlpha, this.pointerPosition);
         ctx.moveTo(points[0].x, points[0].y);
         ctx.lineTo(points[1].x, points[1].y);
         ctx.lineTo(points[2].x, points[2].y);

@@ -1,5 +1,3 @@
-import IUserRepository from "../users/IUserRepository";
-
-export default interface IRoomUserRepository extends IUserRepository{
+export interface IRoomUserRepository {
     tick(delta: number): void
 }

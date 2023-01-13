@@ -1,8 +1,7 @@
 import { IComponentUI } from "./IComponentUI"
 
 export interface IComponentShowableUI extends IComponentUI {
-    visible: boolean
+    toggle(): void
     hide(): void
     show(): void
-    toggle(): void
 }

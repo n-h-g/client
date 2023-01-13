@@ -1,46 +1,57 @@
-
-import IRoomObjectVisualization from "./IRoomObjectVisualization"
-import IRoomObjectLogic from "./IRoomObjectLogic"
 import Point3d from "../../../utils/point/Point3d"
+import { IDisposable } from "../IDisposable"
+import { Positionable } from "./IPositionable"
+import { IRoomObjectLogic } from './IRoomObjectLogic'
+import { IRoomObjectVisualization } from './IRoomObjectVisualization'
 
-import IObjectController from "./IRoomObjectController"
-export default abstract class RoomObjectController implements IObjectController {
+export abstract class RoomObjectController<IRoomObjectVisualization extends IDisposable, IRoomObjectLogic extends IDisposable> implements Positionable,IDisposable {
+    public readonly _id: string
 
-    public readonly id: string
+    protected _objectPosition: Point3d
+    protected _objectVisualization: IRoomObjectVisualization
+    protected _objectLogic: IRoomObjectLogic
 
-    protected objectPosition: Point3d
-    protected objectVisualization: IRoomObjectVisualization | null
-    protected objectLogic: IRoomObjectLogic | null
-
-    constructor(id: string, position: Point3d, visualization: IRoomObjectVisualization | null, logic: IRoomObjectLogic | null) {
-        this.id = id;
-        this.objectPosition = position
-        this.objectVisualization = visualization
-        this.objectLogic = logic
+    constructor(id: string, position: Point3d, visualization: IRoomObjectVisualization, logic: IRoomObjectLogic) {
+        this._id = id;
+        this._objectPosition = position
+        this._objectVisualization = visualization
+        this._objectLogic = logic
     }
 
+    public get id(): string {
+        return this._id
+    }
+
+    public dispose(): void {
+       this._objectVisualization.dispose()
+       this._objectLogic.dispose()
+    }
+
+    setPosition(position: Point3d) {
+        throw new Error("Method not implemented.")
+    }
 
     get position(): Point3d {
-        return this.objectPosition
+        return this._objectPosition
     }
 
-    get visualization(): IRoomObjectVisualization | null {
-        return this.objectVisualization
+    get visualization(): IRoomObjectVisualization {
+        return this._objectVisualization
     }
 
-    get logic(): IRoomObjectLogic | null {
-        return this.objectLogic
+    get logic(): IRoomObjectLogic {
+        return this._objectLogic
     }
 
-    set visualization(objectVisualization: IRoomObjectVisualization | null) {
-        this.objectVisualization = objectVisualization;
+    set visualization(objectVisualization: IRoomObjectVisualization) {
+        this._objectVisualization = objectVisualization;
     }
 
-    set logic(objectLogic: IRoomObjectLogic | null) {
-        this.objectLogic = objectLogic
+    set logic(objectLogic: IRoomObjectLogic) {
+        this._objectLogic = objectLogic
     }
 
     set position(point: Point3d) {
-        this.objectPosition = point
+        this._objectPosition = point
     }
 }

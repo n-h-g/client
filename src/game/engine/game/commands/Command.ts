@@ -1,6 +1,6 @@
 import { ICommand } from "../../../core/game/commands/ICommand";
 
-export default abstract class Command implements ICommand {
+export abstract class Command implements ICommand {
 
     public definition: string
 

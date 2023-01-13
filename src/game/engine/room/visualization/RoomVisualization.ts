@@ -1,23 +1,23 @@
-import IRoomVisualization from "../../../core/room/IRoomVisualization"
 import RoomLayout from "../RoomLayout"
 import { Container } from '@pixi/display'
 import Point from "../../../utils/point/Point"
 import MapData from "../objects/map/MapData"
 import UiUtils from "../../../utils/UiUtils"
-import Tile from "../objects/map/Tile"
+import { Tile } from "../objects/map/Tile"
 import { Engine } from '../../../Engine'
+import { IRoomVisualization } from '../../../core/room/IRoomVisualization'
+import { RoomObjectController } from '../../../core/room/object/RoomObjectController'
+import { RoomLogic } from '../logic/RoomLogic'
 
 export default class RoomVisualization implements IRoomVisualization {
-
     private roomLayout: RoomLayout
 
     private canvasFloor: Container
     private canvasWall: Container
-    private canvasDoorFloor: Container
+    private canvasDoorTile: Container
     private canvasDoorWall: Container
 
     private canvasPointer: Container
-    private canvasDoorTile: Container
 
     public container: Container
 
@@ -29,15 +29,13 @@ export default class RoomVisualization implements IRoomVisualization {
         this.container = new Container();
 
         this.canvasFloor = new Container();
-        this.canvasDoorFloor = new Container();
         this.canvasWall = new Container();
         this.canvasDoorWall = new Container();
         this.canvasPointer = new Container();
         this.canvasDoorTile = new Container();
         
 
-        this.container.addChild(this.canvasDoorTile);
-        this.container.addChild(this.canvasDoorFloor) 
+        this.container.addChild(this.canvasDoorTile) 
         this.container.addChild(this.canvasWall)
         this.container.addChild(this.canvasDoorWall) 
         this.container.addChild(this.canvasFloor)
@@ -46,10 +44,10 @@ export default class RoomVisualization implements IRoomVisualization {
         this.container.x = window.innerWidth / 2
         this.container.y = window.innerHeight / 2
         
-        this.canvasDoorFloor.interactive = true;
+        this.canvasDoorTile.interactive = true;
         this.canvasFloor.interactive = true;
 
-        this.canvasDoorFloor.zIndex = 1;
+        this.canvasDoorTile.zIndex = 1;
         this.canvasFloor.zIndex = 4;
         this.canvasPointer.zIndex = 3;
         this.canvasDoorWall.zIndex = 4;
@@ -57,7 +55,12 @@ export default class RoomVisualization implements IRoomVisualization {
 
         this.container.interactive = true
 
-        Engine.getInstance().application?.stage.addChild(this.container);
+        Engine.getInstance()?.application?.viewport.addChild(this.container)
+    }
+    
+
+    public dispose(): void {
+        this.container.destroy()
     }
 
 
@@ -124,16 +127,29 @@ export default class RoomVisualization implements IRoomVisualization {
         this.container.scale.y = +scale;
     }
 
+    /**
+     * Add a element to the room visualization container, and choose to follow it
+     * @param object 
+     * @param follow 
+     * @returns 
+     */
+    public add(object: RoomObjectController<RoomVisualization, RoomLogic>, follow: boolean = false) {
+        console.log(object.visualization)
+
+        if(!object) return;
+
+        this.container.addChild(object.visualization.container)
+
+        // TODO follow object
+        //Engine.getInstance().application.viewport.follow(object.visualization.container)
+    }
+
     public getCanvasFloor() : Container {
         return this.canvasFloor
     }
 
     public getCanvasWall() : Container {
         return this.canvasWall
-    }
-
-    public getCanvasDoorFloor() : Container {
-        return this.canvasDoorFloor
     }
 
     public getCanvasDoorWall() : Container {

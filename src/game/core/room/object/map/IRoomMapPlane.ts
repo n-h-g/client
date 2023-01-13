@@ -1,5 +1,5 @@
-import IRoomMapObject from "./IRoomMapObject";
+import { IRoomMapObject } from './IRoomMapObject';
 
-export default interface IRoomMapPlane {
-    getMapObjects() : Array<IRoomMapObject>
+export interface IRoomMapPlane {
+    get mapObjects(): Array<IRoomMapObject>
 }

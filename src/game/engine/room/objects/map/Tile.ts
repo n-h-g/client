@@ -1,47 +1,39 @@
-
 import LogicTile from "./logic/LogicTile"
 import VisualizationTile from "./visualization/VisualizationTile"
-import IRoomMapObject from "../../../../core/room/object/map/IRoomMapObject"
-import RoomObjectController from "../../../../core/room/object/RoomObjectController"
+import { RoomObjectController } from "../../../../core/room/object/RoomObjectController"
 import TileType from "./TileTypeEnum"
 import Point3d from "../../../../utils/point/Point3d"
 import ColorRGB from "../../../../utils/color/ColorRGB"
-import RoomPlane from "./RoomPlane"
+import { FloorPlane } from './FloorPlane'
 
-export default class Tile extends RoomObjectController implements IRoomMapObject {
+export class Tile extends RoomObjectController<VisualizationTile, LogicTile> {
+    private _type: TileType
+    private _color: ColorRGB
+    private _plane: FloorPlane
 
-    private type: TileType
-    private color: ColorRGB
-
-    private plane: RoomPlane
-
-
-    constructor(plane: RoomPlane, id: string, position: Point3d, type: TileType, color: ColorRGB) {
+    constructor(plane: FloorPlane, id: string, position: Point3d, type: TileType, color: ColorRGB) {
         super(id, position, null, null)
 
-        this.plane = plane
-
-        this.type = type
-        this.color = color
-
+        this._plane = plane
+        this._type = type
+        this._color = color
         this.visualization = new VisualizationTile(this)
         this.logic = new LogicTile(this)
     }
 
-    public getColor(): ColorRGB {
-        return this.color
+    public get color(): ColorRGB {
+        return this._color
     }
 
-    public getType(): TileType {
-        return this.type
+    public get type(): TileType {
+        return this._type
     }
 
-    public getPlane(): RoomPlane {
-        return this.plane
+    public get plane(): FloorPlane {
+        return this._plane
     }
 
-    public setType(type: TileType) : void {
-        this.type = type
+    public set type(type: TileType) {
+        this._type = type
     }
-
 }

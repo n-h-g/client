@@ -1,10 +1,10 @@
 import { Engine } from '../Engine'
-import { EventManager } from '../engine/ui/events/EventManager'
-import { LoadProgressEvent } from '../engine/ui/events/LoadProgressEvent'
-import { UIEvents } from '../engine/ui/events/UIEvents'
+import { EventManager } from '../core/events/EventManager'
+import { LoadingProgressEventData } from '../engine/events/ui/data/loader/LoadingProgress'
 import { Logger } from '../utils/Logger'
 import { NetworkingManager } from './NetworkingManager'
 import { OutgoingPacket } from './packets/outgoing/OutgoingPacket'
+import { UIEvents } from '../engine/events/ui/UIEvents'
 
 export class WebSocketManager {
     private webSocket: WebSocket
@@ -17,7 +17,7 @@ export class WebSocketManager {
 
         this._networkingManager = networkingManager;
 
-        if (Engine.getInstance().config.debug) {
+        if (Engine.getInstance()?.config.debug) {
             Logger.debug('Connection url: ' + this.webSocketUrl);
         }
 
@@ -44,7 +44,7 @@ export class WebSocketManager {
 
             this._closed = false
 
-            EventManager.emit<LoadProgressEvent>(UIEvents.LOAD, {
+            EventManager.emit<LoadingProgressEventData>(UIEvents.LOAD, {
                 width: 40,
                 message: 'Connected'
             })
@@ -58,7 +58,7 @@ export class WebSocketManager {
                 Logger.info(event.toString())
             }
 
-            EventManager.emit<LoadProgressEvent>(UIEvents.LOAD, {
+            EventManager.emit<LoadingProgressEventData>(UIEvents.LOAD, {
                 width: 40,
                 message: 'Connection Error'
             })

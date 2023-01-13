@@ -1,35 +1,21 @@
-import Command from "./Command";
-import ZoomCommand from "./ZoomCommand";
-import IqqdCommand from "./IqqdCommand";
-import ChooserCommand from "./ChooserCommand";
-import FurniCommand from "./FurniCommand";
-import Service from "../../../core/Service";
-import ICommandRepository from "../../../core/game/commands/ICommandRepository";
-import CommandRepository from "./CommandRepository";
+import { Service } from '../../../core/Service';
+import { CommandRepository } from './CommandRepository'
+import { Command } from './Command';
+import { ChooserCommand } from './ChooserCommand';
 
-export default class CommandService extends Service<ICommandRepository> {
-
+export class CommandService extends Service<string, Command> {
     constructor() {
         super();
-
         this.repository = new CommandRepository();
 
         this.init();
     }
 
-    public async init() {
-        this.addCommand(new ZoomCommand())
-        this.addCommand(new IqqdCommand())
+    public init() {
         this.addCommand(new ChooserCommand())
-        this.addCommand(new FurniCommand())
     }
 
-    /**
-     * Add a command to the repository
-     * @param command 
-     */
-    private addCommand(command: Command) : void {
+    private addCommand(command: Command): void {
         this.repository?.add(command.definition, command)
     }
-
 }
