@@ -3,8 +3,9 @@ import RoomLayout from "./RoomLayout"
 import RoomInfo from "./RoomInfo"
 import { RoomEntityRepository } from './RoomEntityRepository';
 import { RoomItemRepository } from './RoomItemRepository';
+import { IDisposable } from '../../core/room/IDisposable';
 
-export default class Room  {
+export default class Room implements IDisposable {
     private _roomLayout: RoomLayout;
     private roomInfo: RoomInfo;
     private roomName: string;
@@ -16,10 +17,15 @@ export default class Room  {
         this.roomName = roomName;
         this.roomId = roomId;
         this._roomLayout = new RoomLayout(this, roomModel, doorPosition);
-        this.roomInfo = new RoomInfo(roomName);
+        this.roomInfo = new RoomInfo(roomName, roomModel);
 
         this._roomEntityRepository = new RoomEntityRepository();
         this._roomItemRepository = new RoomItemRepository();
+    }
+
+    public dispose(): void {
+        this.roomLayout.Visualization.dispose()
+        this.roomLayout.Logic.dispose()
     }
     
     public get roomLayout(): RoomLayout {
