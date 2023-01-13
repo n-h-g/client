@@ -32,8 +32,8 @@ export abstract class HumanVisualization extends EntityVisualization {
         this._actions = new Set();
     }
 
-    public setPosition(point: Point3d): void {
-        super.setPosition(point)
+    public setNextPosition(point: Point3d): void {
+        super.setNextPosition(point)
         this.headRotation = Rotation.calculateDirection(new Point(this.entity.position.getX(), this._entity.position.getY()), new Point(this.entity.position.getX(), this.entity.position.getY()));
     }
 

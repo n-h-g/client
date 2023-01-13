@@ -26,7 +26,7 @@ export abstract class EntityVisualization extends RoomObjectVisualization {
         this._nextPosition = new Point3d(0, 0, 0);
     }
 
-    public setPosition(point: Point3d) {
+    public setNextPosition(point: Point3d) {
         this.nextPosition.setX(point.getX());
         this.nextPosition.setY(point.getY());
         this.nextPosition.setZ(point.getZ());
