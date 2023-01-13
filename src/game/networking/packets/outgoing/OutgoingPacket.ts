@@ -11,6 +11,7 @@ export enum OutgoingPacket {
     NavigatorAllRooms = 6,
     NavigatorMyRooms = 7,
     UserEnterRoom = 8,
+    CreateNewRoom = 36,
     
     //#region User
     UserMove = 10,
