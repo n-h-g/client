@@ -12,6 +12,7 @@ import {
 import { Engine } from "../../../../Engine"
 import { Logger } from "../../../../utils/Logger"
 import { FurniDataType } from "../../../../core/ui/imagers/items/data/IFurniDataType"
+import UiUtils from "../../../../utils/UiUtils"
 
 export default class FurniImager {
 
@@ -135,7 +136,7 @@ export default class FurniImager {
         })
     }
 
-    public loadFurniIcon(type: ItemType, name: string): Promise<FurniSprite> {
+    public loadFurniIcon(type: ItemType, name: string): Promise<HTMLImageElement> {
         const {
             colorId
         } = splitItemNameAndColor(name);
@@ -144,7 +145,9 @@ export default class FurniImager {
             this.loadFurniBase(type, name).then((furnibase) => {
                 const furniSprite = new FurniSprite(furnibase, true)
 
-                res(furniSprite);
+                let image = UiUtils.generateImageFromObject(furniSprite)
+
+                res(image);
             })
         })
     }

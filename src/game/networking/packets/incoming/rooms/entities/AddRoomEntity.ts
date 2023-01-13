@@ -26,7 +26,11 @@ export default class AddRoomEntity extends MessageHandler {
               entity.id,
               entity
             );
-            entity.visualization.render();
+             try {
+              entity.visualization.render();
+             } catch(e) {
+                throw new e;
+             }
           }
         });
     }

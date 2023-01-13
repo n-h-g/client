@@ -23,9 +23,11 @@ export default class UiUtils {
         return object.worldTransform;
     }
 
-    static generateImageFromObject(object: DisplayObject | Container): HTMLImageElement | undefined {
-        
-        return Engine.getInstance().application?.renderer.plugins.extract.image((object));
+    static async generateImageFromObject(object: DisplayObject | Container): Promise<HTMLImageElement> {
+        return new Promise((resolve, reject) => {
+            let image = Engine.getInstance().application?.renderer.plugins.extract.image((object));
+            resolve(image)
+        })
     }
 
     static generateBase64FromObject(object: DisplayObject | Container): string | undefined {

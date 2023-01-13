@@ -3,4 +3,5 @@ export interface CataloguePageItem {
     name: string,
     credits: 200
     amount: number
+    icon: string
 }

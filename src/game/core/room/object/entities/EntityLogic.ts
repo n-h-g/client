@@ -14,6 +14,8 @@ export abstract class EntityLogic extends RoomObjectLogic {
     
     protected frameTracker: number = 0
 
+    private preview: HTMLImageElement
+
     public constructor(entity: Entity) {
         super()
         this._entity = entity
@@ -21,8 +23,12 @@ export abstract class EntityLogic extends RoomObjectLogic {
 
     public registerEvents(): void {
         this.events.on(EntityEvents.POSITION_CHANGED, () => this.onPositionChanged())
+        this.events.on(EntityEvents.LOAD_COMPLETE, () => this.onLoad())
         this.entity.visualization.container.on('pointerdown', () => this.onClick())
+    }
 
+    private async generateImages() {
+        this.preview = await UiUtils.generateImageFromObject(this.entity.visualization.container)
     }
 
     public dispose(): void {
@@ -34,6 +40,9 @@ export abstract class EntityLogic extends RoomObjectLogic {
     }
 
     public onClick(): void {
+
+        console.log(this._entity.visualization.container)
+
         this.togglePreview()
     }
 
@@ -49,7 +58,7 @@ export abstract class EntityLogic extends RoomObjectLogic {
             mode: mode,
             name: entity.name,
             motto: "dsds",
-            image: UiUtils.generateImageFromObject(this.entity.visualization?.container!).src
+            image: this.preview.src
         })
         EventManager.emit<DialogEventData>(UIEvents.OPEN, {
             type: UIEventsType.PREVIEWBOX
@@ -59,7 +68,9 @@ export abstract class EntityLogic extends RoomObjectLogic {
 
     public abstract onPositionChanged(): void
 
-    public abstract onLoad(): void
+    public async onLoad(){
+        this.generateImages()
+    }
 
     public get entity(): Entity {
         return this._entity

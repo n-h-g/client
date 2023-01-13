@@ -1,5 +1,6 @@
 import { DisplayObject } from "pixi.js";
 import { Engine } from "../../../../../Engine";
+import { EntityEvents } from "../../../../../engine/events/room/objects/entities/EntityEvents";
 import { ItemEvents } from "../../../../../engine/events/room/objects/entities/ItemEvents";
 import Item from "../../../../../engine/room/objects/items/Item";
 import MapData from "../../../../../engine/room/objects/map/MapData";
@@ -16,8 +17,6 @@ import RoomObjectVisualization from '../../RoomObjectVisualization';
 
 export default abstract class ItemVisualization extends EntityVisualization {
     private position: Point3d;
-
-    public imagePreview: string | undefined;
 
     public iconImage: string | undefined;
 
@@ -46,9 +45,6 @@ export default abstract class ItemVisualization extends EntityVisualization {
     }
 
     public generateImages() {
-        this.entity.logic.events.on(ItemEvents.FURNI_SPRITE_LOADED, () =>{
-            this.imagePreview = UiUtils.generateBase64FromObject(this.entity.visualization.container)
-        })
 
         if(this.isIcon) {
             let icon = this.sprite.turnIntoIcon();
@@ -84,14 +80,20 @@ export default abstract class ItemVisualization extends EntityVisualization {
     }
 
     public async render(): Promise<void> {
-
-        let entity = this.entity as Item
-
-        let sprite = await Engine.getInstance().userInterfaceManager.furniImager.loadFurniSprite(ItemType.FloorItem, this.entity.name)
         
-        sprite.start()
+        try {
+            let sprite = await Engine.getInstance().userInterfaceManager.furniImager.loadFurniSprite(ItemType.FloorItem, this.entity.name)
+        
+            sprite.start()
 
-        this.container = sprite
+            this.container = sprite
+
+        } catch(e) {
+            //this.container = await Engine.getInstance().userInterfaceManager.furniImager.loadPlaceHolder()
+            throw new Error("Cannot load furni sprite", e)
+        }
+        
+
 
         this.container.interactive = true
         this.container.interactiveChildren = true
@@ -102,6 +104,10 @@ export default abstract class ItemVisualization extends EntityVisualization {
         }
 
         this.entity.logic?.registerEvents();
+
+        await this.entity.logic.onLoad()
+
+        this.entity.logic?.events.emit(ItemEvents.FURNI_SPRITE_LOADED)
     }
 
     public calculateOffsetX(): number {

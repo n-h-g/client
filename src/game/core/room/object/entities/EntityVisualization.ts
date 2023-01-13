@@ -2,6 +2,7 @@ import { Direction } from "../../../objects/Direction";
 import RoomObjectVisualization from "../RoomObjectVisualization";
 import { Entity } from "./Entity";
 import Point3d from '../../../../utils/point/Point3d';
+
 import AvatarData from "../../../../engine/ui/imagers/avatars/enum/AvatarData";
 import { EntityEvents } from "../../../../engine/events/room/objects/entities/EntityEvents";
 
@@ -28,6 +29,7 @@ export abstract class EntityVisualization extends RoomObjectVisualization {
         this.nextPosition.setX(point.getX());
         this.nextPosition.setY(point.getY());
         this.nextPosition.setZ(point.getZ());
+        //this.rotation = Rotation.calculateDirection(new Point(this._entity.position.getX(), this._entity.position.getY()), new Point(this.entity.position.getX(), this.entity.position.getY()));
         this.updatePosition()
         this.entity.logic.events.emit(EntityEvents.POSITION_CHANGED);
     }

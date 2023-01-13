@@ -37,7 +37,6 @@ function sendMessage(e) {
 }
 
 function onInput() {
-
     this.typing = false;
 }
 </script>

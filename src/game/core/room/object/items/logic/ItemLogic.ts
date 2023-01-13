@@ -19,8 +19,8 @@ export abstract class ItemLogic extends EntityLogic {
         this.events.on(ItemEvents.FURNI_SPRITE_LOADED, () => this.onLoad())
     }
 
-    public onLoad() {
-
+    public async onLoad() {
+        super.onLoad()
     }
 
     public onHover(): void {
