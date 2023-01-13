@@ -29,6 +29,7 @@ export default class RoomVisualization implements IRoomVisualization {
         this.container = new Container();
 
         this.canvasFloor = new Container();
+
         this.canvasWall = new Container();
         this.canvasDoorWall = new Container();
         this.canvasPointer = new Container();
@@ -54,8 +55,6 @@ export default class RoomVisualization implements IRoomVisualization {
         this.canvasWall.zIndex = 4;
 
         this.container.interactive = true
-
-        Engine.getInstance()?.application?.viewport.addChild(this.container)
     }
     
 

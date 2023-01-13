@@ -28,8 +28,7 @@ export class RoomImagerBuilder {
         for(let object of this.objects) {
             object.visualization.render()
         }
-        this._room.roomLayout.Visualization.render();
-        this._room.roomLayout.Logic.registerEvents();
+
         return this._room
     }
 }

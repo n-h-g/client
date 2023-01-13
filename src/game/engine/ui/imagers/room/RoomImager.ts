@@ -1,3 +1,4 @@
+import { Container } from "pixi.js";
 import { Engine } from "../../../../Engine";
 import UiUtils from "../../../../utils/UiUtils";
 import Room from "../../../room/Room";
@@ -17,17 +18,22 @@ export class RoomImager {
 
     public generateRoomPreview(room: Room) {
 
-        if(!room) return;
+        if(!room) return
 
         let generatedRoom = this._roomImagerBuilder.setRoom(room).build()
 
         generatedRoom.roomLayout.Visualization.render()
 
-        let container = generatedRoom.roomLayout.Visualization.Container
+       
+        const container = new Container()
+
+    
         
         let renderingImage = UiUtils.generateBase64FromObject(container)
 
-        generatedRoom.dispose()
+        //console.log(renderingImage)
+
+        //generatedRoom.dispose()
 
         return renderingImage
     }

@@ -18,6 +18,7 @@ export default class RoomService extends Service<null, null> implements IDisposa
         this.currentRoom = new Room(roomName, roomModel, doorPosition, roomId);
         this.currentRoom.roomLayout.Visualization.render();
         this.currentRoom.roomLayout.Logic.registerEvents();
+        Engine.getInstance()?.application?.viewport.addChild(this.currentRoom.roomLayout.Visualization.container)
         this.toggleUI();
         return this.currentRoom;
     }

@@ -81,12 +81,6 @@ export class Engine {
             let item = new FloorItem("473674-34dfbnasb-43423", "habbocake", new Point3d(3, 4, 1), base);
             item.visualization?.render()
             this.roomService.CurrentRoom.roomItemRepository.add(item.id, item)
-
-
-            
-            setTimeout(() => {
-                console.log(Engine.getInstance().userInterfaceManager.roomImager.generateRoomPreview(room))
-            }, 2000);
         }
     }
 
