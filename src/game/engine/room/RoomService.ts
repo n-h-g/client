@@ -53,7 +53,6 @@ export default class RoomService extends Service<null, null> implements IDisposa
 
     public tick(delta: number): void {
         this._currentRoom?.roomLayout.Logic.tick(delta)
-        this._currentRoom?.roomItemRepository.tick(delta);
         this._currentRoom?.roomEntityRepository.tick(delta);
     }
 
