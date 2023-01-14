@@ -36,8 +36,7 @@ export default class UpdateEntity extends MessageHandler {
                 for (let action of entityData.action.actions) {
                     (entity.visualization as HumanVisualization).addAction(action);
                 }
-            }
-
+            } 
             entity.visualization.needsUpdate = true
         } else {
             if (Engine.getInstance().config.debug) {

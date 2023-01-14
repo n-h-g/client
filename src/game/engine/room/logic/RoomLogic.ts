@@ -69,7 +69,6 @@ export class RoomLogic implements IRoomLogic {
         let room: Room = this.room.getRoom();
 
         this.room.Visualization.getCanvasPointer().zIndex = RoomVisualization.calculateZIndex(new Point3d(1, 1, 1), RoomPriority.POINTER)
-        this.room.Visualization.Container.sortChildren()
     }
 
     private onMouseOut() {
@@ -77,7 +76,6 @@ export class RoomLogic implements IRoomLogic {
 
         this.room.Visualization.getCanvasPointer().zIndex = RoomVisualization.calculateZIndex(new Point3d(1, 1, 1), RoomPriority.DOOR_FLOOR_SELECT);
         this.room.Visualization.getCanvasPointer().visible = false
-        this.room.Visualization.Container.sortChildren()
     }
 
 
