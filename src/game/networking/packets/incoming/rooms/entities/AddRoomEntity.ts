@@ -12,7 +12,9 @@ export default class AddRoomEntity extends MessageHandler {
             return;
         }
 
-        EntityBuilder.setId(data.id)
+        let builder = new EntityBuilder()
+
+        builder.setId(data.id)
         .setName(data.name.name)
         .setType(data.type)
         .setFigure(data.aspect)
@@ -21,17 +23,11 @@ export default class AddRoomEntity extends MessageHandler {
         .setUser(data.user)
         .build()
         .then((entity: Entity) => {
-          if (entity) {
-            Engine.getInstance().roomService?.CurrentRoom?.roomEntityRepository.add(
-              entity.id,
-              entity
-            );
-             try {
-              entity.visualization.render();
-             } catch(e) {
-                throw new e;
-             }
-          }
+          Engine.getInstance().roomService?.CurrentRoom?.roomEntityRepository.add(
+            entity.id,
+            entity
+          );
+          entity.visualization.render()
         });
     }
 }

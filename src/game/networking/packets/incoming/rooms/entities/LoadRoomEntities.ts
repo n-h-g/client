@@ -6,18 +6,13 @@ import { MessageHandler } from "../../../../handler/MessageHandler";
 
 export default class LoadRoomEntities extends MessageHandler {
   public handle(): void {
-    for (let readed of this.message.data) {
-      let data: IEntityData = readed;
+    for (let entityData of this.message.data) {
+      let data: IEntityData = entityData; 
 
-      if (
-        Engine.getInstance().roomService.CurrentRoom.roomEntityRepository.get(
-          data.id
-        ) != null
-      ) {
-        return;
-      }
+      let builder = new EntityBuilder()
 
-      EntityBuilder.setId(data.id)
+        builder
+        .setId(data.id)
         .setName(data.name.name)
         .setType(data.type)
         .setFigure(data.aspect)
@@ -26,13 +21,11 @@ export default class LoadRoomEntities extends MessageHandler {
         .setUser(data.user)
         .build()
         .then((entity: Entity) => {
-          if (entity) {
-            Engine.getInstance().roomService?.CurrentRoom?.roomEntityRepository.add(
-              entity.id,
-              entity
-            );
-            entity.visualization.render();
-          }
+          Engine.getInstance().roomService?.CurrentRoom?.roomEntityRepository.add(
+            entity.id,
+            entity
+          );
+          entity.visualization.render();
         });
     }
   }

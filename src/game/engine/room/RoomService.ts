@@ -9,18 +9,23 @@ import { IComponentShowableUI } from "../../core/ui/IComponentShowableUI";
 import { UIEvents } from "../events/ui/UIEvents";
 import { Service } from "../../core/Service";
 import { IDisposable } from "../../core/room/IDisposable";
+import { EntityBuilder } from "../../core/room/object/entities/EntityBuilder";
 
 export default class RoomService extends Service<null, null> implements IDisposable{
     
-    private currentRoom: Room
+    private _currentRoom: Room
+
+    public constructor() {
+        super()
+    }
 
     public setRoom(roomName: string, roomModel: string, doorPosition: Point, roomId: number) : Room {
-        this.currentRoom = new Room(roomName, roomModel, doorPosition, roomId);
-        this.currentRoom.roomLayout.Visualization.render();
-        this.currentRoom.roomLayout.Logic.registerEvents();
-        Engine.getInstance()?.application?.viewport.addChild(this.currentRoom.roomLayout.Visualization.container)
+        this._currentRoom = new Room(roomName, roomModel, doorPosition, roomId);
+        this._currentRoom.roomLayout.Visualization.render();
+        this._currentRoom.roomLayout.Logic.registerEvents();
+        Engine.getInstance()?.application?.viewport.addChild(this._currentRoom.roomLayout.Visualization.container)
         this.toggleUI();
-        return this.currentRoom;
+        return this._currentRoom;
     }
 
     public toggleUI() {
@@ -37,22 +42,22 @@ export default class RoomService extends Service<null, null> implements IDisposa
 
 
     public dispose(): void {
-        if (!this.currentRoom) {
+        if (!this._currentRoom) {
             return;
         }
 
-        this.currentRoom.roomLayout.Visualization.dispose()
-        this.currentRoom = null
+        this._currentRoom.roomLayout.Visualization.dispose()
+        this._currentRoom = null
         this.toggleUI()
     }
 
     public tick(delta: number): void {
-        this.currentRoom?.roomLayout.Logic.tick(delta)
-        this.currentRoom?.roomItemRepository.tick(delta);
-        this.currentRoom?.roomEntityRepository.tick(delta);
+        this._currentRoom?.roomLayout.Logic.tick(delta)
+        this._currentRoom?.roomItemRepository.tick(delta);
+        this._currentRoom?.roomEntityRepository.tick(delta);
     }
 
     public get CurrentRoom(): Room {
-        return this.currentRoom;
+        return this._currentRoom;
     }
 }

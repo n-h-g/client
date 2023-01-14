@@ -90,7 +90,7 @@ export default abstract class ItemVisualization extends EntityVisualization {
 
         } catch(e) {
             //this.container = await Engine.getInstance().userInterfaceManager.furniImager.loadPlaceHolder()
-            throw new Error("Cannot load furni sprite", e)
+            throw new Error(e)
         }
         
 

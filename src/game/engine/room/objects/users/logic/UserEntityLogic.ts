@@ -18,19 +18,23 @@ export default class UserEntityLogic extends HumanLogic {
 
     private _typing: boolean = false
 
+    private _showLabel: boolean = false
+
     public onDance(): void {
 
     }
 
     public registerEvents() {
         this.entity.visualization.container.on('pointerdown', () => this.onClick())
-        this.events.on(UserEvents.USER_TOGGLE_TYPING, () => this.onToggleTyping())
+        this.events.on(UserEvents.USER_TOGGLE_TYPING, (typing: boolean) => this.onToggleTyping(typing))
         this.entity.visualization.container.on('mouseover', () => this.onHover())
         this.entity.visualization.container.on('mouseout', () => this.onHover())
     }
 
-    public onToggleTyping(): void {
-        this._typing = !this._typing
+    public onToggleTyping(typing): void {
+        this._typing = typing
+        this._showLabel = false;
+        this.toggleUI()
     }
 
     public onTalk(length?: number): void {
@@ -52,12 +56,13 @@ export default class UserEntityLogic extends HumanLogic {
     }
 
     public onHover(): void {
+        this._showLabel = !this._showLabel
         this.toggleUI()
     }
 
     private toggleUI() {
         
-        (Engine.getInstance().userInterfaceManager.componentsManager.getComponent(UIComponent.AvatarContainerUI) as IComponentShowableUI).toggle()
+        (Engine.getInstance().userInterfaceManager.componentsManager.getComponent(UIComponent.AvatarContainerUI) as IComponentShowableUI).show()
 
         let dimension = new Point(this.entity.visualization?.container?.height!,
             this.entity.visualization?.container?.width!
@@ -68,10 +73,9 @@ export default class UserEntityLogic extends HumanLogic {
             UiUtils.getGlobalPosition(this.entity.visualization?.container!).ty - dimension.getX() + AvatarData.AVATAR_CONTAINER_OFFSET_TOP);        
                   
 
-
         EventManager.emit<AvatarContainerData>(UIEvents.AVATAR_CONTAINER_UPDATED, {
            label: this.entity.name,
-           showLabel: true,
+           showLabel: this._showLabel,
            bounds: {
              x: position.getX(),
              y: position.getY(),
@@ -84,6 +88,10 @@ export default class UserEntityLogic extends HumanLogic {
 
     public onPositionChanged() {
         //this.setAvatarContainer()
+    }
+
+    public onLoad(): void {
+        throw new Error('Method not implemented.');
     }
 
     public onClick() {
@@ -100,9 +108,6 @@ export default class UserEntityLogic extends HumanLogic {
         super.onClick()
     }
 
-    public userToggleTyping(value: boolean) {
-       
-    }
 
     public figureChanged() {
         

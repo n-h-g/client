@@ -20,7 +20,7 @@ export abstract class ItemLogic extends EntityLogic {
     }
 
     public async onLoad() {
-        super.onLoad()
+        
     }
 
     public onHover(): void {

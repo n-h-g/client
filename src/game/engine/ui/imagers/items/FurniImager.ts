@@ -130,7 +130,8 @@ export default class FurniImager {
             this.loadFurniBase(type, name).then((furnibase) => {
                 const furniSprite = new FurniSprite(furnibase);
                 res(furniSprite);
-            }).catch(() => {
+            }).catch((e) => {
+                throw new e;
                 _rej(null)
             })
         })

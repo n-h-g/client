@@ -14,54 +14,54 @@ import { EntityType } from "./EntityType";
 
 export class EntityBuilder {
 
-    private static _entity: Entity
+    private _entity: Entity
 
-    private static _id: string
+    private _id: string
 
-    private static _name: string
+    private _name: string
 
-    private static _type: EntityType
+    private _type: EntityType
 
-    private static _position: IPositionComponent
+    private _position: IPositionComponent
 
-    private static _bodyRotation?: number
+    private _bodyRotation?: number
 
-    private static _headRotation?: number
+    private _headRotation?: number
 
-    private static _user?: IUserComponent
+    private _user?: IUserComponent
 
-    private static _figure?: IAspectComponent
+    private _figure?: IAspectComponent
 
-    public static setId(id: string) {
+    public setId(id: string) {
         this._id = id;
         return this
     }
 
-    public static setFigure(figure: IAspectComponent) {
+    public setFigure(figure: IAspectComponent) {
 
         this._figure = figure
         return this
     }
 
-    public static setType(type: EntityType) {
+    public setType(type: EntityType) {
         this._type = type
         return this
     } 
 
-    public static setUser(user: IUserComponent) {
+    public setUser(user: IUserComponent) {
 
         this._user = user
         this._entity = new UserEntity()
         return this
     }
 
-    public static setPosition(position: IPositionComponent) {
+    public setPosition(position: IPositionComponent) {
 
         this._position = position
         return this
     }
 
-    public static setHeadBodyRotation(headBodyRotation: IHeadBodyRotationComponent) {
+    public setHeadBodyRotation(headBodyRotation: IHeadBodyRotationComponent) {
 
         if(headBodyRotation) {
             this._bodyRotation = headBodyRotation.body_rot
@@ -71,12 +71,12 @@ export class EntityBuilder {
         return this
     }
 
-    public static setName(name: string) {
+    public setName(name: string) {
         this._name = name
         return this
     }
 
-    private static async getEntityInstance() {
+    private async getEntityInstance() {
 
         let position = this._position ? new Point3d(this._position.x, this._position.y, this._position.z) : null
 
@@ -103,7 +103,7 @@ export class EntityBuilder {
         return entity
     }
 
-    public static async build() {
+    public async build() {
         let entity = await this.getEntityInstance()
         return entity;
     }
