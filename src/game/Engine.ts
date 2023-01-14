@@ -15,6 +15,9 @@ import { ItemType } from './engine/ui/imagers/items/FurniImager'
 import RoomVisualization from './engine/room/visualization/RoomVisualization'
 import FloorItem from './engine/room/objects/items/FloorItem'
 import Point3d from './utils/point/Point3d'
+import { EventManager } from './core/events/EventManager'
+import { LoadingProgressEventData } from './engine/events/ui/data/loader/LoadingProgress'
+import { UIEvents } from './engine/events/ui/UIEvents'
 
 export class Engine {
     private static _instance: Engine
@@ -63,6 +66,11 @@ export class Engine {
         this._networkingManager = new NetworkingManager()
         this._userInterfaceManager = new UserInterfaceManager()
         await this._userInterfaceManager.init()
+
+        EventManager.emit<LoadingProgressEventData>(UIEvents.LOAD, {
+            width: 100,
+            message: 'Logged'
+        })
 
         this.application.init()
 

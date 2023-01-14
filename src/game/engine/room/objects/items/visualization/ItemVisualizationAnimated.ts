@@ -10,7 +10,6 @@ export default class ItemVisualizationAnimated extends ItemVisualization {
     }
 
     public async render() {
-        //this._entity.base.nextFrame();
         super.render()
     }
 
