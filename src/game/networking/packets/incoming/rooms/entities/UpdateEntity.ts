@@ -17,7 +17,14 @@ export default class UpdateEntity extends MessageHandler {
 
             if(entityData.position) {
                 entity.visualization.setNextPosition(new Point3d(entityData.position.x, entityData.position.y, entityData.position.z))
-                entity.visualization.Rot = entityData.bh_rot.body_rot
+                
+                if(entityData.rotation) {
+                    entity.visualization.Rot = entityData.rotation.rot
+                } else {
+                    if(entityData.bh_rot) {
+                        entity.visualization.Rot = entityData.bh_rot.body_rot
+                    }
+                }
             }
 
             if(entityData.action) {

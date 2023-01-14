@@ -88,6 +88,12 @@ export default abstract class ItemVisualization extends EntityVisualization {
         
             sprite.start()
 
+            let dir = sprite.getNextDirection(this.rotation)
+
+            this.rotation = dir
+
+            sprite.setDirection(dir)
+
             this.container = sprite
 
         } catch(e) {
