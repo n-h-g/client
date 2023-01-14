@@ -94,9 +94,10 @@ export default abstract class ItemVisualization extends EntityVisualization {
             //this.container = await Engine.getInstance().userInterfaceManager.furniImager.loadPlaceHolder()
             throw new Error(e)
         }
-        
 
-        this.container.zIndex = this.getZIndex(this._entity.base.data.logic.dimensions[2])
+        let spriteZIndex = this._entity.base.data.logic.dimensions[2]
+        
+        this.container.zIndex = this.getZIndex(spriteZIndex)
 
         this.container.interactive = true
         this.container.interactiveChildren = true
