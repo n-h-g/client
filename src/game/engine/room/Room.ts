@@ -11,7 +11,6 @@ export default class Room implements IDisposable {
     private roomInfo: RoomInfo;
     private roomName: string;
     private roomId: number;
-    private _roomItemRepository: RoomItemRepository
     private _roomEntityRepository: RoomEntityRepository
 
     constructor(roomName: string, roomModel: string, doorPosition: Point, roomId: number) {
@@ -21,7 +20,6 @@ export default class Room implements IDisposable {
         this.roomInfo = new RoomInfo(roomName, roomModel);
 
         this._roomEntityRepository = new RoomEntityRepository();
-        this._roomItemRepository = new RoomItemRepository();
     }
 
     public dispose(): void {
@@ -42,10 +40,6 @@ export default class Room implements IDisposable {
 
     public get roomEntityRepository(): RoomEntityRepository {
         return this._roomEntityRepository
-    }
-
-    public get roomItemRepository(): RoomItemRepository {
-        return this._roomItemRepository
     }
 
     public get name(): string {
