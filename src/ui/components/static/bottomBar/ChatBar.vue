@@ -29,7 +29,10 @@ function sendMessage(e) {
         shout = true;
     }
 
-    console.log(shout)
+    Engine.getInstance().networkingManager.packetManager.applyOut(OutgoingPacket.UserSay, {
+        message: message.value,
+        shout: shout
+    })
 
     typed.value = false
     message.value = ""

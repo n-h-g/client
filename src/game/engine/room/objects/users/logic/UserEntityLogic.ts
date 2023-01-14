@@ -34,7 +34,7 @@ export default class UserEntityLogic extends HumanLogic {
     public onToggleTyping(typing): void {
         this._typing = typing
         this._showLabel = false;
-        this.toggleUI()
+        //this.toggleUI()
     }
 
     public onTalk(length?: number): void {

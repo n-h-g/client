@@ -137,7 +137,7 @@ export default class FurniImager {
         })
     }
 
-    public loadFurniIcon(type: ItemType, name: string): Promise<HTMLImageElement> {
+    public loadFurniIcon(type: ItemType, name: string): Promise<FurniSprite> {
         const {
             colorId
         } = splitItemNameAndColor(name);
@@ -145,10 +145,7 @@ export default class FurniImager {
         return new Promise((res, _rej) => {
             this.loadFurniBase(type, name).then((furnibase) => {
                 const furniSprite = new FurniSprite(furnibase, true)
-
-                let image = UiUtils.generateImageFromObject(furniSprite)
-
-                res(image);
+                res(furniSprite)
             })
         })
     }

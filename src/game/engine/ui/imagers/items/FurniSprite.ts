@@ -140,7 +140,7 @@ export class FurniSprite extends Container {
               );
           let assetName = this.furniBase.assetNameFrom(
             this.isIcon ? 1 : FurniImager.DEFAULT_SIZE,
-            layer,
+            this.isIcon ? 0 : layer,
             this.direction,
             frame
           );
@@ -148,7 +148,7 @@ export class FurniSprite extends Container {
           if (assetName == undefined) {
             assetName = this.furniBase.assetNameFrom(
               this.isIcon ? 1 : FurniImager.DEFAULT_SIZE,
-              layer,
+              this.isIcon ? 0 : layer,
               this.direction + 2,
               frame
             );

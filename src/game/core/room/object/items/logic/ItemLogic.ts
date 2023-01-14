@@ -48,12 +48,6 @@ export abstract class ItemLogic extends EntityLogic {
 
     public onClick(): void {
         super.onClick()
-        let movingItem = Engine.getInstance().roomService.CurrentRoom!.roomItemRepository.movingItem
-        let moving = movingItem?.id === this.entity.id
-
-        if (moving) {
-            this.placeItem();
-        } 
     }
 
     public toggleMovement(value: boolean): void {

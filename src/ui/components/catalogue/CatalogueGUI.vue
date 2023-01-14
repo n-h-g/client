@@ -28,11 +28,11 @@
                 <div class="cataloguePage" ref="cataloguePage">
                     <div class="default_grid">
                         <div id="placeHolder" v-if="{selectedItem}">
-                            <img/>
+                            <img :src="generatePlaceHolder(selectedItem)"/>
                         </div>
                         <div class="defaultGridLayoutItemContainer">
                             <div class="itemCell catalogItemCell" id="catalogItem${items[i].id}" data-credits="${items[i].credits}" data-itemid="${items[i].id}" data-publicname="${items[i].itemBase.publicName}" v-for="item in currentCataloguePage.items" :key="item.id">
-                                <span class="itemIcon"><img id="catalogItem${items[i].id}_iconimage" :src="item.icon" onclick="selectItem(item)"></span>  
+                                <span class="itemIcon"><img id="catalogItem${items[i].id}_iconimage" :src="getIcon(item)" onclick="selectItem(item)"></span>  
                                 <span class="price">{{item.credits}}<img src='@/assets/images/catalogue/creditIcon.png' /></span>
                             </div>
                         </div>
@@ -54,6 +54,7 @@ import { UIEvents } from "../../../game/engine/events/ui/UIEvents"
 import { UIEventsType } from "../../../game/engine/events/ui/UIEventsType"
 import { ItemType } from "../../../game/engine/ui/imagers/items/FurniImager"
 import { OutgoingPacket } from "../../../game/networking/packets/outgoing/OutgoingPacket"
+import UiUtils from "../../../game/utils/UiUtils"
 import Dialog from "../dialog/Dialog.vue"
 import TreeMenu from "./TreeMenu.vue"
 
@@ -97,7 +98,6 @@ EventManager.read(UIEvents.CATALOG_ITEMS_UPDATED, (data: CataloguePageData) => {
     data.items.forEach((item) => {
         if(hasItem(item.id)) return;
 
-
         currentCataloguePage.value.items.push(item)
     })
 
@@ -112,10 +112,17 @@ function generatePlaceHolder(item: CataloguePageItem) {
 }
 
 function getIcon(catalogItem: CataloguePageItem) {
-    Engine.getInstance().userInterfaceManager.furniImager.loadFurniIcon(ItemType.FloorItem, catalogItem.name).then((image) => {
-        console.log(image)
-        catalogItem.icon = image.src
+
+
+    Engine.getInstance().userInterfaceManager.furniImager.loadFurniIcon(ItemType.FloorItem, catalogItem.name).then((sprite) => {
+        sprite.start()
+        
+        setTimeout(() => {
+            catalogItem.icon = UiUtils.generateBase64FromObject(sprite)
+        }, 300);
     })
+
+    return catalogItem.icon
 }
 
 function hasItem(id: number): boolean {
