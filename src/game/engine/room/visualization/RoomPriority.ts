@@ -8,7 +8,7 @@ export enum RoomPriority {
     FLOOR = 7,
     PLAYER_SHADOW = 8,
     WALL_ITEM = 9,
-    POINTER = 14,
+    POINTER = 10,
     USER = 11,
     ROOM_ITEM = 12
 }
