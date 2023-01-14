@@ -5,6 +5,8 @@ import Point3d from '../../../../utils/point/Point3d';
 
 import AvatarData from "../../../../engine/ui/imagers/avatars/enum/AvatarData";
 import { EntityEvents } from "../../../../engine/events/room/objects/entities/EntityEvents";
+import { RoomPriority } from "../../../../engine/room/visualization/RoomPriority";
+import { Engine } from "../../../../Engine";
 
 export abstract class EntityVisualization extends RoomObjectVisualization {
 
@@ -90,14 +92,12 @@ export abstract class EntityVisualization extends RoomObjectVisualization {
 
     public abstract calculateOffsetY()
 
+    public abstract getZIndex(): number;
+
     public updatePosition() {
         this.container.x = this.calculateOffsetX()
         this.container.y = this.calculateOffsetY()
-        
-        this.container.zIndex = 10
-        this.container.interactive = true
-        this.container.interactiveChildren = true
-        this.container.buttonMode = true
+        this.container.zIndex = this.getZIndex()
     }
 
     public set direction(direction: Direction) {

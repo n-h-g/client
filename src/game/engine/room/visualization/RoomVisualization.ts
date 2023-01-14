@@ -82,7 +82,7 @@ export default class RoomVisualization implements IRoomVisualization {
      * @returns the zIndex
      */
     public static calculateZIndex(point: Point3d, priority: RoomPriority): number {
-        return (point.getX() + point.getY()) * (1000000) + (point.getZ() * (10000)) + 10000000 * priority;
+        return ((point.getX() + point.getY()) * (1000000) + (point.getZ() * (10000))) + 10000000 * priority;
     }
 
     /**

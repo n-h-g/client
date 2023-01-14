@@ -5,6 +5,7 @@ import ColorRGB from "../../../../../utils/color/ColorRGB";
 import { Container, Graphics, Point } from 'pixi.js';
 import { Tile } from '../Tile';
 import { RoomPriority } from "../../../visualization/RoomPriority";
+import RoomVisualization from "../../../visualization/RoomVisualization";
 
 export default class VisualizationPointer extends RoomObjectVisualization {
     private pointerContext: Container
@@ -14,7 +15,7 @@ export default class VisualizationPointer extends RoomObjectVisualization {
     private pointerWidth = 3
 
     constructor(pointer: Pointer) {
-        super(0, 0, 0)
+        super(pointer.position.getX(), pointer.position.getY(), pointer.position.getZ())
 
         this.pointerContext = pointer.getCanvas();
         this.pointerContext.interactive = true;
@@ -23,7 +24,7 @@ export default class VisualizationPointer extends RoomObjectVisualization {
     }
 
     public getZIndex(): number {
-        return RoomPriority.POINTER
+        return RoomVisualization.calculateZIndex(this.pointerContext.x, this.pointerContext.y, 1, RoomPriority.POINTER)
     }
 
     render(): void {

@@ -90,8 +90,6 @@ export abstract class HumanVisualization extends EntityVisualization {
 
         this.container = this._avatar.Container
 
-        this.container.zIndex = this.getZIndex()
-
         if (Engine.getInstance().roomService?.CurrentRoom) {
             Engine.getInstance().roomService?.CurrentRoom?.roomLayout.Visualization.container?.addChild(this.container)
             this.updatePosition()
@@ -116,6 +114,8 @@ export abstract class HumanVisualization extends EntityVisualization {
         placeholder.Container.interactiveChildren = true;
 
         this.container = this._avatar.Container;
+    
+        this.container.zIndex = this.getZIndex()
 
         this.loadAvatar().then(() => {
             this.container.destroy()
@@ -140,7 +140,10 @@ export abstract class HumanVisualization extends EntityVisualization {
     }
 
     public getZIndex(): number {
-        return RoomVisualization.calculateZIndex(new Point3d(this.entity.position.getX(), this.entity.position.getY(), this.entity.position.getZ() + 0.001), RoomPriority.USER)
+
+        let isAtDoor = this.entity.position.getX() == Engine.getInstance().roomService.CurrentRoom.roomLayout.getDoorPosition().getX() && this.entity.position.getY() == this.entity.position.getY()
+        
+        return RoomVisualization.calculateZIndex(new Point3d(this.entity.position.getX(), this.entity.position.getY(), this.entity.position.getZ() + 0.001), isAtDoor ? RoomPriority.DOOR_FLOOR_USER : RoomPriority.USER)
     }
 
     public calculateOffsetY() {
