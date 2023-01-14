@@ -1,5 +1,7 @@
-import { Container } from "pixi.js";
+import { autoDetectRenderer, Container, Renderer, Sprite, Texture } from "pixi.js";
+import { render } from "vue";
 import { Engine } from "../../../../Engine";
+import RenderingUtils from "../../../../utils/RenderingUtils";
 import UiUtils from "../../../../utils/UiUtils";
 import Room from "../../../room/Room";
 import { RoomImagerBuilder } from "./RoomImagerBuilder";
@@ -16,7 +18,7 @@ export class RoomImager {
 
     }
 
-    public generateRoomPreview(room: Room) {
+    public async generateRoomPreview(room: Room): Promise<string> {
 
         if(!room) return
 
@@ -24,18 +26,36 @@ export class RoomImager {
 
         generatedRoom.roomLayout.Visualization.render()
 
-       
-        const container = new Container()
+        let container = new Container()
 
-    
-        
-        let renderingImage = UiUtils.generateBase64FromObject(container)
+        container.addChild(generatedRoom.roomLayout.Visualization.getCanvasFloor())
+        container.addChild(generatedRoom.roomLayout.Visualization.getCanvasWall())
+        container.addChild(generatedRoom.roomLayout.Visualization.getCanvasDoorWall())
 
-        //console.log(renderingImage)
+        return new Promise((resolve, reject) => {
+            setTimeout(() => {
+                let renderingImage = UiUtils.generateImageFromObject(container)
 
-        //generatedRoom.dispose()
+                let texture = Texture.from(renderingImage)
 
-        return renderingImage
+                let cropped = RenderingUtils.cropTexture(texture, container.height - 200, container.width - 50, 0, 0)
+
+                let preview = new Sprite(texture)
+
+                preview.scale.y = 1;
+                preview.scale.x = 1;
+
+                preview.anchor.x = generatedRoom.roomLayout.getDoorPosition().getX() + 50
+                preview.anchor.y = generatedRoom.roomLayout.getDoorPosition().getY() + 50
+
+                setTimeout(() => {
+                    let image = UiUtils.generateBase64FromObject(preview)
+
+                    resolve(image)
+                    generatedRoom.dispose()
+                }, 200)
+            }, 200)
+        })
     }
     
     private async loadPattern(pattern) {

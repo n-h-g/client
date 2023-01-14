@@ -28,7 +28,7 @@
                 <div class="cataloguePage" ref="cataloguePage">
                     <div class="default_grid">
                         <div id="placeHolder" v-if="{selectedItem}">
-                            <img :src="generatePlaceHolder(selectedItem)"/>
+                            <img :src="preview" />
                         </div>
                         <div class="defaultGridLayoutItemContainer">
                             <div class="itemCell catalogItemCell" id="catalogItem${items[i].id}" data-credits="${items[i].credits}" data-itemid="${items[i].id}" data-publicname="${items[i].itemBase.publicName}" v-for="item in currentCataloguePage.items" :key="item.id">
@@ -44,6 +44,7 @@
 </template>
 
 <script setup lang="ts">
+import { generate } from "@vue/compiler-core"
 import { ref } from "vue"
 import { CataloguePageItem } from "../../../game/core/communication/incoming/catalogue/CataloguePageItem"
 import { EventManager } from "../../../game/core/events/EventManager"
@@ -52,8 +53,11 @@ import { CataloguePageData } from "../../../game/engine/events/ui/data/catalogue
 import { CataloguePagesData } from "../../../game/engine/events/ui/data/catalogue/CataloguePagesData"
 import { UIEvents } from "../../../game/engine/events/ui/UIEvents"
 import { UIEventsType } from "../../../game/engine/events/ui/UIEventsType"
+import Room from "../../../game/engine/room/Room"
 import { ItemType } from "../../../game/engine/ui/imagers/items/FurniImager"
 import { OutgoingPacket } from "../../../game/networking/packets/outgoing/OutgoingPacket"
+import Point from "../../../game/utils/point/Point"
+import Point3d from "../../../game/utils/point/Point3d"
 import UiUtils from "../../../game/utils/UiUtils"
 import Dialog from "../dialog/Dialog.vue"
 import TreeMenu from "./TreeMenu.vue"
@@ -75,7 +79,11 @@ const currentCataloguePage = ref({items: []} as {
     items: CataloguePageItem[]
 })
 
+const preview = ref("")
 
+generatePlaceHolder(null).then((image: string) => {
+    preview.value = image
+})
 
 let currentMenu = ref({
     id: 1,
@@ -107,12 +115,11 @@ function selectItem(item) {
     this.selectedItem.value = item
 }
 
-function generatePlaceHolder(item: CataloguePageItem) {
-    return Engine.getInstance().userInterfaceManager.roomImager.generateRoomPreview(Engine.getInstance().roomService.CurrentRoom)
+async function generatePlaceHolder(item: CataloguePageItem): Promise<string> {
+    return await Engine.getInstance().userInterfaceManager.roomImager.generateRoomPreview(new Room("", "00001111/00001111/00001111/00001111", new Point(0, 0), 0))
 }
 
 function getIcon(catalogItem: CataloguePageItem) {
-
 
     Engine.getInstance().userInterfaceManager.furniImager.loadFurniIcon(ItemType.FloorItem, catalogItem.name).then((sprite) => {
         sprite.start()
@@ -227,6 +234,18 @@ function openPage() {
             color: #000;
             flex: 1;
             padding-left: 6px;
+
+            .default_grid {
+
+                #placeHolder {
+                    background-color: #000
+                }
+                #placeHolder img {
+                    margin-left: 35px;
+                    text-align:center;
+                    justify-content:center;
+                }
+            }
         }
     }
 
@@ -319,6 +338,10 @@ function openPage() {
         padding-right: 6px;
         display: flex;
         flex-direction: column;
+
+        #placeholder {
+            background-color: #000;
+        }
 
         .defaultGridLayoutTitle {
             margin-bottom: 10px;
