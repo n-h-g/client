@@ -43,19 +43,22 @@ export default class RoomVisualization implements IRoomVisualization {
         this.container.addChild(this.canvasWall)
         this.container.addChild(this.canvasDoorWall) 
         this.container.addChild(this.canvasFloor)
-        this.container.addChild(this.canvasPointer) 
+        this.container.addChild(this.canvasPointer)
 
+  
         this.container.x = window.innerWidth / 2
         this.container.y = window.innerHeight / 2
         
         this.canvasDoorTile.interactive = true;
         this.canvasFloor.interactive = true;
 
-        this.canvasDoorTile.zIndex = RoomPriority.DOOR_FLOOR;
-        this.canvasFloor.zIndex = RoomPriority.FLOOR;
-        this.canvasPointer.zIndex = RoomPriority.POINTER;
-        this.canvasDoorWall.zIndex = RoomPriority.DOOR_WALL;
-        this.canvasWall.zIndex = RoomPriority.WALL;
+        let defaultPoint = new Point3d(1, 1, 1)
+
+        this.canvasDoorTile.zIndex = RoomVisualization.calculateZIndex(defaultPoint, RoomPriority.DOOR_FLOOR);
+        this.canvasFloor.zIndex = RoomVisualization.calculateZIndex(defaultPoint, RoomPriority.FLOOR);
+        this.canvasPointer.zIndex = RoomVisualization.calculateZIndex(defaultPoint, RoomPriority.POINTER);
+        this.canvasDoorWall.zIndex = RoomVisualization.calculateZIndex(defaultPoint, RoomPriority.DOOR_WALL);
+        this.canvasWall.zIndex = RoomVisualization.calculateZIndex(defaultPoint, RoomPriority.WALL);
 
         this.container.interactive = true
     }

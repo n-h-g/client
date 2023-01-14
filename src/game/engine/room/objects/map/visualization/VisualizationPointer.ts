@@ -24,7 +24,7 @@ export default class VisualizationPointer extends RoomObjectVisualization {
     }
 
     public getZIndex(): number {
-        return RoomVisualization.calculateZIndex(this.pointerContext.x, this.pointerContext.y, 1, RoomPriority.POINTER)
+        return -1
     }
 
     render(): void {
