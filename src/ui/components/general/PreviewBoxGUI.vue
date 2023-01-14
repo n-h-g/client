@@ -26,11 +26,11 @@
                     Move</div>
 
                 <div class="previewButton" ref="rotateItemButton" id="rotateItemButton"
-                    :class="{hidden: false}" @click.stop="rotateItem">
+                    :class="{hidden: false}" @click.stop="rotateItem()">
                     Rotate</div>
 
                 <div class="previewButton" ref="pickItemButton" id="pickItemButton"
-                    :class="{hidden: false}" @click.stop="pickItem">
+                    :class="{hidden: false}" @click.stop="pickItem()">
                     Pick</div>
 
                 <div class="previewButton" ref="useItemButton" id="useItemButton"
@@ -87,7 +87,9 @@ function pickItem() {
 }
 
 function rotateItem() {
-
+    Engine.getInstance().networkingManager.packetManager.applyOut(OutgoingPacket.RoomRotateItemEvent, {
+        id: entity.value.id
+    })
 }
 
 function useItem() {
