@@ -17,7 +17,6 @@ export class UpdateRoomData extends MessageHandler {
             if (Engine.getInstance()?.roomService?.CurrentRoom?.getRoomId() != room.id) {
                 Engine.getInstance()?.roomService.dispose()
             } else {
-                //Engine.getInstance()?.roomService?.CurrentRoom.getRoomInfo().roomName = room.name;
                 return;
             }
         }

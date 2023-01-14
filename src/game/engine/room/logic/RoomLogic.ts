@@ -43,6 +43,8 @@ export class RoomLogic implements IRoomLogic {
 
         let out: boolean = false
 
+        if(!this.room.Visualization.container) return;
+
         if(this.room.Visualization.container.x + this.room.Visualization.container.width < 0) {
             out = true
         }

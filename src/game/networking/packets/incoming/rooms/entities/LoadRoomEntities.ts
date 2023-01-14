@@ -6,8 +6,13 @@ import { MessageHandler } from "../../../../handler/MessageHandler";
 
 export default class LoadRoomEntities extends MessageHandler {
   public handle(): void {
-    for (let entityData of this.message.data) {
+    for (let entityData of this.message.data) 
+    {
       let data: IEntityData = entityData; 
+
+      if(Engine.getInstance().roomService.CurrentRoom.roomEntityRepository.get(data.id) !== null) {
+        continue;
+      }
 
       let builder = new EntityBuilder()
 

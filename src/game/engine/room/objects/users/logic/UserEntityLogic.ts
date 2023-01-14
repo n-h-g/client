@@ -62,7 +62,7 @@ export default class UserEntityLogic extends HumanLogic {
 
     private toggleUI() {
         
-        (Engine.getInstance().userInterfaceManager.componentsManager.getComponent(UIComponent.AvatarContainerUI) as IComponentShowableUI).()
+        (Engine.getInstance().userInterfaceManager.componentsManager.getComponent(UIComponent.AvatarContainerUI) as IComponentShowableUI).toggle()
 
         let dimension = new Point(this.entity.visualization?.container?.height!,
             this.entity.visualization?.container?.width!
