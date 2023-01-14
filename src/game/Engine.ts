@@ -92,7 +92,7 @@ export class Engine {
             let roomV = this._roomsService.CurrentRoom.roomLayout.Visualization as RoomVisualization;
             let item = new FloorItem("473674-34dfbnasb-43423", "habbocake", new Point3d(3, 4, 1), base);
             item.visualization?.render()
-            this.roomService.CurrentRoom.roomItemRepository.add(item.id, item)
+            this.roomService.CurrentRoom.roomEntityRepository.add(item.id, item)
         }
     }
 
