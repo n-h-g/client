@@ -8,8 +8,11 @@ import { Engine } from '../../../Engine'
 import { IRoomVisualization } from '../../../core/room/IRoomVisualization'
 import { RoomObjectController } from '../../../core/room/object/RoomObjectController'
 import { RoomLogic } from '../logic/RoomLogic'
+import Point3d from "../../../utils/point/Point3d"
+import { RoomPriority } from "./RoomPriority"
 
 export default class RoomVisualization implements IRoomVisualization {
+
     private roomLayout: RoomLayout
 
     private canvasFloor: Container
@@ -48,11 +51,11 @@ export default class RoomVisualization implements IRoomVisualization {
         this.canvasDoorTile.interactive = true;
         this.canvasFloor.interactive = true;
 
-        this.canvasDoorTile.zIndex = 1;
-        this.canvasFloor.zIndex = 4;
-        this.canvasPointer.zIndex = 3;
-        this.canvasDoorWall.zIndex = 4;
-        this.canvasWall.zIndex = 4;
+        this.canvasDoorTile.zIndex = RoomPriority.DOOR_FLOOR;
+        this.canvasFloor.zIndex = RoomPriority.FLOOR;
+        this.canvasPointer.zIndex = RoomPriority.POINTER;
+        this.canvasDoorWall.zIndex = RoomPriority.DOOR_WALL;
+        this.canvasWall.zIndex = RoomPriority.WALL;
 
         this.container.interactive = true
     }
@@ -70,6 +73,16 @@ export default class RoomVisualization implements IRoomVisualization {
 
     public tileToLocal(x: number, y: number, z: number): Point {
         return new Point((x - y) * MapData.tileWidth, (x + y) * MapData.tileHeight - (z * MapData.tileHeight * 2));
+    }
+
+    /**
+     * Calculate the zIndex of a object depending on the priority
+     * @param point 
+     * @param priority 
+     * @returns the zIndex
+     */
+    public static calculateZIndex(point: Point3d, priority: RoomPriority): number {
+        return (point.getX() + point.getY()) * (1000000) + (point.getZ() * (10000)) + 10000000 * priority;
     }
 
     /**

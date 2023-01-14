@@ -15,6 +15,8 @@ export default abstract class RoomObjectVisualization {
         this._needsUpdate = false
     }
 
+    public abstract getZIndex(): number
+
     public dispose(): void {
         this.container.destroy()
     }

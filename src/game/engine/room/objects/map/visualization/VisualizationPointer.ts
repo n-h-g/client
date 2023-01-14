@@ -4,6 +4,7 @@ import MapData from "../MapData";
 import ColorRGB from "../../../../../utils/color/ColorRGB";
 import { Container, Graphics, Point } from 'pixi.js';
 import { Tile } from '../Tile';
+import { RoomPriority } from "../../../visualization/RoomPriority";
 
 export default class VisualizationPointer extends RoomObjectVisualization {
     private pointerContext: Container
@@ -19,6 +20,10 @@ export default class VisualizationPointer extends RoomObjectVisualization {
         this.pointerContext.interactive = true;
         this.pointerContext.visible = false;
         this.render()
+    }
+
+    public getZIndex(): number {
+        return RoomPriority.POINTER
     }
 
     render(): void {

@@ -1,6 +1,8 @@
 import { Engine } from "../../../../../Engine";
 import MapData from "../../../../../engine/room/objects/map/MapData";
 import { Tile } from "../../../../../engine/room/objects/map/Tile";
+import { RoomPriority } from "../../../../../engine/room/visualization/RoomPriority";
+import RoomVisualization from "../../../../../engine/room/visualization/RoomVisualization";
 import Avatar from "../../../../../engine/ui/imagers/avatars/Avatar";
 import AvatarPlaceHolder from "../../../../../engine/ui/imagers/avatars/AvatarPlaceholder";
 import { ActionId } from "../../../../../engine/ui/imagers/avatars/enum/actions/ActionId";
@@ -88,7 +90,7 @@ export abstract class HumanVisualization extends EntityVisualization {
 
         this.container = this._avatar.Container
 
-        this.container.zIndex = 10
+        this.container.zIndex = this.getZIndex()
 
         if (Engine.getInstance().roomService?.CurrentRoom) {
             Engine.getInstance().roomService?.CurrentRoom?.roomLayout.Visualization.container?.addChild(this.container)
@@ -135,6 +137,10 @@ export abstract class HumanVisualization extends EntityVisualization {
         } else {
             this.frame++;
         }
+    }
+
+    public getZIndex(): number {
+        return RoomVisualization.calculateZIndex(new Point3d(this.entity.position.getX(), this.entity.position.getY(), this.entity.position.getZ() + 0.001), RoomPriority.USER)
     }
 
     public calculateOffsetY() {

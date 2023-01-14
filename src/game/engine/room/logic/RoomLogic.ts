@@ -4,6 +4,7 @@ import { IRoomLogic } from '../../../core/room/IRoomLogic'
 import { Engine } from "../../../Engine"
 import { InteractionEvent, Point } from "pixi.js"
 import { Viewport } from "pixi-viewport"
+import { RoomPriority } from "../visualization/RoomPriority"
 
 export class RoomLogic implements IRoomLogic {
     private room: RoomLayout
@@ -65,14 +66,14 @@ export class RoomLogic implements IRoomLogic {
     private onMouseOver(e: any) {
         let room: Room = this.room.getRoom();
 
-        this.room.Visualization.getCanvasPointer().zIndex = 5;
+        this.room.Visualization.getCanvasPointer().zIndex = RoomPriority.POINTER;
         this.room.Visualization.Container.sortChildren()
     }
 
     private onMouseOut() {
         let room: Room = this.room.getRoom();
 
-        this.room.Visualization.getCanvasPointer().zIndex = 3;
+        this.room.Visualization.getCanvasPointer().zIndex = RoomPriority.DOOR_FLOOR_SELECT;
         this.room.Visualization.Container.sortChildren()
     }
 

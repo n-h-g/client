@@ -11,6 +11,8 @@ import { Tile } from '../../map/Tile';
 import { ActionId } from "../../../../ui/imagers/avatars/enum/actions/ActionId";
 import { HumanVisualization } from "../../../../../core/room/object/human/visualization/HumanVisualization";
 import Point3d from "../../../../../utils/point/Point3d";
+import RoomVisualization from "../../../visualization/RoomVisualization";
+import { RoomPriority } from "../../../visualization/RoomPriority";
 
 export default class UserEntityVisualization extends HumanVisualization {
 
@@ -20,11 +22,6 @@ export default class UserEntityVisualization extends HumanVisualization {
     }
 
     public getZIndex(): number {
-
-        if (this.entity.position.getX() === Engine.getInstance().roomService?.CurrentRoom?.roomLayout.getDoorPosition().getX() && this.entity.position.getY() === Engine.getInstance().roomService?.CurrentRoom?.roomLayout.getDoorPosition().getY()) {
-            return 3;
-        }
-
-        return (1 + Math.round(this.entity.position.getX()) + Math.round(this.entity.position.getY()) + ((Math.round(this.entity.position.getX()) + Math.round(this.entity.position.getY())) * 1000) + 4);
+        return RoomVisualization.calculateZIndex(new Point3d(this.entity.position.getX(), this.entity.position.getY(), this.entity.position.getZ() + 0.001), RoomPriority.USER)
     }
 }

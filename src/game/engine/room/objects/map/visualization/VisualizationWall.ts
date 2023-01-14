@@ -8,6 +8,7 @@ import NormalType from "../../../visualization/NormalTypeEnum"
 import RoomVisualizationColorData from "../../../visualization/RoomVisualizationColorData"
 import { Container, Graphics } from 'pixi.js'
 import { Wall } from '../Wall'
+import { RoomPriority } from "../../../visualization/RoomPriority"
 
 export default class VisualizationWall extends RoomObjectVisualization {
     private wall: Wall
@@ -30,6 +31,10 @@ export default class VisualizationWall extends RoomObjectVisualization {
         this.wallCtx = null;
 
         this.wallContext.interactive = true;
+    }
+
+    public getZIndex(): number {
+        return RoomPriority.WALL
     }
 
     //TODO SET WALL OFFSET 
