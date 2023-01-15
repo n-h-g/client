@@ -85,7 +85,8 @@ import { IComponentShowableUI } from "../../../game/core/ui/IComponentShowableUI
 import { EventManager } from "../../../game/core/events/EventManager"
 import { UIEvents } from "../../../game/engine/events/ui/UIEvents"
 import { InventoryItemsEventData } from "../../../game/engine/events/ui/data/inventory/InventoryItems"
-import { ItemType } from "../../../game/engine/ui/imagers/items/FurniImager"
+import { FurniDataItemType } from "../../../game/engine/ui/imagers/items/FurniImager"
+import { ItemType } from "../../../game/core/room/object/items/ItemType"
 
 const tradeMode = ref(false)
 const myTradeItems = ref([])
@@ -109,7 +110,7 @@ const showAddAllItemsToTradeButton = ref(false)
 EventManager.read(UIEvents.INVENTORY_ITEMS_ADDED, (data: InventoryItemsEventData) => {
     for(let item of data.items) {
         console.log(item)
-        if(item.item_type == ItemType.FloorItem) {
+        if(item.item_type == ItemType.FLOOR_ITEM) {
             floorItems.value.push(item)
         } else {
             wallItems.value.push(item)

@@ -6,7 +6,7 @@ import FloorItem from "../engine/room/objects/items/FloorItem";
 import { UserEntity } from "../engine/room/objects/users/UserEntity";
 import RoomVisualization from "../engine/room/visualization/RoomVisualization";
 import { ActionId } from "../engine/ui/imagers/avatars/enum/actions/ActionId";
-import { ItemType } from "../engine/ui/imagers/items/FurniImager";
+import { FurnidataItemType } from "../engine/ui/imagers/items/FurniImager";
 import Point from "../utils/point/Point";
 import Point3d from "../utils/point/Point3d";
 import Rotation from "../utils/Rotation";
@@ -44,7 +44,7 @@ export class  OfflineMode {
                 //(entity.visualization as UserEntityVisualization).addAction(ActionId.USE_ITEM)
         this._entity.visualization.render()
 
-        let base = await this._engine.userInterfaceManager!.furniImager.loadFurniBase(ItemType.FloorItem, OfflineMode.item);
+        let base = await this._engine.userInterfaceManager!.furniImager.loadFurniBase(FurnidataItemType.FloorItem, OfflineMode.item);
         let roomV = this._engine.roomService.CurrentRoom.roomLayout.Visualization as RoomVisualization;
         let item = new FloorItem(OfflineMode.entityId, OfflineMode.item, new Point3d(3, 4, 1), base);
         item.visualization?.render()

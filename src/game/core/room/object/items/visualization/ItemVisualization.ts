@@ -9,7 +9,7 @@ import { RoomPriority } from "../../../../../engine/room/visualization/RoomPrior
 import RoomVisualization from "../../../../../engine/room/visualization/RoomVisualization";
 import AvatarData from "../../../../../engine/ui/imagers/avatars/enum/AvatarData";
 import { FurniData } from "../../../../../engine/ui/imagers/items/FurniData";
-import { ItemType } from "../../../../../engine/ui/imagers/items/FurniImager";
+import { FurnidataItemType } from "../../../../../engine/ui/imagers/items/FurniImager";
 import { FurniSprite } from "../../../../../engine/ui/imagers/items/FurniSprite";
 import Point from "../../../../../utils/point/Point";
 import Point3d from "../../../../../utils/point/Point3d";
@@ -83,7 +83,7 @@ export default abstract class ItemVisualization extends EntityVisualization {
     public async render(): Promise<void> {
 
         try {
-            let sprite = await Engine.getInstance().userInterfaceManager.furniImager.loadFurniSprite(ItemType.FloorItem, this.entity.name)
+            let sprite = await Engine.getInstance().userInterfaceManager.furniImager.loadFurniSprite(FurnidataItemType.FloorItem, this.entity.name)
         
             sprite.start()
 
