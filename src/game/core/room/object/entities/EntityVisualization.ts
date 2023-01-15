@@ -33,8 +33,8 @@ export abstract class EntityVisualization extends RoomObjectVisualization {
         this._nextPosition.setY(point.getY());
         this._nextPosition.setZ(point.getZ());
         //this.rotation = Rotation.calculateDirection(new Point(this._entity.position.getX(), this._entity.position.getY()), new Point(this.entity.position.getX(), this.entity.position.getY()));
-        this.updatePosition()
         this.entity.logic.events.emit(EntityEvents.POSITION_CHANGED);
+        this.updatePosition()
     }
 
     public move(delta: number): void {
@@ -97,10 +97,12 @@ export abstract class EntityVisualization extends RoomObjectVisualization {
     public updatePosition() {
         this.container.x = this.calculateOffsetX()
         this.container.y = this.calculateOffsetY()
+        
         this.container.zIndex = this.getZIndex()
-
         this.container.interactive = true
         this.container.buttonMode = true
+
+        Engine.getInstance().roomService.CurrentRoom.roomLayout.Visualization.container.sortChildren()
     }
 
     public set direction(direction: Direction) {

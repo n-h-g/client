@@ -14,8 +14,6 @@ import Point from "../../../../../utils/point/Point";
 import Point3d from "../../../../../utils/point/Point3d";
 import UiUtils from "../../../../../utils/UiUtils";
 import { EntityVisualization } from "../../entities/EntityVisualization";
-import { IRoomObjectVisualization } from '../../IRoomObjectVisualization';
-import RoomObjectVisualization from '../../RoomObjectVisualization';
 
 export default abstract class ItemVisualization extends EntityVisualization {
     private position: Point3d;
@@ -137,7 +135,7 @@ export default abstract class ItemVisualization extends EntityVisualization {
     }
 
     public getZIndex(zIndex: number = 1): number {
-        const compareY = (Math.trunc(zIndex / 100)) / 10;
+        const compareY = (Math.trunc(this._entity.base.data.logic.dimensions[2] / 100)) / 10;
         return RoomVisualization.calculateZIndex(new Point3d(this.entity.position.getX(), this.entity.position.getY() + compareY, this.entity.position.getZ()), RoomPriority.ROOM_ITEM);
     }
 }

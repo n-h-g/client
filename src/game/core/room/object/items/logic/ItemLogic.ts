@@ -62,8 +62,11 @@ export abstract class ItemLogic extends EntityLogic {
     }
 
     public tick(delta: number) {
+
         if (this._roll) {
             this.onMove(delta);
         }
+
+        this.entity.visualization.updatePosition()
     }
 }
