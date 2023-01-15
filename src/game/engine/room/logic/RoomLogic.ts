@@ -41,24 +41,6 @@ export class RoomLogic implements IRoomLogic {
     private onCameraMove(e: any) {
         let screen: Point = e.screen
         let viewport: Viewport = e.viewport
-
-        let rect = viewport.getVisibleBounds()
-
-        let out: boolean = false
-
-        if(!this.room.Visualization.container) return;
-
-        if(this.room.Visualization.container.x + this.room.Visualization.container.width < 0) {
-            out = true
-        }
-    
-        if(rect.x > window.innerWidth) {
-            out = true
-        }
-        if(rect.y > window.innerHeight) {
-            out = true
-        }
-
     }
 
     private onMouseClick(e: any) {
