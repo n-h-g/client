@@ -9,6 +9,7 @@ import { ActionId } from "../engine/ui/imagers/avatars/enum/actions/ActionId";
 import { ItemType } from "../engine/ui/imagers/items/FurniImager";
 import Point from "../utils/point/Point";
 import Point3d from "../utils/point/Point3d";
+import Rotation from "../utils/Rotation";
 
 export class  OfflineMode {
 
@@ -51,7 +52,17 @@ export class  OfflineMode {
     }
 
     public walk(point: Point3d) {
+
+        if(point == this._entity.position) {
+            (this._entity.visualization as HumanVisualization).removeAction(ActionId.WALK);
+            (this._entity.visualization as HumanVisualization).addAction(ActionId.STAND)
+            this._entity.visualization.needsUpdate = false
+            return;
+        }
+
         this._entity.visualization.setNextPosition(point);
+
+        this._entity.visualization.Rot = Rotation.calculateDirection(new Point(this._entity.position.getX(), this._entity.position.getY()), new Point(point.getX(), point.getY()));
 
         (this._entity.visualization as HumanVisualization).addAction(ActionId.WALK)
 

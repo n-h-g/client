@@ -8,7 +8,6 @@ import ImagePatterBase from "../../../../../../assets/images/room/content/floor_
 import { Graphics } from 'pixi.js';
 import { RoomObjectController } from '../../../../../core/room/object/RoomObjectController';
 import { RoomPlane } from '../RoomPlane';
-import { IRoomMapObject } from '../../../../../core/room/object/map/IRoomMapObject';
 
 export default class VisualizationPlane extends RoomObjectVisualization {
     private plane: RoomPlane
@@ -20,6 +19,10 @@ export default class VisualizationPlane extends RoomObjectVisualization {
         super(0, 0, 0)
 
         this.plane = plane
+    }
+
+    public getZIndex(): number {
+        throw new Error("Method not implemented.");
     }
 
     render(): void {
