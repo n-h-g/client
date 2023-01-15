@@ -40,9 +40,16 @@ function sendMessage(e) {
 }
 
 function onInput() {
+
+    let typing = true
+
+    if(message.value === "") {
+        typing = false
+    }
+
     Engine.getInstance().networkingManager.packetManager.applyOut(OutgoingPacket.UserTypeStatus, {
         roomId: Engine.getInstance().roomService.CurrentRoom.id,
-        typing: true
+        typing: typing
     })
 }
 </script>

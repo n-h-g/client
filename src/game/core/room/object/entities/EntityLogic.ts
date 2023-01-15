@@ -39,7 +39,7 @@ export abstract class EntityLogic extends RoomObjectLogic {
     }
 
     public onClick(): void {
-        this.togglePreview()
+        (Engine.getInstance().userInterfaceManager.componentsManager.getComponent(UIComponent.PreviewBoxUI) as IComponentShowableUI).hide()
     }
 
     public togglePreview() {
