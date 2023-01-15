@@ -8,8 +8,11 @@ import { Engine } from '../../../Engine'
 import { IRoomVisualization } from '../../../core/room/IRoomVisualization'
 import { RoomObjectController } from '../../../core/room/object/RoomObjectController'
 import { RoomLogic } from '../logic/RoomLogic'
+import Point3d from "../../../utils/point/Point3d"
+import { RoomPriority } from "./RoomPriority"
 
 export default class RoomVisualization implements IRoomVisualization {
+
     private roomLayout: RoomLayout
 
     private canvasFloor: Container
@@ -29,6 +32,7 @@ export default class RoomVisualization implements IRoomVisualization {
         this.container = new Container();
 
         this.canvasFloor = new Container();
+
         this.canvasWall = new Container();
         this.canvasDoorWall = new Container();
         this.canvasPointer = new Container();
@@ -39,23 +43,24 @@ export default class RoomVisualization implements IRoomVisualization {
         this.container.addChild(this.canvasWall)
         this.container.addChild(this.canvasDoorWall) 
         this.container.addChild(this.canvasFloor)
-        this.container.addChild(this.canvasPointer) 
+        this.container.addChild(this.canvasPointer)
 
+  
         this.container.x = window.innerWidth / 2
         this.container.y = window.innerHeight / 2
         
         this.canvasDoorTile.interactive = true;
         this.canvasFloor.interactive = true;
 
-        this.canvasDoorTile.zIndex = 1;
-        this.canvasFloor.zIndex = 4;
-        this.canvasPointer.zIndex = 3;
-        this.canvasDoorWall.zIndex = 4;
-        this.canvasWall.zIndex = 4;
+        let defaultPoint = new Point3d(1, 1, 1)
+
+        this.canvasDoorTile.zIndex = RoomVisualization.calculateZIndex(defaultPoint, RoomPriority.DOOR_FLOOR);
+        this.canvasFloor.zIndex = RoomVisualization.calculateZIndex(defaultPoint, RoomPriority.FLOOR);
+        this.canvasPointer.zIndex = RoomVisualization.calculateZIndex(defaultPoint, RoomPriority.POINTER);
+        this.canvasDoorWall.zIndex = RoomVisualization.calculateZIndex(defaultPoint, RoomPriority.DOOR_WALL);
+        this.canvasWall.zIndex = RoomVisualization.calculateZIndex(defaultPoint, RoomPriority.WALL);
 
         this.container.interactive = true
-
-        Engine.getInstance()?.application?.viewport.addChild(this.container)
     }
     
 
@@ -71,6 +76,16 @@ export default class RoomVisualization implements IRoomVisualization {
 
     public tileToLocal(x: number, y: number, z: number): Point {
         return new Point((x - y) * MapData.tileWidth, (x + y) * MapData.tileHeight - (z * MapData.tileHeight * 2));
+    }
+
+    /**
+     * Calculate the zIndex of a object depending on the priority
+     * @param point 
+     * @param priority 
+     * @returns the zIndex
+     */
+    public static calculateZIndex(point: Point3d, priority: RoomPriority): number {
+        return ((point.getX() + point.getY()) * (1000000) + (point.getZ() * (10000))) + 10000000 * priority;
     }
 
     /**

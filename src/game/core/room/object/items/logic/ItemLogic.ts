@@ -19,8 +19,8 @@ export abstract class ItemLogic extends EntityLogic {
         this.events.on(ItemEvents.FURNI_SPRITE_LOADED, () => this.onLoad())
     }
 
-    public onLoad() {
-
+    public async onLoad() {
+        
     }
 
     public onHover(): void {
@@ -48,12 +48,6 @@ export abstract class ItemLogic extends EntityLogic {
 
     public onClick(): void {
         super.onClick()
-        let movingItem = Engine.getInstance().roomService.CurrentRoom!.roomItemRepository.movingItem
-        let moving = movingItem?.id === this.entity.id
-
-        if (moving) {
-            this.placeItem();
-        } 
     }
 
     public toggleMovement(value: boolean): void {

@@ -16,8 +16,15 @@ export default class UpdateEntity extends MessageHandler {
             if(!entity) return;
 
             if(entityData.position) {
-                entity.visualization.setPosition(new Point3d(entityData.position.x, entityData.position.y, entityData.position.z))
-                entity.visualization.Rot = entityData.bh_rot.body_rot
+                entity.visualization.setNextPosition(new Point3d(entityData.position.x, entityData.position.y, entityData.position.z))
+                
+                if(entityData.rotation) {
+                    entity.visualization.Rot = entityData.rotation.rot
+                } else {
+                    if(entityData.bh_rot) {
+                        entity.visualization.Rot = entityData.bh_rot.body_rot
+                    }
+                }
             }
 
             if(entityData.action) {
@@ -29,8 +36,7 @@ export default class UpdateEntity extends MessageHandler {
                 for (let action of entityData.action.actions) {
                     (entity.visualization as HumanVisualization).addAction(action);
                 }
-            }
-
+            } 
             entity.visualization.needsUpdate = true
         } else {
             if (Engine.getInstance().config.debug) {

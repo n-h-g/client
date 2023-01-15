@@ -15,6 +15,9 @@ import { ItemType } from './engine/ui/imagers/items/FurniImager'
 import RoomVisualization from './engine/room/visualization/RoomVisualization'
 import FloorItem from './engine/room/objects/items/FloorItem'
 import Point3d from './utils/point/Point3d'
+import { EventManager } from './core/events/EventManager'
+import { LoadingProgressEventData } from './engine/events/ui/data/loader/LoadingProgress'
+import { UIEvents } from './engine/events/ui/UIEvents'
 
 export class Engine {
     private static _instance: Engine
@@ -64,24 +67,32 @@ export class Engine {
         this._userInterfaceManager = new UserInterfaceManager()
         await this._userInterfaceManager.init()
 
+        EventManager.emit<LoadingProgressEventData>(UIEvents.LOAD, {
+            width: 100,
+            message: 'Logged'
+        })
+
         this.application.init()
+
+        if(this._config.debug) {
+            (window as any).engine = this
+        }
 
         //0000000000000000000000000/0000000000044444444444444/0000000000044444444444444/0000000000044444444444444/0000000000444444444444444/0000000000044444444444444/0000000000044444444444444/0000000444444444444444444/0000000444444444444444444/0000000444444444444444444/0000000444444444444444444/0000000444444444444444444/0000000444444444444444444/0555554444400000000000000/0555554444400000000000000/0555554444443330011111100/0555554444443330011111100/0005500000000330011111100/0004400000000220011111100/0004443333332222111111100/0004443333332222111111100/0000000000000000011111100/0000000000000000011111100/0000000000000000011111100/0000000000000000011111100/0000000000000000000000000
         //00000000000000000000000000000/03333333333333333333333333330/03333333333333333333333333330/33333333333333333333333333330/03333333333333333333333333330/03333000000333333000000033330/03333000000222222000000033330/03333002222222222222220033330/03333002222222222222220033330/03333002200022220000220033330/03333002200011110000220033330/03333322201111111100220033330/03333322201111111100220033330/03333322201111111100220033330/03333322201111111100220033330/03333322201111111100220033330/03333322201111111100220033330/03333002200000000000220033330/03333002200000000000220033330/03333002222222222222220033330/03333002222222222222220033330/03333000000000000000000033330/03333000000000000000000033330/03333333333333333333333333330/03333333333333333333333333330/03333333333333333333333333330/03333333333333333333333333330/00000000000000000000000000000
         if (this._config.offlineMode) {
-            this._roomsService.setRoom("prova", "0000000000/0111001101/01111111011111/0111111111001/0111111", new Point(3, 3), 200)
+            let room = this._roomsService.setRoom("prova", "0000000000/0111001101/01111111011111/0111111111001/0111111", new Point(3, 3), 200)
 
             let entity = new UserEntity("id", "prova", "hd-185-10.hr-3163-61.ch-3030-92.lg-275-110")
             entity.visualization.Rot = Direction.WEST;
             //(entity.visualization as UserEntityVisualization).addAction(ActionId.USE_ITEM)
             entity.visualization.render()
 
-            
             let base = await this.userInterfaceManager!.furniImager.loadFurniBase(ItemType.FloorItem, "habbocake");
             let roomV = this._roomsService.CurrentRoom.roomLayout.Visualization as RoomVisualization;
             let item = new FloorItem("473674-34dfbnasb-43423", "habbocake", new Point3d(3, 4, 1), base);
             item.visualization?.render()
-            this.roomService.CurrentRoom.roomItemRepository.add(item.id, item)
+            this.roomService.CurrentRoom.roomEntityRepository.add(item.id, item)
         }
     }
 

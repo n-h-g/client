@@ -12,6 +12,7 @@ import {
 import { Engine } from "../../../../Engine"
 import { Logger } from "../../../../utils/Logger"
 import { FurniDataType } from "../../../../core/ui/imagers/items/data/IFurniDataType"
+import UiUtils from "../../../../utils/UiUtils"
 
 export default class FurniImager {
 
@@ -129,6 +130,9 @@ export default class FurniImager {
             this.loadFurniBase(type, name).then((furnibase) => {
                 const furniSprite = new FurniSprite(furnibase);
                 res(furniSprite);
+            }).catch((e) => {
+                throw new e;
+                _rej(null)
             })
         })
     }
@@ -141,8 +145,7 @@ export default class FurniImager {
         return new Promise((res, _rej) => {
             this.loadFurniBase(type, name).then((furnibase) => {
                 const furniSprite = new FurniSprite(furnibase, true)
-
-                res(furniSprite);
+                res(furniSprite)
             })
         })
     }

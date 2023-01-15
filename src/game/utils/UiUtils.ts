@@ -28,6 +28,11 @@ export default class UiUtils {
         return Engine.getInstance().application?.renderer.plugins.extract.image((object));
     }
 
+    static generateCanvasFromObject(object: DisplayObject | Container): HTMLCanvasElement | undefined {
+        
+        return Engine.getInstance().application?.renderer.plugins.extract.canvas((object));
+    }
+
     static generateBase64FromObject(object: DisplayObject | Container): string | undefined {
         const image = Engine.getInstance().application?.renderer.plugins.extract.base64(object)
         return image;

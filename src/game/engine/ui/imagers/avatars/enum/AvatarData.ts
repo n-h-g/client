@@ -10,8 +10,8 @@ export default class AvatarData {
     public static AVATAR_GENERIC_HEIGHT = 210;
 
     // offsets
-    public static AVATAR_LEFT_TYPING_OFFSET = 10; // the x distance between avatar and chat
-    public static AVATAR_TOP_TYPING_OFFSET = 0; // the y distance between avatar and chat
+    public static AVATAR_CONTAINER_OFFSET_LEFT = -4; // the x distance between avatar and container
+    public static AVATAR_CONTAINER_OFFSET_TOP = -20; // the y distance between avatar and container
 
     // frame
     public static AVATAR_FRAME_SPEED = 100;

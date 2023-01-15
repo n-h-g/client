@@ -7,6 +7,7 @@ import { EntityVisualization } from './EntityVisualization'
 import { Moveable } from "../IMoveable"
 import { IRotatable } from "../IRotatable"
 import RoomObjectVisualization from "../RoomObjectVisualization"
+import { EntityEvents } from "../../../../engine/events/room/objects/entities/EntityEvents"
 
 export abstract class Entity extends RoomObjectController<EntityVisualization, EntityLogic>{
     protected _name: string

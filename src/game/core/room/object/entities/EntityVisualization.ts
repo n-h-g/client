@@ -2,10 +2,11 @@ import { Direction } from "../../../objects/Direction";
 import RoomObjectVisualization from "../RoomObjectVisualization";
 import { Entity } from "./Entity";
 import Point3d from '../../../../utils/point/Point3d';
-import Rotation from "../../../../utils/Rotation";
-import Point from "../../../../utils/point/Point";
+
 import AvatarData from "../../../../engine/ui/imagers/avatars/enum/AvatarData";
 import { EntityEvents } from "../../../../engine/events/room/objects/entities/EntityEvents";
+import { RoomPriority } from "../../../../engine/room/visualization/RoomPriority";
+import { Engine } from "../../../../Engine";
 
 export abstract class EntityVisualization extends RoomObjectVisualization {
 
@@ -26,10 +27,11 @@ export abstract class EntityVisualization extends RoomObjectVisualization {
         this._nextPosition = new Point3d(0, 0, 0);
     }
 
-    public setPosition(point: Point3d) {
-        this.nextPosition.setX(point.getX());
-        this.nextPosition.setY(point.getY());
-        this.nextPosition.setZ(point.getZ());
+    public setNextPosition(point: Point3d) {
+
+        this._nextPosition.setX(point.getX());
+        this._nextPosition.setY(point.getY());
+        this._nextPosition.setZ(point.getZ());
         //this.rotation = Rotation.calculateDirection(new Point(this._entity.position.getX(), this._entity.position.getY()), new Point(this.entity.position.getX(), this.entity.position.getY()));
         this.updatePosition()
         this.entity.logic.events.emit(EntityEvents.POSITION_CHANGED);
@@ -90,13 +92,14 @@ export abstract class EntityVisualization extends RoomObjectVisualization {
 
     public abstract calculateOffsetY()
 
+    public abstract getZIndex(): number;
+
     public updatePosition() {
         this.container.x = this.calculateOffsetX()
         this.container.y = this.calculateOffsetY()
-        
-        this.container.zIndex = 10
+        //this.container.zIndex = this.getZIndex()
+
         this.container.interactive = true
-        this.container.interactiveChildren = true
         this.container.buttonMode = true
     }
 

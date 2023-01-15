@@ -9,6 +9,8 @@ import ColorRGB from "../../../../../utils/color/ColorRGB"
 import NormalType from "../../../visualization/NormalTypeEnum"
 import { Container, Graphics, ObservablePoint } from 'pixi.js'
 import { Tile } from '../Tile'
+import { RoomVisualizationType } from "../../../../../core/room/object/RoomVisualizationType"
+import { RoomPriority } from "../../../visualization/RoomPriority"
 
 export default class VisualizationTile extends RoomObjectVisualization {
     private tile: Tile
@@ -33,6 +35,10 @@ export default class VisualizationTile extends RoomObjectVisualization {
         let roomV = (tile.plane.room.Visualization as RoomVisualization)
         this.floorContext = roomV.getCanvasFloor()
         this.doorContext = roomV.getCanvasDoorTile();
+    }
+
+    public getZIndex(): number {
+        return RoomPriority.FLOOR
     }
 
     private static calculateOffsetX(position: Point3d, type: TileType): number {

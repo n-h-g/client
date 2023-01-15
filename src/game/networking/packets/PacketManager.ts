@@ -1,6 +1,8 @@
 import { Engine } from '../../Engine'
 import { Logger } from '../../utils/Logger'
 import { MessageHandler } from '../handler/MessageHandler'
+import { CataloguePage } from './incoming/catalogue/CataloguePage'
+import { CataloguePages } from './incoming/catalogue/CataloguePages'
 import { LoginResponse } from './incoming/handshake/LoginResponse'
 import { PongResponse } from './incoming/handshake/PongResponse'
 import LoadInventoryItems from './incoming/items/LoadInventoryItem'
@@ -11,6 +13,7 @@ import LoadRoomEntities from './incoming/rooms/entities/LoadRoomEntities'
 import RemoveEntity from './incoming/rooms/entities/RemoveEntity'
 import UpdateEntity from './incoming/rooms/entities/UpdateEntity'
 import { UpdateRoomData } from './incoming/rooms/UpdateRoomData'
+import { UserTypingStatus } from './incoming/rooms/users/UserTypingStatus'
 import { UpdateUserInformation } from './incoming/users/UpdateUserInformation'
 import { OutgoingPacket } from './outgoing/OutgoingPacket'
 
@@ -33,7 +36,10 @@ export class PacketManager {
             203: new UpdateEntity,
             204: new AddRoomEntity,
             205: new RemoveEntity,
+            207: new UserTypingStatus,
             400: new UpdateUserInformation,
+            800: new CataloguePages,
+            801: new CataloguePage,
             18: new LoadInventoryItems,
         }
 

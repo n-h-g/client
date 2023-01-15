@@ -29,7 +29,10 @@ function sendMessage(e) {
         shout = true;
     }
 
-    console.log(shout)
+    Engine.getInstance().networkingManager.packetManager.applyOut(OutgoingPacket.UserSay, {
+        message: message.value,
+        shout: shout
+    })
 
     typed.value = false
     message.value = ""
@@ -37,7 +40,9 @@ function sendMessage(e) {
 }
 
 function onInput() {
-
-    this.typing = false;
+    Engine.getInstance().networkingManager.packetManager.applyOut(OutgoingPacket.UserTypeStatus, {
+        roomId: Engine.getInstance().roomService.CurrentRoom.id,
+        typing: true
+    })
 }
 </script>

@@ -1,6 +1,6 @@
 import { IEntityData } from "../../../../../core/communication/incoming/rooms/entities/IEntityData"
 import { Entity } from "../../../../../core/room/object/entities/Entity"
-import { EntityFactory } from "../../../../../core/room/object/entities/EntityFactory"
+import { EntityBuilder } from "../../../../../core/room/object/entities/EntityBuilder"
 import { Engine } from "../../../../../Engine"
 import { MessageHandler } from "../../../../handler/MessageHandler"
 
@@ -12,10 +12,22 @@ export default class AddRoomEntity extends MessageHandler {
             return;
         }
 
-        EntityFactory.createEntity(data).then((entity: Entity) => {
-            Engine.getInstance().roomService?.CurrentRoom?.roomEntityRepository.add(entity.id, entity)
+        let builder = new EntityBuilder()
 
-            entity.visualization.render()
-        })
+        builder.setId(data.id)
+        .setName(data.name.name)
+        .setType(data.type)
+        .setFigure(data.aspect)
+        .setPosition(data.position)
+        .setHeadBodyRotation(data.bh_rot)
+        .setUser(data.user)
+        .build()
+        .then((entity: Entity) => {
+          Engine.getInstance().roomService?.CurrentRoom?.roomEntityRepository.add(
+            entity.id,
+            entity
+          );
+          entity.visualization.render()
+        });
     }
 }

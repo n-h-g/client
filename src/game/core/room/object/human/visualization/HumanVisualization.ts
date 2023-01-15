@@ -1,6 +1,8 @@
 import { Engine } from "../../../../../Engine";
 import MapData from "../../../../../engine/room/objects/map/MapData";
 import { Tile } from "../../../../../engine/room/objects/map/Tile";
+import { RoomPriority } from "../../../../../engine/room/visualization/RoomPriority";
+import RoomVisualization from "../../../../../engine/room/visualization/RoomVisualization";
 import Avatar from "../../../../../engine/ui/imagers/avatars/Avatar";
 import AvatarPlaceHolder from "../../../../../engine/ui/imagers/avatars/AvatarPlaceholder";
 import { ActionId } from "../../../../../engine/ui/imagers/avatars/enum/actions/ActionId";
@@ -32,8 +34,8 @@ export abstract class HumanVisualization extends EntityVisualization {
         this._actions = new Set();
     }
 
-    public setPosition(point: Point3d): void {
-        super.setPosition(point)
+    public setNextPosition(point: Point3d): void {
+        super.setNextPosition(point)
         this.headRotation = Rotation.calculateDirection(new Point(this.entity.position.getX(), this._entity.position.getY()), new Point(this.entity.position.getX(), this.entity.position.getY()));
     }
 
@@ -81,14 +83,12 @@ export abstract class HumanVisualization extends EntityVisualization {
             this._avatar = new Avatar(this._entity.figure, this.rotation, this.rotation, this._actions, this.frame)
 
         } else {
-            this._avatar = new AvatarPlaceHolder("", this.rotation, this.rotation, this._actions, this.frame, this.frame);
+            this._avatar = new AvatarPlaceHolder("", this.rotation, this.rotation, this._actions, this.frame);
         }
 
         Engine.getInstance().userInterfaceManager?.avatarImager.drawAvatar(this._avatar);
 
         this.container = this._avatar.Container
-
-        this.container!.zIndex = 10
 
         if (Engine.getInstance().roomService?.CurrentRoom) {
             Engine.getInstance().roomService?.CurrentRoom?.roomLayout.Visualization.container?.addChild(this.container)
@@ -114,6 +114,8 @@ export abstract class HumanVisualization extends EntityVisualization {
         placeholder.Container.interactiveChildren = true;
 
         this.container = this._avatar.Container;
+    
+        this.container.zIndex = this.getZIndex()
 
         this.loadAvatar().then(() => {
             this.container.destroy()
@@ -125,6 +127,8 @@ export abstract class HumanVisualization extends EntityVisualization {
             Engine.getInstance().roomService?.CurrentRoom?.roomLayout.Visualization.container?.addChild(this.container)
             this.updatePosition();
         }
+
+        this.entity.logic.registerEvents()
     }
 
     public nextFrame(): void {
@@ -133,6 +137,13 @@ export abstract class HumanVisualization extends EntityVisualization {
         } else {
             this.frame++;
         }
+    }
+
+    public getZIndex(): number {
+
+        let isAtDoor = this.entity.position.getX() == Engine.getInstance().roomService.CurrentRoom.roomLayout.getDoorPosition().getX() && this.entity.position.getY() == this.entity.position.getY()
+        
+        return RoomVisualization.calculateZIndex(new Point3d(this.entity.position.getX(), this.entity.position.getY(), this.entity.position.getZ() + 0.001), isAtDoor ? RoomPriority.DOOR_FLOOR_USER : RoomPriority.USER)
     }
 
     public calculateOffsetY() {

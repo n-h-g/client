@@ -12,6 +12,10 @@ export default class LogicPointer extends RoomObjectLogic {
 
     }
 
+    dispose(): void {
+        throw new Error('Method not implemented.')
+    }
+
     public registerEvents() {
 
     }

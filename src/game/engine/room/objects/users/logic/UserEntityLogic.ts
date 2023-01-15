@@ -18,19 +18,23 @@ export default class UserEntityLogic extends HumanLogic {
 
     private _typing: boolean = false
 
+    private _showLabel: boolean = false
+
     public onDance(): void {
 
     }
 
     public registerEvents() {
         this.entity.visualization.container.on('pointerdown', () => this.onClick())
-        this.events.on(UserEvents.USER_TOGGLE_TYPING, () => this.onToggleTyping())
+        this.events.on(UserEvents.USER_TOGGLE_TYPING, (typing: boolean) => this.onToggleTyping(typing))
         this.entity.visualization.container.on('mouseover', () => this.onHover())
-        //this.entity.visualization.container.on('mouseout', () => this.onHover())
+        this.entity.visualization.container.on('mouseout', () => this.onHover())
     }
 
-    public onToggleTyping(): void {
-        this._typing = !this._typing
+    public onToggleTyping(typing): void {
+        this._typing = typing
+        this._showLabel = false;
+        //this.toggleUI()
     }
 
     public onTalk(length?: number): void {
@@ -52,7 +56,8 @@ export default class UserEntityLogic extends HumanLogic {
     }
 
     public onHover(): void {
-        //this.toggleUI()
+        this._showLabel = !this._showLabel
+        this.toggleUI()
     }
 
     private toggleUI() {
@@ -64,18 +69,18 @@ export default class UserEntityLogic extends HumanLogic {
             );        
 
 
-        let position = new Point(UiUtils.getGlobalPosition(this.entity.visualization?.container).tx,
-                                UiUtils.getGlobalPosition(this.entity.visualization?.container!).ty);        
-
+        let position = new Point(UiUtils.getGlobalPosition(this.entity.visualization?.container!).tx + dimension.getY() / 2 + AvatarData.AVATAR_CONTAINER_OFFSET_LEFT,
+            UiUtils.getGlobalPosition(this.entity.visualization?.container!).ty - dimension.getX() + AvatarData.AVATAR_CONTAINER_OFFSET_TOP);        
+                  
 
         EventManager.emit<AvatarContainerData>(UIEvents.AVATAR_CONTAINER_UPDATED, {
            label: this.entity.name,
-           showLabel: true,
+           showLabel: this._showLabel,
            bounds: {
-             x: this.entity.visualization.container.x,
-             y: this.entity.visualization.container.y,
-             w: dimension.getX(),
-             h: dimension.getY()
+             x: position.getX(),
+             y: position.getY(),
+             w: dimension.getY(),
+             h: dimension.getX()
            },
            typing: this._typing
         })
@@ -83,6 +88,10 @@ export default class UserEntityLogic extends HumanLogic {
 
     public onPositionChanged() {
         //this.setAvatarContainer()
+    }
+
+    public onLoad(): void {
+        throw new Error('Method not implemented.');
     }
 
     public onClick() {
@@ -99,13 +108,8 @@ export default class UserEntityLogic extends HumanLogic {
         super.onClick()
     }
 
-    public userToggleTyping(value: boolean) {
-       
-    }
 
     public figureChanged() {
-        let image: HTMLImageElement = UiUtils.generateImageFromObject(this.entity.visualization?.container!);
-        //bottomBarGui.$data.look = image?.src;
-        //bottomBarGui.$forceUpdate();
+        
     }
 }

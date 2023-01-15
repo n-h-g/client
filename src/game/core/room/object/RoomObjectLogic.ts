@@ -11,8 +11,6 @@ export abstract class RoomObjectLogic implements IDisposable {
 
     public constructor() {
         this._events = new EventEmitter()
-
-        this._events.addListener
     }
 
     abstract dispose(): void

@@ -13,7 +13,8 @@ export interface IEntityData {
     aspect: IAspectComponent
     name: {
         name: string
-    }
+    },
+    rotation
     position: IPositionComponent
     bh_rot: IHeadBodyRotationComponent
     type: EntityType

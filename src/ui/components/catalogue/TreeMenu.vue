@@ -1,22 +1,20 @@
 <template>
-  <li class="treeView">
+  <li class="treeView" v-if="catalogMenu">
     <div v-for="menu in filteredMenu()" class="catalogLi"
-      :class="{ hidden: !menu.isVisible, active: currentMenu.id == menu.id }" :key="menu.id"
-      @click.stop="openEvent(menu)">
+      :class="{ active: currentMenu.id == menu.id }" :key="menu.id"
+      @click="openEvent(menu)">
       <div class="description">
         <span class="catalogLiIcon">
           <img :src="
             resourceUrl +
-            'icon_' +
-            menu.iconImage +
+            menu.id +
             '.png'
           " />
         </span>
         <span class="catalogMenuLabel">{{ menu.title }}</span>
       </div>
       <ul class="menuUlCatalog" :class="{ hidden: !menu.openSubMenu }">
-        <TreeMenu v-if="menu.subPages.length > 0" :catalogMenu="menu.subPages" :currentMenu="props.currentMenu"
-          :openPage="props.openPage" />
+        <TreeMenu v-if="menu.subPages && menu.subPages.length > 0" :catalogMenu="menu.subPages" :currentMenu="props.currentMenu"/>
       </ul>
     </div>
   </li>
@@ -24,17 +22,29 @@
 
 <script setup lang="ts">
 import { Engine } from "../../../game/Engine"
+import { OutgoingPacket } from "../../../game/networking/packets/outgoing/OutgoingPacket"
 
-const props = defineProps(['currentMenu', 'openPage'])
+const props = defineProps<{
+    catalogMenu
+    currentMenu
+}>()
 
-let resourceUrl = Engine.getInstance().config.catalogueResourcesUrl
+const resourceUrl = Engine.getInstance().config.catalogueResourcesUrl + "icons/"
 
-function openEvent(menu: string) {
+function openEvent(menu) {
+
+
+  if (menu.subPages && menu.subPages.length > 0)
+        menu.openSubMenu = !menu.openSubMenu
+
+  Engine.getInstance().networkingManager.packetManager.applyOut(OutgoingPacket.RequestCatalogPageEvent, {
+    id: menu.id
+  })
 
 }
 
 function filteredMenu() {
-  return []
+  return props.catalogMenu.filter((menu) => menu.isEnabled !== -1);
 }
 </script>
 

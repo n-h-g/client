@@ -9,7 +9,7 @@ export class LoginResponse extends MessageHandler {
     public handle(): void {
         if (this.message.data) {
             EventManager.emit<LoadingProgressEventData>(UIEvents.LOAD, {
-                width: 100,
+                width: 80,
                 message: 'Logged'
             })
 

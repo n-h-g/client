@@ -7,7 +7,7 @@
             </div>
             <div class="iconContainer">
                 <img v-if="currentMenu && currentMenu.iconImage"
-                    :src="resourceUrl + 'icon_' + currentMenu.iconImage + '.png'" />
+                    :src="resourceUrl + currentMenu.iconImage + '.png'" />
             </div>
             <div class="menuTitleWrapper">
                 <span class="menuTitle">
@@ -21,11 +21,22 @@
         <div class="wrapper">
             <div class="catalogueMenu">
                 <ul class="menuUlCatalog">
-                    <TreeMenu :catalogMenu="catalogMenu" :currentMenu="currentMenu" :openPage="openPage" />
+                    <TreeMenu :catalogMenu="catalogMenu" :currentMenu="currentMenu"/>
                 </ul>
             </div>
-            <div class="cataloguePageContainer">
+            <div class="cataloguePageContainer" v-if="currentCataloguePage && currentCataloguePage.items">
                 <div class="cataloguePage" ref="cataloguePage">
+                    <div class="default_grid">
+                        <div id="placeHolder" v-if="{selectedItem}">
+                            <img :src="preview" />
+                        </div>
+                        <div class="defaultGridLayoutItemContainer">
+                            <div class="itemCell catalogItemCell" id="catalogItem${items[i].id}" data-credits="${items[i].credits}" data-itemid="${items[i].id}" data-publicname="${items[i].itemBase.publicName}" v-for="item in currentCataloguePage.items" :key="item.id">
+                                <span class="itemIcon"><img id="catalogItem${items[i].id}_iconimage" :src="getIcon(item)" onclick="selectItem(item)"></span>  
+                                <span class="price">{{item.credits}}<img src='@/assets/images/catalogue/creditIcon.png' /></span>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -33,11 +44,27 @@
 </template>
 
 <script setup lang="ts">
+import { generate } from "@vue/compiler-core"
 import { ref } from "vue"
+import { CataloguePageItem } from "../../../game/core/communication/incoming/catalogue/CataloguePageItem"
+import { EventManager } from "../../../game/core/events/EventManager"
 import { Engine } from "../../../game/Engine"
+import { CataloguePageData } from "../../../game/engine/events/ui/data/catalogue/CataloguePageData"
+import { CataloguePagesData } from "../../../game/engine/events/ui/data/catalogue/CataloguePagesData"
+import { UIEvents } from "../../../game/engine/events/ui/UIEvents"
 import { UIEventsType } from "../../../game/engine/events/ui/UIEventsType"
+import Room from "../../../game/engine/room/Room"
+import { ItemType } from "../../../game/engine/ui/imagers/items/FurniImager"
+import { OutgoingPacket } from "../../../game/networking/packets/outgoing/OutgoingPacket"
+import Point from "../../../game/utils/point/Point"
+import Point3d from "../../../game/utils/point/Point3d"
+import UiUtils from "../../../game/utils/UiUtils"
 import Dialog from "../dialog/Dialog.vue"
 import TreeMenu from "./TreeMenu.vue"
+
+Engine.getInstance().networkingManager.packetManager.applyOut(OutgoingPacket.CatalogPagesListEvent)
+
+const resourceUrl = Engine.getInstance().config.catalogueResourcesUrl + "icons/"
 
 let catalogMenu = ref([])
 let activePage = ref({
@@ -46,17 +73,75 @@ let activePage = ref({
     }
 })
 
-let currentMenu = ref({
-    id: -1,
-    title: "titolo",
-    description: "",
-    iconImage: ""
+const selectedItem = ref()
+
+const currentCataloguePage = ref({items: []} as {
+    items: CataloguePageItem[]
 })
 
-let resourceUrl = Engine.getInstance().config.catalogueResourcesUrl
+const preview = ref("")
+
+generatePlaceHolder(null).then((image: string) => {
+    preview.value = image
+})
+
+let currentMenu = ref({
+    id: 1,
+    title: "titolo",
+    description: "",
+    iconImage: "1"
+})
+
+EventManager.read(UIEvents.CATALOGUE_PAGES_UPDATED, (data: CataloguePagesData) => {
+    data.pages.forEach((page) => {
+        
+        if(catalogMenu.value.indexOf(page) < 0) {
+            catalogMenu.value.push(page)
+        }
+    })
+
+})
+
+EventManager.read(UIEvents.CATALOG_ITEMS_UPDATED, (data: CataloguePageData) => {
+    data.items.forEach((item) => {
+        if(hasItem(item.id)) return;
+
+        currentCataloguePage.value.items.push(item)
+    })
+
+})
+
+function selectItem(item) {
+    this.selectedItem.value = item
+}
+
+async function generatePlaceHolder(item: CataloguePageItem): Promise<string> {
+    return await Engine.getInstance().userInterfaceManager.roomImager.generateRoomPreview(new Room("", "00001111/00001111/00001111/00001111", new Point(0, 0), 0))
+}
+
+function getIcon(catalogItem: CataloguePageItem) {
+
+    Engine.getInstance().userInterfaceManager.furniImager.loadFurniIcon(ItemType.FloorItem, catalogItem.name).then((sprite) => {
+        sprite.start()
+        
+        setTimeout(() => {
+            catalogItem.icon = UiUtils.generateBase64FromObject(sprite)
+        }, 300);
+    })
+
+    return catalogItem.icon
+}
+
+function hasItem(id: number): boolean {
+    currentCataloguePage.value.items.forEach((item) => {
+        return item.id == id
+    })
+
+    return false
+}
 
 function openPage() {
-
+    console.log('dasd')
 }
 </script>
 
@@ -149,6 +234,18 @@ function openPage() {
             color: #000;
             flex: 1;
             padding-left: 6px;
+
+            .default_grid {
+
+                #placeHolder {
+                    background-color: #000
+                }
+                #placeHolder img {
+                    margin-left: 35px;
+                    text-align:center;
+                    justify-content:center;
+                }
+            }
         }
     }
 
@@ -235,115 +332,118 @@ function openPage() {
         }
     }
 }
+    .default_grid {
+        overflow: hidden;
+        padding-top: 0px;
+        padding-right: 6px;
+        display: flex;
+        flex-direction: column;
 
-.cataloguePage.default_grid {
-    overflow: hidden;
-    padding-top: 0px;
-    padding-right: 6px;
-    display: flex;
-    flex-direction: column;
+        #placeholder {
+            background-color: #000;
+        }
 
-    .defaultGridLayoutTitle {
-        margin-bottom: 10px;
-        flex-grow: 0;
-        font-weight: 500;
-    }
+        .defaultGridLayoutTitle {
+            margin-bottom: 10px;
+            flex-grow: 0;
+            font-weight: 500;
+        }
 
-    .defaultGridLayoutText {
-        flex-grow: 0;
-        margin-bottom: 20px;
-    }
+        .defaultGridLayoutText {
+            flex-grow: 0;
+            margin-bottom: 20px;
+        }
 
-    .defaultGridLayoutItemContainer {
-        height: 152px;
-        border-radius: 8px;
-        border: 1px solid #757571;
-        box-shadow: inset 0 0 0 2px rgba(255, 255, 255, 1);
-        background-color: #d2d1cb;
-        padding: 2px;
-        flex: 1;
-
-        display: inline-flex;
-        flex-direction: row;
-        flex-wrap: wrap;
-        justify-content: flex-start;
-        min-height: 180px;
-
-
-        &>.itemCell {
-            width: 50px;
-            height: 60px;
-            overflow: hidden;
-            cursor: pointer;
-            margin: 2px;
+        .defaultGridLayoutItemContainer {
+            height: 152px;
             border-radius: 8px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            flex-direction: column;
+            border: 1px solid #757571;
+            box-shadow: inset 0 0 0 2px rgba(255, 255, 255, 1);
+            background-color: #d2d1cb;
+            padding: 2px;
+            flex: 1;
 
-            &.selected {
-                border: 2px solid #62c4e8;
-                background-color: #fff;
+            display: inline-flex;
+            flex-direction: row;
+            flex-wrap: wrap;
+            justify-content: flex-start;
+            min-height: 180px;
 
-            }
 
-            .itemIcon {
-                min-height: 38px;
-                flex: 1;
-                width: 100%;
-                align-items: center;
-                justify-content: center;
+            &>.itemCell {
+                width: 50px;
+                height: 60px;
+                overflow: hidden;
+                cursor: pointer;
+                margin: 2px;
+                border-radius: 8px;
                 display: flex;
-            }
+                justify-content: center;
+                align-items: center;
+                flex-direction: column;
 
-            .price {
-                margin-top: 2px;
-                font-weight: 700;
-                text-align: right;
-                width: 100%;
+                &.selected {
+                    border: 2px solid #62c4e8;
+                    background-color: #fff;
 
-                img {
-                    vertical-align: middle;
+                }
+
+                .itemIcon {
+                    min-height: 38px;
+                    flex: 1;
+                    width: 100%;
+                    align-items: center;
+                    justify-content: center;
+                    display: flex;
+                }
+
+                .price {
+                    margin-top: 2px;
+                    font-weight: 700;
+                    text-align: right;
+                    width: 100%;
+
+                    img {
+                        vertical-align: middle;
+                    }
                 }
             }
         }
+
+        //.defaultGridLayoutItemContainer > .itemCell > img {}
+
     }
 
-    //.defaultGridLayoutItemContainer > .itemCell > img {}
+    .cataloguePage.frontpage {
+        //overflow-y: auto !important;
 
-}
+        .cards-list {
+            padding: 10px;
+        }
 
-.cataloguePage.frontpage {
-    //overflow-y: auto !important;
+        .card {
+            box-sizing: content-box;
+            margin-bottom: 20px;
+            box-shadow: 0 0 20px 0 #666;
+            border-radius: 10px;
+            overflow: hidden;
+            position: relative;
+            background: #fff;
+        }
 
-    .cards-list {
-        padding: 10px;
+        .card-header {
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            height: 300px;
+            color: #fff;
+            background-position: center;
+            background-size: cover;
+        }
+
+        .card-header>.head-title>h1 {
+            margin-bottom: 10px;
+        }
     }
-
-    .card {
-        box-sizing: content-box;
-        margin-bottom: 20px;
-        box-shadow: 0 0 20px 0 #666;
-        border-radius: 10px;
-        overflow: hidden;
-        position: relative;
-        background: #fff;
-    }
-
-    .card-header {
-        padding: 20px;
-        display: flex;
-        flex-direction: column;
-        justify-content: space-between;
-        height: 300px;
-        color: #fff;
-        background-position: center;
-        background-size: cover;
-    }
-
-    .card-header>.head-title>h1 {
-        margin-bottom: 10px;
-    }
-}
 </style>

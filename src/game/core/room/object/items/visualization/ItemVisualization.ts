@@ -1,9 +1,12 @@
 import { DisplayObject } from "pixi.js";
 import { Engine } from "../../../../../Engine";
+import { EntityEvents } from "../../../../../engine/events/room/objects/entities/EntityEvents";
 import { ItemEvents } from "../../../../../engine/events/room/objects/entities/ItemEvents";
 import Item from "../../../../../engine/room/objects/items/Item";
 import MapData from "../../../../../engine/room/objects/map/MapData";
 import { Tile } from "../../../../../engine/room/objects/map/Tile";
+import { RoomPriority } from "../../../../../engine/room/visualization/RoomPriority";
+import RoomVisualization from "../../../../../engine/room/visualization/RoomVisualization";
 import AvatarData from "../../../../../engine/ui/imagers/avatars/enum/AvatarData";
 import { ItemType } from "../../../../../engine/ui/imagers/items/FurniImager";
 import { FurniSprite } from "../../../../../engine/ui/imagers/items/FurniSprite";
@@ -16,8 +19,6 @@ import RoomObjectVisualization from '../../RoomObjectVisualization';
 
 export default abstract class ItemVisualization extends EntityVisualization {
     private position: Point3d;
-
-    public imagePreview: string | undefined;
 
     public iconImage: string | undefined;
 
@@ -46,9 +47,6 @@ export default abstract class ItemVisualization extends EntityVisualization {
     }
 
     public generateImages() {
-        this.entity.logic.events.on(ItemEvents.FURNI_SPRITE_LOADED, () =>{
-            this.imagePreview = UiUtils.generateBase64FromObject(this.entity.visualization.container)
-        })
 
         if(this.isIcon) {
             let icon = this.sprite.turnIntoIcon();
@@ -85,13 +83,27 @@ export default abstract class ItemVisualization extends EntityVisualization {
 
     public async render(): Promise<void> {
 
-        let entity = this.entity as Item
-
-        let sprite = await Engine.getInstance().userInterfaceManager.furniImager.loadFurniSprite(ItemType.FloorItem, this.entity.name)
+        try {
+            let sprite = await Engine.getInstance().userInterfaceManager.furniImager.loadFurniSprite(ItemType.FloorItem, this.entity.name)
         
-        sprite.start()
+            sprite.start()
 
-        this.container = sprite
+            let dir = sprite.getNextDirection(this.rotation)
+
+            this.rotation = dir
+
+            sprite.setDirection(dir)
+
+            this.container = sprite
+
+        } catch(e) {
+            //this.container = await Engine.getInstance().userInterfaceManager.furniImager.loadPlaceHolder()
+            throw new Error(e)
+        }
+
+        let spriteZIndex = this._entity.base.data.logic.dimensions[2]
+        
+        this.container.zIndex = this.getZIndex(spriteZIndex)
 
         this.container.interactive = true
         this.container.interactiveChildren = true
@@ -102,6 +114,10 @@ export default abstract class ItemVisualization extends EntityVisualization {
         }
 
         this.entity.logic?.registerEvents();
+
+        await this.entity.logic.onLoad()
+
+        this.entity.logic?.events.emit(ItemEvents.FURNI_SPRITE_LOADED)
     }
 
     public calculateOffsetX(): number {
@@ -120,7 +136,8 @@ export default abstract class ItemVisualization extends EntityVisualization {
         return ((tile!.position.getY() + tile!.position.getX()) * MapData.tileHeight / 2 + MapData.tileHeight / 2) + offsetFloor;
     }
 
-    public getZIndex(): number {
-        return 1 + this.entity.position.getX() + this.entity.position.getY()+ ((this.entity.position.getX() + this.entity.position.getY()) * 1000) + this.entity.position.getZ ()
+    public getZIndex(zIndex: number = 1): number {
+        const compareY = (Math.trunc(zIndex / 100)) / 10;
+        return RoomVisualization.calculateZIndex(new Point3d(this.entity.position.getX(), this.entity.position.getY() + compareY, this.entity.position.getZ()), RoomPriority.ROOM_ITEM);
     }
 }

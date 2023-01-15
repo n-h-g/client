@@ -4,6 +4,7 @@ import anime from "animejs";
 import { IOffsets } from "../../../../core/ui/imagers/items/IAsset";
 import { Container, DisplayObject } from 'pixi.js';
 import { Logger } from "../../../../utils/Logger";
+import { Direction } from "../../../../core/objects/Direction";
 
 export class FurniSprite extends Container {
   private _furniBase: FurniBase;
@@ -42,8 +43,7 @@ export class FurniSprite extends Container {
     }
     return directions[0];
   }
-  public getNextDirection() {
-    console.log(this.furniBase.data);
+  public getNextDirection(direction: Direction) {
     const directions = this.furniBase.getAvailableDirections();
     const pos = directions.indexOf(this.direction);
     return directions[(pos + 1) % directions.length];
@@ -140,7 +140,7 @@ export class FurniSprite extends Container {
               );
           let assetName = this.furniBase.assetNameFrom(
             this.isIcon ? 1 : FurniImager.DEFAULT_SIZE,
-            layer,
+            this.isIcon ? 0 : layer,
             this.direction,
             frame
           );
@@ -148,7 +148,7 @@ export class FurniSprite extends Container {
           if (assetName == undefined) {
             assetName = this.furniBase.assetNameFrom(
               this.isIcon ? 1 : FurniImager.DEFAULT_SIZE,
-              layer,
+              this.isIcon ? 0 : layer,
               this.direction + 2,
               frame
             );
