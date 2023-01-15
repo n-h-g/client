@@ -16,10 +16,6 @@ import UiUtils from "../../../../utils/UiUtils"
 
 export default class FurniImager {
 
-    public static DEFAULT_SIZE: number = 64;
-    public static LOADING_ALPHA: number = 0.6;
-    public static DEFAULT_ALPHA: number = 1;
-
     private ready: boolean
     private bases: {
         flooritem: {

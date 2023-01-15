@@ -5,6 +5,7 @@ import { IOffsets } from "../../../../core/ui/imagers/items/IAsset";
 import { Container, DisplayObject } from 'pixi.js';
 import { Logger } from "../../../../utils/Logger";
 import { Direction } from "../../../../core/objects/Direction";
+import { FurniData } from "./FurniData";
 
 export class FurniSprite extends Container {
   private _furniBase: FurniBase;
@@ -139,7 +140,7 @@ export class FurniSprite extends Container {
                 this.frameCount
               );
           let assetName = this.furniBase.assetNameFrom(
-            this.isIcon ? 1 : FurniImager.DEFAULT_SIZE,
+            this.isIcon ? 1 : FurniData.DEFAULT_SIZE,
             this.isIcon ? 0 : layer,
             this.direction,
             frame
@@ -147,7 +148,7 @@ export class FurniSprite extends Container {
 
           if (assetName == undefined) {
             assetName = this.furniBase.assetNameFrom(
-              this.isIcon ? 1 : FurniImager.DEFAULT_SIZE,
+              this.isIcon ? 1 : FurniData.DEFAULT_SIZE,
               this.isIcon ? 0 : layer,
               this.direction + 2,
               frame
@@ -169,6 +170,8 @@ export class FurniSprite extends Container {
               }
 
               let offsets: IOffsets = asset.offsets;
+
+              if(!spriteElement) return;
 
               spriteElement.pivot.x = offsets.left;
               spriteElement.pivot.y = offsets.top;

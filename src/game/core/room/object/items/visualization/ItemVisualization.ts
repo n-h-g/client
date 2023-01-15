@@ -8,6 +8,7 @@ import { Tile } from "../../../../../engine/room/objects/map/Tile";
 import { RoomPriority } from "../../../../../engine/room/visualization/RoomPriority";
 import RoomVisualization from "../../../../../engine/room/visualization/RoomVisualization";
 import AvatarData from "../../../../../engine/ui/imagers/avatars/enum/AvatarData";
+import { FurniData } from "../../../../../engine/ui/imagers/items/FurniData";
 import { ItemType } from "../../../../../engine/ui/imagers/items/FurniImager";
 import { FurniSprite } from "../../../../../engine/ui/imagers/items/FurniSprite";
 import Point from "../../../../../utils/point/Point";
@@ -129,7 +130,7 @@ export default abstract class ItemVisualization extends EntityVisualization {
         let currentRoom = Engine.getInstance().roomService?.CurrentRoom
         let tile: Tile = currentRoom.roomLayout.getFloorPlane().getTilebyPosition(new Point(Math.round(this.position.getX()), Math.round(this.position.getY())))
 
-        let offsetFloor = tile!.position.getZ() > 0 ? -MapData.thickSpace * MapData.stepHeight * tile!.position.getZ() : -AvatarData.AVATAR_TOP_OFFSET;
+        let offsetFloor = tile!.position.getZ() > 0 ? -MapData.thickSpace * MapData.stepHeight * tile!.position.getZ() : -FurniData.FURNI_TOP_OFFSET;
         
         return ((tile!.position.getY() + tile!.position.getX()) * MapData.tileHeight / 2 + MapData.tileHeight / 2) + offsetFloor;
     }

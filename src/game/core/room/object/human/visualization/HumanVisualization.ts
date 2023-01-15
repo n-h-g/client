@@ -141,7 +141,7 @@ export abstract class HumanVisualization extends EntityVisualization {
 
     public getZIndex(): number {
 
-        let isAtDoor = Math.floor(this.entity.position.getX()) == Engine.getInstance().roomService.CurrentRoom.roomLayout.getDoorPosition().getX() && Math.floor(this.entity.position.getY()) == this.entity.position.getY()
+        let isAtDoor = Math.floor(this.entity.position.getX()) == Engine.getInstance().roomService.CurrentRoom.roomLayout.getDoorPosition().getX() && Math.floor(this.entity.position.getY()) == Engine.getInstance().roomService.CurrentRoom.roomLayout.getDoorPosition().getY()
 
 
         return RoomVisualization.calculateZIndex(new Point3d(this.entity.position.getX(), this.entity.position.getY(), this.entity.position.getZ() + 0.001), isAtDoor ? RoomPriority.DOOR_FLOOR_USER : RoomPriority.USER)

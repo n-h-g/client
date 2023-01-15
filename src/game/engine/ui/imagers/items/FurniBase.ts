@@ -75,7 +75,7 @@ export default class FurniBase {
     public updateSpriteFrom(sprite: PIXI.Sprite, layer: ILayer): PIXI.Sprite {
         if (layer) {
             if (layer.ink === 'ADD') {
-                sprite.blendMode = PIXI.BLEND_MODES.ADD;
+                sprite.blendMode = PIXI.BLEND_MODES.COLOR;
             }
             if(layer.z) {
                 sprite.zIndex = layer.z
@@ -134,6 +134,10 @@ export default class FurniBase {
     }
 
     public getSprite(texture: PIXI.Texture, framePart: IAsset): PIXI.Sprite {
+
+        if(!framePart.sprite) {
+            return;
+        }
         
         texture = new PIXI.Texture(texture.baseTexture, new PIXI.Rectangle(framePart.sprite.left, framePart.sprite.top, framePart.sprite.width, framePart.sprite.height))
         let sprite = new PIXI.Sprite(texture);
