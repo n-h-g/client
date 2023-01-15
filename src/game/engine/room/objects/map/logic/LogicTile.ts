@@ -6,6 +6,7 @@ import { Engine } from "../../../../../Engine"
 import { OutgoingPacket } from "../../../../../networking/packets/outgoing/OutgoingPacket"
 import { RoomObjectLogic } from '../../../../../core/room/object/RoomObjectLogic'
 import { Tile } from '../Tile'
+import { OfflineMode } from "../../../../../offline/OfflineMode"
 
 export default class LogicTile extends RoomObjectLogic {
     private tile: Tile
@@ -29,7 +30,17 @@ export default class LogicTile extends RoomObjectLogic {
         }, 200);
     }
 
+    dispose(): void {
+        throw new Error("Method not implemented.")
+    }
+
     public onClick(): void {
+
+        if(Engine.getInstance().config.offlineMode) {
+            OfflineMode.getInstance().walk(this.tile.position)
+            return
+        }
+
         Engine.getInstance().networkingManager.packetManager.applyOut(OutgoingPacket.UserMove, {
             x: this.tile.position.getX(),
             y: this.tile.position.getY()
