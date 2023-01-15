@@ -68,10 +68,13 @@ export class Engine {
         this._userInterfaceManager = new UserInterfaceManager()
         await this._userInterfaceManager.init()
 
-        EventManager.emit<LoadingProgressEventData>(UIEvents.LOAD, {
-            width: 100,
-            message: 'Logged'
-        })
+        if(!this._networkingManager.webSocketManager.closed) {
+            EventManager.emit<LoadingProgressEventData>(UIEvents.LOAD, {
+                width: 100,
+                message: 'Logged'
+            })
+        }
+        
 
         this.application.init()
 

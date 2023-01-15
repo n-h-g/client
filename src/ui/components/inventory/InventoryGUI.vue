@@ -14,14 +14,14 @@
                     <div class="listContainer itemsContainer" v-if="currentTab == 'floor'">
                         <div class="itemInventory" :class="{ selected: selectedItem && selectedItem.id == item.Id }"
                             v-for="item in floorItems" @click.stop="selectItem(item)" v-bind:key="item.Id">
-                            <img v-bind:src="item.objectVisualization.iconImage" :alt="item.Name" />
+                            <img :alt="item.Name" />
                             <span class="stackSize">{{ item.qty }}</span>
                         </div>
                     </div>
                     <div class="listContainer itemsContainer" v-if="currentTab == 'wall'">
                         <div class="itemInventory" :class="{ selected: selectedItem && selectedItem.id == item.Id }"
                             v-for="item in wallItems" @click.stop="selectItem(item)" v-bind:key="item.Id">
-                            <img :src="item.objectVisualization.iconImage" alt="item.Name" />
+                            <img alt="item.Name" />
                             <span class="stackSize">{{ item.qty }}</span>
                         </div>
                     </div>
@@ -82,6 +82,10 @@ import { UIEventsType } from "../../../game/engine/events/ui/UIEventsType"
 import Dialog from '../dialog/Dialog.vue'
 import { UIComponent } from "../../../game/engine/ui/components/UIComponent"
 import { IComponentShowableUI } from "../../../game/core/ui/IComponentShowableUI"
+import { EventManager } from "../../../game/core/events/EventManager"
+import { UIEvents } from "../../../game/engine/events/ui/UIEvents"
+import { InventoryItemsEventData } from "../../../game/engine/events/ui/data/inventory/InventoryItems"
+import { ItemType } from "../../../game/engine/ui/imagers/items/FurniImager"
 
 const tradeMode = ref(false)
 const myTradeItems = ref([])
@@ -101,6 +105,16 @@ const floorItems = ref([])
 const wallItems = ref([])
 
 const showAddAllItemsToTradeButton = ref(false)
+
+EventManager.read(UIEvents.INVENTORY_ITEMS_ADDED, (data: InventoryItemsEventData) => {
+    for(let item of data.items) {
+        if(item.item_type == ItemType.FloorItem) {
+            floorItems.value.push(item)
+        } else {
+            wallItems.value.push(item)
+        }
+    }
+})
 
 function addAllItemsToTrade() {
 

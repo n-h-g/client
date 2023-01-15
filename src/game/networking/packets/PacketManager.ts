@@ -38,6 +38,7 @@ export class PacketManager {
             205: new RemoveEntity,
             207: new UserTypingStatus,
             400: new UpdateUserInformation,
+            401: new LoadInventoryItems,
             800: new CataloguePages,
             801: new CataloguePage,
             18: new LoadInventoryItems,
