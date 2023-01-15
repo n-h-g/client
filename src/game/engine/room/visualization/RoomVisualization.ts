@@ -61,6 +61,8 @@ export default class RoomVisualization implements IRoomVisualization {
         this.canvasWall.zIndex = RoomVisualization.calculateZIndex(defaultPoint, RoomPriority.WALL);
 
         this.container.interactive = true
+
+        this.container.sortableChildren = true
     }
     
 
