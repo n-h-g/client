@@ -166,7 +166,7 @@ export default class FurniImager {
 }
 
 export enum ItemType {
-    FloorItem = 'flooritem', WallItem = 'wallitem'
+    FloorItem = 'FLOOR_ITEM', WallItem = 'WALL_ITEM'
 }
 
 export interface NameColorPair {
