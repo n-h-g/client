@@ -21,7 +21,7 @@ export class  OfflineMode {
 
     private static entityId: string = "473674-34dfbnasb-43423"
 
-    private static item: string = "hole"
+    private static item: string = "hc_machine"
 
     public constructor(engine: Engine) {
         this._engine = engine
