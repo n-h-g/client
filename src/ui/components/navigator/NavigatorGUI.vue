@@ -93,7 +93,7 @@ function changeTab(tab: string) {
 
 <style lang="scss">
 .navigator {
-  position: fixed;
+  position: relative;
   height: 500px;
   width: 425px;
 
