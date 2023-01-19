@@ -1,40 +1,28 @@
 <template>
-    <div id="dialog" @mousedown="pointerDown" @mouseup="pointerUp" :style="style">
-        <div class="title-bar">
-            {{ props.title }}
-            <div class="closeIcon" @click="hide()"></div>
+    <DragDialog :class="props.className">
+        <div id="dialog" :class="props.className">
+            <div class="title-bar drag-handler">
+                {{ props.title }}
+                <div class="closeIcon" @click="hide()"></div>
+            </div>
+            <div class="content">
+                <slot></slot>
+            </div>
         </div>
-        <div class="content">
-            <slot />
-        </div>
-    </div>
+    </DragDialog>
 </template>
 
 <script setup lang="ts">
-import { onMounted, ref, } from 'vue'
 import { EventManager } from '../../../game/core/events/EventManager'
 import { DialogEventData } from '../../../game/engine/events/ui/data/general/Dialog'
 import { UIEvents } from "../../../game/engine/events/ui/UIEvents"
 import { UIEventsType } from "../../../game/engine/events/ui/UIEventsType"
-
-let style = ref('');
-
-const mouseMove = ev => {
-    style.value = 'transform: translate('+ ev.clientX +'px, '+ ev.clientY + 'px)'
-}
-
-const pointerDown = ev => {
-    document.getElementById('dialog').addEventListener('mousemove', mouseMove)
-}
-
-const pointerUp = ev => {
-    document.getElementById('dialog').removeEventListener('mousemove', mouseMove)
-}
-
+import DragDialog from './DragDialog.vue'
 
 const props = defineProps<{
     title: String,
-    box: UIEventsType
+    box: UIEventsType,
+    className: String
 }>()
 
 function hide() {
