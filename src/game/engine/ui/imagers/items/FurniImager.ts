@@ -16,10 +16,6 @@ import UiUtils from "../../../../utils/UiUtils"
 
 export default class FurniImager {
 
-    public static DEFAULT_SIZE: number = 64;
-    public static LOADING_ALPHA: number = 0.6;
-    public static DEFAULT_ALPHA: number = 1;
-
     private ready: boolean
     private bases: {
         flooritem: {
@@ -88,7 +84,7 @@ export default class FurniImager {
         return null;
     }
 
-    public loadFurniBase(type: ItemType, furniBaseName: string): Promise<FurniBase> {
+    public loadFurniBase(type: FurnidataItemType, furniBaseName: string): Promise<FurniBase> {
 
         let rawItem = this.findItemByName(furniBaseName);
 
@@ -121,7 +117,7 @@ export default class FurniImager {
         return this.bases[type][itemName]
     }
 
-    public loadFurniSprite(type: ItemType, name: string): Promise<FurniSprite> {
+    public loadFurniSprite(type: FurnidataItemType, name: string): Promise<FurniSprite> {
         const {
             colorId
         } = splitItemNameAndColor(name);
@@ -137,7 +133,7 @@ export default class FurniImager {
         })
     }
 
-    public loadFurniIcon(type: ItemType, name: string): Promise<FurniSprite> {
+    public loadFurniIcon(type: FurnidataItemType, name: string): Promise<FurniSprite> {
         const {
             colorId
         } = splitItemNameAndColor(name);
@@ -169,7 +165,7 @@ export default class FurniImager {
     }
 }
 
-export enum ItemType {
+export enum FurnidataItemType {
     FloorItem = 'flooritem', WallItem = 'wallitem'
 }
 

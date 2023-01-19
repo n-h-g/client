@@ -8,14 +8,13 @@ import { Tile } from "../../../../../engine/room/objects/map/Tile";
 import { RoomPriority } from "../../../../../engine/room/visualization/RoomPriority";
 import RoomVisualization from "../../../../../engine/room/visualization/RoomVisualization";
 import AvatarData from "../../../../../engine/ui/imagers/avatars/enum/AvatarData";
-import { ItemType } from "../../../../../engine/ui/imagers/items/FurniImager";
+import { FurniData } from "../../../../../engine/ui/imagers/items/FurniData";
+import { FurnidataItemType } from "../../../../../engine/ui/imagers/items/FurniImager";
 import { FurniSprite } from "../../../../../engine/ui/imagers/items/FurniSprite";
 import Point from "../../../../../utils/point/Point";
 import Point3d from "../../../../../utils/point/Point3d";
 import UiUtils from "../../../../../utils/UiUtils";
 import { EntityVisualization } from "../../entities/EntityVisualization";
-import { IRoomObjectVisualization } from '../../IRoomObjectVisualization';
-import RoomObjectVisualization from '../../RoomObjectVisualization';
 
 export default abstract class ItemVisualization extends EntityVisualization {
     private position: Point3d;
@@ -84,7 +83,7 @@ export default abstract class ItemVisualization extends EntityVisualization {
     public async render(): Promise<void> {
 
         try {
-            let sprite = await Engine.getInstance().userInterfaceManager.furniImager.loadFurniSprite(ItemType.FloorItem, this.entity.name)
+            let sprite = await Engine.getInstance().userInterfaceManager.furniImager.loadFurniSprite(FurnidataItemType.FloorItem, this.entity.name)
         
             sprite.start()
 
@@ -131,13 +130,13 @@ export default abstract class ItemVisualization extends EntityVisualization {
         let currentRoom = Engine.getInstance().roomService?.CurrentRoom
         let tile: Tile = currentRoom.roomLayout.getFloorPlane().getTilebyPosition(new Point(Math.round(this.position.getX()), Math.round(this.position.getY())))
 
-        let offsetFloor = tile!.position.getZ() > 0 ? -MapData.thickSpace * MapData.stepHeight * tile!.position.getZ() : -AvatarData.AVATAR_TOP_OFFSET;
+        let offsetFloor = tile!.position.getZ() > 0 ? -MapData.thickSpace * MapData.stepHeight * tile!.position.getZ() : -FurniData.FURNI_TOP_OFFSET;
         
         return ((tile!.position.getY() + tile!.position.getX()) * MapData.tileHeight / 2 + MapData.tileHeight / 2) + offsetFloor;
     }
 
     public getZIndex(zIndex: number = 1): number {
-        const compareY = (Math.trunc(zIndex / 100)) / 10;
+        const compareY = (Math.trunc(this._entity.base.data.logic.dimensions[2] / 100)) / 10;
         return RoomVisualization.calculateZIndex(new Point3d(this.entity.position.getX(), this.entity.position.getY() + compareY, this.entity.position.getZ()), RoomPriority.ROOM_ITEM);
     }
 }

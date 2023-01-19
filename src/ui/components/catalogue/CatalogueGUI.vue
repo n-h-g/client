@@ -54,7 +54,7 @@ import { CataloguePagesData } from "../../../game/engine/events/ui/data/catalogu
 import { UIEvents } from "../../../game/engine/events/ui/UIEvents"
 import { UIEventsType } from "../../../game/engine/events/ui/UIEventsType"
 import Room from "../../../game/engine/room/Room"
-import { ItemType } from "../../../game/engine/ui/imagers/items/FurniImager"
+import { FurnidataItemType } from "../../../game/engine/ui/imagers/items/FurniImager"
 import { OutgoingPacket } from "../../../game/networking/packets/outgoing/OutgoingPacket"
 import Point from "../../../game/utils/point/Point"
 import Point3d from "../../../game/utils/point/Point3d"
@@ -121,7 +121,7 @@ async function generatePlaceHolder(item: CataloguePageItem): Promise<string> {
 
 function getIcon(catalogItem: CataloguePageItem) {
 
-    Engine.getInstance().userInterfaceManager.furniImager.loadFurniIcon(ItemType.FloorItem, catalogItem.name).then((sprite) => {
+    Engine.getInstance().userInterfaceManager.furniImager.loadFurniIcon(FurnidataItemType.FloorItem, catalogItem.name).then((sprite) => {
         sprite.start()
         
         setTimeout(() => {

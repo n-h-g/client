@@ -16,6 +16,10 @@ export default class LogicWall extends RoomObjectLogic {
         this.hitContext = canvas.getContext("2d")
     }
 
+    dispose(): void {
+        throw new Error("Method not implemented.")
+    }
+
     registerEvents(): void {
         setTimeout(() => {          
             this.wall.visualization.WallContext?.on('pointerdown', () => this.onClick());

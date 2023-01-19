@@ -1,3 +1,4 @@
 /node_modules/
 /dist/
 /src/game/configuration/general.json
+/src/offline/

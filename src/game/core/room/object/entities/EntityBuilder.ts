@@ -3,7 +3,7 @@ import FloorItem from "../../../../engine/room/objects/items/FloorItem";
 import WallItem from "../../../../engine/room/objects/items/WallItem";
 import { UserEntity } from "../../../../engine/room/objects/users/UserEntity";
 import UserEntityVisualization from "../../../../engine/room/objects/users/visualization/UserEntityVisualization";
-import { ItemType } from "../../../../engine/ui/imagers/items/FurniImager";
+import { FurnidataItemType } from "../../../../engine/ui/imagers/items/FurniImager";
 import Point3d from "../../../../utils/point/Point3d";
 import { IAspectComponent } from "./components/IAspectComponent";
 import { IHeadBodyRotationComponent } from "./components/IHeadBodyRotation";
@@ -92,7 +92,7 @@ export class EntityBuilder {
             }
         } else if(this._type == EntityType.ITEM) 
         {
-           let base = await Engine.getInstance().userInterfaceManager.furniImager.loadFurniBase(ItemType.FloorItem, this._name)
+           let base = await Engine.getInstance().userInterfaceManager.furniImager.loadFurniBase(FurnidataItemType.FloorItem, this._name)
            if(this._position != null) {
                 entity = new FloorItem(this._id, this._name, position, base)
            } else {

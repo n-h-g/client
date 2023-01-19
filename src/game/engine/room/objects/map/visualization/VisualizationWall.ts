@@ -131,10 +131,7 @@ export default class VisualizationWall extends RoomObjectVisualization {
             //console.log(this.wall.plane.room.getMapSizeX())
             let last: boolean = this.wall.isLast();
 
-
-            if(this.wall.position.getX() === this.wall.plane.room.getDoorPosition().getX() -1 && this.wall.position.getY() === 1) {
-                ctx.endFill()
-            } else if(this.wall.position.getY() === this.wall.plane.room.getDoorPosition().getY() -1 && this.wall.position.getX() === 1) {
+            if(!last) {
                 ctx.endFill()
             } else {
                 

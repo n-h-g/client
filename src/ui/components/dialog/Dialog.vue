@@ -97,6 +97,7 @@ function hide() {
             line-height: 19px;
             text-decoration: none;
             border-radius: 6px 6px 0 0;
+            cursor:pointer;
 
             &.active {
                 border: 1px solid #000;

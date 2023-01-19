@@ -6,6 +6,9 @@ import { Engine } from "../../../../../Engine"
 import { OutgoingPacket } from "../../../../../networking/packets/outgoing/OutgoingPacket"
 import { RoomObjectLogic } from '../../../../../core/room/object/RoomObjectLogic'
 import { Tile } from '../Tile'
+import { OfflineMode } from "../../../../../offline/OfflineMode"
+import { RoomPriority } from "../../../visualization/RoomPriority"
+import RoomVisualization from "../../../visualization/RoomVisualization"
 
 export default class LogicTile extends RoomObjectLogic {
     private tile: Tile
@@ -29,7 +32,17 @@ export default class LogicTile extends RoomObjectLogic {
         }, 200);
     }
 
+    dispose(): void {
+        throw new Error("Method not implemented.")
+    }
+
     public onClick(): void {
+
+        if(Engine.getInstance().config.offlineMode) {
+            OfflineMode.getInstance().walk(this.tile.position)
+            return
+        }
+
         Engine.getInstance().networkingManager.packetManager.applyOut(OutgoingPacket.UserMove, {
             x: this.tile.position.getX(),
             y: this.tile.position.getY()
@@ -45,7 +58,10 @@ export default class LogicTile extends RoomObjectLogic {
 
         let tileContext: Container | null | undefined = this.tile.visualization?.container;
 
-        this.tile.plane.room.Visualization.getCanvasPointer().zIndex = 5;
+        let isDoor = this.tile.position.getX() == this.tile.plane.room.getDoorPosition().getX() && this.tile.position.getY() == this.tile.plane.room.getDoorPosition().getY()
+
+
+        this.tile.plane.room.Visualization.getCanvasPointer().zIndex = RoomVisualization.calculateZIndex(this.tile.position, isDoor ? RoomPriority.DOOR_FLOOR_SELECT : RoomPriority.POINTER);
         this.tile.plane.room.Visualization.getCanvasPointer().visible = true;
         this.tile.plane.room.getPointer().visualization.updatePosition(tileContext!.x, tileContext!.y, this.tile);
     }

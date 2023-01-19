@@ -19,6 +19,10 @@ export default class LogicPlane extends RoomObjectLogic {
 
     }
 
+    dispose(): void {
+        throw new Error('Method not implemented.')
+    }
+
     registerEvents(): void {
         this.plane.mapObjects.forEach((obj) => {
             if (obj instanceof RoomObjectController) {

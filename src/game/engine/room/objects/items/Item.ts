@@ -5,7 +5,7 @@ import { RoomObjectController } from "../../../../core/room/object/RoomObjectCon
 import { Engine } from '../../../../Engine';
 import Point3d from "../../../../utils/point/Point3d";
 import FurniBase from '../../../ui/imagers/items/FurniBase';
-import { ItemType } from '../../../ui/imagers/items/FurniImager';
+import { FurniDataItemType } from '../../../ui/imagers/items/FurniImager';
 import { FurniSprite } from "../../../ui/imagers/items/FurniSprite";
 import Room from "../../Room";
 import ItemLogicBasic from "./logic/ItemLogicBasic";
