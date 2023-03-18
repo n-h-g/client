@@ -6,6 +6,7 @@ import { Container, DisplayObject } from 'pixi.js';
 import { Logger } from "../../../../utils/Logger";
 import { Direction } from "../../../../core/objects/Direction";
 import { FurniData } from "./FurniData";
+import { Engine } from "../../../../Engine";
 
 export class FurniSprite extends Container {
   private _furniBase: FurniBase;

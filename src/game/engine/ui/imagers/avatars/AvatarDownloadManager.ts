@@ -2,17 +2,10 @@
 import { fetchJsonAsync } from "../../../../utils/DownloadManager";
 
 import * as PIXI from 'pixi.js'
-import UiUtils from "../../../../utils/UiUtils";
 import RenderingUtils from "../../../../utils/RenderingUtils";
 import { Engine } from "../../../../Engine";
 
 export default class AvatarDownloadManager {
-
-    private complete: boolean = false;
-
-    constructor() {
-
-    }
 
     public loadConfigFile(resource: string): any {
         return new Promise((resolve, reject) => {

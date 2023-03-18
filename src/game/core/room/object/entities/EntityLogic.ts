@@ -55,7 +55,7 @@ export abstract class EntityLogic extends RoomObjectLogic {
             id: entity.id,
             mode: mode,
             name: entity.name,
-            motto: "dsds",
+            motto: "",
             image: UiUtils.generateImageFromObject(this.entity.visualization?.container!).src
         })
     }

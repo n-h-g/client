@@ -10,8 +10,6 @@ import AvatarStructure from "./structure/AvatarStructure";
 
 const DEFAULT_FIGURE = "hd-180-1.ch-255-66.lg-280-110.sh-305-62.ha-1012-110.hr-828-61";
 
-
-
 export type FigurePart = {
     type: string;
     id: string;
@@ -51,8 +49,6 @@ export default class Avatar {
     private totalFrames: number = 0;
 
     private events: AvatarEvents | null = null;
-
-    // private bodyPartContainers: BodyPartContainers;
 
     constructor(
         figure: string = DEFAULT_FIGURE,

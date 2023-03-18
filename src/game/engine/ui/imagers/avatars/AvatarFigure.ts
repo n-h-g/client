@@ -3,7 +3,6 @@ import { FigurePart } from "./Avatar";
 import AvatarFigureComponent from "./AvatarFigureComponent";
 import AvatarFigureDataPart from "./AvatarFigureDataPart";
 import AvatarFigurePart from "./AvatarFigurePart";
-import { FigureDataPart } from "./AvatarImager";
 import AvatarStructure from "./structure/AvatarStructure";
 import PaletteColor from "./structure/figure/PaletteColor";
 
