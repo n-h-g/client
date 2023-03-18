@@ -1,5 +1,5 @@
 <template>
-  <Dialog title="Navigator" class="navigator" :box="UIEventsType.NAVIGATOR">
+  <Dialog title="Navigator" className="navigator" :box="UIEventsType.NAVIGATOR">
     <div class="sub">
       <div class="item" :class="{ active: currentTab == 'public' }" @click="changeTab('public')">
         Public
@@ -93,7 +93,8 @@ function changeTab(tab: string) {
 
 <style lang="scss">
 .navigator {
-  position: fixed;
+  position: absolute;
+  z-index: 2;
   height: 500px;
   width: 425px;
 

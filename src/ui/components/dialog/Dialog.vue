@@ -1,13 +1,15 @@
 <template>
-    <div id="dialog">
-        <div class="title-bar" ref="handler">
-            {{ props.title }}
-            <div class="closeIcon" @click="hide()"></div>
+    <DragDialog :class="props.className">
+        <div id="dialog" :class="props.className">
+            <div class="title-bar drag-handler">
+                {{ props.title }}
+                <div class="closeIcon" @click="hide()"></div>
+            </div>
+            <div class="content">
+                <slot></slot>
+            </div>
         </div>
-        <div class="content">
-            <slot />
-        </div>
-    </div>
+    </DragDialog>
 </template>
 
 <script setup lang="ts">
@@ -15,10 +17,12 @@ import { EventManager } from '../../../game/core/events/EventManager'
 import { DialogEventData } from '../../../game/engine/events/ui/data/general/Dialog'
 import { UIEvents } from "../../../game/engine/events/ui/UIEvents"
 import { UIEventsType } from "../../../game/engine/events/ui/UIEventsType"
+import DragDialog from './DragDialog.vue'
 
 const props = defineProps<{
     title: String,
-    box: UIEventsType
+    box: UIEventsType,
+    className: String
 }>()
 
 function hide() {
