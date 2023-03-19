@@ -1,5 +1,5 @@
 <template>
-  <Dialog title="Navigator" className="navigator" :box="UIEventsType.NAVIGATOR">
+  <Dialog title="Navigator" class-name="navigator" :box="UIEventsType.NAVIGATOR">
     <div class="sub">
       <div class="item" :class="{ active: currentTab == 'public' }" @click="changeTab('public')">
         Public

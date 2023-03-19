@@ -1,5 +1,5 @@
 <template>
-    <Dialog title="Catalogue" class="catalogue" :box="UIEventsType.CATALOGUE">
+    <Dialog title="Catalogue" class-name="catalogue" :box="UIEventsType.CATALOGUE">
         <div class="header">
             <div class="headerImage">
                 <img v-if="activePage && activePage.rawInfo && activePage.rawInfo.headerImage && activePage.rawInfo.headerImage != ''"
@@ -147,7 +147,8 @@ function openPage() {
 
 <style lang="scss">
 .catalogue {
-    position: fixed;
+    position: absolute;
+    z-index: 2;
     height: 620px;
     width: 568px;
 

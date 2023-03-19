@@ -1,5 +1,5 @@
 <template>
-  <Dialog title="Create Room" class="createRoom" :box="UIEventsType.NAVIGATOR">
+  <Dialog title="Create Room" class-name="createRoom" :box="UIEventsType.NAVIGATOR">
     <div class="createRoomContainer">
       <h2>Choose the model</h2>
       <div class="roomGrid">

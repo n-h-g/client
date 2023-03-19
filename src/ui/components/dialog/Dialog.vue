@@ -1,23 +1,22 @@
 <template>
-    <DragDialog :class="props.className">
-        <div id="dialog" :class="props.className">
-            <div class="title-bar drag-handler">
-                {{ props.title }}
-                <div class="closeIcon" @click="hide()"></div>
-            </div>
-            <div class="content">
-                <slot></slot>
-            </div>
+    <div id="dialog" :class="props.className" draggable="true" @dragstart="dragStart" @drag="drag"
+        @dragend="dragEnd">
+        <div class="title-bar drag-handler">
+            {{ props.title }}
+            <div class="closeIcon" @click="hide"></div>
         </div>
-    </DragDialog>
+        <div class="content">
+            <slot></slot>
+        </div>
+    </div>
 </template>
 
 <script setup lang="ts">
+import { ref } from 'vue'
 import { EventManager } from '../../../game/core/events/EventManager'
 import { DialogEventData } from '../../../game/engine/events/ui/data/general/Dialog'
 import { UIEvents } from "../../../game/engine/events/ui/UIEvents"
 import { UIEventsType } from "../../../game/engine/events/ui/UIEventsType"
-import DragDialog from './DragDialog.vue'
 
 const props = defineProps<{
     title: String,
@@ -30,13 +29,50 @@ function hide() {
         type: props.box,
     })
 }
+
+const offset = ref({
+    x: 0,
+    y: 0
+})
+const initial = ref({
+    x: 0,
+    y: 0
+})
+const current = ref({
+    x: 0,
+    y: 0
+})
+const active = ref(false)
+
+const dragStart = (ev: DragEvent) => {
+    initial.value.x = ev.clientX - offset.value.x
+    initial.value.y = ev.clientY - offset.value.y
+    active.value = true
+}
+
+const drag = (ev: DragEvent) => {
+    if (active.value) {
+        ev.preventDefault();
+        current.value.x = ev.clientX - initial.value.x
+        current.value.y = ev.clientY - initial.value.y
+        offset.value.x = current.value.x
+        offset.value.y = current.value.y
+        document.getElementById('dialog').style.transform = 'translate3d(' + current.value.x + 'px, ' + current.value.y + 'px, 0)'
+    }
+}
+
+const dragEnd = () => {
+    initial.value.x = current.value.x
+    initial.value.y = current.value.y
+    active.value = false
+}
 </script>
 
 <style lang="scss">
 #dialog {
-	border-radius: 6px;
+    border-radius: 6px;
     border: 6px solid #367897;
-    box-shadow: #408caf 5px 5px inset,  #408caf -5px -5px inset;
+    box-shadow: #408caf 5px 5px inset, #408caf -5px -5px inset;
     pointer-events: all;
     z-index: 1;
 
@@ -85,7 +121,7 @@ function hide() {
             line-height: 19px;
             text-decoration: none;
             border-radius: 6px 6px 0 0;
-            cursor:pointer;
+            cursor: pointer;
 
             &.active {
                 border: 1px solid #000;
