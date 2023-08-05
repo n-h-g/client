@@ -1,3 +1,3 @@
 export interface IColorLayer {
-    color: number;
+    color: number
 }

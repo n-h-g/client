@@ -9,7 +9,6 @@ export default class LogicPointer extends RoomObjectLogic {
     constructor(pointer: Pointer) {
         super()
         this.pointer = pointer
-
     }
 
     dispose(): void {

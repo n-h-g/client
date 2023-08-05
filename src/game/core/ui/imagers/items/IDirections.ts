@@ -1,5 +1,5 @@
-import { ILayer } from "./ILayer";
+import { ILayer } from './ILayer'
 
 export interface IDirections {
-    layers: { [key: string] : ILayer };
+    layers: { [key: string] : ILayer }
 }

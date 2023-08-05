@@ -7,18 +7,14 @@
 <script setup lang="ts">
 import '@/assets/scss/game.scss'
 import { onMounted } from 'vue'
-import { useRoute } from 'vue-router'
+import { useRoute, RouteLocationNormalizedLoaded } from 'vue-router'
 import { Engine } from '../../game/Engine'
 
-const route = useRoute()
-
-const sso: string | string[] = route.params.sso
-
 onMounted(() => {
-    let engine = new Engine()
-
+    const route: RouteLocationNormalizedLoaded = useRoute()
+    const sso: string = route.params.sso[0]
+    const engine: Engine = new Engine()
     engine.init()
-
-    engine.sso = sso as string
+    engine.sso = sso
 })
 </script>

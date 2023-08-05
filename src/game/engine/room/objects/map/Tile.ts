@@ -1,9 +1,9 @@
-import LogicTile from "./logic/LogicTile"
-import VisualizationTile from "./visualization/VisualizationTile"
-import { RoomObjectController } from "../../../../core/room/object/RoomObjectController"
-import TileType from "./TileTypeEnum"
-import Point3d from "../../../../utils/point/Point3d"
-import ColorRGB from "../../../../utils/color/ColorRGB"
+import LogicTile from './logic/LogicTile'
+import VisualizationTile from './visualization/VisualizationTile'
+import { RoomObjectController } from '../../../../core/room/object/RoomObjectController'
+import { TileType } from './TileTypeEnum'
+import Point3d from '../../../../utils/point/Point3d'
+import ColorRGB from '../../../../utils/color/ColorRGB'
 import { FloorPlane } from './FloorPlane'
 
 export class Tile extends RoomObjectController<VisualizationTile, LogicTile> {

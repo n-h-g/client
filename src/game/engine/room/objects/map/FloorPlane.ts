@@ -1,10 +1,10 @@
-import RoomPlaneType from "./RoomPlaneTypeEnum"
-import ColorRGB from "../../../../utils/color/ColorRGB"
-import TileType from "./TileTypeEnum"
-import MapTypeChecker from "./MapTypeChecker"
-import Point3d from "../../../../utils/point/Point3d"
-import RoomLayout from "../../RoomLayout"
-import Point from "../../../../utils/point/Point"
+import { RoomPlaneType } from './RoomPlaneTypeEnum'
+import ColorRGB from '../../../../utils/color/ColorRGB'
+import { TileType } from './TileTypeEnum'
+import MapTypeChecker from './MapTypeChecker'
+import Point3d from '../../../../utils/point/Point3d'
+import RoomLayout from '../../RoomLayout'
+import Point from '../../../../utils/point/Point'
 import { RoomPlane } from './RoomPlane'
 import { Tile } from './Tile'
 

@@ -1,14 +1,14 @@
 import { EventEmitter } from 'eventemitter3'
-import { UIEvents } from '../../engine/events/ui/UIEvents'
+import { Events } from '../../engine/events/Events'
 
 export class EventManager {
-    private static _event = new EventEmitter()
+    private static _eventManager = new EventEmitter()
 
-    public static emit<T>(key: UIEvents, event?: T): void {
-        this._event.emit(key, event)
+    public static emit<T>(key: Events, event?: T): void {
+        this._eventManager.emit(key.key, event)
     }
 
-    public static read(key: UIEvents, callback): void {
-        this._event.addListener(key, callback)
+    public static read(key: Events, callback: (payload: any) => void): void {
+        this._eventManager.addListener(key.key, callback)
     }
 }

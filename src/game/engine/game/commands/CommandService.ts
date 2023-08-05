@@ -5,10 +5,11 @@ import { ChooserCommand } from './ChooserCommand';
 
 export class CommandService extends Service<string, Command> {
     constructor() {
-        super();
-        this.repository = new CommandRepository();
+        super()
 
-        this.init();
+        this.repository = new CommandRepository()
+
+        this.init()
     }
 
     public init() {

@@ -1,11 +1,9 @@
-import RoomObjectVisualization from "../../../../../core/room/object/RoomObjectVisualization";
-import Pointer from "../Pointer";
-import MapData from "../MapData";
-import ColorRGB from "../../../../../utils/color/ColorRGB";
-import { Container, Graphics, Point } from 'pixi.js';
-import { Tile } from '../Tile';
-import { RoomPriority } from "../../../visualization/RoomPriority";
-import RoomVisualization from "../../../visualization/RoomVisualization";
+import RoomObjectVisualization from '../../../../../core/room/object/RoomObjectVisualization'
+import Pointer from '../Pointer'
+import MapData from '../MapData'
+import ColorRGB from '../../../../../utils/color/ColorRGB'
+import { Container, Graphics, Point } from 'pixi.js'
+import { Tile } from '../Tile'
 
 export default class VisualizationPointer extends RoomObjectVisualization {
     private pointerContext: Container
@@ -17,9 +15,9 @@ export default class VisualizationPointer extends RoomObjectVisualization {
     constructor(pointer: Pointer) {
         super(pointer.position.getX(), pointer.position.getY(), pointer.position.getZ())
 
-        this.pointerContext = pointer.getCanvas();
-        this.pointerContext.interactive = true;
-        this.pointerContext.visible = false;
+        this.pointerContext = pointer.getCanvas()
+        this.pointerContext.interactive = true
+        this.pointerContext.visible = false
         this.render()
     }
 
@@ -35,10 +33,10 @@ export default class VisualizationPointer extends RoomObjectVisualization {
         let xpos = ((x - y) * (MapData.tileWidth / 2)) + tile!.visualization!.offsetX
         let ypos = ((x + y) * (MapData.tileHeight / 2)) + tile!.visualization!.offsetY
 
-        this.pointerContext.visible = true;
+        this.pointerContext.visible = true
 
-        this.pointerContext.x = xpos;
-        this.pointerContext.y = ypos;
+        this.pointerContext.x = xpos
+        this.pointerContext.y = ypos
     }
 
     public getPointerWidth(): number {
@@ -46,25 +44,25 @@ export default class VisualizationPointer extends RoomObjectVisualization {
     }
 
     drawPointer(container: Container): Container {
-        const ctx = new Graphics();
+        const ctx = new Graphics()
 
         const points = [
             new Point(MapData.tileWidth / 2, 0),
             new Point(MapData.tileWidth, MapData.tileHeight / 2),
             new Point(MapData.tileWidth / 2, MapData.tileHeight),
             new Point(0, MapData.tileHeight / 2)
-        ];
+        ]
 
-        ctx.lineStyle(this.pointerWidth, this.pointerColor.toHex(), this.pointerAlpha, this.pointerPosition);
-        ctx.moveTo(points[0].x, points[0].y);
-        ctx.lineTo(points[1].x, points[1].y);
-        ctx.lineTo(points[2].x, points[2].y);
-        ctx.lineTo(points[3].x, points[3].y);
-        ctx.lineTo(points[0].x, points[0].y);
-        ctx.endFill();
+        ctx.lineStyle(this.pointerWidth, this.pointerColor.toHex(), this.pointerAlpha, this.pointerPosition)
+        ctx.moveTo(points[0].x, points[0].y)
+        ctx.lineTo(points[1].x, points[1].y)
+        ctx.lineTo(points[2].x, points[2].y)
+        ctx.lineTo(points[3].x, points[3].y)
+        ctx.lineTo(points[0].x, points[0].y)
+        ctx.endFill()
 
-        container.addChild(ctx);
+        container.addChild(ctx)
 
-        return container;
+        return container
     }
 }

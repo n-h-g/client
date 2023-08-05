@@ -1,9 +1,9 @@
-import Point3d from "../../../../utils/point/Point3d"
-import VisualizationPointer from "./visualization/VisualizationPointer"
-import LogicPointer from "./logic/LogicPointer"
-import RoomVisualization from "../../visualization/RoomVisualization"
-import MapData from "./MapData"
-import RoomLayout from "../../RoomLayout"
+import Point3d from '../../../../utils/point/Point3d'
+import VisualizationPointer from './visualization/VisualizationPointer'
+import LogicPointer from './logic/LogicPointer'
+import RoomVisualization from '../../visualization/RoomVisualization'
+import MapData from './MapData'
+import RoomLayout from '../../RoomLayout'
 import { Container } from 'pixi.js'
 import { RoomObjectController } from '../../../../core/room/object/RoomObjectController'
 
@@ -11,7 +11,7 @@ export default class Pointer extends RoomObjectController<VisualizationPointer, 
     private room: RoomLayout
 
     constructor(room: RoomLayout) {
-        super("roomPointer", new Point3d(0,0,0), null, null)
+        super('roomPointer', new Point3d(0,0,0), null, null)
 
         this.room = room
 

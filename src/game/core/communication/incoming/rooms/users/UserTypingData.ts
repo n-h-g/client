@@ -1,4 +1,4 @@
 export interface UserTypingData {
-    typing: boolean,
+    typing: boolean
     id: string
 }

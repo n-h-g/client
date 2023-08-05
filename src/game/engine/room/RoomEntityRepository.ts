@@ -1,6 +1,5 @@
-import { Repository } from '../../core/Repository';
-import { Entity } from '../../core/room/object/entities/Entity';
-import { UserEntity } from './objects/users/UserEntity';
+import { Repository } from '../../core/Repository'
+import { Entity } from '../../core/room/object/entities/Entity'
 
 export class RoomEntityRepository extends Repository<string, Entity> {
     public constructor() {
@@ -8,8 +7,8 @@ export class RoomEntityRepository extends Repository<string, Entity> {
     }
 
     public tick(delta: number) {
-        this.map.forEach((entity: Entity) => {
-            entity.logic.tick(delta);
+        this.getAll().forEach((entity: Entity) => {
+            entity.logic.tick(delta)
         })
     }
 }

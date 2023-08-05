@@ -1,12 +1,9 @@
-import { UIComponent } from "../../engine/ui/components/UIComponent";
-import { IComponentUI } from "./IComponentUI";
-
-import { Component as ComponentGUI }  from "vue";
+import { UIComponent } from '../../engine/ui/components/UIComponent'
+import { IComponentUI } from './IComponentUI'
+import { Component as ComponentGUI }  from 'vue'
 
 export default abstract class Component implements IComponentUI {
-
-    private _type: UIComponent 
-
+    private _type: UIComponent
     private componentGUI: ComponentGUI
     
     constructor(component: ComponentGUI, type: UIComponent) {

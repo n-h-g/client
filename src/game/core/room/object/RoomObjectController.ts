@@ -1,8 +1,6 @@
-import Point3d from "../../../utils/point/Point3d"
-import { IDisposable } from "../IDisposable"
-import { Positionable } from "./IPositionable"
-import { IRoomObjectLogic } from './IRoomObjectLogic'
-import { IRoomObjectVisualization } from './IRoomObjectVisualization'
+import Point3d from '../../../utils/point/Point3d'
+import { IDisposable } from '../IDisposable'
+import { Positionable } from './IPositionable'
 
 export abstract class RoomObjectController<IRoomObjectVisualization extends IDisposable, IRoomObjectLogic extends IDisposable> implements Positionable,IDisposable {
     public readonly _id: string
@@ -27,8 +25,8 @@ export abstract class RoomObjectController<IRoomObjectVisualization extends IDis
        this._objectLogic.dispose()
     }
 
-    setPosition(position: Point3d) {
-        throw new Error("Method not implemented.")
+    setPosition(position: Point3d): void {
+        throw new Error('Method not implemented.')
     }
 
     get position(): Point3d {

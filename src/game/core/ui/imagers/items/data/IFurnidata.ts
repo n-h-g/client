@@ -6,15 +6,15 @@ import { FloorItemDescription } from "./IFloorItemDescription";
 import { WallItemDescription } from "./IWallItemDescription";
 
 export interface IFurnidata {
-    type: string;
-    name: string;
-    visualizationType: string;
-    logicType: string;
-    spritesheet: string;
-    dimensions: IDimension;
-    assets: { [key: string] : IAsset };
-    visualization: IVisualization;
-    logic: ILogic,
+    type: string
+    name: string
+    visualizationType: string
+    logicType: string
+    spritesheet: string
+    dimensions: IDimension
+    assets: { [key: string] : IAsset }
+    visualization: IVisualization
+    logic: ILogic
 }
 
 export type Furnidata = {
@@ -27,4 +27,3 @@ export type Furnidata = {
 };
 
 export type FurniDescription = FloorItemDescription | WallItemDescription;
-

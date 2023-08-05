@@ -1,21 +1,12 @@
-import FurniBase from "./FurniBase"
-import {
-    fetchJsonAsync
-} from "../../../../utils/DownloadManager"
-import {
-    Furnidata,
-    IFurnidata
-} from "../../../../core/ui/imagers/items/data/IFurnidata"
-import {
-    FurniSprite
-} from "./FurniSprite"
-import { Engine } from "../../../../Engine"
-import { Logger } from "../../../../utils/Logger"
-import { FurniDataType } from "../../../../core/ui/imagers/items/data/IFurniDataType"
-import UiUtils from "../../../../utils/UiUtils"
+import FurniBase from './FurniBase'
+import { fetchJsonAsync } from '../../../../utils/DownloadManager'
+import { Furnidata, IFurnidata } from '../../../../core/ui/imagers/items/data/IFurnidata'
+import { FurniSprite } from './FurniSprite'
+import { Engine } from '../../../../Engine'
+import { Logger } from '../../../../utils/Logger'
+import { FurniDataType } from '../../../../core/ui/imagers/items/data/IFurniDataType'
 
 export default class FurniImager {
-
     private ready: boolean
     private bases: {
         flooritem: {
@@ -45,14 +36,14 @@ export default class FurniImager {
 
     private loadFiles(): Promise<void>[] {
         return [
-            fetchJsonAsync(Engine.getInstance().config.itemsResourcesUrl + "furnidata.json")
+            fetchJsonAsync(Engine.getInstance().config.itemsResourcesUrl + 'furnidata.json')
                 .then(data => {
                     this.furnidata = data as Furnidata;
                     this.ready = true;
                 })
                 .catch(err => {
                     if (Engine.getInstance().config.debug) {
-                        Logger?.error("Cannot load furnidata")
+                        Logger?.error('Cannot load furnidata')
                     }
                     this.ready = false;
                 }),
@@ -60,7 +51,6 @@ export default class FurniImager {
     }
 
     public findItemByName(itemName: string) {
-
         for (let itemId in this.furnidata.roomitemtypes) {
             const item = this.furnidata.roomitemtypes[itemId];
             //console.log(item);  
@@ -81,11 +71,11 @@ export default class FurniImager {
                 };
             }
         }
+
         return null;
     }
 
     public loadFurniBase(type: FurnidataItemType, furniBaseName: string): Promise<FurniBase> {
-
         let rawItem = this.findItemByName(furniBaseName);
 
         if (rawItem == null) {
@@ -109,7 +99,7 @@ export default class FurniImager {
                     furniBase.init()
                     resolve(furniBase);
                 }).catch(() => {
-                    Logger.debug("[Furni] Unable to find item " + itemName)
+                    Logger.debug('[Furni] Unable to find item ' + itemName)
                 })
             })
         }
@@ -148,7 +138,7 @@ export default class FurniImager {
 
 
     private fetchOffsetAsync(uniqueName: string) {
-        //console.log("downloading .." + Engine.getInstance().getConfig().proxyUrl + Engine.getInstance().getConfig().itemsResourcesUrl + uniqueName + '/' + uniqueName + '.json');
+        //console.log('downloading ..' + Engine.getInstance().getConfig().proxyUrl + Engine.getInstance().getConfig().itemsResourcesUrl + uniqueName + '/' + uniqueName + '.json');
         return new Promise((resolve, reject) => {
             fetchJsonAsync(Engine.getInstance().config.itemsResourcesUrl + uniqueName + '/' + uniqueName + '.json').then(data => {
                 resolve(data);
@@ -175,8 +165,8 @@ export interface NameColorPair {
 
 export const splitItemNameAndColor = (itemName: string): NameColorPair => {
     let colorId = 0;
-    if (itemName.includes("*")) {
-        const longFurniName = itemName.split("*");
+    if (itemName.includes('*')) {
+        const longFurniName = itemName.split('*');
         itemName = longFurniName[0];
         colorId = parseInt(longFurniName[1]);
     }

@@ -1,75 +1,63 @@
-import RoomLayout from "../RoomLayout"
+import RoomLayout from '../RoomLayout'
 import { Container } from '@pixi/display'
-import Point from "../../../utils/point/Point"
-import MapData from "../objects/map/MapData"
-import UiUtils from "../../../utils/UiUtils"
-import { Tile } from "../objects/map/Tile"
-import { Engine } from '../../../Engine'
+import Point from '../../../utils/point/Point'
+import MapData from '../objects/map/MapData'
+import UiUtils from '../../../utils/UiUtils'
+import { Tile } from '../objects/map/Tile'
 import { IRoomVisualization } from '../../../core/room/IRoomVisualization'
 import { RoomObjectController } from '../../../core/room/object/RoomObjectController'
 import { RoomLogic } from '../logic/RoomLogic'
-import Point3d from "../../../utils/point/Point3d"
-import { RoomPriority } from "./RoomPriority"
+import Point3d from '../../../utils/point/Point3d'
+import { RoomPriority } from './RoomPriority'
 
 export default class RoomVisualization implements IRoomVisualization {
-
     private roomLayout: RoomLayout
-
     private canvasFloor: Container
     private canvasWall: Container
     private canvasDoorTile: Container
     private canvasDoorWall: Container
-
     private canvasPointer: Container
-
     public container: Container
-
-    public needsUpdate: boolean = false;
+    public needsUpdate: boolean = false
 
     constructor(room: RoomLayout) {
         this.roomLayout = room
-   
-        this.container = new Container();
 
-        this.canvasFloor = new Container();
+        this.container = new Container()
+        this.canvasFloor = new Container()
+        this.canvasWall = new Container()
+        this.canvasDoorWall = new Container()
+        this.canvasPointer = new Container()
+        this.canvasDoorTile = new Container()
 
-        this.canvasWall = new Container();
-        this.canvasDoorWall = new Container();
-        this.canvasPointer = new Container();
-        this.canvasDoorTile = new Container();
-        
-
-        this.container.addChild(this.canvasDoorTile) 
+        this.container.addChild(this.canvasDoorTile)
         this.container.addChild(this.canvasWall)
-        this.container.addChild(this.canvasDoorWall) 
+        this.container.addChild(this.canvasDoorWall)
         this.container.addChild(this.canvasFloor)
         this.container.addChild(this.canvasPointer)
 
-  
         this.container.x = window.innerWidth / 2
         this.container.y = window.innerHeight / 2
-        
-        this.canvasDoorTile.interactive = true;
-        this.canvasFloor.interactive = true;
+
+        this.canvasDoorTile.interactive = true
+        this.canvasFloor.interactive = true
 
         let defaultPoint = new Point3d(1, 1, 1)
 
-        this.canvasDoorTile.zIndex = RoomVisualization.calculateZIndex(defaultPoint, RoomPriority.DOOR_FLOOR);
-        this.canvasFloor.zIndex = RoomVisualization.calculateZIndex(defaultPoint, RoomPriority.FLOOR);
-        this.canvasPointer.zIndex = RoomVisualization.calculateZIndex(defaultPoint, RoomPriority.POINTER);
-        this.canvasDoorWall.zIndex = RoomVisualization.calculateZIndex(defaultPoint, RoomPriority.DOOR_WALL);
-        this.canvasWall.zIndex = RoomVisualization.calculateZIndex(defaultPoint, RoomPriority.WALL);
+        this.canvasDoorTile.zIndex = RoomVisualization.calculateZIndex(defaultPoint, RoomPriority.DOOR_FLOOR)
+        this.canvasFloor.zIndex = RoomVisualization.calculateZIndex(defaultPoint, RoomPriority.FLOOR)
+        this.canvasPointer.zIndex = RoomVisualization.calculateZIndex(defaultPoint, RoomPriority.POINTER)
+        this.canvasDoorWall.zIndex = RoomVisualization.calculateZIndex(defaultPoint, RoomPriority.DOOR_WALL)
+        this.canvasWall.zIndex = RoomVisualization.calculateZIndex(defaultPoint, RoomPriority.WALL)
 
         this.container.interactive = true
 
         this.container.sortableChildren = true
     }
-    
 
     public dispose(): void {
         this.container.destroy()
     }
-
 
     public render() {
         this.roomLayout.getWallPlane().visualization?.render()
@@ -77,110 +65,76 @@ export default class RoomVisualization implements IRoomVisualization {
     }
 
     public tileToLocal(x: number, y: number, z: number): Point {
-        return new Point((x - y) * MapData.tileWidth, (x + y) * MapData.tileHeight - (z * MapData.tileHeight * 2));
+        return new Point((x - y) * MapData.tileWidth, (x + y) * MapData.tileHeight - (z * MapData.tileHeight * 2))
     }
 
-    /**
-     * Calculate the zIndex of a object depending on the priority
-     * @param point 
-     * @param priority 
-     * @returns the zIndex
-     */
     public static calculateZIndex(point: Point3d, priority: RoomPriority): number {
-        return ((point.getX() + point.getY()) * (1000000) + (point.getZ() * (10000))) + 10000000 * priority;
+        return ((point.getX() + point.getY()) * (1000000) + (point.getZ() * (10000))) + 10000000 * priority
     }
 
-    /**
-     * Get a tile by event
-     * @param event 
-     * @returns 
-     */
-    public getTileByEvent(event: Event): Tile | undefined{
-        let hitCtx = this.canvasFloor;
-        let coords = UiUtils.getPosition(event, hitCtx);
-        console.log(coords);
-        return this.roomLayout.getFloorPlane().getTilebyPosition(new Point(Math.floor(coords.x), Math.floor(coords.y)));
+    public getTileByEvent(event: Event): Tile | undefined {
+        let hitCtx = this.canvasFloor
+        let coords = UiUtils.getPosition(event, hitCtx)
+        console.log(coords)
+        return this.roomLayout.getFloorPlane().getTilebyPosition(new Point(Math.floor(coords.x), Math.floor(coords.y)))
     }
 
-    /**
-     * Transform a global position to a local tile
-     * @param x 
-     * @param y 
-     * @param z 
-     * @returns 
-     */
     public globalToTileWithHeight(x: number, y: number, z: number): Point {
-        const offsetX = this.container.x;
-        const offsetY = this.container.y - (z * MapData.tileHeight * 2);
+        const offsetX = this.container.x
+        const offsetY = this.container.y - (z * MapData.tileHeight * 2)
 
-        const xminusy = (x - MapData.tileWidth - offsetX) / MapData.tileWidth;
+        const xminusy = (x - MapData.tileWidth - offsetX) / MapData.tileWidth
         const xplusy = (y - offsetY) / MapData.tileWidth
 
-        const tileX = Math.floor((xminusy + xplusy) / 2);
-        const tileY = Math.floor((xplusy - xminusy) / 2);
+        const tileX = Math.floor((xminusy + xplusy) / 2)
+        const tileY = Math.floor((xplusy - xminusy) / 2)
 
-        return new Point(tileX, tileY);
+        return new Point(tileX, tileY)
     }
 
-    /**
-     * Flip the room visualization
-     */
     public flip() {
-        let scale = this.container.scale.y == 1 ? -1 : 1 ;
+        let scale = this.container.scale.y == 1 ? -1 : 1
 
-        this.container.scale.y = scale;
+        this.container.scale.y = scale
     }
 
-    /**
-     * Zoom the room from 0-infinity
-     * @param scale 
-     */
     public zoom(scale: number) {
-        if(scale < 0) {
-            return;
+        if (scale < 0) {
+            return
         }
-        
-        this.container.scale.x = +scale;
-        this.container.scale.y = +scale;
+
+        this.container.scale.x = +scale
+        this.container.scale.y = +scale
     }
 
-    /**
-     * Add a element to the room visualization container, and choose to follow it
-     * @param object 
-     * @param follow 
-     * @returns 
-     */
     public add(object: RoomObjectController<RoomVisualization, RoomLogic>, follow: boolean = false) {
         console.log(object.visualization)
 
-        if(!object) return;
+        if (!object) return
 
         this.container.addChild(object.visualization.container)
-
-        // TODO follow object
-        //Engine.getInstance().application.viewport.follow(object.visualization.container)
     }
 
-    public getCanvasFloor() : Container {
+    public getCanvasFloor(): Container {
         return this.canvasFloor
     }
 
-    public getCanvasWall() : Container {
+    public getCanvasWall(): Container {
         return this.canvasWall
     }
 
-    public getCanvasDoorWall() : Container {
+    public getCanvasDoorWall(): Container {
         return this.canvasDoorWall
     }
 
-    public getCanvasPointer() : Container {
+    public getCanvasPointer(): Container {
         return this.canvasPointer
     }
-    public getCanvasDoorTile() : Container {
+    public getCanvasDoorTile(): Container {
         return this.canvasDoorTile
     }
 
-    public get Container() : Container {
-        return this.container;
+    public get Container(): Container {
+        return this.container
     }
 } 

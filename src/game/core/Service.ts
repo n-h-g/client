@@ -1,17 +1,6 @@
-import { Repository } from "./Repository";
+import { IService } from './IService';
+import { Repository } from './Repository';
 
-export abstract class Service<S, T> {
-    public _repository?: Repository<S, T>
-
-    public constructor() {
-        this._repository = new Repository();
-    }
-
-    public get repository(): Repository<S, T> {
-        return this._repository
-    }
-
-    public set repository(repository: Repository<S, T>) {
-        this._repository = repository
-    }
+export abstract class Service<S, T> implements IService<S, T> {
+    public repository?: Repository<S, T>
 }

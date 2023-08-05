@@ -1,14 +1,20 @@
-export enum UIEvents {
-    LOAD = 'loading',
-    SET_TOPBAR = 'set_top_bar',
-    NAVIGATOR_ROOMS_ADDED = 'navigator_rooms_added',
-    OPEN = 'open_box',
-    CLOSE = 'close_box',
-    INVENTORY_ITEMS_ADDED = 'inventory_items_added',
-    PREVIEW_BOX_MODE = 'preview_box_mode',
-    HOTEL_VIEW = 'hotel_view',
-    ROOM_UI = 'room_ui',
-    AVATAR_CONTAINER_UPDATED = 'avatar_container_updated',
-    CATALOGUE_PAGES_UPDATED = 'catalog_pages_updated',
-    CATALOG_ITEMS_UPDATED = 'catalog_items_updated'
+import { Events } from '../Events'
+
+export class UIEvents extends Events {
+    private constructor(key: string) {
+        super(key)
+    }
+
+    public static LOAD: UIEvents = new UIEvents('loading')
+    public static SET_TOPBAR: UIEvents = new UIEvents('set_top_bar')
+    public static NAVIGATOR_ROOMS_ADDED: UIEvents = new UIEvents('navigator_rooms_added')
+    public static OPEN: UIEvents = new UIEvents('open_box')
+    public static CLOSE: UIEvents = new UIEvents('close_box')
+    public static INVENTORY_ITEMS_ADDED: UIEvents = new UIEvents('inventory_items_added')
+    public static PREVIEW_BOX_MODE: UIEvents = new UIEvents('preview_box_mode')
+    public static HOTEL_VIEW: UIEvents = new UIEvents('hotel_view')
+    public static ROOM_UI: UIEvents = new UIEvents('room_ui')
+    public static AVATAR_CONTAINER_UPDATED: UIEvents = new UIEvents('avatar_container_updated')
+    public static CATALOGUE_PAGES_UPDATED: UIEvents = new UIEvents('catalog_pages_updated')
+    public static CATALOG_ITEMS_UPDATED: UIEvents = new UIEvents('catalog_items_updated')
 }

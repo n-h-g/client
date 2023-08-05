@@ -1,20 +1,18 @@
-import RoomPlaneType from "./RoomPlaneTypeEnum";
-import Point3d from "../../../../utils/point/Point3d";
-import LogicPlane from "./logic/LogicPlane";
-import VisualizationPlane from "./visualization/VisualizationPlane"
-import RoomLayout from "../../RoomLayout";
-import { RoomObjectController } from '../../../../core/room/object/RoomObjectController';
-import { IRoomMapPlane } from '../../../../core/room/object/map/IRoomMapPlane';
-import { IRoomMapObject } from '../../../../core/room/object/map/IRoomMapObject';
+import { RoomPlaneType } from './RoomPlaneTypeEnum'
+import Point3d from '../../../../utils/point/Point3d'
+import LogicPlane from './logic/LogicPlane'
+import VisualizationPlane from './visualization/VisualizationPlane'
+import RoomLayout from '../../RoomLayout'
+import { RoomObjectController } from '../../../../core/room/object/RoomObjectController'
+import { IRoomMapObject } from '../../../../core/room/object/map/IRoomMapObject'
 
 export abstract class RoomPlane extends RoomObjectController<VisualizationPlane, LogicPlane> {
     private _room: RoomLayout
     private _type: RoomPlaneType
-
     private objectList: Array<IRoomMapObject> = new Array<IRoomMapObject>()
 
     constructor(room: RoomLayout, type: RoomPlaneType) {
-        super("plane" + type, new Point3d(0, 0, 0), null, null)
+        super('plane' + type, new Point3d(0, 0, 0), null, null)
         this._room = room
         this._type = type
         this.logic = new LogicPlane(this)

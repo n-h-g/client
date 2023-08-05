@@ -1,5 +1,4 @@
-import { ActionId } from "../../../../../engine/ui/imagers/avatars/enum/actions/ActionId"
-import { Gender } from "../../../../../engine/ui/imagers/avatars/gamedata/IFigureData"
+import { Direction } from '../../../../objects/Direction'
 import { IActionsComponent } from "../../../../room/object/entities/components/IActionsComponent"
 import { IAspectComponent } from "../../../../room/object/entities/components/IAspectComponent"
 import { IHeadBodyRotationComponent } from "../../../../room/object/entities/components/IHeadBodyRotation"
@@ -13,8 +12,8 @@ export interface IEntityData {
     aspect: IAspectComponent
     name: {
         name: string
-    },
-    rotation
+    }
+    rotation: Direction
     position: IPositionComponent
     bh_rot: IHeadBodyRotationComponent
     type: EntityType

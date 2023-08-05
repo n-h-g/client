@@ -3,8 +3,8 @@ import { Command } from './Command';
 
 export class CommandRepository extends Repository<string, Command> {
     getCommandByAlias(alias: string): Command {
-        for(let command of this.getAll().values()) {
-            if(command.aliases.indexOf(alias) > -1) return command;
+        for (let command of this.getAll().values()) {
+            if (command.aliases.indexOf(alias) > -1) return command;
         }
 
         return null;

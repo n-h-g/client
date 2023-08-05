@@ -1,31 +1,19 @@
 import { ApplicationEngine } from './core/Application'
 import RoomService from './engine/room/RoomService'
-import Point from './utils/point/Point'
 import generalConfig from './configuration/general.json'
 import { NetworkingManager } from './networking/NetworkingManager'
 import { UserInterfaceManager } from './engine/ui/UserInterfaceManager'
 import { CommandService } from './engine/game/commands/CommandService'
-import Room from './engine/room/Room'
 import * as PIXI from "pixi.js"
-import { UserEntity } from './engine/room/objects/users/UserEntity'
-import { Direction } from './core/objects/Direction'
-import UserEntityVisualization from './engine/room/objects/users/visualization/UserEntityVisualization'
-import { ActionId } from './engine/ui/imagers/avatars/enum/actions/ActionId'
-import RoomVisualization from './engine/room/visualization/RoomVisualization'
-import FloorItem from './engine/room/objects/items/FloorItem'
-import Point3d from './utils/point/Point3d'
-import { EventManager } from './core/events/EventManager'
-import { LoadingProgressEventData } from './engine/events/ui/data/loader/LoadingProgress'
-import { UIEvents } from './engine/events/ui/UIEvents'
 import { OfflineMode } from './offline/OfflineMode'
 
 export class Engine {
     private static _instance: Engine
-    private _application: ApplicationEngine | null
-    private _userInterfaceManager: UserInterfaceManager | null
-    private _roomsService: RoomService | null
-    private _networkingManager: NetworkingManager | null
-    private _commandService: CommandService | null
+    private _application: ApplicationEngine
+    private _userInterfaceManager: UserInterfaceManager
+    private _roomsService: RoomService
+    private _networkingManager: NetworkingManager
+    private _commandService: CommandService
 
     private _config = generalConfig
 
@@ -93,7 +81,7 @@ export class Engine {
     }
 
     public get application(): ApplicationEngine {
-        return this._application || null
+        return this._application
     }
 
     public get commandService(): CommandService {

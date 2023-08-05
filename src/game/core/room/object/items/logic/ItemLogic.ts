@@ -1,13 +1,11 @@
 import { Engine } from '../../../../../Engine'
 import { ItemEvents } from '../../../../../engine/events/room/objects/entities/ItemEvents'
-import Item from "../../../../../engine/room/objects/items/Item"
+import Item from '../../../../../engine/room/objects/items/Item'
 import { FurniData } from '../../../../../engine/ui/imagers/items/FurniData'
-import FurniImager from "../../../../../engine/ui/imagers/items/FurniImager"
 import { OutgoingPacket } from '../../../../../networking/packets/outgoing/OutgoingPacket'
 import { EntityLogic } from '../../entities/EntityLogic'
 
 export abstract class ItemLogic extends EntityLogic {
-
     public _roll: boolean = false
 
     constructor(item: Item) {
@@ -20,16 +18,16 @@ export abstract class ItemLogic extends EntityLogic {
         this.events.on(ItemEvents.FURNI_SPRITE_LOADED, () => this.onLoad())
     }
 
-    public async onLoad() {
-        
+    public onLoad() {
+
     }
 
     public onHover(): void {
-        
+
     }
 
     public onPositionChanged(): void {
-        
+
     }
 
     public placeItem() {
@@ -63,7 +61,6 @@ export abstract class ItemLogic extends EntityLogic {
     }
 
     public tick(delta: number) {
-
         if (this._roll) {
             this.onMove(delta);
         }

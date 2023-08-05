@@ -1,5 +1,5 @@
-import { IAnimationLayer } from "./IAnimationLayer";
+import { IAnimationLayer } from './IAnimationLayer'
 
 export interface IAnimation {
-    layers: { [key: string] : IAnimationLayer };
+    layers: { [key: string]: IAnimationLayer }
 }

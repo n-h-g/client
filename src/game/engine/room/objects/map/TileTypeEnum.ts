@@ -1,4 +1,4 @@
-enum TileType {
+export enum TileType {
     Door,
     Hole,
     Flat,
@@ -8,5 +8,3 @@ enum TileType {
     StairCornerLeft,
     StairCornerRight,
 }
-
-export default TileType

@@ -1,7 +1,6 @@
-import SoundManager from "./SoundManager"
+import SoundManager from './SoundManager'
 
 class SoundResource {
-
 	private soundManager: SoundManager
 	private name: string
 	private audio: HTMLAudioElement

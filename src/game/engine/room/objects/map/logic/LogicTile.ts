@@ -1,14 +1,13 @@
-import MapData from "../MapData"
-import TileType from "../TileTypeEnum"
-import Room from "../../../Room"
+import MapData from '../MapData'
+import TileType from '../TileTypeEnum'
 import { Container } from 'pixi.js'
-import { Engine } from "../../../../../Engine"
-import { OutgoingPacket } from "../../../../../networking/packets/outgoing/OutgoingPacket"
+import { Engine } from '../../../../../Engine'
+import { OutgoingPacket } from '../../../../../networking/packets/outgoing/OutgoingPacket'
 import { RoomObjectLogic } from '../../../../../core/room/object/RoomObjectLogic'
 import { Tile } from '../Tile'
-import { OfflineMode } from "../../../../../offline/OfflineMode"
-import { RoomPriority } from "../../../visualization/RoomPriority"
-import RoomVisualization from "../../../visualization/RoomVisualization"
+import { OfflineMode } from '../../../../../offline/OfflineMode'
+import { RoomPriority } from '../../../visualization/RoomPriority'
+import RoomVisualization from '../../../visualization/RoomVisualization'
 
 export default class LogicTile extends RoomObjectLogic {
     private tile: Tile
@@ -20,7 +19,7 @@ export default class LogicTile extends RoomObjectLogic {
         this.tile = tile
 
         let canvas = this.tile.plane.room.Logic.getCanvasFloorHit()
-        this.hitContext = canvas.getContext("2d")
+        this.hitContext = canvas.getContext('2d')
 
         this.checkTileAndDrawHitBox()
     }
@@ -33,12 +32,11 @@ export default class LogicTile extends RoomObjectLogic {
     }
 
     dispose(): void {
-        throw new Error("Method not implemented.")
+        throw new Error('Method not implemented.')
     }
 
     public onClick(): void {
-
-        if(Engine.getInstance().config.offlineMode) {
+        if (Engine.getInstance().config.offlineMode) {
             OfflineMode.getInstance().walk(this.tile.position)
             return
         }
@@ -54,12 +52,9 @@ export default class LogicTile extends RoomObjectLogic {
     }
 
     public onHover() {
-        let room: Room | null = this.tile.plane.room.getRoom();
-
         let tileContext: Container | null | undefined = this.tile.visualization?.container;
 
         let isDoor = this.tile.position.getX() == this.tile.plane.room.getDoorPosition().getX() && this.tile.position.getY() == this.tile.plane.room.getDoorPosition().getY()
-
 
         this.tile.plane.room.Visualization.getCanvasPointer().zIndex = RoomVisualization.calculateZIndex(this.tile.position, isDoor ? RoomPriority.DOOR_FLOOR_SELECT : RoomPriority.POINTER);
         this.tile.plane.room.Visualization.getCanvasPointer().visible = true;
@@ -75,7 +70,6 @@ export default class LogicTile extends RoomObjectLogic {
     }
 
     private drawTileHitBox(hitCtx: CanvasRenderingContext2D): CanvasRenderingContext2D {
-
         hitCtx.save();
 
         hitCtx.beginPath();

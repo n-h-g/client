@@ -1,15 +1,13 @@
 import { Application, IApplicationOptions } from '@pixi/app'
 import { Viewport } from 'pixi-viewport';
-import { Container, Text, Ticker } from 'pixi.js';
+import { Container, Text } from 'pixi.js';
 import { Engine } from '../Engine';
-
 
 export class ApplicationEngine extends Application {
     private _engine: Engine
     private _lastFrameTime: number
     private _timeElapsed: number = 0
     private _viewport: Viewport
-
     private debugInfoContainer: Container
 
     constructor(engine: Engine, options?: IApplicationOptions) {
@@ -33,7 +31,6 @@ export class ApplicationEngine extends Application {
             screenHeight: window.innerHeight,
             worldWidth: 1000,
             worldHeight: 1000,
-
             interaction: this.renderer.plugins.interaction // the interaction module is important for wheel to work properly when renderer.view is placed or scaled
         })
 
@@ -83,9 +80,9 @@ export class ApplicationEngine extends Application {
                 this._engine.roomService.tick(this._timeElapsed)
                 this._lastFrameTime = currentTime
 
-                /*if(this._engine.config.debug) {
+                if (this._engine.config.debug) {
                     this.showDebugInfo()
-                }*/
+                }
             }
         }
 

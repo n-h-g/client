@@ -1,17 +1,17 @@
-import { ComponentsManager } from "./components/ComponentsManager";
-import AvatarImager from "./imagers/avatars/AvatarImager";
-import AvatarStructure from "./imagers/avatars/structure/AvatarStructure";
-import FurniImager from "./imagers/items/FurniImager";
-import { RoomImager } from "./imagers/room/RoomImager";
-import SoundManager from "./sound/SoundManager";
+import { ComponentsManager } from './components/ComponentsManager'
+import AvatarImager from './imagers/avatars/AvatarImager'
+import AvatarStructure from './imagers/avatars/structure/AvatarStructure'
+import FurniImager from './imagers/items/FurniImager'
+import { RoomImager } from './imagers/room/RoomImager'
+import SoundManager from './sound/SoundManager'
 
 export class UserInterfaceManager {
     private _soundManager: SoundManager
-    private _componentsManager: ComponentsManager;
+    private _componentsManager: ComponentsManager
     private _avatarStructure: AvatarStructure
     private _avatarImager: AvatarImager
     private _furniImager: FurniImager
-    private _roomImager: RoomImager;
+    private _roomImager: RoomImager
 
     constructor() {
         this._componentsManager = new ComponentsManager()
@@ -19,7 +19,7 @@ export class UserInterfaceManager {
         this._componentsManager.initGameComponents()
 
         this._soundManager = new SoundManager(this)
-        this._avatarStructure = new AvatarStructure();
+        this._avatarStructure = new AvatarStructure()
         this._avatarImager = new AvatarImager(this._avatarStructure)
         this._furniImager = new FurniImager()
         this._roomImager = new RoomImager()

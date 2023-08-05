@@ -1,5 +1,5 @@
 export interface ILogic {
-    dimensions: number[];
-    directions: number[];
+    dimensions: number[]
+    directions: number[]
     type: string
 }

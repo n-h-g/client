@@ -1,7 +1,5 @@
-enum RoomPlaneType {
+export enum RoomPlaneType {
     Floor,
     LeftWall,
     RightWall
 }
-
-export default RoomPlaneType

@@ -1,43 +1,32 @@
-import Room from "./Room";
-import Point from "../../utils/point/Point";
-import RoomVisualization from "./visualization/RoomVisualization";
-import { RoomLogic } from "./logic/RoomLogic";
-import { FloorPlane } from "./objects/map/FloorPlane";
-import ColorRGB from "../../utils/color/ColorRGB";
-import { WallPlane } from "./objects/map/WallPlane";
-import Pointer from "./objects/map/Pointer";
-import MapData from "./objects/map/MapData";
+import Room from './Room'
+import Point from '../../utils/point/Point'
+import RoomVisualization from './visualization/RoomVisualization'
+import { RoomLogic } from './logic/RoomLogic'
+import { FloorPlane } from './objects/map/FloorPlane'
+import ColorRGB from '../../utils/color/ColorRGB'
+import { WallPlane } from './objects/map/WallPlane'
+import Pointer from './objects/map/Pointer'
+import MapData from './objects/map/MapData'
 
 export default class RoomLayout {
     private visualization: RoomVisualization
     private logic: RoomLogic
-    private room: Room;
-
+    private room: Room
     private modelMatrix: number[][] = new Array()
-
     private colorsHash: ColorRGB[] = new Array()
     private floorPlane: FloorPlane
     private wallPlane: WallPlane
-
     private mapSizeX: number = 0
     private mapSizeY: number = 0
     private mapSizeZ: number = 0
-
     private heighestPosition = new Point(0, 0)
-
     private doorPosition: Point
-
     private zoom: number = 1
-
     private fullHeightTick: boolean = false
-
-
     private pointer: Pointer
 
-
     constructor(room: Room, model: string, doorPosition: Point) {
-
-        this.room = room;
+        this.room = room
 
         this.doorPosition = doorPosition
 
@@ -52,29 +41,22 @@ export default class RoomLayout {
         this.prepareMapObjects()
 
         this.pointer = new Pointer(this)
-
-
     }
 
     private parseModel(model: string): void {
-        let modelRows = model.split("/")
+        let modelRows = model.split('/')
 
         this.mapSizeX = modelRows.length
         this.mapSizeY = Math.max(...(modelRows.map(el => el.length)))
 
-
         for (let x = 0; x < this.mapSizeX; x++) {
-            this.modelMatrix[x] = new Array();
+            this.modelMatrix[x] = new Array()
             for (let y = 0; y < this.mapSizeY; y++) {
+                let tile = modelRows[x].substring(y, y + 1).trim().toUpperCase().charAt(0)
 
-                let tile = modelRows[x].substr(y, y + 1).trim().toUpperCase().charAt(0)
-
-
-
-                // height 0 represent empty tile
                 let height = tile.toUpperCase() != tile.toLowerCase()
                     ? 10 + tile.charCodeAt(0) - 'A'.charCodeAt(0)
-                    : parseInt(tile);
+                    : parseInt(tile)
 
                 this.modelMatrix[x][y] = height
 
@@ -87,8 +69,6 @@ export default class RoomLayout {
     }
 
     private prepareMapObjects(): void {
-
-        //black is reserved to null tile/wall
         this.colorsHash.push(new ColorRGB(0, 0, 0))
 
         this.floorPlane.prepareTiles()
@@ -98,10 +78,9 @@ export default class RoomLayout {
     public getExtraHeight() {
         let extra = MapData.tileHeight * (this.mapSizeZ) - MapData.tileHeight / 2 * (this.heighestPosition.getX() + this.heighestPosition.getY())
         if (extra < 0)
-            extra = 0;
+            extra = 0
 
         return extra
-
     }
 
     public getCanvasSize(): Point {
@@ -117,14 +96,12 @@ export default class RoomLayout {
             Math.floor(Y * Math.cos(Math.PI / 6) - X * Math.cos((Math.PI / 6) + (2 * Math.PI) / 3)) + ((MapData.wallDepth + 1) * 2),
             Math.floor(Y * Math.sin((Math.PI / 6)) + X * Math.sin((Math.PI / 6) + (2 * Math.PI) / 3) - (MapData.tileHeight / 2) + MapData.wallHeight - MapData.thickSpace - MapData.wallDepth + heightExtra + fixSpaces)
         )
-
     }
 
     public createOrGetRoomCanvas(name: string): HTMLCanvasElement {
-
         let canvas = document.getElementById(name) as HTMLCanvasElement
 
-        if (canvas == undefined) canvas = document.createElement("canvas")
+        if (canvas == undefined) canvas = document.createElement('canvas')
 
         canvas.id = name
 
@@ -133,11 +110,11 @@ export default class RoomLayout {
         canvas.height = canvasSize.getY()
 
         let roomOffset = this.getRoomOffset()
-        canvas.getContext("2d")!.translate(
+        canvas.getContext('2d')!.translate(
             roomOffset.getX(),
             roomOffset.getY()
-        );
-        canvas.getContext("2d")!.imageSmoothingEnabled = false;
+        )
+        canvas.getContext('2d')!.imageSmoothingEnabled = false
 
         return canvas
     }
@@ -147,10 +124,10 @@ export default class RoomLayout {
             (this.mapSizeX - 1) * MapData.tileWidth / 2 + MapData.wallDepth,
             MapData.wallHeight - MapData.thickSpace - MapData.wallDepth - MapData.wallBlankTop + this.getExtraHeight()
         )
-
     }
+    
     public getOffset(x: number, y: number, z: number): Point {
-        return new Point((y - x) * MapData.tileWidth, (x + y) * MapData.tileHeight - (z * MapData.tileHeight * 2));
+        return new Point((y - x) * MapData.tileWidth, (x + y) * MapData.tileHeight - (z * MapData.tileHeight * 2))
     }
 
     public getUniqueColor(): ColorRGB {

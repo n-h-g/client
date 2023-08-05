@@ -1,21 +1,19 @@
-import RoomObjectVisualization from "../../../../../core/room/object/RoomObjectVisualization"
-import RoomVisualization from "../../../visualization/RoomVisualization"
-import MapData from "../MapData"
-import WallType from "../WallTypeEnum"
-import Point3d from "../../.././../../utils/point/Point3d"
-import ColorRGB from "../../../../../utils/color/ColorRGB"
-import NormalType from "../../../visualization/NormalTypeEnum"
-import RoomVisualizationColorData from "../../../visualization/RoomVisualizationColorData"
+import RoomObjectVisualization from '../../../../../core/room/object/RoomObjectVisualization'
+import MapData from '../MapData'
+import { WallType } from '../WallTypeEnum'
+import Point3d from '../../.././../../utils/point/Point3d'
+import ColorRGB from '../../../../../utils/color/ColorRGB'
+import NormalType from '../../../visualization/NormalTypeEnum'
+import RoomVisualizationColorData from '../../../visualization/RoomVisualizationColorData'
 import { Container, Graphics } from 'pixi.js'
 import { Wall } from '../Wall'
-import { RoomPriority } from "../../../visualization/RoomPriority"
+import { RoomPriority } from '../../../visualization/RoomPriority'
 
 export default class VisualizationWall extends RoomObjectVisualization {
     private wall: Wall
     private wallContext: Container
     private wallCtx: Graphics
     private doorContext: Container
-
     private color: ColorRGB = ColorRGB.getColorFromNumber(0xa5afc0)
 
     constructor(wall: Wall) {

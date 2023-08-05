@@ -1,43 +1,36 @@
-import { DisplayObject } from "pixi.js";
-import { Engine } from "../../../../../Engine";
-import { EntityEvents } from "../../../../../engine/events/room/objects/entities/EntityEvents";
-import { ItemEvents } from "../../../../../engine/events/room/objects/entities/ItemEvents";
-import Item from "../../../../../engine/room/objects/items/Item";
-import MapData from "../../../../../engine/room/objects/map/MapData";
-import { Tile } from "../../../../../engine/room/objects/map/Tile";
-import { RoomPriority } from "../../../../../engine/room/visualization/RoomPriority";
-import RoomVisualization from "../../../../../engine/room/visualization/RoomVisualization";
-import AvatarData from "../../../../../engine/ui/imagers/avatars/enum/AvatarData";
-import { FurniData } from "../../../../../engine/ui/imagers/items/FurniData";
-import { FurnidataItemType } from "../../../../../engine/ui/imagers/items/FurniImager";
-import { FurniSprite } from "../../../../../engine/ui/imagers/items/FurniSprite";
-import Point from "../../../../../utils/point/Point";
-import Point3d from "../../../../../utils/point/Point3d";
-import UiUtils from "../../../../../utils/UiUtils";
-import { EntityVisualization } from "../../entities/EntityVisualization";
+import { Engine } from '../../../../../Engine'
+import { ItemEvents } from '../../../../../engine/events/room/objects/entities/ItemEvents'
+import Item from '../../../../../engine/room/objects/items/Item'
+import MapData from '../../../../../engine/room/objects/map/MapData'
+import { Tile } from '../../../../../engine/room/objects/map/Tile'
+import { RoomPriority } from '../../../../../engine/room/visualization/RoomPriority'
+import RoomVisualization from '../../../../../engine/room/visualization/RoomVisualization'
+import { FurniData } from '../../../../../engine/ui/imagers/items/FurniData'
+import { FurnidataItemType } from '../../../../../engine/ui/imagers/items/FurniImager'
+import { FurniSprite } from '../../../../../engine/ui/imagers/items/FurniSprite'
+import Point from '../../../../../utils/point/Point'
+import Point3d from '../../../../../utils/point/Point3d'
+import UiUtils from '../../../../../utils/UiUtils'
+import { EntityVisualization } from '../../entities/EntityVisualization'
 
 export default abstract class ItemVisualization extends EntityVisualization {
-    private position: Point3d;
-
-    public iconImage: string | undefined;
-
-    public isIcon: boolean = false;
-
-    declare public _entity: Item
-
+    private position: Point3d
+    public iconImage: string | undefined
+    public isIcon: boolean = false
+    public _entity: Item = null
     private sprite: FurniSprite
 
     constructor(item: Item) {
-        super(item);
+        super(item)
         this.position = item.position
-        this.iconImage = this.generateIcon();
+        this.iconImage = this.generateIcon()
     }
 
 
     public nextFrame(): void {
-        throw new Error("Method not implemented.");
+        throw new Error('Method not implemented.')
     }
-    
+
     public draw(): void {
         if (Engine.getInstance().roomService?.CurrentRoom) {
             Engine.getInstance().roomService?.CurrentRoom?.roomLayout.Visualization.container?.addChild(this.container)
@@ -46,45 +39,43 @@ export default abstract class ItemVisualization extends EntityVisualization {
     }
 
     public generateImages() {
+        if (this.isIcon) {
+            let icon = this.sprite.turnIntoIcon()
 
-        if(this.isIcon) {
-            let icon = this.sprite.turnIntoIcon();
-        
             setTimeout(() => {
-                this.iconImage = UiUtils.generateBase64FromObject(icon);
-            }, 2000);
+                this.iconImage = UiUtils.generateBase64FromObject(icon)
+            }, 2000)
         }
     }
 
     public turnIntoIcon() {
-        let icon = this.sprite.turnIntoIcon();
-        this.entity.visualization.container = icon;
-        this.needsUpdate = false;
-        this.isIcon = true;
+        let icon = this.sprite.turnIntoIcon()
+        this.entity.visualization.container = icon
+        this.needsUpdate = false
+        this.isIcon = true
     }
 
     public restore() {
         this.entity.visualization.container = this.container
-        this.needsUpdate = false;
-        this.isIcon = false;
+        this.needsUpdate = false
+        this.isIcon = false
     }
 
     private generateImagePreview() {
-        return UiUtils.generateBase64FromObject(this.entity.visualization.container);
+        return UiUtils.generateBase64FromObject(this.entity.visualization.container)
     }
 
-    private generateIcon(): string | undefined{
-        //let icon: FurniSprite = this.entity.visualization.container.turnIntoIcon()
-        //this.entity.visualization.container.restore()
-        //return UiUtils.generateBase64FromObject(icon);
-        return ""
+    private generateIcon(): string {
+        /*let icon: FurniSprite = this.item.base.turnIntoIcon()
+        this.item.base.restore()
+        return UiUtils.generateBase64FromObject(icon);*/
+        return '';
     }
 
     public async render(): Promise<void> {
-
         try {
             let sprite = await Engine.getInstance().userInterfaceManager.furniImager.loadFurniSprite(FurnidataItemType.FloorItem, this.entity.name)
-        
+
             sprite.start()
 
             let dir = sprite.getNextDirection(this.rotation)
@@ -95,13 +86,12 @@ export default abstract class ItemVisualization extends EntityVisualization {
 
             this.container = sprite
 
-        } catch(e) {
-            //this.container = await Engine.getInstance().userInterfaceManager.furniImager.loadPlaceHolder()
+        } catch (e) {
             throw new Error(e)
         }
 
         let spriteZIndex = this._entity.base.data.logic.dimensions[2]
-        
+
         this.container.zIndex = this.getZIndex(spriteZIndex)
 
         this.container.interactive = true
@@ -112,9 +102,9 @@ export default abstract class ItemVisualization extends EntityVisualization {
             this.updatePosition()
         }
 
-        this.entity.logic?.registerEvents();
+        this.entity.logic?.registerEvents()
 
-        await this.entity.logic.onLoad()
+        this.entity.logic.onLoad()
 
         this.entity.logic?.events.emit(ItemEvents.FURNI_SPRITE_LOADED)
     }
@@ -130,13 +120,13 @@ export default abstract class ItemVisualization extends EntityVisualization {
         let currentRoom = Engine.getInstance().roomService?.CurrentRoom
         let tile: Tile = currentRoom.roomLayout.getFloorPlane().getTilebyPosition(new Point(Math.round(this.position.getX()), Math.round(this.position.getY())))
 
-        let offsetFloor = tile!.position.getZ() > 0 ? -MapData.thickSpace * MapData.stepHeight * tile!.position.getZ() : -FurniData.FURNI_TOP_OFFSET;
-        
-        return ((tile!.position.getY() + tile!.position.getX()) * MapData.tileHeight / 2 + MapData.tileHeight / 2) + offsetFloor;
+        let offsetFloor = tile!.position.getZ() > 0 ? -MapData.thickSpace * MapData.stepHeight * tile!.position.getZ() : -FurniData.FURNI_TOP_OFFSET
+
+        return ((tile!.position.getY() + tile!.position.getX()) * MapData.tileHeight / 2 + MapData.tileHeight / 2) + offsetFloor
     }
 
     public getZIndex(zIndex: number = 1): number {
-        const compareY = (Math.trunc(this._entity.base.data.logic.dimensions[2] / 100)) / 10;
-        return RoomVisualization.calculateZIndex(new Point3d(this.entity.position.getX(), this.entity.position.getY() + compareY, this.entity.position.getZ()), RoomPriority.ROOM_ITEM);
+        const compareY = (Math.trunc(this._entity.base.data.logic.dimensions[2] / 100)) / 10
+        return RoomVisualization.calculateZIndex(new Point3d(this.entity.position.getX(), this.entity.position.getY() + compareY, this.entity.position.getZ()), RoomPriority.ROOM_ITEM)
     }
 }

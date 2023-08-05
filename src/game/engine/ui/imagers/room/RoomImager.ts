@@ -1,25 +1,17 @@
-import { autoDetectRenderer, Container, Renderer, Sprite, Texture } from "pixi.js";
-import { render } from "vue";
-import { Engine } from "../../../../Engine";
-import RenderingUtils from "../../../../utils/RenderingUtils";
-import UiUtils from "../../../../utils/UiUtils";
-import Room from "../../../room/Room";
-import { RoomImagerBuilder } from "./RoomImagerBuilder";
+import { Container, Sprite, Texture } from 'pixi.js'
+import RenderingUtils from '../../../../utils/RenderingUtils'
+import UiUtils from '../../../../utils/UiUtils'
+import Room from '../../../room/Room'
+import { RoomImagerBuilder } from './RoomImagerBuilder'
 
 export class RoomImager {
-
-    /**
-     * This builder is used to build room utils like plain images of the room: plain room images, patterns
-     */
     private _roomImagerBuilder: RoomImagerBuilder
 
     public constructor() {
         this._roomImagerBuilder = new RoomImagerBuilder()
-
     }
 
     public async generateRoomPreview(room: Room): Promise<string> {
-
         if(!room) return
 
         let generatedRoom = this._roomImagerBuilder.setRoom(room).build()
@@ -42,8 +34,8 @@ export class RoomImager {
 
                 let preview = new Sprite(texture)
 
-                preview.scale.y = 1;
-                preview.scale.x = 1;
+                preview.scale.y = 1
+                preview.scale.x = 1
 
                 preview.anchor.x = generatedRoom.roomLayout.getDoorPosition().getX() + 50
                 preview.anchor.y = generatedRoom.roomLayout.getDoorPosition().getY() + 50

@@ -1,7 +1,7 @@
-import { Repository } from '../../core/Repository';
-import Item from "./objects/items/Item";
+import { Repository } from '../../core/Repository'
+import Item from './objects/items/Item'
 
-export class RoomItemRepository extends Repository<string, Item>{
+export class RoomItemRepository extends Repository<string, Item> {
     private _movingItem: Item
 
     constructor() {
@@ -17,7 +17,7 @@ export class RoomItemRepository extends Repository<string, Item>{
     }
 
     public tick(delta: number) {
-        this.map.forEach((item: Item) => {
+        this.getAll().forEach((item: Item) => {
             item.logic.tick(delta)
         })
     }

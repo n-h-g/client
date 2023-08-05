@@ -1,16 +1,16 @@
-import { ISpritesheetFrame } from "./ISpritesheetFrame";
+import { ISpritesheetFrame } from './ISpritesheetFrame'
 
 export interface ISpritesheet {
     meta: {
-        app: string,
-        format: string,
+        app: string
+        format: string
         image: string
-        scale: string,
+        scale: string
         size: {
-            w: number,
+            w: number
             h: number
         },
         version: string
     },
-    frames: { [key: string] : ISpritesheetFrame };
+    frames: { [key: string] : ISpritesheetFrame }
 }
