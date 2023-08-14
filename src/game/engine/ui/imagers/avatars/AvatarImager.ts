@@ -32,18 +32,17 @@ export type FigureDataPart = {
 }
 
 export default class AvatarImager {
-
     private data: AvatarImageData;
     private structure: AvatarStructure;
     private loader: PIXI.Loader;
     private loaded: boolean = false;
     private parts: any;
-    private textures: Map<string, Promise<PIXI.Texture>>
+    private textures: Map<string, PIXI.Texture>
 
     constructor(structure: AvatarStructure) {
-        this.data = new AvatarImageData();
-        this.loader = new PIXI.Loader();
-        this.textures = new Map();
+        this.data = new AvatarImageData()
+        this.loader = new PIXI.Loader()
+        this.textures = new Map()
 
         this.structure = structure;
     }
@@ -233,6 +232,15 @@ export default class AvatarImager {
         this.drawSpriteComponent(spriteComponent, assetName, avatar, offsets);
     }
 
+    private getTextureAndCache(resource: string, asset: AssetData, assetName: string): PIXI.Texture {
+        if (!this.textures.has(resource)) {
+            let downloadedTexture: PIXI.Texture = this.data.getTexture(assetName)
+            let texture: PIXI.Texture = RenderingUtils.cropTexture(downloadedTexture, parseInt(asset.height), parseInt(asset.width), parseInt(asset.left), parseInt(asset.top))
+            this.textures.set(resource, texture)
+        }
+
+        return this.textures.get(resource);
+    }
 
     private async drawSpriteComponent(component: AvatarSpriteComponent, assetName: string, avatar: Avatar, bodyPartOffset: BodyPart) {
         let spritesheet: Spritesheet = await this.data.SpriteSheets.get(assetName) as Spritesheet;
@@ -245,7 +253,7 @@ export default class AvatarImager {
 
         let assetData: AssetData = spritesheet[component.ResourceName]
         if (assetData !== undefined) {
-            let downloadedTexture: PIXI.Texture = this.data.getTexture(assetName)
+            /*let downloadedTexture: PIXI.Texture = this.data.getTexture(assetName)
             if (!downloadedTexture) {
                 if (Engine.getInstance().config.debug) {
                     Logger.debug('cannot find texture resource ' + assetName);
@@ -260,8 +268,12 @@ export default class AvatarImager {
                 asset = spritesheet[component.ResourceName]
             }
             
-            let texture = RenderingUtils.cropTexture(downloadedTexture, parseInt(asset.height), parseInt(asset.width), parseInt(asset.left), parseInt(asset.top));
-
+            let texture = RenderingUtils.cropTexture(downloadedTexture, parseInt(asset.height), parseInt(asset.width), parseInt(asset.left), parseInt(asset.top));*/
+            let asset: AssetData = spritesheet[component.ResourceName]
+            if (asset.link != undefined) {
+                asset = spritesheet[asset.link]
+            }
+            let texture = this.getTextureAndCache(component.ResourceName, asset, assetName);
             let sprite = new Sprite(texture);
 
             sprite.width = parseInt(asset.width);
