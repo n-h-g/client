@@ -6,14 +6,12 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from "vue";
-import HotelView from "./HotelView.vue"
-import { EventManager } from "../../../game/core/events/EventManager";
-
-import BubbleAlertContainer from "./BubbleAlertContainer.vue";
-import { HotelViewData } from "../../../game/engine/events/ui/data/static/HotelView";
-import { UIEvents } from "../../../game/engine/events/ui/UIEvents";
-
+import { ref } from 'vue'
+import HotelView from './HotelView.vue'
+import { EventManager } from '../../../game/core/events/EventManager'
+import BubbleAlertContainer from './BubbleAlertContainer.vue'
+import { HotelViewData } from '../../../game/engine/events/ui/data/static/HotelView'
+import { UIEvents } from '../../../game/engine/events/ui/UIEvents'
 
 let hotelView = ref(true)
 

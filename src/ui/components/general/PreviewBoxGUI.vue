@@ -53,7 +53,6 @@ import Item from '../../../game/engine/room/objects/items/Item';
 import { OutgoingPacket } from '../../../game/networking/packets/outgoing/OutgoingPacket';
 
 const mode = ref('')
-
 const entity = ref({
     id: '',
     name: '',
@@ -70,8 +69,7 @@ EventManager.read(UIEvents.PREVIEW_BOX_MODE, (evt: PreviewModeEventData) => {
 })
 
 function isAnimated() {
-
-    let item = Engine.getInstance().roomService.CurrentRoom.roomEntityRepository.get(entity.value.id) as Item
+    let item = Engine.getInstance()?.roomService?.CurrentRoom?.roomEntityRepository?.get(entity.value.id) as Item
 
     return item.base.data.visualizationType == "furniture_animated"
 }
@@ -81,13 +79,13 @@ function moveItem() {
 }
 
 function pickItem() {
-    Engine.getInstance().networkingManager.packetManager.applyOut(OutgoingPacket.RoomPickupItemEvent, {
+    Engine.getInstance()?.networkingManager?.packetManager?.applyOut(OutgoingPacket.RoomPickupItemEvent, {
         id: entity.value.id
     })
 }
 
 function rotateItem() {
-    Engine.getInstance().networkingManager.packetManager.applyOut(OutgoingPacket.RoomRotateItemEvent, {
+    Engine.getInstance()?.networkingManager?.packetManager?.applyOut(OutgoingPacket.RoomRotateItemEvent, {
         id: entity.value.id
     })
 }

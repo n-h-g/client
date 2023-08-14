@@ -1,5 +1,5 @@
 <template>
-    <Dialog title="Catalogue" class-name="catalogue" :box="UIEventsType.CATALOGUE">
+    <Dialog title="Catalogue" className="catalogue" :box="UIEventsType.CATALOGUE">
         <div class="header">
             <div class="headerImage">
                 <img v-if="activePage && activePage.rawInfo && activePage.rawInfo.headerImage && activePage.rawInfo.headerImage != ''"
@@ -44,7 +44,6 @@
 </template>
 
 <script setup lang="ts">
-import { generate } from "@vue/compiler-core"
 import { ref } from "vue"
 import { CataloguePageItem } from "../../../game/core/communication/incoming/catalogue/CataloguePageItem"
 import { EventManager } from "../../../game/core/events/EventManager"
@@ -57,28 +56,24 @@ import Room from "../../../game/engine/room/Room"
 import { FurnidataItemType } from "../../../game/engine/ui/imagers/items/FurniImager"
 import { OutgoingPacket } from "../../../game/networking/packets/outgoing/OutgoingPacket"
 import Point from "../../../game/utils/point/Point"
-import Point3d from "../../../game/utils/point/Point3d"
 import UiUtils from "../../../game/utils/UiUtils"
 import Dialog from "../dialog/Dialog.vue"
 import TreeMenu from "./TreeMenu.vue"
 
-Engine.getInstance().networkingManager.packetManager.applyOut(OutgoingPacket.CatalogPagesListEvent)
+Engine.getInstance()?.networkingManager?.packetManager?.applyOut(OutgoingPacket.CatalogPagesListEvent)
 
-const resourceUrl = Engine.getInstance().config.catalogueResourcesUrl + "icons/"
+const resourceUrl = Engine.getInstance()?.config?.catalogueResourcesUrl + "icons/"
 
-let catalogMenu = ref([])
-let activePage = ref({
+const catalogMenu = ref([])
+const activePage = ref({
     rawInfo: {
         headerImage: ""
     }
 })
-
 const selectedItem = ref()
-
 const currentCataloguePage = ref({items: []} as {
     items: CataloguePageItem[]
 })
-
 const preview = ref("")
 
 generatePlaceHolder(null).then((image: string) => {
@@ -93,35 +88,29 @@ let currentMenu = ref({
 })
 
 EventManager.read(UIEvents.CATALOGUE_PAGES_UPDATED, (data: CataloguePagesData) => {
-    data.pages.forEach((page) => {
-        
-        if(catalogMenu.value.indexOf(page) < 0) {
+    for (var page of data.pages) {
+        if (catalogMenu.value.indexOf(page) < 0)
             catalogMenu.value.push(page)
-        }
-    })
-
+    }
 })
 
 EventManager.read(UIEvents.CATALOG_ITEMS_UPDATED, (data: CataloguePageData) => {
-    data.items.forEach((item) => {
-        if(hasItem(item.id)) return;
-
+    for (var item of data.items) {
+        if (hasItem(item.id)) return;
         currentCataloguePage.value.items.push(item)
-    })
-
+    }
 })
 
 function selectItem(item) {
-    this.selectedItem.value = item
+    selectedItem.value = item
 }
 
 async function generatePlaceHolder(item: CataloguePageItem): Promise<string> {
-    return await Engine.getInstance().userInterfaceManager.roomImager.generateRoomPreview(new Room("", "00001111/00001111/00001111/00001111", new Point(0, 0), 0))
+    return await Engine.getInstance()?.userInterfaceManager?.roomImager?.generateRoomPreview(new Room("", "00001111/00001111/00001111/00001111", new Point(0, 0), 0))
 }
 
 function getIcon(catalogItem: CataloguePageItem) {
-
-    Engine.getInstance().userInterfaceManager.furniImager.loadFurniIcon(FurnidataItemType.FloorItem, catalogItem.name).then((sprite) => {
+    Engine.getInstance()?.userInterfaceManager?.furniImager?.loadFurniIcon(FurnidataItemType.FloorItem, catalogItem.name).then((sprite) => {
         sprite.start()
         
         setTimeout(() => {
@@ -133,15 +122,15 @@ function getIcon(catalogItem: CataloguePageItem) {
 }
 
 function hasItem(id: number): boolean {
-    currentCataloguePage.value.items.forEach((item) => {
+    for (var item of currentCataloguePage.value.items) {
         return item.id == id
-    })
+    }
 
     return false
 }
 
 function openPage() {
-    console.log('dasd')
+    console.log('open page')
 }
 </script>
 

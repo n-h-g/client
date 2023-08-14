@@ -1,7 +1,7 @@
 <template>
 	<div id="hotel-view">
-		<div class="bg-right" />
-		<div class="bg-left" />
+		<div class="bg-right"></div>
+		<div class="bg-left"></div>
 	</div>
 </template>
 
@@ -27,7 +27,7 @@
 	bottom: 0;
 	width: 413px;
 	height: 124px;
-	background-image: url("../../../assets/images//hotelview/reception_flathotel_hotel.png");
+	background-image: url("@/assets/images/hotelview/reception_flathotel_hotel.png");
 }
 
 #hotel-view .bg-right {
@@ -37,6 +37,6 @@
 	z-index: 0;
 	width: 484px;
 	height: 463px;
-	background-image: url("../../../assets/images/hotelview/default_new_bg_right.png");
+	background-image: url("@/assets/images/hotelview/default_new_bg_right.png");
 }
 </style>

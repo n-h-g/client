@@ -1,5 +1,5 @@
 <template>
-    <Dialog title="Inventory" class="inventory" :box="UIEventsType.INVENTORY">
+    <Dialog title="Inventory" className="inventory" :box="UIEventsType.INVENTORY">
         <div class="sub">
             <div class="item" :class="{ active: currentTab == 'floor' }" @click.stop="changeTab('floor')">
                 Floor
@@ -85,36 +85,28 @@ import { IComponentShowableUI } from "../../../game/core/ui/IComponentShowableUI
 import { EventManager } from "../../../game/core/events/EventManager"
 import { UIEvents } from "../../../game/engine/events/ui/UIEvents"
 import { InventoryItemsEventData } from "../../../game/engine/events/ui/data/inventory/InventoryItems"
-import { FurniDataItemType } from "../../../game/engine/ui/imagers/items/FurniImager"
 import { ItemType } from "../../../game/core/room/object/items/ItemType"
 
 const tradeMode = ref(false)
 const myTradeItems = ref([])
 const targetTradeItems = ref([])
-
 const showPlaceItemButton = ref(false)
-
 const trade = ref({
     targetTradeName: ""
 })
-
 const selectedItem = ref()
-
-let currentTab = ref("floor");
-
+const currentTab = ref("floor");
 const floorItems = ref([])
 const wallItems = ref([])
-
 const showAddAllItemsToTradeButton = ref(false)
 
 EventManager.read(UIEvents.INVENTORY_ITEMS_ADDED, (data: InventoryItemsEventData) => {
-    for(let item of data.items) {
+    for (let item of data.items) {
         console.log(item)
-        if(item.item_type == ItemType.FLOOR_ITEM) {
+        if (item.item_type == ItemType.FLOOR_ITEM)
             floorItems.value.push(item)
-        } else {
+        else
             wallItems.value.push(item)
-        }
     }
 })
 
@@ -124,14 +116,13 @@ function addAllItemsToTrade() {
 
 function placeItem() {
     hide()
-    Engine.getInstance().networkingManager.packetManager.applyOut(OutgoingPacket.RoomPlaceItemEvent, {
+    Engine.getInstance()?.networkingManager?.packetManager?.applyOut(OutgoingPacket.RoomPlaceItemEvent, {
         id: this.selectedItem.id,
         name: this.selectedItem.name,
         x: 2,
         y: 0,
         z: 0
     })
-
 }
 
 function getImagePreview(item: Item) {
@@ -148,17 +139,15 @@ function changeTab(tab: string) {
             break;
     }
 
-    this.showPlaceItemButton = false
-
+    showPlaceItemButton.value = false
 }
 
 function selectItem(item: Item) {
-    this.selectedItem = item
+    selectedItem.value = item
 
     if (Engine.getInstance()?.roomService?.CurrentRoom != undefined) {
-        this.showPlaceItemButton = true
+        showPlaceItemButton.value = true
     }
-
 }
 
 function deselectItem() {
@@ -174,11 +163,11 @@ function cancelTrade() {
 }
 
 function hide() {
-    Engine.getInstance()?.userInterfaceManager?.componentsManager.getComponent<IComponentShowableUI>(UIComponent.InventoryUI).hide()
+    Engine.getInstance()?.userInterfaceManager?.componentsManager?.getComponent<IComponentShowableUI>(UIComponent.InventoryUI).hide()
 }
 
 onMounted(() => {
-    Engine.getInstance()?.networkingManager?.packetManager.applyOut(OutgoingPacket.RequestInventoryItemsEvent)
+    Engine.getInstance()?.networkingManager?.packetManager?.applyOut(OutgoingPacket.RequestInventoryItemsEvent)
 })
 </script>
 

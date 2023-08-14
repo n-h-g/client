@@ -12,9 +12,12 @@ import { Engine } from '../../game/Engine'
 
 onMounted(() => {
     const route: RouteLocationNormalizedLoaded = useRoute()
-    const sso: string = route.params.sso[0]
+    var sso: string;
+    if (route.params != null && route.params.sso != null)
+        sso = route.params.sso[0]
     const engine: Engine = new Engine()
     engine.init()
-    engine.sso = sso
+    if (sso != null)
+        engine.sso = sso
 })
 </script>

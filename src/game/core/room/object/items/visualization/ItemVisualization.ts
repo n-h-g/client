@@ -15,7 +15,8 @@ import { EntityVisualization } from '../../entities/EntityVisualization'
 
 export default abstract class ItemVisualization extends EntityVisualization {
     private position: Point3d
-    public iconImage: string | undefined
+    public iconImage: string
+    public imagePreview: string
     public isIcon: boolean = false
     public _entity: Item = null
     private sprite: FurniSprite
@@ -24,8 +25,8 @@ export default abstract class ItemVisualization extends EntityVisualization {
         super(item)
         this.position = item.position
         this.iconImage = this.generateIcon()
+        this.imagePreview = this.generateImagePreview()
     }
-
 
     public nextFrame(): void {
         throw new Error('Method not implemented.')

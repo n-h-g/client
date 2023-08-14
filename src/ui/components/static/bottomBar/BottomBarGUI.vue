@@ -27,14 +27,14 @@ import ChatBar from './ChatBar.vue'
 function toggle(ui: string) {
   switch (ui) {
     case 'navigator':
-      Engine.getInstance()?.userInterfaceManager?.componentsManager.getComponent<IComponentShowableUI>(UIComponent.NavigatorUI).toggle()
-      break;
+      Engine.getInstance()?.userInterfaceManager?.componentsManager?.getComponent<IComponentShowableUI>(UIComponent.NavigatorUI).toggle()
+      break
     case 'inventory':
-      Engine.getInstance()?.userInterfaceManager?.componentsManager.getComponent<IComponentShowableUI>(UIComponent.InventoryUI).toggle()
-      break;
+      Engine.getInstance()?.userInterfaceManager?.componentsManager?.getComponent<IComponentShowableUI>(UIComponent.InventoryUI).toggle()
+      break
     case 'catalogue':
-      Engine.getInstance()?.userInterfaceManager?.componentsManager.getComponent<IComponentShowableUI>(UIComponent.CatalogueUI).toggle()
-      break;
+      Engine.getInstance()?.userInterfaceManager?.componentsManager?.getComponent<IComponentShowableUI>(UIComponent.CatalogueUI).toggle()
+      break
   }
 }
 </script>
@@ -123,8 +123,7 @@ function toggle(ui: string) {
     left: 10px;
   }
 
-  & .rightOptions,
-  .leftOptions {
+  & .rightOptions, .leftOptions {
     position: absolute;
     top: 0;
     min-width: 125px;
@@ -147,18 +146,14 @@ function toggle(ui: string) {
         filter: drop-shadow(2px 2px 0 rgba(0, 0, 0, .50))
       }
 
-
-
-
-
       &.navigator {
-        background-image: url("../../../../assets/images/bottom-bar/rooms.png");
+        background-image: url("@/assets/images/bottom-bar/rooms.png");
         width: 44px;
         height: 30px;
       }
 
       &.inventory {
-        background-image: url("../../../../assets/images/bottom-bar/inventory.png");
+        background-image: url("@/assets/images/bottom-bar/inventory.png");
         width: 44px;
         height: 41px;
         top: 5px;
@@ -183,7 +178,7 @@ function toggle(ui: string) {
       }
 
       &.search_friends {
-        background-image: url("../../../../assets/images/bottom-bar/friend_search.png");
+        background-image: url("@/assets/images/bottom-bar/friend_search.png");
         width: 29px;
         height: 33px;
         top: 10px;

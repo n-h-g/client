@@ -1,5 +1,5 @@
 import RoomObjectVisualization from '../../../../../core/room/object/RoomObjectVisualization'
-import RoomPlaneType from '../RoomPlaneTypeEnum'
+import { RoomPlaneType } from '../RoomPlaneTypeEnum'
 import RoomVisualization from '../../../visualization/RoomVisualization'
 import MapData from '../MapData'
 import { Tile } from '../Tile'

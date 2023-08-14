@@ -1,5 +1,5 @@
 import MapData from '../MapData'
-import TileType from '../TileTypeEnum'
+import { TileType } from '../TileTypeEnum'
 import { Container } from 'pixi.js'
 import { Engine } from '../../../../../Engine'
 import { OutgoingPacket } from '../../../../../networking/packets/outgoing/OutgoingPacket'

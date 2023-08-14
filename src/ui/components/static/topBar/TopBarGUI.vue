@@ -1,7 +1,7 @@
 <template>
     <div class="topBar">
         <div class="coinsBox credits">{{ credits }}</div>
-        <div class="coinsBox points">0</div>
+        <div class="coinsBox points">{{ points }}</div>
     </div>
 </template>
 
@@ -12,9 +12,11 @@ import { TopbarEventData } from '../../../../game/engine/events/ui/data/static/T
 import { UIEvents } from '../../../../game/engine/events/ui/UIEvents';
 
 const credits = ref(0)
+const points = ref(0)
 
 EventManager.read(UIEvents.SET_TOPBAR, (event: TopbarEventData) => {
     credits.value = event.credits
+    points.value = 0
 })
 </script>
 
