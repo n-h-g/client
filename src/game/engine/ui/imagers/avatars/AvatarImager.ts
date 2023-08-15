@@ -251,8 +251,8 @@ export default class AvatarImager {
 
         component.IsFlipped = isFlipped;
 
-        let assetData: AssetData = spritesheet[component.ResourceName]
-        if (assetData !== undefined) {
+        let asset: AssetData = spritesheet[component.ResourceName]
+        if (asset !== undefined) {
             /*let downloadedTexture: PIXI.Texture = this.data.getTexture(assetName)
             if (!downloadedTexture) {
                 if (Engine.getInstance().config.debug) {
@@ -269,10 +269,10 @@ export default class AvatarImager {
             }
             
             let texture = RenderingUtils.cropTexture(downloadedTexture, parseInt(asset.height), parseInt(asset.width), parseInt(asset.left), parseInt(asset.top));*/
-            let asset: AssetData = spritesheet[component.ResourceName]
-            if (asset.link != undefined) {
+            //let asset: AssetData = spritesheet[component.ResourceName]
+            if (asset.link != undefined)
                 asset = spritesheet[asset.link]
-            }
+
             let texture = this.getTextureAndCache(component.ResourceName, asset, assetName);
             let sprite = new Sprite(texture);
 
@@ -288,7 +288,6 @@ export default class AvatarImager {
             let offsets = asset.offset.split(",");
 
             if (offsets) {
-
                 const offset = new Point(parseInt(offsets[0]), parseInt(offsets[1]))
 
                 sprite.pivot.x = bodyPartOffset ? bodyPartOffset.dx + offset.getX() : offset.getX()
@@ -299,7 +298,6 @@ export default class AvatarImager {
                 sprite.scale.x = -1;
                 sprite.x = this.structure.Geometry?.width! - sprite.x + AvatarData.AVATAR_LEFT_OFFSET;
             }
-
 
             if (component.ResourceType == "sh") {
                 avatar.ShoesContainer.addChild(sprite);
