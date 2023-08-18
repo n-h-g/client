@@ -8,6 +8,7 @@ import RoomVisualization from '../../../../../engine/room/visualization/RoomVisu
 import { FurniData } from '../../../../../engine/ui/imagers/items/FurniData'
 import { FurnidataItemType } from '../../../../../engine/ui/imagers/items/FurniImager'
 import { FurniSprite } from '../../../../../engine/ui/imagers/items/FurniSprite'
+import { Logger } from '../../../../../utils/Logger'
 import Point from '../../../../../utils/point/Point'
 import Point3d from '../../../../../utils/point/Point3d'
 import UiUtils from '../../../../../utils/UiUtils'
@@ -63,13 +64,10 @@ export default abstract class ItemVisualization extends EntityVisualization {
     }
 
     private generateImagePreview() {
-        return UiUtils.generateBase64FromObject(this.entity.visualization.container)
+        return this.entity ? UiUtils.generateBase64FromObject(this.entity.visualization.container) : null;
     }
 
     private generateIcon(): string {
-        /*let icon: FurniSprite = this.item.base.turnIntoIcon()
-        this.item.base.restore()
-        return UiUtils.generateBase64FromObject(icon);*/
         return '';
     }
 
@@ -88,8 +86,11 @@ export default abstract class ItemVisualization extends EntityVisualization {
             this.container = sprite
 
         } catch (e) {
-            throw new Error(e)
+            if(Engine.getInstance().config.debug)
+                Logger.error(e.message)
         }
+
+        if(!this._entity) return;
 
         let spriteZIndex = this._entity.base.data.logic.dimensions[2]
 
