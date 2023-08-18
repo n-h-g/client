@@ -8,6 +8,7 @@ import { Engine } from '../../../../Engine'
 
 export abstract class EntityVisualization extends RoomObjectVisualization {
     public _entity: Entity
+    
     protected rotation: Direction = Direction.SOUTH
     private _nextPosition: Point3d
     public frame: number = 0

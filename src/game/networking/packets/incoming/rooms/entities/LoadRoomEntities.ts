@@ -30,6 +30,7 @@ export default class LoadRoomEntities extends MessageHandler {
             entity.id,
             entity
           );
+          console.log(entity.visualization)
           entity.visualization.render();
         });
     }

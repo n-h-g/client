@@ -14,6 +14,7 @@ export default abstract class Item extends Entity {
         super(id, name)
         this.position = position
         this.base = furniBase
+        
         this.visualization = this.getItemVisualizationFromType(this.base.data.visualization.type)
         this.logic = this.getItemLogicFromType(this.base.data.logic.type)
     }

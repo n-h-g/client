@@ -19,7 +19,6 @@ export default abstract class ItemVisualization extends EntityVisualization {
     public iconImage: string
     public imagePreview: string
     public isIcon: boolean = false
-    public _entity: Item = null
     private sprite: FurniSprite
 
     constructor(item: Item) {
@@ -64,7 +63,7 @@ export default abstract class ItemVisualization extends EntityVisualization {
     }
 
     private generateImagePreview() {
-        return this.entity ? UiUtils.generateBase64FromObject(this.entity.visualization.container) : null;
+        return this.entity ? UiUtils.generateBase64FromObject(this.container) : null;
     }
 
     private generateIcon(): string {
@@ -72,6 +71,7 @@ export default abstract class ItemVisualization extends EntityVisualization {
     }
 
     public async render(): Promise<void> {
+        
         try {
             let sprite = await Engine.getInstance().userInterfaceManager.furniImager.loadFurniSprite(FurnidataItemType.FloorItem, this.entity.name)
 
@@ -92,7 +92,7 @@ export default abstract class ItemVisualization extends EntityVisualization {
 
         if(!this._entity) return;
 
-        let spriteZIndex = this._entity.base.data.logic.dimensions[2]
+        let spriteZIndex = (this._entity as Item).base.data.logic.dimensions[2]
 
         this.container.zIndex = this.getZIndex(spriteZIndex)
 
@@ -128,7 +128,7 @@ export default abstract class ItemVisualization extends EntityVisualization {
     }
 
     public getZIndex(zIndex: number = 1): number {
-        const compareY = (Math.trunc(this._entity.base.data.logic.dimensions[2] / 100)) / 10
+        const compareY = (Math.trunc((this._entity as Item).base.data.logic.dimensions[2] / 100)) / 10
         return RoomVisualization.calculateZIndex(new Point3d(this.entity.position.getX(), this.entity.position.getY() + compareY, this.entity.position.getZ()), RoomPriority.ROOM_ITEM)
     }
 }

@@ -126,7 +126,7 @@ function placeItem() {
 }
 
 function getImagePreview(item: Item) {
-    return (item.visualization as ItemVisualization).imagePreview 
+    return item.visualization ? (item.visualization as ItemVisualization).imagePreview : "/src/assets/images/items/default_placeholder.png"
 }
 
 function changeTab(tab: string) {
