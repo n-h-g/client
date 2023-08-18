@@ -5,6 +5,7 @@ import Item from '../../../../../engine/room/objects/items/Item'
 import { FurniData } from '../../../../../engine/ui/imagers/items/FurniData'
 import { OutgoingPacket } from '../../../../../networking/packets/outgoing/OutgoingPacket'
 import { EntityLogic } from '../../entities/EntityLogic'
+import ItemVisualization from '../visualization/ItemVisualization'
 
 export abstract class ItemLogic extends EntityLogic {
     public _roll: boolean = false
@@ -29,7 +30,7 @@ export abstract class ItemLogic extends EntityLogic {
     }
 
     public onPositionChanged(): void {
-        this._entity.visualization.render()
+      
     }   
 
     public placeItem() {
@@ -55,7 +56,6 @@ export abstract class ItemLogic extends EntityLogic {
         this._roll = value;
         this.entity.visualization!.needsUpdate = value;
         this.entity.visualization.container.alpha = value ? FurniData.LOADING_ALPHA : FurniData.DEFAULT_ALPHA;
-        //Engine.getInstance()!.roomService!.CurrentRoom.roomItemRepository.movingItem = value ? this.entity : null;
     }
 
     public onMove(delta: number): void {
@@ -71,6 +71,7 @@ export abstract class ItemLogic extends EntityLogic {
             return;
         }
 
-        this.entity.visualization.updatePosition()
+        if(this.entity.visualization.needsUpdate)
+            this.entity.visualization.render()
     }
 }

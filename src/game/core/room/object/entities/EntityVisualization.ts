@@ -8,7 +8,7 @@ import { Engine } from '../../../../Engine'
 
 export abstract class EntityVisualization extends RoomObjectVisualization {
     public _entity: Entity
-    
+
     protected rotation: Direction = Direction.SOUTH
     private _nextPosition: Point3d
     public frame: number = 0
@@ -85,9 +85,7 @@ export abstract class EntityVisualization extends RoomObjectVisualization {
     public abstract getZIndex(): number
 
     public updatePosition() {
-
-        if(!this.container)
-            return;
+        if(!this.container) return;
 
         this.container.x = this.calculateOffsetX()
         this.container.y = this.calculateOffsetY()

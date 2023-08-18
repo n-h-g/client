@@ -40,11 +40,15 @@ export class FurniSprite extends Container {
     if (directions.includes(2)) {
       return 2
     }
+
+    if(directions.includes(6)) {
+      return 0;
+    }
     return directions[0]
   }
   public getNextDirection(direction: Direction) {
     const directions = this.furniBase.getAvailableDirections()
-    const pos = directions.indexOf(this.direction)
+    const pos = directions.indexOf(direction)
     return directions[(pos + 1) % directions.length]
   }
 
@@ -57,10 +61,9 @@ export class FurniSprite extends Container {
   }
 
   public setDirection(direction: number = 0) {
-    if (direction != this.direction) {
-      this.direction = direction
-      this.needsUpdate = true
-    }
+    this.direction = direction
+    this.needsUpdate = true
+    this.update()
   }
 
   public setAnimation(animation: number) {

@@ -71,7 +71,11 @@ export default abstract class ItemVisualization extends EntityVisualization {
     }
 
     public async render(): Promise<void> {
-        
+
+        if(this.container) {
+            this.container.removeChildren()
+        }
+
         try {
             let sprite = await Engine.getInstance().userInterfaceManager.furniImager.loadFurniSprite(FurnidataItemType.FloorItem, this.entity.name)
 
@@ -79,9 +83,11 @@ export default abstract class ItemVisualization extends EntityVisualization {
 
             let dir = sprite.getNextDirection(this.rotation)
 
-            this.rotation = dir
+            this.direction = dir
 
             sprite.setDirection(dir)
+
+            sprite.update()
 
             this.container = sprite
 
@@ -91,6 +97,7 @@ export default abstract class ItemVisualization extends EntityVisualization {
         }
 
         if(!this._entity) return;
+
 
         let spriteZIndex = (this._entity as Item).base.data.logic.dimensions[2]
 
