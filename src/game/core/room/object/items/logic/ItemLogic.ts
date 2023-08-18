@@ -1,4 +1,5 @@
 import { Engine } from '../../../../../Engine'
+import { EntityEvents } from '../../../../../engine/events/room/objects/entities/EntityEvents'
 import { ItemEvents } from '../../../../../engine/events/room/objects/entities/ItemEvents'
 import Item from '../../../../../engine/room/objects/items/Item'
 import { FurniData } from '../../../../../engine/ui/imagers/items/FurniData'
@@ -16,6 +17,7 @@ export abstract class ItemLogic extends EntityLogic {
         super.registerEvents()
 
         this.events.on(ItemEvents.FURNI_SPRITE_LOADED, () => this.onLoad())
+        this.events.on(EntityEvents.POSITION_CHANGED, () => this.onPositionChanged())
     }
 
     public onLoad() {
@@ -27,8 +29,8 @@ export abstract class ItemLogic extends EntityLogic {
     }
 
     public onPositionChanged(): void {
-
-    }
+        this._entity.visualization.render()
+    }   
 
     public placeItem() {
         Engine.getInstance().networkingManager?.packetManager.applyOut(OutgoingPacket.RoomPickupItemEvent, {
@@ -63,6 +65,10 @@ export abstract class ItemLogic extends EntityLogic {
     public tick(delta: number) {
         if (this._roll) {
             this.onMove(delta);
+        }
+
+        if(!this.entity) {
+            return;
         }
 
         this.entity.visualization.updatePosition()

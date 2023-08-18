@@ -102,7 +102,6 @@ const showAddAllItemsToTradeButton = ref(false)
 
 EventManager.read(UIEvents.INVENTORY_ITEMS_ADDED, (data: InventoryItemsEventData) => {
     for (let item of data.items) {
-        console.log(item)
         if (item.item_type == ItemType.FLOOR_ITEM)
             floorItems.value.push(item)
         else

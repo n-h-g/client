@@ -13,7 +13,9 @@ export interface IEntityData {
     name: {
         name: string
     }
-    rotation: Direction
+    rotation: {
+        rot: number
+    }
     position: IPositionComponent
     bh_rot: IHeadBodyRotationComponent
     type: EntityType
