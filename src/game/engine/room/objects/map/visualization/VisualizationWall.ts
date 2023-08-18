@@ -14,7 +14,7 @@ export default class VisualizationWall extends RoomObjectVisualization {
     private wallContext: Container
     private wallCtx: Graphics
     private doorContext: Container
-    private color: ColorRGB = ColorRGB.getColorFromNumber(0xa5afc0)
+    private color: ColorRGB = ColorRGB.getColorFromNumber(RoomVisualizationColorData.WALL_COLOR)
 
     constructor(wall: Wall) {
         super(VisualizationWall.calculateOffsetX(wall.position),

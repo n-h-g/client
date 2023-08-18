@@ -14,7 +14,7 @@ export default class VisualizationTile extends RoomObjectVisualization {
     private tile: Tile
     private floorContext: Container
     private doorContext: Container
-    private color: ColorRGB = ColorRGB.getColorFromNumber(0x969664)
+    private color: ColorRGB = ColorRGB.getColorFromNumber(RoomVisualizationColorData.TILE_COLOR)
     private useStroke: boolean = true
 
     constructor(tile: Tile) {
