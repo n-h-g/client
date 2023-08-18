@@ -2,11 +2,15 @@ import RoomLayout from '../RoomLayout'
 import Room from '../Room'
 import { IRoomLogic } from '../../../core/room/IRoomLogic'
 import { Engine } from '../../../Engine'
-import { Point } from 'pixi.js'
+import { Point, Sprite, Texture } from 'pixi.js'
 import { Viewport } from 'pixi-viewport'
 import { RoomPriority } from '../visualization/RoomPriority'
 import RoomVisualization from '../visualization/RoomVisualization'
 import Point3d from '../../../utils/point/Point3d'
+import { UIComponent } from '../../ui/components/UIComponent'
+import RoomUI from '../../ui/components/room/RoomUI'
+import UiUtils from '../../../utils/UiUtils'
+import RenderingUtils from '../../../utils/RenderingUtils'
 
 export class RoomLogic implements IRoomLogic {
     private room: RoomLayout
@@ -16,6 +20,10 @@ export class RoomLogic implements IRoomLogic {
     constructor(room: RoomLayout) {
         this.room = room
         this.canvasFloorHit = this.room.createOrGetRoomCanvas('floorHit')
+
+        if(Engine.getInstance().config.debugRoomClick)
+            this.room.Visualization.Container.addChild(new Sprite(Texture.from(RenderingUtils.convertCanvasToImage(this.canvasFloorHit))));
+
         this.canvasWallHit = this.room.createOrGetRoomCanvas('wallHit')
     }
 

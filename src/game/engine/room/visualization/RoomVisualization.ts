@@ -18,6 +18,7 @@ export default class RoomVisualization implements IRoomVisualization {
     private canvasDoorWall: Container
     private canvasPointer: Container
     public container: Container
+    
     public needsUpdate: boolean = false
 
     constructor(room: RoomLayout) {

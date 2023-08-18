@@ -126,7 +126,7 @@ function placeItem() {
 }
 
 function getImagePreview(item: Item) {
-    return (item.visualization as ItemVisualization).imagePreview
+    return (item.visualization as ItemVisualization).imagePreview 
 }
 
 function changeTab(tab: string) {

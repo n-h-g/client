@@ -1,6 +1,6 @@
 import MapData from '../MapData'
 import { TileType } from '../TileTypeEnum'
-import { Container } from 'pixi.js'
+import { Container, Texture } from 'pixi.js'
 import { Engine } from '../../../../../Engine'
 import { OutgoingPacket } from '../../../../../networking/packets/outgoing/OutgoingPacket'
 import { RoomObjectLogic } from '../../../../../core/room/object/RoomObjectLogic'
@@ -11,6 +11,7 @@ import RoomVisualization from '../../../visualization/RoomVisualization'
 
 export default class LogicTile extends RoomObjectLogic {
     private tile: Tile
+
     private hitContext: CanvasRenderingContext2D | null
 
     constructor(tile: Tile) {
@@ -64,7 +65,7 @@ export default class LogicTile extends RoomObjectLogic {
     public checkTileAndDrawHitBox() {
         if (this.tile.type != TileType.Hole) {
             if (this.hitContext != null) {
-                this.drawTileHitBox(this.hitContext)
+                let ctx = this.drawTileHitBox(this.hitContext)
             }
         }
     }

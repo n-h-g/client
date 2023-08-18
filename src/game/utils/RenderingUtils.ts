@@ -19,4 +19,10 @@ export default class RenderingUtils {
     static getPointFromObject(object: {x, y, z}){
         return new Point3d(object.x, object.y, object.z)
     }
+
+    static convertCanvasToImage(canvas) {
+        var image = new Image();
+        image.src = canvas.toDataURL("image/png");
+        return image;
+    }
 }
