@@ -6,6 +6,7 @@ import { UserInterfaceManager } from './engine/ui/UserInterfaceManager'
 import { CommandService } from './engine/game/commands/CommandService'
 import * as PIXI from "pixi.js"
 import { OfflineMode } from './offline/OfflineMode'
+import ChatMessageService from './engine/game/chat/ChatService'
 
 export class Engine {
     private static _instance: Engine
@@ -14,6 +15,7 @@ export class Engine {
     private _roomsService: RoomService
     private _networkingManager: NetworkingManager
     private _commandService: CommandService
+    private _chatService: ChatMessageService
 
     private _config = generalConfig
 
@@ -50,6 +52,7 @@ export class Engine {
 
         this._roomsService = new RoomService()
         this._commandService = new CommandService()
+        this._chatService = new ChatMessageService()
 
         this._networkingManager = new NetworkingManager()
         this._userInterfaceManager = new UserInterfaceManager()
@@ -93,6 +96,10 @@ export class Engine {
 
     public get userInterfaceManager(): UserInterfaceManager {
         return this._userInterfaceManager
+    }
+
+    public get chatService(): ChatMessageService {
+        return this._chatService;
     }
 
     public get networkingManager(): NetworkingManager {

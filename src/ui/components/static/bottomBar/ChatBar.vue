@@ -27,10 +27,12 @@ function sendMessage(e) {
     if (e.shiftKey)
         shout = true
 
-    Engine.getInstance().networkingManager.packetManager.applyOut(OutgoingPacket.UserSay, {
-        message: message.value,
-        shout: shout
-    })
+    if(!Engine.getInstance().chatService.checkCommand(message.value)) {
+        Engine.getInstance().networkingManager.packetManager.applyOut(OutgoingPacket.UserSay, {
+            message: message.value,
+            shout: shout
+        })
+    }
 
     typed.value = false
     message.value = ""
