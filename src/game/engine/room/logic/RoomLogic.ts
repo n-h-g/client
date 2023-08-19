@@ -37,6 +37,7 @@ export class RoomLogic implements IRoomLogic {
         roomVisualization.getCanvasFloor().on('pointerover', this.onMouseOver.bind(this))
         roomVisualization.Container.on('pointerdown', this.onMouseClick.bind(this))
         roomVisualization.getCanvasFloor().on('pointerout', this.onMouseOut.bind(this))
+
         Engine.getInstance().application.viewport.on('drag-end', this.onCameraMove.bind(this))
 
         this.room.getFloorPlane().logic?.registerEvents()

@@ -42,6 +42,10 @@ export default class LogicTile extends RoomObjectLogic {
             return
         }
 
+        if(this.tile.plane.room.getRoom().roomEntityRepository.isEntityRolling()) {
+            this.tile.plane.room.getRoom().roomEntityRepository.stopRollingEntity()
+        }
+
         Engine.getInstance().networkingManager.packetManager.applyOut(OutgoingPacket.UserMove, {
             x: this.tile.position.getX(),
             y: this.tile.position.getY()
@@ -60,6 +64,7 @@ export default class LogicTile extends RoomObjectLogic {
         this.tile.plane.room.Visualization.getCanvasPointer().zIndex = RoomVisualization.calculateZIndex(this.tile.position, isDoor ? RoomPriority.DOOR_FLOOR_SELECT : RoomPriority.POINTER);
         this.tile.plane.room.Visualization.getCanvasPointer().visible = true;
         this.tile.plane.room.getPointer().visualization.updatePosition(tileContext!.x, tileContext!.y, this.tile);
+        this.tile.plane.room.getRoom().roomEntityRepository.updateRollingEntity(this.tile.position);
     }
 
     public checkTileAndDrawHitBox() {

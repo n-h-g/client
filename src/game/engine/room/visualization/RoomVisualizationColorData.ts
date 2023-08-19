@@ -2,6 +2,7 @@ import ColorRGB from '../../../utils/color/ColorRGB'
 import { NormalType } from './NormalTypeEnum'
 
 export default class RoomVisualizationColorData {
+    
     public static MASK_BRIGHTNESS_LIGHT = 0
     public static MASK_BRIGHTNESS_MEDIUM = -10
     public static MASK_BRIGHTNESS_DARK = -20

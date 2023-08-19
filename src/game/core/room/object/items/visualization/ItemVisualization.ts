@@ -13,12 +13,13 @@ import Point from '../../../../../utils/point/Point'
 import Point3d from '../../../../../utils/point/Point3d'
 import UiUtils from '../../../../../utils/UiUtils'
 import { EntityVisualization } from '../../entities/EntityVisualization'
+import { MoveableVisualization } from '../../IMoveable'
 
-export default abstract class ItemVisualization extends EntityVisualization {
+export default abstract class ItemVisualization extends EntityVisualization implements MoveableVisualization {
     private position: Point3d
     public iconImage: string
     public imagePreview: string
-    public isIcon: boolean = false
+    public isIcon: boolean = false 
     private sprite: FurniSprite
 
     constructor(item: Item) {
@@ -34,8 +35,20 @@ export default abstract class ItemVisualization extends EntityVisualization {
 
     public draw(): void {
         if (Engine.getInstance().roomService?.CurrentRoom) {
+
+            let temp: FurniSprite = this.container as FurniSprite;
+
+            if(this.container) {
+                (this.container as FurniSprite).restore()
+            }
+
+            this.container = temp;
+            
+            (this.container as FurniSprite).update();
+
             Engine.getInstance().roomService?.CurrentRoom?.roomLayout.Visualization.container?.addChild(this.container)
             this.updatePosition()
+            this.entity.logic.registerEvents()
         }
     }
 
@@ -76,6 +89,8 @@ export default abstract class ItemVisualization extends EntityVisualization {
             this.container.removeChildren()
         }
 
+        console.log('rendering...')
+
         try {
             let sprite = await Engine.getInstance().userInterfaceManager.furniImager.loadFurniSprite(FurnidataItemType.FloorItem, this.entity.name)
 
@@ -84,6 +99,8 @@ export default abstract class ItemVisualization extends EntityVisualization {
             let dir = sprite.getNextDirection(this.rotation)
 
             this.direction = dir
+
+            sprite.setAnimation(2)
 
             sprite.setDirection(dir)
 

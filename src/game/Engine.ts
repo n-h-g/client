@@ -48,6 +48,9 @@ export class Engine {
             powerPreference: "high-performance",
             resizeTo: window
         })
+
+
+
         document.body.appendChild(this._application.view)
 
         this._roomsService = new RoomService()
@@ -69,6 +72,10 @@ export class Engine {
         if (this._config.offlineMode) {
             new OfflineMode(this).init()
         }
+    }
+
+    public setUpInteractionManager() {
+        
     }
 
     public get config(): typeof generalConfig {

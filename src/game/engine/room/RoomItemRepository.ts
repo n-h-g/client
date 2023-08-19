@@ -2,6 +2,7 @@ import { Repository } from '../../core/Repository'
 import Item from './objects/items/Item'
 
 export class RoomItemRepository extends Repository<string, Item> {
+    
     private _movingItem: Item
 
     constructor() {

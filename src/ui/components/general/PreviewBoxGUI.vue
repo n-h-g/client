@@ -44,6 +44,8 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import { EventManager } from '../../../game/core/events/EventManager';
+import { ItemLogic } from '../../../game/core/room/object/items/logic/ItemLogic';
+import ItemVisualization from '../../../game/core/room/object/items/visualization/ItemVisualization';
 import { Engine } from '../../../game/Engine';
 import { DialogEventData } from '../../../game/engine/events/ui/data/general/Dialog';
 import { PreviewModeEventData } from '../../../game/engine/events/ui/data/general/PreviewUserData';
@@ -75,7 +77,11 @@ function isAnimated() {
 }
 
 function moveItem() {
+    let item = Engine.getInstance()?.roomService?.CurrentRoom?.roomEntityRepository?.get(entity.value.id) as Item
+    let visualization = item.logic as ItemLogic
 
+    visualization.toggleMovement(true)
+    Engine.getInstance().roomService.CurrentRoom.roomEntityRepository.setRollingEntity(item);
 }
 
 function pickItem() {
