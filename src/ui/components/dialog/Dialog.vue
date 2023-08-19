@@ -35,12 +35,12 @@ const offset = ref({
     y: 0
 })
 const initial = ref({
-    x: 0,
-    y: 0
+    x: null,
+    y: null
 })
 const current = ref({
-    x: 0,
-    y: 0
+    x: null,
+    y: null
 })
 const active = ref(false)
 
@@ -51,13 +51,12 @@ const dragStart = (ev: DragEvent) => {
 }
 
 const drag = (ev: DragEvent) => {
-    if (active.value) {
-        ev.preventDefault();
+    if (active.value && ev.clientX != 0 && ev.clientY != 0) {
         current.value.x = ev.clientX - initial.value.x
         current.value.y = ev.clientY - initial.value.y
         offset.value.x = current.value.x
         offset.value.y = current.value.y
-        document.getElementById('dialog').style.transform = 'translate3d(' + current.value.x + 'px, ' + current.value.y + 'px, 0)'
+        document.getElementById('dialog').style.transform = 'translate(' + current.value.x + 'px, ' + current.value.y + 'px)'
     }
 }
 
