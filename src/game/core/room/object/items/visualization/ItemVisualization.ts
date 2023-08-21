@@ -46,6 +46,8 @@ export default abstract class ItemVisualization extends EntityVisualization impl
             
             (this.container as FurniSprite).update();
 
+            this.container.alpha = FurniData.DEFAULT_ALPHA;
+
             Engine.getInstance().roomService?.CurrentRoom?.roomLayout.Visualization.container?.addChild(this.container)
             this.updatePosition()
             this.entity.logic.registerEvents()
@@ -121,7 +123,6 @@ export default abstract class ItemVisualization extends EntityVisualization impl
         this.container.zIndex = this.getZIndex(spriteZIndex)
 
         this.container.interactive = true
-        this.container.interactiveChildren = true
 
         if (Engine.getInstance().roomService?.CurrentRoom) {
             Engine.getInstance().roomService?.CurrentRoom?.roomLayout.Visualization.container?.addChild(this.container)

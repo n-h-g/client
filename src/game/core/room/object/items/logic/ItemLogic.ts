@@ -17,6 +17,7 @@ export abstract class ItemLogic extends EntityLogic implements MoveableLogic{
 
     public registerEvents(): void {
         super.registerEvents()
+
         this.events.on(ItemEvents.FURNI_SPRITE_LOADED, () => this.onLoad())
         this.events.on(EntityEvents.POSITION_CHANGED, () => this.onPositionChanged())
         this.events.on(EntityEvents.START_ROLL, () => this.toggleMovement(true))
@@ -78,15 +79,20 @@ export abstract class ItemLogic extends EntityLogic implements MoveableLogic{
     }
 
     public stopRolling() {
+
+        if(this._roll) return;
+
         this.toggleMovement(false)
         
-        Engine.getInstance()?.networkingManager?.packetManager?.applyOut(OutgoingPacket.RoomPlaceItemEvent, {
+        Engine.getInstance()?.networkingManager?.packetManager?.applyOut(OutgoingPacket.RoomMoveItemEvent, {
             id: this.entity.id,
             name: this.entity.name,
             x: this.entity.position.getX(),
             y: this.entity.position.getY(),
             z: this.entity.position.getZ()
         })
+
+        this._roll = false;
     }
 
     public get roll(): boolean {

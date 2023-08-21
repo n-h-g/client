@@ -12,7 +12,7 @@ export default class UpdateEntity extends MessageHandler {
 
         if (Engine.getInstance().roomService?.CurrentRoom) {
             let entity = Engine.getInstance().roomService?.CurrentRoom?.roomEntityRepository.get(entityData.id)
-
+            
             if(!entity) return;
 
             if(entityData.position) {
@@ -26,6 +26,8 @@ export default class UpdateEntity extends MessageHandler {
                 }
 
                 entity.visualization.setNextPosition(new Point3d(entityData.position.x, entityData.position.y, entityData.position.z))
+
+                entity.visualization.needsUpdate = (entity.position.getX() != entityData.position.x && entity.position.getY() != entityData.position.y) || entityData.aspect != undefined
     
             }
 
@@ -38,8 +40,9 @@ export default class UpdateEntity extends MessageHandler {
                 for (let action of entityData.action.actions) {
                     (entity.visualization as HumanVisualization).addAction(action);
                 }
-            } 
-            entity.visualization.needsUpdate = true
+
+                entity.visualization.needsUpdate = true;
+            }
         } else {
             if (Engine.getInstance().config.debug) {
                 Logger.debug("Invalid current room");

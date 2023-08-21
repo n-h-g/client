@@ -80,7 +80,6 @@ function moveItem() {
     let item = Engine.getInstance()?.roomService?.CurrentRoom?.roomEntityRepository?.get(entity.value.id) as Item
     let visualization = item.logic as ItemLogic
 
-    visualization.toggleMovement(true)
     Engine.getInstance().roomService.CurrentRoom.roomEntityRepository.setRollingEntity(item);
 }
 

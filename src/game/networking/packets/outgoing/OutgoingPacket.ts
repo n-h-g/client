@@ -38,6 +38,7 @@ export enum OutgoingPacket {
     RoomPickupItemEvent = 23,
     RoomRotateItemEvent = 24, 
     RoomPlaceItemEvent = 25,
+    RoomMoveItemEvent = 26,
     MoveWallItemEvent = 33,
     ToggleFloorItemEvent = 34,
     ToggleWallItemEvent = 35,
