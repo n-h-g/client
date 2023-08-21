@@ -14,14 +14,14 @@
                     <div class="listContainer itemsContainer" v-if="currentTab == 'floor'">
                         <div class="itemInventory" :class="{ selected: selectedItem && selectedItem.id == item.Id }"
                             v-for="item in floorItems" @click.stop="selectItem(item)" v-bind:key="item.Id">
-                            <img :alt="item.Name" />
+                            <img :src="getImageIcon(item)" />
                             <span class="stackSize">{{ item.qty }}</span>
                         </div>
                     </div>
                     <div class="listContainer itemsContainer" v-if="currentTab == 'wall'">
                         <div class="itemInventory" :class="{ selected: selectedItem && selectedItem.id == item.Id }"
                             v-for="item in wallItems" @click.stop="selectItem(item)" v-bind:key="item.Id">
-                            <img alt="item.Name" />
+                            <img :alt="item.Name" :src="getImageIcon(item)"/>
                             <span class="stackSize">{{ item.qty }}</span>
                         </div>
                     </div>
@@ -123,6 +123,10 @@ function placeItem() {
         y: 0,
         z: 0
     })
+}
+
+function getImageIcon(item: Item) {
+    return Engine.getInstance().config.itemsResourcesUrl + "/icons/" + item.name + "_icon.png"
 }
 
 function getImagePreview(item: Item) {

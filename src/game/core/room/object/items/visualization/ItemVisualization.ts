@@ -91,7 +91,7 @@ export default abstract class ItemVisualization extends EntityVisualization impl
             this.container.removeChildren()
         }
 
-        console.log('rendering...')
+        //console.log('rendering...')
 
         try {
             let sprite = await Engine.getInstance().userInterfaceManager.furniImager.loadFurniSprite(FurnidataItemType.FloorItem, this.entity.name)

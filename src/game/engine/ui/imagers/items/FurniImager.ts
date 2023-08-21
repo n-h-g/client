@@ -8,6 +8,7 @@ import { FurniDataType } from '../../../../core/ui/imagers/items/data/IFurniData
 
 export default class FurniImager {
     private ready: boolean
+    
     private bases: {
         flooritem: {
             [id: string]: Promise<FurniBase>
