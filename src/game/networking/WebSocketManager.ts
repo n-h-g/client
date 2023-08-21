@@ -43,11 +43,6 @@ export class WebSocketManager {
             Engine.getInstance().networkingManager.packetManager.applyOut(OutgoingPacket.PingRequest)
 
             this._closed = false
-
-            EventManager.emit<LoadingProgressEventData>(UIEvents.LOAD, {
-                width: 40,
-                message: 'Connected'
-            })
         }
 
         this.webSocket.onerror = (event) => {
@@ -59,7 +54,7 @@ export class WebSocketManager {
             }
 
             EventManager.emit<LoadingProgressEventData>(UIEvents.LOAD, {
-                width: 40,
+                width: 20,
                 message: 'Connection Error'
             })
         }

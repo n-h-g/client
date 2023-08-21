@@ -57,11 +57,15 @@ export class Engine {
         this._commandService = new CommandService()
         this._chatService = new ChatMessageService()
 
-        this._networkingManager = new NetworkingManager()
-        this._userInterfaceManager = new UserInterfaceManager()
-        await this._userInterfaceManager.init()
 
         this.application.init()
+
+        this._userInterfaceManager = new UserInterfaceManager()
+
+        this._userInterfaceManager.init().then(() => {
+            this._networkingManager = new NetworkingManager()
+        })
+        
 
         if (this._config.debug) {
             (window as any).engine = this
@@ -73,11 +77,6 @@ export class Engine {
             new OfflineMode(this).init()
         }
     }
-
-    public setUpInteractionManager() {
-        
-    }
-
     public get config(): typeof generalConfig {
         return this._config;
     }

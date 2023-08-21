@@ -1,3 +1,7 @@
+import { EventManager } from '../../core/events/EventManager'
+import { Logger } from '../../utils/Logger'
+import { LoadingProgressEventData } from '../events/ui/data/loader/LoadingProgress'
+import { UIEvents } from '../events/ui/UIEvents'
 import { ComponentsManager } from './components/ComponentsManager'
 import AvatarImager from './imagers/avatars/AvatarImager'
 import AvatarStructure from './imagers/avatars/structure/AvatarStructure'
@@ -13,6 +17,8 @@ export class UserInterfaceManager {
     private _furniImager: FurniImager
     private _roomImager: RoomImager
 
+    private _ready: boolean = false
+
     constructor() {
         this._componentsManager = new ComponentsManager()
         this._componentsManager.loadGameComponents()
@@ -26,9 +32,28 @@ export class UserInterfaceManager {
     }
 
     public async init(): Promise<void> {
-        await this._avatarImager.Data.loadGameData()
-        this._avatarImager.loadStructure()
-        await this._furniImager.init()
+        try {
+            await this._avatarImager.Data.loadGameData(),
+            this._avatarImager.loadStructure()
+            await this._furniImager.init()
+
+            this._ready = true;
+
+            EventManager.emit<LoadingProgressEventData>(UIEvents.LOAD, {
+                width: 50,
+                message: 'Logged'
+            })
+             
+        } catch(e) {
+            this._ready = false;
+
+            Logger.error(e)
+
+            EventManager.emit<LoadingProgressEventData>(UIEvents.LOAD, {
+                width: 0,
+                message: 'Assets loading failed'
+            })
+        }
     }
 
     public get soundManager(): SoundManager {
@@ -53,5 +78,9 @@ export class UserInterfaceManager {
 
     public get avatarImager(): AvatarImager {
         return this._avatarImager
+    }
+
+    public get ready(): boolean {
+        return this._ready;
     }
 }

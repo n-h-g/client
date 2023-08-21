@@ -9,6 +9,14 @@ import { UIEventsType } from '../../../events/ui/UIEventsType'
 import { UIEvents } from '../../../events/ui/UIEvents'
 
 export class GameLoaderUI extends DeletableComponent {
+
+    /*
+        0 = initializing
+        50 = assets loading
+        100 = game connected
+    */
+    private _progress: number = 0;
+
     constructor() {
         super(GameLoaderGUI, UIComponent.GameLoaderUI)
     }
@@ -28,10 +36,16 @@ export class GameLoaderUI extends DeletableComponent {
             if (event.width == 100 || Engine.getInstance().config.offlineMode) {
                 this.delete()
             }
+
+            this._progress = event.width;
         })
     }
 
     delete(): void {
         UiUtils.dismountComponent(UIComponent.GameLoaderUI)
+    }
+
+    public get progress() {
+        return this._progress;
     }
 }
