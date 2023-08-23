@@ -129,7 +129,7 @@ export default class AvatarImager {
 
         for (let component of figureComponents) {
 
-            console.log(component)
+            //console.log(component)
 
             if (hiddens.includes(component.part.type)) continue
 
