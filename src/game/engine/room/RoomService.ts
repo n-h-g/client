@@ -27,6 +27,9 @@ export default class RoomService extends Service<null, null> implements IDisposa
     }
 
     public toggleUI() {
+
+        if(Engine.getInstance().config.offlineMode) return;
+
         Engine.getInstance().userInterfaceManager.componentsManager.getComponent<IComponentShowableUI>(UIComponent.RoomUI).toggle()
 
         EventManager.emit<HotelViewData>(UIEvents.HOTEL_VIEW, {

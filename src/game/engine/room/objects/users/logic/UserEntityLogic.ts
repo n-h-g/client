@@ -58,6 +58,9 @@ export default class UserEntityLogic extends HumanLogic {
     }
 
     private toggleUI() {
+
+        if(Engine.getInstance().config.offlineMode) return;
+
         Engine.getInstance().userInterfaceManager.componentsManager.getComponent<IComponentShowableUI>(UIComponent.AvatarContainerUI).toggle()
 
         let dimension = new Point(this.entity.visualization?.container?.height!,

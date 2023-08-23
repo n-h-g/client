@@ -1,4 +1,5 @@
 import { EventManager } from '../../core/events/EventManager'
+import { Engine } from '../../Engine'
 import { Logger } from '../../utils/Logger'
 import { LoadingProgressEventData } from '../events/ui/data/loader/LoadingProgress'
 import { UIEvents } from '../events/ui/UIEvents'
@@ -21,8 +22,11 @@ export class UserInterfaceManager {
 
     constructor() {
         this._componentsManager = new ComponentsManager()
-        this._componentsManager.loadGameComponents()
-        this._componentsManager.initGameComponents()
+
+        if(!Engine.getInstance().config.offlineMode) {
+            this._componentsManager.loadGameComponents()
+             this._componentsManager.initGameComponents()
+        }
 
         this._soundManager = new SoundManager(this)
         this._avatarStructure = new AvatarStructure()

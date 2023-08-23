@@ -38,6 +38,9 @@ export abstract class EntityLogic extends RoomObjectLogic {
     }
 
     public togglePreview() {
+
+        if(Engine.getInstance().config.offlineMode) return;
+        
         let entity: Entity = this.entity
 
         let isHuman = entity instanceof Human

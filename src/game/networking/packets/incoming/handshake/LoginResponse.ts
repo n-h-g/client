@@ -9,6 +9,9 @@ import { GameLoaderUI } from '../../../../engine/ui/components/loader/GameLoader
 
 export class LoginResponse extends MessageHandler {
     public handle(): void {
+
+        if(Engine.getInstance().config.offlineMode) return;
+
         if (this.message.data) {
 
             let GameLoaderUI = Engine.getInstance().userInterfaceManager.componentsManager.getComponent(UIComponent.GameLoaderUI) as GameLoaderUI
