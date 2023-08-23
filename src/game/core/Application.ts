@@ -40,7 +40,7 @@ export class ApplicationEngine extends Application {
 
         this.stage.addChild(this._viewport)
 
-        this._viewport.addChild(this.debugInfoContainer)
+        this.stage.addChild(this.debugInfoContainer)
 
         this.viewPortScreenCords = new Point(window.innerWidth, window.innerHeight)
 
