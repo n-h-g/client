@@ -115,6 +115,8 @@ export class ApplicationEngine extends Application {
     private onResize() {
         this.view.style.height = window.innerHeight + "px"
         this.view.style.width = window.innerWidth + "px"
+
+        this.renderer.resize(window.innerWidth, window.innerHeight);
     }
 
     public get viewport(): Viewport {
