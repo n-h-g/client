@@ -28,6 +28,9 @@ export class ApplicationEngine extends Application {
     }
 
     public setUpViewport() {
+
+        if(this._viewport != null) this._viewport.destroy();
+
         this._viewport = new Viewport({
             screenWidth: window.innerWidth,
             screenHeight: window.innerHeight,
