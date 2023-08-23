@@ -11,11 +11,12 @@ export default class ItemVisualizationAnimated extends ItemVisualization {
     }
 
     public async render() {
-        if(this.needsUpdate) {
-            this.setAnimation(this.animation + 1)
-        }
-
+        
         super.render()
+    }
+
+    public nextFrame(): void {
+        
     }
 
     public setAnimation(animation: number) {

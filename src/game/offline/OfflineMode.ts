@@ -22,7 +22,7 @@ export class  OfflineMode {
 
     private static entityId: string = "473674-34dfbnasb-43423"
 
-    private static item: string = "country_well"
+    private static item: string = "party_table"
 
     public constructor(engine: Engine) {
         this._engine = engine
@@ -48,7 +48,6 @@ export class  OfflineMode {
         let base = await this._engine.userInterfaceManager!.furniImager.loadFurniBase(FurnidataItemType.FloorItem, OfflineMode.item);
         let roomV = this._engine.roomService.CurrentRoom.roomLayout.Visualization as RoomVisualization;
         let item = new FloorItem(OfflineMode.entityId, OfflineMode.item, new Point3d(3, 4, 1), base);
-        item.visualization.direction = Direction.NORTH
         item.visualization?.render()
         this._engine.roomService.CurrentRoom.roomEntityRepository.add(item.id, item)
     }

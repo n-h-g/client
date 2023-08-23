@@ -58,13 +58,30 @@ export default class FurniBase {
         return texture
     }
 
+    public getBlendModeFromInk(blendMode: string) {
+        switch(blendMode){
+            case 'ADD':
+                return PIXI.BLEND_MODES.ADD
+            case 'COPY':
+            case '':
+                return PIXI.BLEND_MODES.COLOR
+        }
+    }
+
     public updateSpriteFrom(sprite: PIXI.Sprite, layer: ILayer): PIXI.Sprite {
         if (layer) {
-            if (layer.ink === 'ADD') {
-                sprite.blendMode = PIXI.BLEND_MODES.COLOR
+            if (layer.ink) {
+                sprite.blendMode = this.getBlendModeFromInk(layer.ink)
             }
             if (layer.z) {
                 sprite.zIndex = layer.z
+            }
+            if(layer.alpha) {
+                sprite.alpha = layer.alpha
+            }
+
+            if(layer.ignoreMouse) {
+                sprite.buttonMode = false
             }
         }
         return sprite
@@ -75,8 +92,9 @@ export default class FurniBase {
         const rawDirections = this.directions
 
         for (let direction in rawDirections) {
-            directions.push((parseInt(direction) % rawDirections.length) * 2)
+            directions.push(parseInt(direction))
         }
+        
 
         return directions
     }
@@ -236,7 +254,7 @@ export default class FurniBase {
     }
 
     public get visualizationType(): string {
-        return this.data.visualizationType
+        return this.data.visualization.type
     }
 
     public getSpriteSheetData() {

@@ -51,6 +51,12 @@ export default class FurniImager {
         ];
     }
 
+    public generateRandomItem() {
+        let randomIndex = Math.floor((Math.random() * Object.values(this.furnidata.roomitemtypes).length) );
+
+        return this.furnidata.roomitemtypes[randomIndex].className;
+    }
+
     public findItemByName(itemName: string) {
         for (let itemId in this.furnidata.roomitemtypes) {
             const item = this.furnidata.roomitemtypes[itemId];

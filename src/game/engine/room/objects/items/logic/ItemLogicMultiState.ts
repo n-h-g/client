@@ -13,11 +13,11 @@ export default class ItemLogicMultiState extends ItemLogic {
 
     public registerEvents() {
         super.registerEvents()
-
-        this._entity.visualization.container.on("dblclick", (event) => this.changeState())
+        this.entity.visualization.container.on("dblclick", (event) => this.changeState())
     }
 
     public changeState() {
+        console.log('changed state');
         let state = this.state;
 
         let item = this.entity as Item;
@@ -30,8 +30,9 @@ export default class ItemLogicMultiState extends ItemLogic {
         }
 
         (item.visualization.container as FurniSprite).setAnimation(state);
+        
 
-        this.entity.visualization.needsUpdate = true
+        //this.entity.visualization.needsUpdate = true
 
         this.state = state;
     }
@@ -41,10 +42,14 @@ export default class ItemLogicMultiState extends ItemLogic {
 
         let item = this.entity as Item;
 
+        this.frameTracker += delta
+
         if (item.base.visualizationType === "furniture_animated") {
+
             if (this.frameTracker > (1000 * (100 / FurniSprite.FPS)) / FurniSprite.FPS) {
                 this.frameTracker = 0;
-                (this.entity.visualization as ItemVisualizationAnimated).render()
+                //(this.entity.visualization as ItemVisualizationAnimated).frame = (this.entity.visualization as ItemVisualizationAnimated).frame + 1;
+                //(this.entity.visualization as ItemVisualizationAnimated).draw()
             }
         }
 

@@ -34,15 +34,11 @@ export class FurniSprite extends Container {
 
   public getUIDirection(): number {
     const directions = this.furniBase.getAvailableDirections()
-    if (directions.includes(4)) {
-      return 4
-    }
     if (directions.includes(2)) {
-      return 2
+        return 2;
     }
-
-    if(directions.includes(6)) {
-      return 0;
+    if (directions.includes(4)) {
+      return 4;
     }
     return directions[0]
   }
@@ -62,18 +58,19 @@ export class FurniSprite extends Container {
 
   public setDirection(direction: number = 0) {
     this.direction = direction
-    this.needsUpdate = true
+    this.needsUpdate = false
     this.update()
   }
 
   public setAnimation(animation: number) {
-    if (this.furniBase.hasAnimation(animation)) {
-      this.animationPlaying = animation
-      this.needsUpdate = true
-      this.update()
-    } else {
-      this.animationPlaying = 0
-    }
+    if (this.furniBase.hasAnimation(animation) || animation !== null) {
+
+        this.removeChildren()
+
+        this.animationPlaying = animation
+        this.needsUpdate = true;
+        this.update();
+     }
   }
 
   public setIcon(icon: boolean) {
@@ -102,7 +99,7 @@ export class FurniSprite extends Container {
 
   public nextFrame() {
     this.frameCount++
-    this.needsUpdate = true
+    this.needsUpdate = false
     this.update()
   }
 
@@ -111,7 +108,7 @@ export class FurniSprite extends Container {
     this.direction = 0
     this.frameCount = 0
     this.isIcon = true
-    this.needsUpdate = true
+    this.needsUpdate = false
     this.update()
     this.needsUpdate = false
     return this
@@ -126,9 +123,7 @@ export class FurniSprite extends Container {
 
   public update() {
     if (this.needsUpdate) {
-      this.children.forEach((child: DisplayObject) => {
-        child.destroy()
-      })
+      this.removeChildren()
     }
     Promise.resolve(
       this.furniBase.downloadSpritesheet().then((texture) => {

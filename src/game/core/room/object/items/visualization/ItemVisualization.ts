@@ -30,7 +30,7 @@ export default abstract class ItemVisualization extends EntityVisualization impl
     }
 
     public nextFrame(): void {
-        throw new Error('Method not implemented.')
+    
     }
 
     public draw(): void {
@@ -47,6 +47,8 @@ export default abstract class ItemVisualization extends EntityVisualization impl
             (this.container as FurniSprite).update();
 
             this.container.alpha = FurniData.DEFAULT_ALPHA;
+
+            this.container.interactive = true
 
             Engine.getInstance().roomService?.CurrentRoom?.roomLayout.Visualization.container?.addChild(this.container)
             this.updatePosition()
@@ -91,22 +93,16 @@ export default abstract class ItemVisualization extends EntityVisualization impl
             this.container.removeChildren()
         }
 
-        //console.log('rendering...')
-
         try {
             let sprite = await Engine.getInstance().userInterfaceManager.furniImager.loadFurniSprite(FurnidataItemType.FloorItem, this.entity.name)
 
-            sprite.start()
+            sprite.start(3)
 
-            let dir = sprite.getNextDirection(this.rotation)
+            let dir = sprite.getUIDirection()
 
-            this.direction = dir
-
-            sprite.setAnimation(2)
+            this.direction = dir;
 
             sprite.setDirection(dir)
-
-            sprite.update()
 
             this.container = sprite
 
@@ -116,7 +112,6 @@ export default abstract class ItemVisualization extends EntityVisualization impl
         }
 
         if(!this._entity) return;
-
 
         let spriteZIndex = (this._entity as Item).base.data.logic.dimensions[2]
 
