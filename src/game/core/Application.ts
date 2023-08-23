@@ -1,6 +1,6 @@
 import { Application, IApplicationOptions } from '@pixi/app'
 import { Viewport } from 'pixi-viewport';
-import { Container, Text } from 'pixi.js';
+import { Container, Point, Text } from 'pixi.js';
 import { Engine } from '../Engine';
 
 export class ApplicationEngine extends Application {
@@ -9,6 +9,8 @@ export class ApplicationEngine extends Application {
     private _timeElapsed: number = 0
     private _viewport: Viewport
     private debugInfoContainer: Container
+
+    private viewPortScreenCords: Point
 
     constructor(engine: Engine, options?: IApplicationOptions) {
         super(options);
@@ -25,7 +27,7 @@ export class ApplicationEngine extends Application {
         this._engine = engine
     }
 
-    private setUpViewport() {
+    public setUpViewport() {
         this._viewport = new Viewport({
             screenWidth: window.innerWidth,
             screenHeight: window.innerHeight,
@@ -40,9 +42,11 @@ export class ApplicationEngine extends Application {
 
         this._viewport.addChild(this.debugInfoContainer)
 
+        this.viewPortScreenCords = new Point(window.innerWidth, window.innerHeight)
+
         this._viewport.drag({
             wheel: false
-        })
+        }).on('drag-end', (screen: Point, world) => this.viewPortScreenCords = screen)
     }
 
     public showDebugInfo(fps: number = this.ticker.FPS) {
@@ -112,5 +116,9 @@ export class ApplicationEngine extends Application {
 
     public get viewport(): Viewport {
         return this._viewport
+    }
+
+    public get screenCords(): Point {
+        return this.viewPortScreenCords
     }
 }

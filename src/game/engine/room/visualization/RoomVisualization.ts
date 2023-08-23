@@ -9,6 +9,7 @@ import { RoomObjectController } from '../../../core/room/object/RoomObjectContro
 import { RoomLogic } from '../logic/RoomLogic'
 import Point3d from '../../../utils/point/Point3d'
 import { RoomPriority } from './RoomPriority'
+import { Engine } from '../../../Engine'
 
 export default class RoomVisualization implements IRoomVisualization {
     private roomLayout: RoomLayout
@@ -24,6 +25,8 @@ export default class RoomVisualization implements IRoomVisualization {
     constructor(room: RoomLayout) {
         this.roomLayout = room
 
+        Engine.getInstance().application.setUpViewport();
+
         this.container = new Container()
         this.canvasFloor = new Container()
         this.canvasWall = new Container()
@@ -37,8 +40,8 @@ export default class RoomVisualization implements IRoomVisualization {
         this.container.addChild(this.canvasFloor)
         this.container.addChild(this.canvasPointer)
 
-        this.container.x = window.innerWidth / 2
-        this.container.y = window.innerHeight / 2
+        this.container.x = Engine.getInstance().application.screenCords.x / 2
+        this.container.y = Engine.getInstance().application.screenCords.y / 2
 
         this.canvasDoorTile.interactive = true
         this.canvasFloor.interactive = true
