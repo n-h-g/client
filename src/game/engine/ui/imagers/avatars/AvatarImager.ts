@@ -129,6 +129,8 @@ export default class AvatarImager {
 
         for (let component of figureComponents) {
 
+            console.log(component)
+
             if (hiddens.includes(component.part.type)) continue
 
             let partSet = this.structure.PartSets?.getPart(component.part.type);
@@ -138,7 +140,6 @@ export default class AvatarImager {
             let action = this.getFigureComponentAction(component, actions!)
             let assetName = this.Structure.Assets?.getUniqueName(component.part.type, component.part.id)
             
-          
             if (!action || !assetName) continue
 
             this.data.loadTexture(assetName).then(() => {
@@ -299,6 +300,7 @@ export default class AvatarImager {
                 sprite.x = this.structure.Geometry?.width! - sprite.x + AvatarData.AVATAR_LEFT_OFFSET;
             }
 
+    
             if (component.ResourceType == "sh") {
                 avatar.ShoesContainer.addChild(sprite);
             } else if (component.ResourceType == "hd") {
@@ -329,7 +331,7 @@ export default class AvatarImager {
             }
         } else {
             if (Engine.getInstance().config.debug) {
-                //Logger.debug('cannot find resource ' + this.getTextureId(assetName, component.ResourceName))
+                Logger.debug('cannot find resource ' + this.getTextureId(assetName, component.ResourceName))
             }
         }
     }

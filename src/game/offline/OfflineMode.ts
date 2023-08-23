@@ -4,6 +4,7 @@ import { HumanVisualization } from "../core/room/object/human/visualization/Huma
 import { Engine } from "../Engine";
 import FloorItem from "../engine/room/objects/items/FloorItem";
 import { UserEntity } from "../engine/room/objects/users/UserEntity";
+import UserEntityVisualization from "../engine/room/objects/users/visualization/UserEntityVisualization";
 import RoomVisualization from "../engine/room/visualization/RoomVisualization";
 import { ActionId } from "../engine/ui/imagers/avatars/enum/actions/ActionId";
 import { FurnidataItemType } from "../engine/ui/imagers/items/FurniImager";
@@ -38,10 +39,10 @@ export class  OfflineMode {
 
         let room = this._engine.roomService.setRoom("prova", "0000000000/0111001101/01111111011111/0111111111001/0111111", new Point(3, 3), 200)
 
-        this._entity = new UserEntity("id", "prova", "hd-185-10.hr-3163-61.ch-3030-92.lg-275-110")
+        this._entity = new UserEntity("id", "prova", "hd-615-18.ch-822-79.lg-710-81.sh-905-108.ha-1002-96.wa-2001-")
         this._entity.visualization.Rot = Direction.WEST;
-        this._engine.roomService.CurrentRoom.roomEntityRepository.add(this._entity.id, this._entity)
-                //(entity.visualization as UserEntityVisualization).addAction(ActionId.USE_ITEM)
+        this._engine.roomService.CurrentRoom.roomEntityRepository.add(this._entity.id, this._entity);
+        (this._entity.visualization as UserEntityVisualization).addAction(ActionId.LAUGH)
         this._entity.visualization.render()
 
         let base = await this._engine.userInterfaceManager!.furniImager.loadFurniBase(FurnidataItemType.FloorItem, OfflineMode.item);

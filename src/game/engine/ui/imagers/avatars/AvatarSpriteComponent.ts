@@ -71,7 +71,7 @@ export default class AvatarSpriteComponent {
         if(partType == 'ey') this.colorable = false;
 
       
-        this.resourceType = flippedType != undefined && this.isFlipped ? flippedType : partType
+        this.resourceType = partType
     }
 
     public calcFlip = (d: number) => (d > 3 && d < 7 ? 6 - d : d)
