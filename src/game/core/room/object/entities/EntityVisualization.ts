@@ -97,6 +97,11 @@ export abstract class EntityVisualization extends RoomObjectVisualization {
         Engine.getInstance().roomService.CurrentRoom.roomLayout.Visualization.container.sortChildren()
     }
 
+    public dispose(): void {
+
+        super.dispose()
+    }
+
     public set direction(direction: Direction) {
         this.rotation = direction
     }

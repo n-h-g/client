@@ -46,6 +46,10 @@ export abstract class HumanVisualization extends EntityVisualization {
         })
     }
 
+    public dispose(): void {
+        super.dispose()
+    }
+
     public set headRotation(direction: Direction) {
         this._headDirection = direction
     }

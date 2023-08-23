@@ -1,6 +1,6 @@
 import { Container } from 'pixi.js'
 
-export default abstract class RoomObjectVisualization {
+export default abstract class RoomObjectVisualization{
     protected _offsetX: number
     protected _offsetY: number
     protected _zIndex: number

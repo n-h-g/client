@@ -9,10 +9,14 @@ export default class RemoveEntity extends MessageHandler {
 
         let entity: Entity = Engine.getInstance().roomService.CurrentRoom.roomEntityRepository.get(data)
 
+        console.log(entity)
+
         if(entity == null) {
             return;
         }
 
         entity.dispose()
+
+        Engine.getInstance().roomService.CurrentRoom.roomEntityRepository.delete(data)
     }
 }
