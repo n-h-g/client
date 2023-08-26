@@ -29,7 +29,7 @@ export abstract class RoomObjectController<IRoomObjectVisualization extends IDis
         throw new Error('Method not implemented.')
     }
 
-    get position(): Point3d {
+    public get position(): Point3d {
         return this._objectPosition
     }
 

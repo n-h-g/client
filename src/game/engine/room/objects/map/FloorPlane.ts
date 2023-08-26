@@ -30,7 +30,7 @@ export class FloorPlane extends RoomPlane {
         })
     }
 
-    public getRandomTiles(n: number) {
+    public getRandomTile() {
 
         let tiles = [];
 
@@ -47,7 +47,7 @@ export class FloorPlane extends RoomPlane {
             }
 
         }
-        return null;
+        return tiles;
     }
 
     public setTileType(x: number, y: number, type: TileType): void {

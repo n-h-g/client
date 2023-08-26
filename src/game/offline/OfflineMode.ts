@@ -22,9 +22,13 @@ export class  OfflineMode {
 
     private _entity: Entity
 
-    private static entityId: string = "473674-34dfbnasb-43423"
+    private static ENTITY_ID: string = "473674-34dfbnasb-43423"
 
-    private static item: string = "wed_icesculp"
+    private static ITEM: string = "wed_icesculp"
+
+    private static NUMBER_OF_ITEMS = 0
+
+    private static NUMBER_OF_USERS = 500
 
     public constructor(engine: Engine) {
         this._engine = engine
@@ -39,26 +43,34 @@ export class  OfflineMode {
             OfflineMode._instance = this
         }
 
-        let room = this._engine.roomService.setRoom("prova", "0000000000/0111001101/01111111011111/0111111111001/0111111", new Point(3, 3), 200)
-
-        this._entity = new UserEntity("id", "prova", "hd-615-18.ch-822-79.lg-710-81.sh-905-108.ha-1002-96.wa-2001-")
-        this._entity.visualization.Rot = Direction.WEST;
-        this._engine.roomService.CurrentRoom.roomEntityRepository.add(this._entity.id, this._entity);
-        //(this._entity.visualization as UserEntityVisualization).addAction(ActionId.LAUGH)
-        this._entity.visualization.render()
+        let generatedModel = this._engine.roomService.generateSquareRoomModel(50)
 
 
-        let randomTile = room.roomLayout.getFloorPlane().getRandomTiles(5) as Tile
+        let room = this._engine.roomService.setRoom("prova", generatedModel, new Point(0, 0), 200)
+
+        for(let i = 0; i < OfflineMode.NUMBER_OF_USERS; i++) {
+            const randomTile = room.roomLayout.getFloorPlane().getRandomTile() as Tile
 
 
-        console.log(randomTile)
+            this._entity = new UserEntity("id", "prova", "hd-615-18.ch-822-79.lg-710-81.sh-905-108.ha-1002-96.wa-2001-")
+            this._entity.visualization.Rot = Direction.WEST;
+            this._entity.position = randomTile.position
+            this._engine.roomService.CurrentRoom.roomEntityRepository.add(this._entity.id, this._entity);
+            this._entity.visualization.render()
+        }
 
-        let base = await this._engine.userInterfaceManager!.furniImager.loadFurniBase(FurnidataItemType.FloorItem, OfflineMode.item);
-        let item = new FloorItem(OfflineMode.entityId, OfflineMode.item, new Point3d(randomTile.position.getX(), randomTile.position.getY(), 1), base);
+
+       
+        for(let i = 0; i < OfflineMode.NUMBER_OF_ITEMS; i++) {
+            const randomTile = room.roomLayout.getFloorPlane().getRandomTile() as Tile
+
+            let base = await this._engine.userInterfaceManager!.furniImager.loadFurniBase(FurnidataItemType.FloorItem, OfflineMode.ITEM);
+            let item = new FloorItem(OfflineMode.ENTITY_ID, OfflineMode.ITEM, new Point3d(randomTile.position.getX(), randomTile.position.getY(), 1), base);
 
 
-        item.visualization?.render()
-        this._engine.roomService.CurrentRoom.roomEntityRepository.add(item.id, item)
+            item.visualization?.render()
+            this._engine.roomService.CurrentRoom.roomEntityRepository.add(item.id, item)
+        }
     }
 
     public walk(point: Point3d) {

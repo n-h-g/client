@@ -26,6 +26,31 @@ export default class RoomService extends Service<null, null> implements IDisposa
         return this._currentRoom
     }
 
+    /**
+     * Generate a square room n * n.
+     * @param size the number of tiles you want to generate (n * n)
+     * @returns 
+     */
+    public generateSquareRoomModel(size: number) {
+        let count = 1;
+
+        let model = ""
+
+        const area = size * size
+
+        while(count <= area) {
+            if(((count % size) == 0) && count != area) {
+                model += "1/"
+            } else {
+                model += "1"
+            }
+
+            count++;
+        }
+
+        return model;
+    }
+
     public toggleUI() {
 
         if(Engine.getInstance().config.offlineMode) return;
