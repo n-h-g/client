@@ -1,5 +1,6 @@
 export enum RoomPlaneType {
     Floor,
     LeftWall,
-    RightWall
+    RightWall,
+    Hole
 }

@@ -1,12 +1,23 @@
 import FurniBase from './FurniBase'
 import { fetchJsonAsync } from '../../../../utils/DownloadManager'
 import { Furnidata, IFurnidata } from '../../../../core/ui/imagers/items/data/IFurnidata'
-import { FurniSprite } from './FurniSprite'
 import { Engine } from '../../../../Engine'
 import { Logger } from '../../../../utils/Logger'
 import { FurniDataType } from '../../../../core/ui/imagers/items/data/IFurniDataType'
+import { Furni } from './Furni'
+import { Sprite, Texture } from 'pixi.js'
+import { NameColorPair } from './enum/NameColorPair'
+import { FurnidataItemType } from './enum/FurniDataItemType'
+import { FurniSpriteUtils } from './utils/FurniSpriteUtils'
 
 export default class FurniImager {
+
+    public static FPS: number = 36
+
+    private _textureCaches: Map<string, Texture> 
+
+    private _spriteCaches: Sprite[]
+
     private ready: boolean
     
     private bases: {
@@ -29,6 +40,8 @@ export default class FurniImager {
             roomitemtypes: {},
             wallitemtypes: {}
         };
+
+        this._textureCaches = new Map();
     }
 
     public async init(): Promise<void> {
@@ -96,15 +109,16 @@ export default class FurniImager {
         const {
             itemName,
             colorId
-        } = splitItemNameAndColor(rawItemName);
+        } = FurniSpriteUtils.splitItemNameAndColor(rawItemName);
 
         if (this.bases[type][itemName] == null) {
             this.bases[type][itemName] = new Promise((resolve, _reject) => {
                 //Load furni json
                 this.fetchOffsetAsync(itemName).then((data) => {
                     const furniBase = new FurniBase(data as IFurnidata, itemName)
-                    furniBase.init()
-                    resolve(furniBase);
+                    furniBase.init().then(() => {
+                        resolve(furniBase);
+                    })
                 }).catch(() => {
                     Logger.debug('[Furni] Unable to find item ' + itemName)
                 })
@@ -114,14 +128,14 @@ export default class FurniImager {
         return this.bases[type][itemName]
     }
 
-    public loadFurniSprite(type: FurnidataItemType, name: string): Promise<FurniSprite> {
+    public loadFurniSprite(type: FurnidataItemType, name: string): Promise<Furni> {
         const {
             colorId
-        } = splitItemNameAndColor(name);
+        } = FurniSpriteUtils.splitItemNameAndColor(name);
 
         return new Promise((res, _rej) => {
             this.loadFurniBase(type, name).then((furnibase) => {
-                const furniSprite = new FurniSprite(furnibase);
+                const furniSprite = new Furni(furnibase);
                 res(furniSprite);
             }).catch((e) => {
                 throw new e;
@@ -130,14 +144,15 @@ export default class FurniImager {
         })
     }
 
-    public loadFurniIcon(type: FurnidataItemType, name: string): Promise<FurniSprite> {
+    public loadFurniIcon(type: FurnidataItemType, name: string): Promise<Furni> {
         const {
             colorId
-        } = splitItemNameAndColor(name);
+        } = FurniSpriteUtils.splitItemNameAndColor(name);
 
         return new Promise((res, _rej) => {
             this.loadFurniBase(type, name).then((furnibase) => {
-                const furniSprite = new FurniSprite(furnibase, true)
+                const furniSprite = new Furni(furnibase)
+                furniSprite.setIcon(true)
                 res(furniSprite)
             })
         })
@@ -152,6 +167,18 @@ export default class FurniImager {
             }).catch(err => reject(err));
         });
     }
+    
+    public addTexture(id: string, texture: Texture): void {
+        this._textureCaches.set(id, texture)
+    }
+
+    public hasTexture(id: string): boolean {
+        return this._textureCaches.has(id)
+    }
+
+    public getTexture(id: string): Texture {
+        return this._textureCaches.get(id)
+    }
 
     public get isReady(): boolean {
         return this.ready
@@ -159,26 +186,5 @@ export default class FurniImager {
 
     public getFurnidata(): Furnidata {
         return this.furnidata
-    }
-}
-
-export enum FurnidataItemType {
-    FloorItem = 'flooritem', WallItem = 'wallitem'
-}
-
-export interface NameColorPair {
-    itemName: string, colorId: number
-}
-
-export const splitItemNameAndColor = (itemName: string): NameColorPair => {
-    let colorId = 0;
-    if (itemName.includes('*')) {
-        const longFurniName = itemName.split('*');
-        itemName = longFurniName[0];
-        colorId = parseInt(longFurniName[1]);
-    }
-    return {
-        itemName,
-        colorId
     }
 }

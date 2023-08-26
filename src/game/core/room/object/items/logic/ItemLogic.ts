@@ -18,7 +18,7 @@ export abstract class ItemLogic extends EntityLogic implements MoveableLogic{
     public registerEvents(): void {
         super.registerEvents()
 
-        this.events.on(ItemEvents.FURNI_SPRITE_LOADED, () => this.onLoad())
+        this.events.on(ItemEvents.ITEM_LOADED, () => this.onLoad())
         this.events.on(EntityEvents.POSITION_CHANGED, () => this.onPositionChanged())
         this.events.on(EntityEvents.START_ROLL, () => this.toggleMovement(true))
         this.events.on(EntityEvents.STOP_ROLL, () => this.stopRolling())

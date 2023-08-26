@@ -11,7 +11,7 @@ export default abstract class Item extends Entity {
     
     public base: FurniBase
 
-    constructor(id: string, name: string, position: Point3d, furniBase) {
+    constructor(id: string, name: string, position: Point3d, furniBase: FurniBase) {
         super(id, name)
         this.position = position
         this.base = furniBase

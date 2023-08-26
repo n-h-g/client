@@ -1,8 +1,8 @@
 export interface IAsset {
-    sprite: ISprite
     offsets: IOffsets
     flipH: number
     source: string 
+    sprite?: ISprite
 }
 
 export interface ISprite {

@@ -1,3 +1,4 @@
+import { random } from "animejs";
 import { Direction } from "../core/objects/Direction";
 import { Entity } from "../core/room/object/entities/Entity";
 import { HumanVisualization } from "../core/room/object/human/visualization/HumanVisualization";
@@ -7,10 +8,11 @@ import { UserEntity } from "../engine/room/objects/users/UserEntity";
 import UserEntityVisualization from "../engine/room/objects/users/visualization/UserEntityVisualization";
 import RoomVisualization from "../engine/room/visualization/RoomVisualization";
 import { ActionId } from "../engine/ui/imagers/avatars/enum/actions/ActionId";
-import { FurnidataItemType } from "../engine/ui/imagers/items/FurniImager";
+import { FurnidataItemType } from "../engine/ui/imagers/items/enum/FurniDataItemType";
 import Point from "../utils/point/Point";
 import Point3d from "../utils/point/Point3d";
 import Rotation from "../utils/Rotation";
+import { Tile } from "../engine/room/objects/map/Tile";
 
 export class  OfflineMode {
 
@@ -22,7 +24,7 @@ export class  OfflineMode {
 
     private static entityId: string = "473674-34dfbnasb-43423"
 
-    private static item: string = "party_table"
+    private static item: string = "wed_icesculp"
 
     public constructor(engine: Engine) {
         this._engine = engine
@@ -42,12 +44,19 @@ export class  OfflineMode {
         this._entity = new UserEntity("id", "prova", "hd-615-18.ch-822-79.lg-710-81.sh-905-108.ha-1002-96.wa-2001-")
         this._entity.visualization.Rot = Direction.WEST;
         this._engine.roomService.CurrentRoom.roomEntityRepository.add(this._entity.id, this._entity);
-        (this._entity.visualization as UserEntityVisualization).addAction(ActionId.LAUGH)
+        //(this._entity.visualization as UserEntityVisualization).addAction(ActionId.LAUGH)
         this._entity.visualization.render()
 
+
+        let randomTile = room.roomLayout.getFloorPlane().getRandomTiles(5) as Tile
+
+
+        console.log(randomTile)
+
         let base = await this._engine.userInterfaceManager!.furniImager.loadFurniBase(FurnidataItemType.FloorItem, OfflineMode.item);
-        let roomV = this._engine.roomService.CurrentRoom.roomLayout.Visualization as RoomVisualization;
-        let item = new FloorItem(OfflineMode.entityId, OfflineMode.item, new Point3d(3, 4, 1), base);
+        let item = new FloorItem(OfflineMode.entityId, OfflineMode.item, new Point3d(randomTile.position.getX(), randomTile.position.getY(), 1), base);
+
+
         item.visualization?.render()
         this._engine.roomService.CurrentRoom.roomEntityRepository.add(item.id, item)
     }

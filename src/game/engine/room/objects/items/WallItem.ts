@@ -1,5 +1,5 @@
 import Point3d from '../../../../utils/point/Point3d'
-import { FurniSprite } from '../../../ui/imagers/items/FurniSprite'
+import { FurniSprite } from '../../../ui/imagers/items/_FurniSprite'
 import Item from './Item'
 
 export default class WallItem extends Item {

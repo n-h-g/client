@@ -1,5 +1,5 @@
 import { ItemLogic } from '../../../../../core/room/object/items/logic/ItemLogic'
-import { FurniSprite } from '../../../../ui/imagers/items/FurniSprite'
+import FurniImager from '../../../../ui/imagers/items/FurniImager'
 import Item from '../Item'
 import ItemVisualizationAnimated from '../visualization/ItemVisualizationAnimated'
 
@@ -29,7 +29,7 @@ export default class ItemLogicMultiState extends ItemLogic {
             state++
         }
 
-        (item.visualization.container as FurniSprite).setAnimation(state);
+        //(item.visualization.container as FurniSprite).setAnimation(state);
         
 
         //this.entity.visualization.needsUpdate = true
@@ -46,7 +46,7 @@ export default class ItemLogicMultiState extends ItemLogic {
 
         if (item.base.visualizationType === "furniture_animated") {
 
-            if (this.frameTracker > (1000 * (100 / FurniSprite.FPS)) / FurniSprite.FPS) {
+            if (this.frameTracker > (1000 * (100 / FurniImager.FPS)) / FurniImager.FPS) {
                 this.frameTracker = 0;
                 //(this.entity.visualization as ItemVisualizationAnimated).frame = (this.entity.visualization as ItemVisualizationAnimated).frame + 1;
                 //(this.entity.visualization as ItemVisualizationAnimated).draw()

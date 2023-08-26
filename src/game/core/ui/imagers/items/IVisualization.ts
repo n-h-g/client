@@ -8,6 +8,10 @@ export interface IVisualization {
     type: string
     layers?: { [key: string] : ILayer }
     colors?: { [key: string] : IColor }
-    directions?: number[]
+    directions?: { [key: string] : IDirection }
     animations?: { [key: string] : IAnimation }
+}
+
+export interface IDirection {
+
 }

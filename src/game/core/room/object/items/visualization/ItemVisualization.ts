@@ -1,3 +1,4 @@
+import { Container } from 'pixi.js'
 import { Engine } from '../../../../../Engine'
 import { ItemEvents } from '../../../../../engine/events/room/objects/entities/ItemEvents'
 import Item from '../../../../../engine/room/objects/items/Item'
@@ -5,22 +6,27 @@ import MapData from '../../../../../engine/room/objects/map/MapData'
 import { Tile } from '../../../../../engine/room/objects/map/Tile'
 import { RoomPriority } from '../../../../../engine/room/visualization/RoomPriority'
 import RoomVisualization from '../../../../../engine/room/visualization/RoomVisualization'
+import { Furni } from '../../../../../engine/ui/imagers/items/Furni'
 import { FurniData } from '../../../../../engine/ui/imagers/items/FurniData'
-import { FurnidataItemType } from '../../../../../engine/ui/imagers/items/FurniImager'
-import { FurniSprite } from '../../../../../engine/ui/imagers/items/FurniSprite'
 import { Logger } from '../../../../../utils/Logger'
 import Point from '../../../../../utils/point/Point'
 import Point3d from '../../../../../utils/point/Point3d'
 import UiUtils from '../../../../../utils/UiUtils'
 import { EntityVisualization } from '../../entities/EntityVisualization'
 import { MoveableVisualization } from '../../IMoveable'
+import { FurnidataItemType } from '../../../../../engine/ui/imagers/items/enum/FurniDataItemType'
 
 export default abstract class ItemVisualization extends EntityVisualization implements MoveableVisualization {
-    private position: Point3d
-    public iconImage: string
-    public imagePreview: string
-    public isIcon: boolean = false 
-    private sprite: FurniSprite
+    
+    protected position: Point3d
+
+    protected iconImage: string
+
+    protected imagePreview: string
+
+    protected isIcon: boolean = false 
+
+    protected sprite: Furni
 
     constructor(item: Item) {
         super(item)
@@ -36,18 +42,14 @@ export default abstract class ItemVisualization extends EntityVisualization impl
     public draw(): void {
         if (Engine.getInstance().roomService?.CurrentRoom) {
 
-            let temp: FurniSprite = this.container as FurniSprite;
+            let temp: Container = this.sprite.container as Container;
 
             if(this.container) {
-                (this.container as FurniSprite).restore()
+                this.sprite.reset()
             }
 
             this.container = temp;
-            
-            (this.container as FurniSprite).update();
-
-            this.container.alpha = FurniData.DEFAULT_ALPHA;
-
+    
             this.container.interactive = true
 
             Engine.getInstance().roomService?.CurrentRoom?.roomLayout.Visualization.container?.addChild(this.container)
@@ -57,20 +59,20 @@ export default abstract class ItemVisualization extends EntityVisualization impl
     }
 
     public generateImages() {
-        if (this.isIcon) {
+        /*if (this.isIcon) {
             let icon = this.sprite.turnIntoIcon()
 
             setTimeout(() => {
                 this.iconImage = UiUtils.generateBase64FromObject(icon)
             }, 2000)
-        }
+        }*/
     }
 
     public turnIntoIcon() {
-        let icon = this.sprite.turnIntoIcon()
+        /*let icon = this.sprite.turnIntoIcon()
         this.entity.visualization.container = icon
         this.needsUpdate = false
-        this.isIcon = true
+        this.isIcon = true*/
     }
 
     public restore() {
@@ -94,41 +96,45 @@ export default abstract class ItemVisualization extends EntityVisualization impl
         }
 
         try {
-            let sprite = await Engine.getInstance().userInterfaceManager.furniImager.loadFurniSprite(FurnidataItemType.FloorItem, this.entity.name)
+                this.sprite = await Engine.getInstance().userInterfaceManager.furniImager.loadFurniSprite(FurnidataItemType.FloorItem, this.entity.name)
 
-            sprite.start(3)
+                await this.sprite.init()
 
-            let dir = sprite.getUIDirection()
+                let dir = this.sprite.furniBase.getUIDirection()
 
-            this.direction = dir;
+                this.direction = dir;
 
-            sprite.setDirection(dir)
+                this.sprite.setDirection(dir)
 
-            this.container = sprite
+                this.sprite.update(true)
 
+                this.container = this.sprite.container
+        
         } catch (e) {
             if(Engine.getInstance().config.debug)
                 Logger.error(e.message)
         }
 
+     
         if(!this._entity) return;
 
-        let spriteZIndex = (this._entity as Item).base.data.logic.dimensions[2]
+        
+        let spriteZIndex = (this._entity as Item).base.getLogicDimension(2)
+        
+        if(!this.container) return;
 
         this.container.zIndex = this.getZIndex(spriteZIndex)
 
         this.container.interactive = true
 
         if (Engine.getInstance().roomService?.CurrentRoom) {
-            Engine.getInstance().roomService?.CurrentRoom?.roomLayout.Visualization.container?.addChild(this.container)
+            Engine.getInstance().roomService?.CurrentRoom?.roomLayout.Visualization.container?.addChild(this.sprite.container)
+            
             this.updatePosition()
         }
-
         this.entity.logic?.registerEvents()
-
         this.entity.logic.onLoad()
-
-        this.entity.logic?.events.emit(ItemEvents.FURNI_SPRITE_LOADED)
+        this.entity.logic?.events.emit(ItemEvents.ITEM_LOADED)
     }
 
     public calculateOffsetX(): number {

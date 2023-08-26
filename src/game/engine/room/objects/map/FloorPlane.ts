@@ -30,6 +30,26 @@ export class FloorPlane extends RoomPlane {
         })
     }
 
+    public getRandomTiles(n: number) {
+
+        let tiles = [];
+
+        let tile = false;
+
+        while(!tile) {
+            let object = this.mapObjects[Math.floor(Math.random()*this.mapObjects.length)];
+
+            if(object instanceof Tile) {
+                if(object.type != TileType.Hole) {
+                    tile = true;
+                    return object;
+                }
+            }
+
+        }
+        return null;
+    }
+
     public setTileType(x: number, y: number, type: TileType): void {
         this.mapObjects.find((obj) => {
             if (obj instanceof Tile) {

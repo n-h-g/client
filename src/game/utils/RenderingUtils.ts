@@ -1,4 +1,4 @@
-import { Texture, Rectangle, TextureMatrix, Sprite } from 'pixi.js'
+import { Texture, Rectangle, TextureMatrix, Sprite, BaseTexture } from 'pixi.js'
 import Point3d from './point/Point3d'
 
 export default class RenderingUtils {
