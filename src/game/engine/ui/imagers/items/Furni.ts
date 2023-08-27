@@ -1,4 +1,4 @@
-import { Container, Rectangle, Sprite, Texture } from "pixi.js";
+import { Container, Loader, Rectangle, Sprite, Texture } from "pixi.js";
 import FurniBase from "./FurniBase";
 import { FurniData } from "./FurniData";
 import { FurniAsset } from "./FurniAsset";
@@ -59,6 +59,9 @@ export class Furni {
     }
 
     public async init() {
+
+        if(this._isPlaceholder) return;
+
         return new Promise<void>((res, rej)  => {
             if(Engine.getInstance().userInterfaceManager.furniImager.hasTexture(this._furniBase.itemName)) {
                 this._textureCache = Engine.getInstance().userInterfaceManager.furniImager.getTexture(this._furniBase.itemName)
@@ -73,6 +76,11 @@ export class Furni {
     }
 
     public update(needsUpdate: boolean = false) {
+        
+        if(this._isPlaceholder) {
+            this.loadPlaceHolder();
+            return;
+        }
 
         this._isPlaying = true;
 
@@ -85,6 +93,21 @@ export class Furni {
         }
 
         this._events.onSpriteCreated()
+    }
+
+    private loadPlaceHolder() {
+
+        this.downloadPlaceHolderTexture().then(async (texture) => { 
+            this._textureCache = texture as Texture
+            Engine.getInstance().userInterfaceManager.furniImager.addTexture(this._furniBase ? this._furniBase.itemName : null, texture)
+
+            let placeholder = new Sprite(this._textureCache)
+
+            placeholder.height = 68 - 10e-3;
+            placeholder.width = 68 - 10e-3;
+
+            this.container.addChild(placeholder)
+        })
     }
 
     public reset() {
@@ -205,6 +228,22 @@ export class Furni {
             sprite.alpha = FurniData.DEFAULT_ALPHA / 255 * this._multiplier
         }
         return sprite
+    }
+
+    public downloadPlaceHolderTexture(): Promise<Texture> {
+        let configUrl = Engine.getInstance().config.proxyUrl + Engine.getInstance().config.roomResourcesUrl + '/furni_placeholder.png'
+
+
+        let texture: Promise<Texture> = new Promise((resolve, reject) => {
+            try {
+                const texture = Texture.from(configUrl)
+                resolve(texture)
+            }catch (e) {
+                throw e;
+            }
+        })
+
+        return texture
     }
 
     public getNextDirection(direction: number) {

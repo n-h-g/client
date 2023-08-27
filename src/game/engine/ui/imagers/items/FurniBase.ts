@@ -47,7 +47,6 @@ export default class FurniBase {
             new Promise((res, rej) => {
                 let url = Engine.getInstance().config.proxyUrl + Engine.getInstance().config.itemsResourcesUrl + this.itemName + '/' + this.itemName + '.json'
                 fetchJsonAsync(url).then(data => {
-                    
                     this._visualizationData = new VisualizationData((data as IFurnidata).visualization)
                     this._logicData = new LogicData((data as IFurnidata).logic)
                     this.loadAssets((data as IFurnidata).assets)
@@ -66,6 +65,7 @@ export default class FurniBase {
             }
         }
     }
+
 
     public downloadSpritesheet(): Promise<PIXI.Texture> {
         let loader = new PIXI.Loader()

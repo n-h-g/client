@@ -96,29 +96,35 @@ export default abstract class ItemVisualization extends EntityVisualization impl
         }
 
         try {
-                this.sprite = await Engine.getInstance().userInterfaceManager.furniImager.loadFurniSprite(FurnidataItemType.FloorItem, this.entity.name)
+            this.sprite = await Engine.getInstance().userInterfaceManager.furniImager.loadFurniSprite(FurnidataItemType.FloorItem, this.entity.name)
 
-                await this.sprite.init()
+            await this.sprite.init()
 
-                let dir = this.sprite.furniBase.getUIDirection()
+            let dir = this.sprite.furniBase.getUIDirection()
 
-                this.direction = dir;
+            this.direction = dir;
 
-                this.sprite.setDirection(dir)
+            this.sprite.setDirection(dir)
 
-                this.sprite.update(true)
+            this.sprite.update(true)
 
-                this.container = this.sprite.container
+            this.container = this.sprite.container
         
         } catch (e) {
-            if(Engine.getInstance().config.debug)
-                Logger.error(e.message)
+
+            this.sprite = await Engine.getInstance().userInterfaceManager.furniImager.loadFurniPlaceholder(FurnidataItemType.FloorItem, this.entity.name)
+
+            await this.sprite.init()
+
+            this.sprite.update(true)
+
+            this.container = this.sprite.container
+            
+            console.log(this.container)
         }
 
-     
         if(!this._entity) return;
-
-        
+                
         let spriteZIndex = (this._entity as Item).base.getLogicDimension(2)
         
         if(!this.container) return;

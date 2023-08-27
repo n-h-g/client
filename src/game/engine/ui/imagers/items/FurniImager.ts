@@ -6,9 +6,9 @@ import { Logger } from '../../../../utils/Logger'
 import { FurniDataType } from '../../../../core/ui/imagers/items/data/IFurniDataType'
 import { Furni } from './Furni'
 import { Sprite, Texture } from 'pixi.js'
-import { NameColorPair } from './enum/NameColorPair'
 import { FurnidataItemType } from './enum/FurniDataItemType'
 import { FurniSpriteUtils } from './utils/FurniSpriteUtils'
+import { FurniPlaceholder } from './FurniPlaceholder'
 
 export default class FurniImager {
 
@@ -65,12 +65,12 @@ export default class FurniImager {
     }
 
     public generateRandomItem() {
-        let randomIndex = Math.floor((Math.random() * Object.values(this.furnidata.roomitemtypes).length) );
+        let randomIndex = Math.floor((Math.random() * Object.keys(this.furnidata.roomitemtypes).length) );
 
         return this.furnidata.roomitemtypes[randomIndex].className;
     }
 
-    public findItemByName(itemName: string) {
+    private findItemByName(itemName: string) {
         for (let itemId in this.furnidata.roomitemtypes) {
             const item = this.furnidata.roomitemtypes[itemId];
             //console.log(item);  
@@ -128,18 +128,20 @@ export default class FurniImager {
         return this.bases[type][itemName]
     }
 
-    public loadFurniSprite(type: FurnidataItemType, name: string): Promise<Furni> {
-        const {
-            colorId
-        } = FurniSpriteUtils.splitItemNameAndColor(name);
+    public loadFurniPlaceholder(type: FurnidataItemType, name: string): Promise<Furni>  {
+        return new Promise((res, _rej) => {
+            const furniSprite = new FurniPlaceholder(null);
+            res(furniSprite);
+        })
+    }
 
+    public loadFurniSprite(type: FurnidataItemType, name: string): Promise<Furni> {
         return new Promise((res, _rej) => {
             this.loadFurniBase(type, name).then((furnibase) => {
                 const furniSprite = new Furni(furnibase);
                 res(furniSprite);
-            }).catch((e) => {
-                throw new e;
-                _rej(null)
+            }).catch((e)=> {
+                _rej(e)
             })
         })
     }
@@ -154,6 +156,8 @@ export default class FurniImager {
                 const furniSprite = new Furni(furnibase)
                 furniSprite.setIcon(true)
                 res(furniSprite)
+            }).catch(() => {
+                _rej('invalid furniBase name')
             })
         })
     }
