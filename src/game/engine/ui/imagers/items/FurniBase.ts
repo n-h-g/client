@@ -162,6 +162,10 @@ export default class FurniBase {
         return this._visualizationData.getValidDirection(direction)
     }
 
+    public getDirection(direction: number) {
+        return this._visualizationData.getDirection(direction)
+    }
+
 
     public getFrameFrom(direction: number, animation: number, layer: number, frameCount: number): number {
         if (this.hasAnimationForLayer(animation, layer)) {

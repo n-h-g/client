@@ -124,7 +124,7 @@ export default abstract class ItemVisualization extends EntityVisualization impl
         }
 
         if(!this._entity) return;
-                
+
         let spriteZIndex = (this._entity as Item).base.getLogicDimension(2)
         
         if(!this.container) return;
@@ -156,11 +156,11 @@ export default abstract class ItemVisualization extends EntityVisualization impl
 
         let offsetFloor = tile!.position.getZ() > 0 ? -MapData.thickSpace * MapData.stepHeight * tile!.position.getZ() : -FurniData.FURNI_TOP_OFFSET
 
-        return ((tile!.position.getY() + tile!.position.getX()) * MapData.tileHeight / 2 + MapData.tileHeight / 2) + offsetFloor
+        return ((tile!.position.getY() + tile!.position.getX()) * MapData.tileHeight / 2 + MapData.tileHeight / 2) + offsetFloor + 3
     }
 
     public getZIndex(zIndex: number = 1): number {
-        const compareY = (Math.trunc((this._entity as Item).base.data.logic.dimensions[2] / 100)) / 10
+        const compareY = (Math.trunc((this._entity as Item).base.getLogicDimension(2) / 100)) / 10
         return RoomVisualization.calculateZIndex(new Point3d(this.entity.position.getX(), this.entity.position.getY() + compareY, this.entity.position.getZ()), RoomPriority.ROOM_ITEM)
     }
 }

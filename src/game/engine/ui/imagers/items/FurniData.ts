@@ -3,5 +3,5 @@ export class FurniData {
     public static LOADING_ALPHA: number = 0.6;
     public static DEFAULT_ALPHA: number = 255;
     public static FURNI_LEFT_OFFSET = -25;
-    public static FURNI_TOP_OFFSET = 25;
+    public static FURNI_TOP_OFFSET = 20;
 }

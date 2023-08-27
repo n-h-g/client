@@ -72,8 +72,7 @@ export abstract class EntityVisualization extends RoomObjectVisualization {
 
         this.updatePosition()
     }
-
-
+    
     public abstract draw(): void
 
     public abstract nextFrame(): void

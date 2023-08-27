@@ -120,6 +120,14 @@ export class VisualizationData {
         return color;
     }
 
+    public getDirection(number): DirectionData {
+        const direction = this._directions.get(number)
+
+        if(!direction) return null;
+
+        return direction
+    }
+
     public hasAnimation(animation: number): boolean {
         return this.hasAnimations() && this._animations.get(animation) != null;
     }
@@ -135,7 +143,7 @@ export class VisualizationData {
 
     public loadLayers(layers: { [key: string]: ILayer; }) {
         for(let layer of Object.keys(layers)) {
-            this._layers.set(parseInt(layer), new Layer(layers[layer]))
+            this._layers.set(parseInt(layer), new Layer(parseInt(layer), layers[layer]))
         }
     }
 
@@ -160,6 +168,7 @@ export class VisualizationData {
     public getColors(): string[] {
         return Object.keys(this._colors)
     }
+
     public getDirections(): Map<number, DirectionData> {
         return this._directions;
     }

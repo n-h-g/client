@@ -216,7 +216,11 @@ export class Furni {
                 sprite.blendMode = FurniSpriteUtils.getBlendModeFromInk(layer.ink)
             }
             if (layer.z) {
-                sprite.zIndex = layer.z
+
+                let relativeDepth = this._furniBase.getDirection(direction) != null ? this._furniBase.getDirection(direction).getOffsetZ() : layer.z
+                relativeDepth = (relativeDepth - (layer.id * 0.001));
+
+                sprite.zIndex = relativeDepth
             }
             if(layer.alpha) {
                 sprite.alpha = (layer.alpha / 255) * this._multiplier

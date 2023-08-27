@@ -10,7 +10,10 @@ export class Layer {
 
     private _ink: string;
 
-    public constructor(data: ILayer) {
+    private _id: number;
+
+    public constructor(id: number, data: ILayer) {
+        this._id = id;
         this._ignoreMouse = data.ignoreMouse;
         this._alpha = data.alpha;
         this._z = data.z;
@@ -83,4 +86,8 @@ export class Layer {
 		this._ink = value;
 	}
 
+
+    public get id(): number {
+        return this._id
+    }
 }
