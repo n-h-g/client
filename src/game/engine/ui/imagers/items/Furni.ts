@@ -154,6 +154,8 @@ export class Furni {
 
         let asset: FurniAsset = this._furniBase.getAsset(assetName)
 
+        //console.log(assetName)
+
         if(!asset) {
             Logger.debug("No assets found");
             return;

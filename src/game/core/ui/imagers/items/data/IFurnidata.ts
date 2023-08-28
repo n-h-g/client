@@ -18,10 +18,10 @@ export interface IFurnidata {
 }
 
 export type Furnidata = {
-    roomitemtypes: { //todo change to flooritemtypes
+    floorItems: { //todo change to flooritemtypes
         [id: number]: FloorItemDescription
     },
-    wallitemtypes: {
+    wallItems: {
         [id: number]: WallItemDescription
     }
 };

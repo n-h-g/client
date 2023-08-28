@@ -37,8 +37,8 @@ export default class FurniImager {
             wallitem: {}
         };
         this.furnidata = {
-            roomitemtypes: {},
-            wallitemtypes: {}
+            floorItems: {},
+            wallItems: {}
         };
 
         this._textureCaches = new Map();
@@ -65,16 +65,20 @@ export default class FurniImager {
     }
 
     public generateRandomItem() {
-        let randomIndex = Math.floor((Math.random() * Object.keys(this.furnidata.roomitemtypes).length) );
+        let randomIndex = Math.floor((Math.random() * Object.values(this.furnidata.floorItems).length) );
 
-        return this.furnidata.roomitemtypes[randomIndex].className;
+        const item = this.furnidata.floorItems[randomIndex]
+
+        if(!item) return;
+
+        return item.className;
     }
 
     private findItemByName(itemName: string) {
-        for (let itemId in this.furnidata.roomitemtypes) {
-            const item = this.furnidata.roomitemtypes[itemId];
+        for (let itemId in this.furnidata.floorItems) {
+            const item = this.furnidata.floorItems[itemId];
             //console.log(item);  
-            if (item.className === itemName) {
+            if (item.className == itemName) {
                 return {
                     item,
                     type: FurniDataType.FLOOR_ITEMS
@@ -82,9 +86,9 @@ export default class FurniImager {
             }
         }
 
-        for (let itemId in this.furnidata.wallitemtypes) {
-            const item = this.furnidata.wallitemtypes[itemId];
-            if (item.className === itemName) {
+        for (let itemId in this.furnidata.wallItems) {
+            const item = this.furnidata.wallItems[itemId];
+            if (item.className == itemName) {
                 return {
                     item,
                     type: FurniDataType.WALL_ITEMS
@@ -120,7 +124,7 @@ export default class FurniImager {
                         resolve(furniBase);
                     })
                 }).catch(() => {
-                    Logger.debug('[Furni] Unable to find item ' + itemName)
+                    Logger.error('[Furni] Unable to find assets of item ' + itemName)
                 })
             })
         }
@@ -141,7 +145,7 @@ export default class FurniImager {
                 const furniSprite = new Furni(furnibase);
                 res(furniSprite);
             }).catch((e)=> {
-                _rej(e)
+                throw e;
             })
         })
     }

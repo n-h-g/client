@@ -26,7 +26,7 @@ export class  OfflineMode {
 
     private static RANDOM_ITEMS: boolean = false
 
-    private static ITEM: string = "couch_norja"
+    private static ITEM: string = "habbocake"
 
     private static NUMBER_OF_ITEMS = 1
 
