@@ -6,6 +6,7 @@ import { FurniData } from '../../../../../engine/ui/imagers/items/FurniData'
 import { OutgoingPacket } from '../../../../../networking/packets/outgoing/OutgoingPacket'
 import { MoveableLogic, MoveableVisualization } from '../../IMoveable'
 import { EntityLogic } from '../../entities/EntityLogic'
+import ItemVisualization from '../visualization/ItemVisualization'
 
 export abstract class ItemLogic extends EntityLogic implements MoveableLogic{
 
@@ -80,7 +81,7 @@ export abstract class ItemLogic extends EntityLogic implements MoveableLogic{
 
     public stopRolling() {
 
-        if(this._roll) return;
+        this.entity.visualization.needsUpdate = false;
 
         this.toggleMovement(false)
         

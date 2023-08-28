@@ -1,4 +1,4 @@
-import { Container, Loader, Rectangle, Sprite, Texture } from "pixi.js";
+import { BLEND_MODES, Container, Loader, Rectangle, Sprite, Texture } from "pixi.js";
 import FurniBase from "./FurniBase";
 import { FurniData } from "./FurniData";
 import { FurniAsset } from "./FurniAsset";
@@ -129,8 +129,11 @@ export class Furni {
 
     private updateSprite(layer: number) {
 
-        const direction = this._furniBase.getValidDirection(this._direction)
+        let offsetDirection = (360 - (this._direction + 135));
+        offsetDirection = ((((offsetDirection) % 360) + 360) % 360);
 
+        const direction = this._furniBase.getValidDirection(offsetDirection)
+        
         const frame = this._isIcon
           ? 0
           : this._furniBase.getFrameFrom(
@@ -148,14 +151,11 @@ export class Furni {
         );
 
         if(!assetName) {
-            Logger.debug("Unable to generate assetname");
+            Logger.debug("Unable to generate assetName");
             return;
         }
 
         let asset: FurniAsset = this._furniBase.getAsset(assetName)
-
-        //console.log(assetName)
-
         if(!asset) {
             Logger.debug("No assets found");
             return;
@@ -163,6 +163,7 @@ export class Furni {
 
 
         if(!asset.sprite) asset = this._furniBase.getAsset(asset.source)
+
 
         let sprite = this.getSprite(asset)
         if (asset.isFlipped()) {
@@ -176,14 +177,14 @@ export class Furni {
           sprite.pivot.x = offsets.left
           sprite.pivot.y = offsets.top
 
-          if (!this._furniBase.getLayers()) return; 
+          if (!this._furniBase.hasLayers()) return; 
         
             sprite = this.updateSpriteFrom(
                 sprite,
                 this._direction,
                 this._furniBase.getLayer(layer)
             )
-          
+
           this._container.addChild(sprite)
     }
 
@@ -221,8 +222,8 @@ export class Furni {
 
                 let relativeDepth = this._furniBase.getDirection(direction) != null ? this._furniBase.getDirection(direction).getOffsetZ() : layer.z
                 relativeDepth = (relativeDepth - (layer.id * 0.001));
-
-                sprite.zIndex = relativeDepth
+            } else {
+                sprite.zIndex = 1 * this._furniBase.getDirection(direction).getOffsetZ()
             }
             if(layer.alpha) {
                 sprite.alpha = (layer.alpha / 255) * this._multiplier

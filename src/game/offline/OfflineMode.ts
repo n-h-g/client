@@ -26,11 +26,11 @@ export class  OfflineMode {
 
     private static RANDOM_ITEMS: boolean = false
 
-    private static ITEM: string = "habbocake"
+    private static ITEM: string = "party_djtable"
 
     private static NUMBER_OF_ITEMS = 1
 
-    private static NUMBER_OF_USERS = 100
+    private static NUMBER_OF_USERS = 1
 
     private static ROOM_SIZE = 20
 

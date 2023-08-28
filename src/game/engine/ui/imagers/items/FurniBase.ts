@@ -101,23 +101,29 @@ export default class FurniBase {
         const directions = this.getAvailableDirections()
         let direction = directions[0]
 
-        if (directions.includes(2) || directions.includes(1)) {
-            direction = 2;
+        if (directions.includes(4)) {
+            direction = 4;
+            return direction;
         }
-        if (directions.includes(4)|| directions.includes(1)) {
-        direction = 4;
+
+        if (directions.includes(2)) {
+            direction = 2;
+            return direction;
+            
         }
         return direction
     }
 
     public getAvailableDirections(): number[] {
-        const directions: number[] = []
-        const rawDirections = this.directions
+        const directions: number[] = [];
+        const rawDirections = this.directions;
 
         for (let direction in rawDirections) {
-            directions.push(parseInt(direction))
+            directions.push((parseInt(direction) % 90) * 2)
         }
-        return directions
+
+        return directions;
+
     }
 
 
@@ -190,7 +196,7 @@ export default class FurniBase {
         return this._visualizationData.getLayer(layer)
     }
 
-    public getLayers(): boolean {
+    public hasLayers(): boolean {
         return this._visualizationData.hasLayers()
     }
 
@@ -287,6 +293,7 @@ export default class FurniBase {
     }
 
     public get directions(): number[] {
+
         return this.data.logic.directions!.map((direction) => direction / 90 * 2)
     }
 }

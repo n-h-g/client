@@ -48,6 +48,8 @@ export default abstract class ItemVisualization extends EntityVisualization impl
                 this.sprite.reset()
             }
 
+            this.sprite.update(true)
+
             this.container = temp;
     
             this.container.interactive = true
@@ -75,7 +77,7 @@ export default abstract class ItemVisualization extends EntityVisualization impl
         this.isIcon = true*/
     }
 
-    public restore() {
+    public reset() {
         this.entity.visualization.container = this.container
         this.needsUpdate = false
         this.isIcon = false
@@ -101,9 +103,7 @@ export default abstract class ItemVisualization extends EntityVisualization impl
             await this.sprite.init()
 
             let dir = this.sprite.furniBase.getUIDirection()
-
-            this.direction = dir;
-
+            
             this.sprite.setDirection(dir)
 
             this.sprite.update(true)
@@ -133,13 +133,13 @@ export default abstract class ItemVisualization extends EntityVisualization impl
 
         this.container.interactive = true
 
+
         if (Engine.getInstance().roomService?.CurrentRoom) {
             Engine.getInstance().roomService?.CurrentRoom?.roomLayout.Visualization.container?.addChild(this.sprite.container)
             
             this.updatePosition()
         }
         this.entity.logic?.registerEvents()
-        this.entity.logic.onLoad()
         this.entity.logic?.events.emit(ItemEvents.ITEM_LOADED)
     }
 
@@ -162,5 +162,9 @@ export default abstract class ItemVisualization extends EntityVisualization impl
     public getZIndex(zIndex: number = 1): number {
         const compareY = (Math.trunc((this._entity as Item).base.getLogicDimension(2) / 100)) / 10
         return RoomVisualization.calculateZIndex(new Point3d(this.entity.position.getX(), this.entity.position.getY() + compareY, this.entity.position.getZ()), RoomPriority.ROOM_ITEM)
+    }
+
+    public getSprite() {
+        return this.sprite;
     }
 }
