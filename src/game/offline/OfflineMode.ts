@@ -30,9 +30,9 @@ export class  OfflineMode {
 
     private static NUMBER_OF_ITEMS = 1
 
-    private static NUMBER_OF_USERS = 1
+    private static NUMBER_OF_USERS = 100
 
-    private static ROOM_SIZE = 10
+    private static ROOM_SIZE = 20
 
     public constructor(engine: Engine) {
         this._engine = engine
