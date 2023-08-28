@@ -1,5 +1,5 @@
 <template>
-    <div id="dialog" :class="props.className" draggable="true" @dragstart="dragStart" @drag="drag"
+    <div id="dialog" ref="dialog" :class="props.className" draggable="true" @dragstart="dragStart" @drag="drag"
         @dragend="dragEnd">
         <div class="title-bar drag-handler">
             {{ props.title }}
@@ -12,7 +12,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+import { onMounted, ref, watch } from 'vue'
 import { EventManager } from '../../../game/core/events/EventManager'
 import { DialogEventData } from '../../../game/engine/events/ui/data/general/Dialog'
 import { UIEvents } from "../../../game/engine/events/ui/UIEvents"
@@ -26,27 +26,40 @@ const props = defineProps<{
 
 function hide() {
     EventManager.emit<DialogEventData>(UIEvents.CLOSE, {
-        type: props.box,
+        type: props.box
     })
 }
 
+const dialog = ref(null)
 const offset = ref({
     x: 0,
     y: 0
 })
 const initial = ref({
-    x: null,
-    y: null
+    x: 0,
+    y: 0
 })
 const current = ref({
-    x: null,
-    y: null
+    x: 0,
+    y: 0
 })
 const active = ref(false)
 
+onMounted(() => {
+    var initialPosition: { x: number, y: number } = JSON.parse(localStorage.getItem(`position_${props.box}`))
+    if (initialPosition != null) {
+        initial.value.x = initialPosition.x
+        initial.value.x = initialPosition.y
+        var box = (dialog.value as HTMLDivElement)
+        box.style.transform = 'translate(' + initialPosition.x + 'px, ' + initialPosition.y + 'px)'
+    }
+})
+
 const dragStart = (ev: DragEvent) => {
-    initial.value.x = ev.clientX - offset.value.x
-    initial.value.y = ev.clientY - offset.value.y
+    if (initial.value.x != 0 && initial.value.y != 0) {
+        initial.value.x = ev.clientX - offset.value.x
+        initial.value.y = ev.clientY - offset.value.y
+    }
     active.value = true
 }
 
@@ -56,7 +69,8 @@ const drag = (ev: DragEvent) => {
         current.value.y = ev.clientY - initial.value.y
         offset.value.x = current.value.x
         offset.value.y = current.value.y
-        document.getElementById('dialog').style.transform = 'translate(' + current.value.x + 'px, ' + current.value.y + 'px)'
+        var box = (dialog.value as HTMLDivElement)
+        box.style.transform = 'translate(' + current.value.x + 'px, ' + current.value.y + 'px)'
     }
 }
 
@@ -64,6 +78,7 @@ const dragEnd = () => {
     initial.value.x = current.value.x
     initial.value.y = current.value.y
     active.value = false
+    localStorage.setItem(`position_${props.box}`, JSON.stringify(initial.value))
 }
 </script>
 
