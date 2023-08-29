@@ -58,8 +58,8 @@ export default class UserEntityLogic extends HumanLogic {
     }
 
     private toggleUI() {
-
-        if(Engine.getInstance().config.offlineMode) return;
+        if (Engine.getInstance().config.offlineMode)
+            return
 
         Engine.getInstance().userInterfaceManager.componentsManager.getComponent<IComponentShowableUI>(UIComponent.AvatarContainerUI).toggle()
 

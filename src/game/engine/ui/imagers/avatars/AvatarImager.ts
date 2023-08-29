@@ -232,32 +232,31 @@ export default class AvatarImager {
         )
 
         const spritesheet = this.data.SpriteSheets.get(assetName) as Spritesheet
-
-        if (!this.textures.has(spriteComponent.ResourceName)) {
+        if (!this.textures.has(spriteComponent.ResourceName))
             this.loadTextureIntoCache(spriteComponent.ResourceName, spritesheet, assetName)
-        }
+
         this.drawSpriteComponent(spriteComponent, assetName, avatar, offsets)
     }
 
     private loadTextureIntoCache(resource: string, spritesheet: Spritesheet, assetName: string): void {
         let asset: AssetData = spritesheet[resource]
 
-        if(!asset) return;
+        if (!asset)
+            return
 
         if (asset.link != undefined)
             asset = spritesheet[asset.link]
+
         let downloadedTexture: PIXI.Texture = this.data.getTexture(assetName)
         if (!downloadedTexture) {
             if (Engine.getInstance().config.debug) {
                 Logger.debug('Cannot find resource ' + this.getTextureId(resource))
             }
             return
-        } else {
-            let texture: PIXI.Texture = RenderingUtils.cropTexture(downloadedTexture, parseInt(asset.height), parseInt(asset.width), parseInt(asset.left), parseInt(asset.top))
-            this.textures.add(resource, texture)
-
-            Logger.debug('Storing ' + this.getTextureId(resource) + ' into cache')
         }
+
+        let texture: PIXI.Texture = RenderingUtils.cropTexture(downloadedTexture, parseInt(asset.height), parseInt(asset.width), parseInt(asset.left), parseInt(asset.top))
+        this.textures.add(resource, texture)
     }
 
     private async drawSpriteComponent(component: AvatarSpriteComponent, assetName: string, avatar: Avatar, bodyPartOffset: BodyPart) {

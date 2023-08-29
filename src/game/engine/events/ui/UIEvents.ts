@@ -17,4 +17,5 @@ export class UIEvents extends Events {
     public static AVATAR_CONTAINER_UPDATED: UIEvents = new UIEvents('avatar_container_updated')
     public static CATALOGUE_PAGES_UPDATED: UIEvents = new UIEvents('catalog_pages_updated')
     public static CATALOG_ITEMS_UPDATED: UIEvents = new UIEvents('catalog_items_updated')
+    public static ENTER_ROOM_INFO: UIEvents = new UIEvents('enter_room_info')
 }

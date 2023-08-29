@@ -9,6 +9,7 @@ import { IComponentShowableUI } from '../../core/ui/IComponentShowableUI'
 import { UIEvents } from '../events/ui/UIEvents'
 import { Service } from '../../core/Service'
 import { IDisposable } from '../../core/room/IDisposable'
+import { EnterRoomUIEventData } from '../events/ui/data/room/EnterRoomUIEventData'
 
 export default class RoomService extends Service<null, null> implements IDisposable {
     private _currentRoom: Room
@@ -52,16 +53,23 @@ export default class RoomService extends Service<null, null> implements IDisposa
     }
 
     public toggleUI() {
+        if (Engine.getInstance().config.offlineMode)
+            return;
 
-        if(Engine.getInstance().config.offlineMode) return;
-
-        Engine.getInstance().userInterfaceManager.componentsManager.getComponent<IComponentShowableUI>(UIComponent.RoomUI).toggle()
+        Engine.getInstance().userInterfaceManager.componentsManager.getComponent<IComponentShowableUI>(UIComponent.RoomUI).show()
+        Engine.getInstance().userInterfaceManager.componentsManager.getComponent<IComponentShowableUI>(UIComponent.RoomInfoUI).show()
 
         EventManager.emit<HotelViewData>(UIEvents.HOTEL_VIEW, {
             mode: false
         })
         EventManager.emit<RoomUIEventData>(UIEvents.ROOM_UI, {
             enabled: true
+        })
+        EventManager.emit<EnterRoomUIEventData>(UIEvents.ENTER_ROOM_INFO, {
+            name: this.CurrentRoom.getRoomInfo().roomName,
+            description: this.CurrentRoom.getRoomInfo().description,
+            owner: 'RealCosis',
+            haveRights: true
         })
     }
 

@@ -11,14 +11,16 @@ import { CatalogueUI } from './catalogue/CatalogueUI'
 import StaticContainerUI from './static/StaticContainerUI'
 import RoomUI from './room/RoomUI'
 import { AvatarContainerUI } from './avatar/AvatarContainerUI'
+import { RoomInfoUI } from './room/RoomInfoUI'
+import { Repository } from '../../../core/Repository'
 
 export class ComponentsManager {
     private _rootComponent: HTMLElement
-    private _gameComponents: Map<UIComponent, IComponentUI>
+    private _gameComponents: Repository<UIComponent, IComponentUI>
 
     constructor() {
         this._rootComponent = document.getElementById("gameContainer")
-        this._gameComponents = new Map<UIComponent, IComponentUI>()
+        this._gameComponents = new Repository()
     }
 
     public loadGameComponents(): void {
@@ -33,10 +35,11 @@ export class ComponentsManager {
         this.addComponent(UIComponent.CatalogueUI, new CatalogueUI())
         this.addComponent(UIComponent.RoomUI, new RoomUI())
         this.addComponent(UIComponent.AvatarContainerUI, new AvatarContainerUI())
+        this.addComponent(UIComponent.RoomInfoUI, new RoomInfoUI())
     }
 
     public initGameComponents(): void {
-        for (let component of this._gameComponents.values()) {
+        for (let component of this._gameComponents.getAll().values()) {
             component.init()
         }
     }
@@ -49,10 +52,10 @@ export class ComponentsManager {
         if (this._gameComponents.has(componentKey))
             return
 
-        this._gameComponents.set(componentKey, component)
+        this._gameComponents.add(componentKey, component)
     }
 
-    public getComponents(): Map<UIComponent, IComponentUI> {
+    public getComponents(): Repository<UIComponent, IComponentUI> {
         return this._gameComponents;
     }
 
