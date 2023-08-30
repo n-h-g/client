@@ -1,25 +1,62 @@
 <template>
-    <Dialog :title="roomName" class-name="roomInfo" :box="UIEventsType.ROOM">
-        <div class="roomInfoContainer">
-            <div class="roomInfoContainerBg">
-                <div class="roomInfoDiv">
-                    <div class="roomInfoLabel">Owner</div>
-                    <div class="roomInfoValue" id="roomInfoValueOwnerName">{{ owner }}</div>
-                    <hr>
+    <Dialog :title="roomName" id="roomEditInfo" :box="UIEventsType.ROOM">
+
+        <div class="RoomEditInfoContainer">
+            <div class="RoomEditInfoContainerBg">
+                <div class="roomEditInfoTabs">
+                    <div class="tab" :class="{ active: currentTab == 'basic' }" @click="changeTab('basic')">
+                        Basic
+                    </div>
+                    <div class="tab" :class="{ active: currentTab == 'rights' }" @click="changeTab('rights')">
+                        Rights
+                    </div>
                 </div>
-                <div class="roomInfoDiv">
-                    <div class="roomInfoDescription" id="roomInfoValueDescription">{{ description }}</div>
+                <div class="tabContainer" v-if="currentTab == 'basic'">
+                    <ul id="roomInfoEditContainer" class="settingsRoomPanel">
+                        <label for="roomeditname">Room Edit Name</label>
+                        <input type="text" name="roomeditname" id="roomeditname"
+                            placeholder="Room"
+                            v-model="roomName">
+                        <label for="roomeditdesc">Desc</label>
+                        <textarea name="roomeditdesc" id="roomeditdesc"
+                            placeholder="Descrizione"
+                            cols="40" rows="5" v-model="description"></textarea>
+
+                        <label for="roomeditmaxusers">Max Users</label>
+                        <select id="roomeditmaxusers" v-model="roomMaxUsers">
+                            <option value="10">10</option>
+                            <option value="25">25</option>
+                            <option value="50">50</option>
+                            <option value="100">100</option>
+                        </select>
+                        <div>
+                            <input type="checkbox" id="roomallowwalkthrough" name="roomallowwalkthrough" value="true"
+                                v-model="roomWalkThrough">
+                            <label
+                                for="roomallowwalkthrough">Allow Walkthrough</label>
+                        </div>
+                        <div>
+                            <button class="deleteButton" @click="saveRoomInfo(true)">Delete Room</button>
+                        </div>
+                    </ul>
                 </div>
-                <div class="roomInfoDiv infoCButton">
-                    <button id="roomInfoSettingsButton" class="ui-button small" :class="{ hidden: !showSettingButton }">Settings</button>
+                <div class="tabContainer" v-if="currentTab == 'rights'">
+                    <select id="roomRightsEditContainer" v-model="rightsSelectUsers">
+                        <option :value="rUser.id" v-for="rUser in rightsList" :key="rUser.id">Nome</option>
+                    </select>
+                    <div id="roomRightsButtons">
+                        <div class="ui-button small" id="removeRightsInfoEditButton" @click="saveRights" v-if="rightsSelectUsers != null && rightsSelectUsers">
+                            Togli i diritti</div>
+                    </div>
                 </div>
             </div>
         </div>
+
     </Dialog>
 </template>
 
 <script setup lang="ts" scoped>
-import { Ref, ref } from 'vue'
+import { reactive, Ref, ref } from 'vue'
 import Dialog from '../dialog/Dialog.vue'
 import { EventManager } from '../../../game/core/events/EventManager'
 import { UIEvents } from '../../../game/engine/events/ui/UIEvents'
@@ -30,6 +67,12 @@ const owner: Ref<string> = ref('')
 const description: Ref<string> = ref('')
 const roomName: Ref<string> = ref('')
 const showSettingButton: Ref<boolean> = ref(false)
+const roomMaxUsers = ref(0)
+const roomWalkThrough = ref(true)
+const rightsList = ref([])
+const rightsSelectUsers = ref([])
+
+let currentTab = ref("basic")
 
 EventManager.read(UIEvents.ENTER_ROOM_INFO, (event: EnterRoomUIEventData) => {
     owner.value = event.owner
@@ -37,14 +80,24 @@ EventManager.read(UIEvents.ENTER_ROOM_INFO, (event: EnterRoomUIEventData) => {
     roomName.value = event.name
     showSettingButton.value = event.haveRights
 })
+
+function changeTab(tab) {
+    currentTab.value = tab
+}
+
+function saveRights() { 
+}
+
+function saveRoomInfo(deleteRoom = false) {
+
+}
 </script>
 
 <style lang="scss">
-.roomInfo {
-    pointer-events: all !important;
+#roomEditInfo {
     position: fixed;
-    height: 200px;
-    width: 250px;
+    height: 450px;
+    width: 400px;
     background-color: #e9e9e1;
     overflow: hidden;
     border-radius: 8px;
@@ -53,11 +106,11 @@ EventManager.read(UIEvents.ENTER_ROOM_INFO, (event: EnterRoomUIEventData) => {
     flex-flow: column;
     left: 20vw;
     top: 20vh;
-    z-index: 10000;
+    pointer-events: all !important;
 
     &::after {
-        content: ' ';
-        box-shadow: inset 0 0 0 2px rgba(255, 255, 255, .15);
+        content: " ";
+        box-shadow: inset 0 0 0 2px rgba(255, 255, 255, 0.15);
         position: absolute;
         top: 0;
         left: 0;
@@ -85,49 +138,161 @@ EventManager.read(UIEvents.ENTER_ROOM_INFO, (event: EnterRoomUIEventData) => {
             width: 19px;
             height: 20px;
             cursor: pointer;
-            background: url("~@/assets/images/closeIcon.png") no-repeat;
+            background: url("/src/assets/images/closeIcon.png") no-repeat;
 
             &:hover {
-                background: url("~@/assets/images/closeIconHover.png") no-repeat;
+                background: url("/src/assets/images/closeIconHover.png") no-repeat;
             }
         }
     }
 
-    .roomInfoContainer {
+    .RoomEditInfoContainer {
         position: relative;
         margin-top: 0px;
         width: 100%;
         height: calc(100% - 26px);
 
-        .roomInfoContainerBg {
-            border-radius: 12px;
-            padding: 6px;
+        .RoomEditInfoContainerBg {
             width: 100%;
             height: 100%;
 
             display: flex;
             flex-direction: column;
-            justify-content: flex-start;
-            padding: 8px;
+            justify-content: space-evenly;
+            padding-left: 4px;
+            padding-right: 4px;
+            padding-bottom: 4px;
 
-            .roomInfoLabel {
-                font-weight: 700;
-                color: #000;
+            .roomEditInfoTabs {
+                padding-top: 5px;
+                padding-left: 16px;
+                padding-right: 16px;
+                border-bottom: 1px solid #000;
+
+                display: flex;
+                width: 100%;
+
+                justify-items: center;
+                align-items: center;
+                justify-content: left;
+
+                .tab {
+                    text-align: center;
+                    border-top-left-radius: 4px;
+                    border-top-right-radius: 4px;
+                    border: 1px solid #000;
+                    border-bottom: 0;
+                    padding: 3px;
+                    color: #000;
+                    background-color: #c3c2b8;
+                    position: relative;
+                    cursor: pointer;
+                    user-select: none;
+
+                    &.active {
+                        border-left: 2px solid #000;
+                        border-right: 2px solid #000;
+                        border-top: 2px solid #000;
+                        background-color: #eceae0;
+
+                        &::after {
+                            content: " ";
+                            position: absolute;
+                            bottom: -1px;
+                            width: 100%;
+                            height: 2px;
+                            background-color: #eceae0;
+                            left: 0;
+                        }
+                    }
+                }
             }
 
-            .roomInfoValue {
-                font-size: small;
-            }
+            .tabContainer {
+                padding: 6px;
 
-            .infoCButton {
-                align-self: center;
-                justify-content: flex-end;
-            }
+                display: flex;
+                width: 100%;
+                height: 100%;
 
-            .roomInfoDiv {
-                flex: 1;
+                overflow-y: auto;
+
+                .settingsRoomPanel > label,
+                .settingsRoomPanel > input,
+                .settingsRoomPanel > select,
+                .settingsRoomPanel > textarea {
+                    display: block;
+                    width: 100%;
+                }
+
+                .settingsRoomPanel > label {
+                    padding: 2px;
+                    margin-bottom: 2px;
+                }
+
+                .settingsRoomPanel > input[type="text"],
+                .settingsRoomPanel > select,
+                .settingsRoomPanel > textarea {
+                    height: 25px;
+                    border: 1px solid #424242;
+                    padding: 4px;
+                    border-radius: 4px;
+                    margin-bottom: 10px;
+                    font-family: "Ubuntu";
+                }
+
+                .settingsRoomPanel > select {
+                    background-color: #fff;
+                }
+
+                .settingsRoomPanel > button {
+                    border: 1px solid #424242;
+                    padding: 4px;
+                    width: 50%;
+                    display: inline-block;
+                    border-radius: 4px;
+                    background-color: #fff;
+
+                    &:hover {
+                        background-color: #e0e0e0;
+                    }
+                }
+
+                .settingsRoomPanel  button.deleteButton {
+                    border:none;
+                    padding: 4px;
+                    width: 100%;
+                    display: inline-block;
+                    border-radius: 4px;
+                    background-color: rgb(207, 11, 11);
+                    text-align:center;
+                    justify-content: center;
+                    margin: 10px auto;
+                    color:#fff;
+                    cursor:pointer;
+                }
+
+                .settingsRoomPanel > textarea {
+                    height: 60px;
+                    max-height: 60px;
+                }
+
+                .settingsRoomPanel {
+                    margin: 4px;
+                }
+
+                #roomRightsEditContainer {
+                    width: 50%;
+                }
+
+                #roomRightsButtons {
+                    width: 50%;
+                    float: right;
+                    padding: 2px;
+                }
             }
         }
     }
 }
+
 </style>

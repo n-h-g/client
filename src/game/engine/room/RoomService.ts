@@ -68,7 +68,7 @@ export default class RoomService extends Service<null, null> implements IDisposa
         EventManager.emit<EnterRoomUIEventData>(UIEvents.ENTER_ROOM_INFO, {
             name: this.CurrentRoom.getRoomInfo().roomName,
             description: this.CurrentRoom.getRoomInfo().description,
-            owner: 'RealCosis',
+            owner: this.CurrentRoom.getRoomInfo().authorName ?? "",
             haveRights: true
         })
     }

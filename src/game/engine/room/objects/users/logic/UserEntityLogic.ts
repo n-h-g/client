@@ -1,10 +1,13 @@
 import { EventManager } from '../../../../../core/events/EventManager'
+import { Entity } from '../../../../../core/room/object/entities/Entity'
 import { HumanLogic } from '../../../../../core/room/object/human/logic/HumanLogic'
 import { IComponentShowableUI } from '../../../../../core/ui/IComponentShowableUI'
 import { Engine } from '../../../../../Engine'
 import { OutgoingPacket } from '../../../../../networking/packets/outgoing/OutgoingPacket'
 import Point from '../../../../../utils/point/Point'
 import UiUtils from '../../../../../utils/UiUtils'
+import { EntityEvents } from '../../../../events/room/objects/entities/EntityEvents'
+import { HumanEvents } from '../../../../events/room/objects/entities/HumanEvents'
 import { UserEvents } from '../../../../events/room/objects/entities/UserEvents'
 import { AvatarContainerData } from '../../../../events/ui/data/avatar/AvatarContainerData'
 import { UIEvents } from '../../../../events/ui/UIEvents'
@@ -18,6 +21,8 @@ export default class UserEntityLogic extends HumanLogic {
     private _typing: boolean = false
     private _showLabel: boolean = false
 
+    private static SHOW_LABELS: boolean = false
+
     public onDance(): void {
 
     }
@@ -25,8 +30,15 @@ export default class UserEntityLogic extends HumanLogic {
     public registerEvents() {
         this.entity.visualization.container.on('pointerdown', () => this.onClick())
         this.events.on(UserEvents.USER_TOGGLE_TYPING, (typing: boolean) => this.onToggleTyping(typing))
-        this.entity.visualization.container.on('mouseover', () => this.onHover())
-        this.entity.visualization.container.on('mouseout', () => this.onHover())
+        this.entity.visualization.container.on('mouseover', (e) => { 
+            this.onHover()
+            e.stopPropagation()
+        })
+        this.entity.visualization.container.on('mouseout', (e) => {
+            this.onHover()
+            e.stopPropagation()
+        })
+        this.events.on(HumanEvents.HUMAN_RENDERING_COMPLETE, () => this.onLoad())
     }
 
     public onToggleTyping(typing): void {
@@ -53,6 +65,9 @@ export default class UserEntityLogic extends HumanLogic {
     }
 
     public onHover(): void {
+
+        if(!UserEntityLogic.SHOW_LABELS) return;
+
         this._showLabel = !this._showLabel
         this.toggleUI()
     }
@@ -90,7 +105,7 @@ export default class UserEntityLogic extends HumanLogic {
     }
 
     public onLoad(): void {
-        throw new Error('Method not implemented.')
+        this._showLabel = false
     }
 
     public onClick() {

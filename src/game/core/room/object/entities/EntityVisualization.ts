@@ -93,6 +93,8 @@ export abstract class EntityVisualization extends RoomObjectVisualization {
         this.container.interactive = true
         this.container.buttonMode = true
 
+        this.entity.logic.events.emit(EntityEvents.POSITION_CHANGED)
+
         Engine.getInstance().roomService.CurrentRoom.roomLayout.Visualization.container.sortChildren()
     }
 

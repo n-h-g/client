@@ -1,4 +1,5 @@
 import { Engine } from '../../../../../Engine'
+import { HumanEvents } from '../../../../../engine/events/room/objects/entities/HumanEvents'
 import MapData from '../../../../../engine/room/objects/map/MapData'
 import { Tile } from '../../../../../engine/room/objects/map/Tile'
 import { RoomPriority } from '../../../../../engine/room/visualization/RoomPriority'
@@ -94,6 +95,9 @@ export abstract class HumanVisualization extends EntityVisualization {
             this.updatePosition()
         }
 
+
+        this.entity.logic.events.emit(HumanEvents.HUMAN_RENDERING_COMPLETE)
+
         this.container.interactive = true
 
         this.entity.logic.registerEvents()
@@ -127,7 +131,11 @@ export abstract class HumanVisualization extends EntityVisualization {
             this.updatePosition()
         }
 
+
+        this.entity.logic.events.emit(HumanEvents.HUMAN_RENDERING_COMPLETE)
+
         this.entity.logic.registerEvents()
+
     }
 
     public nextFrame(): void {

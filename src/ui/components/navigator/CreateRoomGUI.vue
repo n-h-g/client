@@ -93,6 +93,8 @@ function checkAndCreateRoom() {
     mold: selectedModel.value
   }
   Engine.getInstance()?.networkingManager?.packetManager.applyOut(OutgoingPacket.CreateNewRoom, body);
+
+  this.toggle();
 }
 
 function toggle() {

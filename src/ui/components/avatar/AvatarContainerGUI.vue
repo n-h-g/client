@@ -23,6 +23,7 @@ const bounds = ref({
 
 EventManager.read(UIEvents.AVATAR_CONTAINER_UPDATED, (event: AvatarContainerData) => {
   label.value = event.label
+  showLabel.value = event.showLabel
   typing.value = event.typing
   bounds.value = event.bounds
 })
@@ -39,6 +40,7 @@ EventManager.read(UIEvents.AVATAR_CONTAINER_UPDATED, (event: AvatarContainerData
     
         .label {
             background-color: #333;
+            padding: 5px 4px;
             padding: 2px 1px;
             color:#fff;
             margin: 0 auto;
