@@ -10,6 +10,7 @@ import { UIEvents } from '../events/ui/UIEvents'
 import { Service } from '../../core/Service'
 import { IDisposable } from '../../core/room/IDisposable'
 import { EnterRoomUIEventData } from '../events/ui/data/room/EnterRoomUIEventData'
+import { OutgoingPacket } from '../../networking/packets/outgoing/OutgoingPacket'
 
 export default class RoomService extends Service<null, null> implements IDisposable {
     private _currentRoom: Room
@@ -56,9 +57,8 @@ export default class RoomService extends Service<null, null> implements IDisposa
         if (Engine.getInstance().config.offlineMode)
             return;
 
-        Engine.getInstance().userInterfaceManager.componentsManager.getComponent<IComponentShowableUI>(UIComponent.RoomUI).show()
-
-
+        Engine.getInstance().userInterfaceManager.componentsManager.getComponent<IComponentShowableUI>(UIComponent.RoomUI).toggle()
+        
         EventManager.emit<HotelViewData>(UIEvents.HOTEL_VIEW, {
             mode: false
         })
@@ -79,9 +79,10 @@ export default class RoomService extends Service<null, null> implements IDisposa
             return
         }
 
+        this.toggleUI()
+
         this._currentRoom.roomLayout.Visualization.dispose()
         this._currentRoom = null
-        this.toggleUI()
     }
 
     public tick(delta: number): void {

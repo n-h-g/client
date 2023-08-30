@@ -62,6 +62,10 @@ import { EventManager } from '../../../game/core/events/EventManager'
 import { UIEvents } from '../../../game/engine/events/ui/UIEvents'
 import { EnterRoomUIEventData } from '../../../game/engine/events/ui/data/room/EnterRoomUIEventData'
 import { UIEventsType } from '../../../game/engine/events/ui/UIEventsType'
+import { Engine } from '../../../game/Engine'
+import { OutgoingPacket } from '../../../game/networking/packets/outgoing/OutgoingPacket'
+import { IComponentShowableUI } from '../../../game/core/ui/IComponentShowableUI'
+import { UIComponent } from '../../../game/engine/ui/components/UIComponent'
 
 const owner: Ref<string> = ref('')
 const description: Ref<string> = ref('')
@@ -89,6 +93,22 @@ function saveRights() {
 }
 
 function saveRoomInfo(deleteRoom = false) {
+    if (Engine.getInstance().roomService.CurrentRoom == null)
+        return;
+
+    let message = {
+        id: Engine.getInstance().roomService.CurrentRoom.getRoomId(),
+        name: this.roomName,
+        desc: this.roomDesc,
+        maxUsers: this.roomMaxUsers,
+        allowWalk: this.roomWalkThrough,
+        deleteRoom: deleteRoom
+    }
+
+    Engine.getInstance().networkingManager.packetManager.applyOut(OutgoingPacket.SaveRoomSettingsEvent, message)
+
+    Engine.getInstance().userInterfaceManager.componentsManager.getComponent<IComponentShowableUI>(UIComponent.RoomInfoUI).hide()
+        
 
 }
 </script>

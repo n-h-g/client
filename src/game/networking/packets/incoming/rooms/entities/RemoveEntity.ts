@@ -7,6 +7,8 @@ export default class RemoveEntity extends MessageHandler {
     public handle(): void {
         let data: string = this.message.data
 
+        if(!Engine.getInstance().roomService.CurrentRoom) return;
+
         let entity: Entity = Engine.getInstance().roomService.CurrentRoom.roomEntityRepository.get(data)
 
         if(entity == null) {
