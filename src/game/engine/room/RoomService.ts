@@ -57,7 +57,7 @@ export default class RoomService extends Service<null, null> implements IDisposa
             return;
 
         Engine.getInstance().userInterfaceManager.componentsManager.getComponent<IComponentShowableUI>(UIComponent.RoomUI).show()
-        Engine.getInstance().userInterfaceManager.componentsManager.getComponent<IComponentShowableUI>(UIComponent.RoomInfoUI).show()
+
 
         EventManager.emit<HotelViewData>(UIEvents.HOTEL_VIEW, {
             mode: false

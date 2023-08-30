@@ -1,5 +1,5 @@
 <template>
-    <Dialog :title="roomName" id="roomEditInfo" :box="UIEventsType.ROOM">
+    <Dialog :title="roomName" class-name="roomInfo" id="roomEditInfo" :box="UIEventsType.ROOM_INFO">
 
         <div class="RoomEditInfoContainer">
             <div class="RoomEditInfoContainerBg">
@@ -104,8 +104,8 @@ function saveRoomInfo(deleteRoom = false) {
     border: 1px solid #000;
     flex-wrap: wrap;
     flex-flow: column;
-    left: 20vw;
-    top: 20vh;
+    left: 5vw;
+    top: 5vh;
     pointer-events: all !important;
 
     &::after {

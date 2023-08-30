@@ -17,13 +17,36 @@
             <div id="roomCanvasContainer" style="position: absolute;" ref="roomCanvasContainer">
             </div>
         </div>
+        <div class="roomPanel" ref="roomPanel">
+            <div class="arrowLeft"></div>
+            <b>{{ getRoomName() }}</b>
+            <p>by {{ getAuthorName() }}</p>
+            <ul class="buttons-list">
+                <li class="settings" @click="openSettings()"></li>
+            </ul>
+        </div>
     </div>
 </template>
 
 <script setup lang="ts">
 import { ref } from 'vue'
+import { EventManager } from '../../../game/core/events/EventManager'
+import { IComponentShowableUI } from '../../../game/core/ui/IComponentShowableUI'
+import { Engine } from '../../../game/Engine'
+import { UIComponent } from '../../../game/engine/ui/components/UIComponent'
 
 let messages = ref([])
+
+function openSettings() {
+    Engine.getInstance().userInterfaceManager.componentsManager.getComponent<IComponentShowableUI>(UIComponent.RoomInfoUI).toggle()
+}
+
+function getRoomName() {
+    return Engine.getInstance().roomService.CurrentRoom.getRoomInfo().roomName
+}
+function getAuthorName() {
+    return Engine.getInstance().roomService.CurrentRoom.getRoomInfo().authorName
+}
 </script>
 
 <style lang="scss">
@@ -32,6 +55,40 @@ let messages = ref([])
     width: 100%;
     height: 100%;
     z-index: 10000;
+
+    .roomPanel {
+        background-color: #2e2e2c;
+        border: 2px solid #53524f;
+        min-height: 50px;
+        position:fixed;
+        left:0;
+        bottom:90px;
+        padding: 10px;
+        line-height: 5px;
+
+        b {
+            color: #fff;
+        }
+        p {
+            color: #fff;
+            opacity: 0.3;
+        }
+
+        .buttons-list {
+            list-style-type: none;
+
+            li {
+                background-image: url("@/assets/images/bottom-bar/settings.png");
+                height: 20px;
+                width: 20px;
+                border: 2px solid #53524f;
+                border-radius: 5px;
+                pointer-events: all;
+                cursor: pointer;
+            }
+        }
+
+    }
 
     #chatBubbleContainer {
         position: absolute;

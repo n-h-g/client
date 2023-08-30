@@ -9,6 +9,6 @@ export class RoomInfoUI extends ShowableComponent {
     }
 
     getEventTypeFromComponent(): UIEventsType {
-        return UIEventsType.ROOM
+        return UIEventsType.ROOM_INFO
     } 
 }

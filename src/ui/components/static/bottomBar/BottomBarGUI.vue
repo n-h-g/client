@@ -11,6 +11,7 @@
       <div class="menuButton friends" @click="toggle('friends')">
       </div>
     </div>
+    <div class="separator"></div>
     <ChatBar />
     <div class="rightOptions">
       <div class="menuButton search_friends" @click="toggle('search_friends')"></div>
@@ -77,6 +78,23 @@ function toggle(ui: string) {
   background-color: #2e2e2c;
   box-shadow: 0 -1px 0 0 rgba(0, 0, 0, .6);
 
+  &:before {
+    content: "";
+    position: absolute;
+    width: 100%;
+    height: 1px;
+    top: -3px;
+    background-color: rgba(0, 0, 0, 0.63);
+  }
+
+  & .separator {
+    height: 40px;
+    width: 1px;
+    background-color: #454442;
+    margin-left: 330px;
+    margin-right: 330px;
+  }
+
   .chatBar {
     position: fixed;
     width: 100%;
@@ -114,6 +132,8 @@ function toggle(ui: string) {
     color: red;
   }
 
+  
+
   & .rightOptions {
     display: flex;
     right: -40px;
@@ -121,6 +141,24 @@ function toggle(ui: string) {
 
   & .leftOptions {
     left: 10px;
+
+    
+
+    &:before {
+      background-image: url("@/assets/images/bottom-bar/room_infoIconLeft.png");
+      content: "";
+      position: absolute;
+      width: 6px;
+      height: 8px;
+      left: calc(50% + 3px);
+      top: 50%;
+      transform: translate(-50%, -50%);
+      z-index: 1;
+    }
+
+    &--active:before {
+      transform: translate(-50%, -50%) rotate(180deg);
+    }
   }
 
   & .rightOptions, .leftOptions {
