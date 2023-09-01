@@ -20,6 +20,7 @@ export default class RoomService extends Service<null, null> implements IDisposa
     }
 
     public setRoom(roomName: string, roomModel: string, doorPosition: Point, roomId: number) : Room {
+        Engine.getInstance()?.application.setUpViewport()
         this._currentRoom = new Room(roomName, roomModel, doorPosition, roomId)
         this._currentRoom.roomLayout.Visualization.render()
         this._currentRoom.roomLayout.Logic.registerEvents()

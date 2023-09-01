@@ -25,8 +25,6 @@ export default class RoomVisualization implements IRoomVisualization {
     constructor(room: RoomLayout) {
         this.roomLayout = room
 
-        Engine.getInstance().application.setUpViewport();
-
         this.container = new Container()
         this.canvasFloor = new Container()
         this.canvasWall = new Container()
