@@ -1,11 +1,16 @@
 import { Container } from 'pixi.js'
+import { IRoomObjectSprite } from './IRoomObjectSprite'
+import { RoomObjectSprite } from './RoomObjectSprite'
 
 export default abstract class RoomObjectVisualization{
+
     protected _offsetX: number
     protected _offsetY: number
     protected _zIndex: number
     protected _container: Container
     protected _needsUpdate: boolean
+
+    private _sprite: IRoomObjectSprite
 
     constructor(offsetX: number, offsetY: number, zIndex: number) {
         this._offsetX = offsetX
@@ -13,8 +18,18 @@ export default abstract class RoomObjectVisualization{
         this._zIndex = zIndex
         this._container = null
         this._needsUpdate = false
+
+        this._sprite = new RoomObjectSprite()
     }
 
+    public get sprite(): IRoomObjectSprite {
+        return this._sprite;
+    }
+
+    public set sprite(sprite: IRoomObjectSprite) {
+        this._sprite = sprite;
+    }
+  
     public abstract getZIndex(): number
 
     public dispose(): void {

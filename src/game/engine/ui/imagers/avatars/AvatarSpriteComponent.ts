@@ -4,6 +4,7 @@ import { IAction } from "./gamedata/IAvatarActions";
 
 
 export default class AvatarSpriteComponent {
+    
     private state: string;
     private partType: string;
     private resourceType: string

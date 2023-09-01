@@ -10,8 +10,9 @@ import { Engine } from "../../../../Engine";
 import { RoomVisualizationType } from "../../../../core/room/object/RoomVisualizationType";
 import { Logger } from "../../../../utils/Logger";
 import RenderingUtils from "../../../../utils/RenderingUtils";
+import { RoomObjectSprite } from "../../../../core/room/object/RoomObjectSprite";
 
-export class Furni {
+export class Furni extends RoomObjectSprite {
 
     private _furniBase: FurniBase
 
@@ -20,8 +21,6 @@ export class Furni {
     private _animation: number = 0
 
     private _textureCache: Texture
-
-    private _container: Container;
 
     private _isIcon: boolean;
     
@@ -38,6 +37,8 @@ export class Furni {
     private _lastAnimation: number = 1
     
     public constructor(furniBase: FurniBase, direction: number = 0, animation: number = 0, frame: number = 0, isIcon: boolean = false, isPlaceholder: boolean = false) {
+        super();
+
         this._furniBase = furniBase
         this._direction = direction;
         this._animation = animation;
@@ -51,11 +52,10 @@ export class Furni {
         this._isPlaceholder = isPlaceholder;
 
         this._events = new FurniEvents()
-        this._container = new Container()
-
-        this._container.interactive = true
-        this._container.visible = true
-        this._container.sortableChildren = true
+    
+        this.container.interactive = true
+        this.container.visible = true
+        this.container.sortableChildren = true
     }
 
     public async init() {
@@ -108,15 +108,6 @@ export class Furni {
 
             this.container.addChild(placeholder)
         })
-    }
-
-    public reset() {
-        this._animation = 0;
-        this._direction = 0;
-        this._frame = 0;
-        this._lastAnimation = 0;
-
-        this.container.removeChildren()
     }
 
     private updateSprites(needsUpdate: boolean = false, animation: number = 0) {
@@ -185,7 +176,7 @@ export class Furni {
                 this._furniBase.getLayer(layer)
             )
 
-          this._container.addChild(sprite)
+          this.container.addChild(sprite)
     }
 
     private getSprite(asset: FurniAsset): Sprite {
@@ -275,11 +266,4 @@ export class Furni {
         this._direction = direction;
     }
 
-    public updateObject() {
-
-    }
-    
-    public get container() {
-        return this._container;
-    }
 }

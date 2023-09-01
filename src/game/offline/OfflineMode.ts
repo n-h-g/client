@@ -1,12 +1,9 @@
-import { random } from "animejs";
 import { Direction } from "../core/objects/Direction";
 import { Entity } from "../core/room/object/entities/Entity";
 import { HumanVisualization } from "../core/room/object/human/visualization/HumanVisualization";
 import { Engine } from "../Engine";
 import FloorItem from "../engine/room/objects/items/FloorItem";
 import { UserEntity } from "../engine/room/objects/users/UserEntity";
-import UserEntityVisualization from "../engine/room/objects/users/visualization/UserEntityVisualization";
-import RoomVisualization from "../engine/room/visualization/RoomVisualization";
 import { ActionId } from "../engine/ui/imagers/avatars/enum/actions/ActionId";
 import { FurnidataItemType } from "../engine/ui/imagers/items/enum/FurniDataItemType";
 import Point from "../utils/point/Point";
@@ -26,7 +23,7 @@ export class  OfflineMode {
 
     private static RANDOM_ITEMS: boolean = false
 
-    private static ITEM: string = "party_djtable"
+    private static ITEM: string = "hc_tv"
 
     private static NUMBER_OF_ITEMS = 1
 

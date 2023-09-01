@@ -1,15 +1,15 @@
 import { InteractionManager, InteractionTrackingData } from 'pixi.js';
 import { loadUI } from './ui/main'
 
-const superAddEvents = InteractionManager.prototype.addEvents;
-const superRemoveEvents = InteractionManager.prototype.removeEvents;
+const superAddEvents = (InteractionManager.prototype as any).addEvents;
+const superRemoveEvents = (InteractionManager.prototype as any).removeEvents;
 
 /**
  * To add DOM native 'dblclick' event to the manager
  * @private  
  * @extends
  */
-InteractionManager.prototype.addEvents = function () {
+(InteractionManager.prototype as any).addEvents = function () {
     superAddEvents.call(this);
 
     this.onDoubleClick = this.onDoubleClick.bind(this);
@@ -24,7 +24,7 @@ InteractionManager.prototype.addEvents = function () {
  * @private
  * @extends
  */
-InteractionManager.prototype.removeEvents = function () {
+(InteractionManager.prototype as any).removeEvents = function () {
     if (this.interactionDOMElement) {
         this.interactionDOMElement.removeEventListener('dblclick', this.onDoubleClick, true);
     }
@@ -39,7 +39,7 @@ InteractionManager.prototype.removeEvents = function () {
  * @param {PIXI.Container|PIXI.Sprite|PIXI.TilingSprite} displayObject - The display object that was tested
  * @param {boolean} hit - the result of the hit test on the display object
  */
-InteractionManager.prototype.processDoubleClick = function (interactionEvent, displayObject, hit) {
+(InteractionManager.prototype as any).processDoubleClick = function (interactionEvent, displayObject, hit) {
     var data = interactionEvent.data;
     var id = interactionEvent.data.identifier;
 
@@ -56,7 +56,7 @@ InteractionManager.prototype.processDoubleClick = function (interactionEvent, di
 /**
  * @param {PointerEvent} originalEvent
  */
-InteractionManager.prototype.onDoubleClick = function (originalEvent) {
+(InteractionManager.prototype as any).onDoubleClick = function (originalEvent) {
     // if we support touch events, then only use those for touch events, not pointer events
     if (this.supportsTouchEvents && originalEvent.pointerType === 'touch') {
         return;

@@ -6,9 +6,7 @@ import MapData from '../../../../../engine/room/objects/map/MapData'
 import { Tile } from '../../../../../engine/room/objects/map/Tile'
 import { RoomPriority } from '../../../../../engine/room/visualization/RoomPriority'
 import RoomVisualization from '../../../../../engine/room/visualization/RoomVisualization'
-import { Furni } from '../../../../../engine/ui/imagers/items/Furni'
 import { FurniData } from '../../../../../engine/ui/imagers/items/FurniData'
-import { Logger } from '../../../../../utils/Logger'
 import Point from '../../../../../utils/point/Point'
 import Point3d from '../../../../../utils/point/Point3d'
 import UiUtils from '../../../../../utils/UiUtils'
@@ -26,8 +24,6 @@ export default abstract class ItemVisualization extends EntityVisualization impl
 
     protected isIcon: boolean = false 
 
-    protected sprite: Furni
-
     constructor(item: Item) {
         super(item)
         this.position = item.position
@@ -42,7 +38,7 @@ export default abstract class ItemVisualization extends EntityVisualization impl
     public draw(): void {
         if (Engine.getInstance().roomService?.CurrentRoom) {
 
-            let temp: Container = this.sprite.container as Container;
+            let temp: Container = this.sprite.container;
 
             if(this.container) {
                 this.sprite.reset()
@@ -98,42 +94,44 @@ export default abstract class ItemVisualization extends EntityVisualization impl
         }
 
         try {
-            this.sprite = await Engine.getInstance().userInterfaceManager.furniImager.loadFurniSprite(FurnidataItemType.FloorItem, this.entity.name)
+            const sprite = await Engine.getInstance().userInterfaceManager.furniImager.loadFurniSprite(FurnidataItemType.FloorItem, this.entity.name)
 
-            await this.sprite.init()
+            await sprite.init()
 
-            let dir = this.sprite.furniBase.getUIDirection()
+            let dir = sprite.furniBase.getUIDirection()
             
-            this.sprite.setDirection(dir)
+            sprite.setDirection(dir)
 
-            this.sprite.update(true)
+            sprite.update(true)
 
-            this.container = this.sprite.container
+            this.sprite = sprite
         
         } catch (e) {
 
-            this.sprite = await Engine.getInstance().userInterfaceManager.furniImager.loadFurniPlaceholder(FurnidataItemType.FloorItem, this.entity.name)
+            const sprite = await Engine.getInstance().userInterfaceManager.furniImager.loadFurniPlaceholder(FurnidataItemType.FloorItem, this.entity.name)
 
-            await this.sprite.init()
+            await sprite.init()
 
-            this.sprite.update(true)
+            sprite.update(true)
 
-            this.container = this.sprite.container
+            this.sprite = sprite
             
-            console.log(this.container)
+            //console.log(this.container)
         }
+
+        //console.log(this.sprite.container)
 
         if(!this._entity) return;
 
         let spriteZIndex = (this._entity as Item).base.getLogicDimension(2)
         
-        if(!this.container) return;
+        if(!this.sprite.container) return;
 
-        this.container.zIndex = this.getZIndex(spriteZIndex)
+        this.sprite.container.zIndex = this.getZIndex(spriteZIndex)
 
-        this.container.interactive = true
+        this.sprite.container.interactive = true
 
-
+        this.container = this.sprite.container;
         if (Engine.getInstance().roomService?.CurrentRoom) {
             Engine.getInstance().roomService?.CurrentRoom?.roomLayout.Visualization.container?.addChild(this.sprite.container)
             
@@ -162,9 +160,5 @@ export default abstract class ItemVisualization extends EntityVisualization impl
     public getZIndex(zIndex: number = 1): number {
         const compareY = (Math.trunc((this._entity as Item).base.getLogicDimension(2) / 100)) / 10
         return RoomVisualization.calculateZIndex(new Point3d(this.entity.position.getX(), this.entity.position.getY() + compareY, this.entity.position.getZ()), RoomPriority.ROOM_ITEM)
-    }
-
-    public getSprite() {
-        return this.sprite;
     }
 }
