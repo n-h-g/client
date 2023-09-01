@@ -65,7 +65,7 @@ export default class ChatMessageService implements IDisposable {
           Engine.getInstance().networkingManager?.packetManager.applyOut(
             OutgoingPacket.UserSay,
             {
-              message: message,
+              text: message,
               shout: shout,
               whisper,
               whisperId,
@@ -75,7 +75,7 @@ export default class ChatMessageService implements IDisposable {
           Engine.getInstance().networkingManager?.packetManager.applyOut(
             OutgoingPacket.UserSay,
             {
-              message: message,
+              text: message,
               shout: shout,
               whisper,
               whisperId,

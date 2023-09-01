@@ -29,7 +29,7 @@ function sendMessage(e) {
 
     if(!Engine.getInstance().chatService.checkCommand(message.value)) {
         Engine.getInstance().networkingManager.packetManager.applyOut(OutgoingPacket.UserSay, {
-            message: message.value,
+            text: message.value,
             shout: shout
         })
     }
