@@ -54,6 +54,7 @@ import { UIEvents } from "../../../game/engine/events/ui/UIEvents"
 import { UIEventsType } from "../../../game/engine/events/ui/UIEventsType"
 import Room from "../../../game/engine/room/Room"
 import { FurnidataItemType } from "../../../game/engine/ui/imagers/items/enum/FurniDataItemType"
+import { RoomImager } from "../../../game/engine/ui/imagers/room/RoomImager"
 import { OutgoingPacket } from "../../../game/networking/packets/outgoing/OutgoingPacket"
 import Point from "../../../game/utils/point/Point"
 import UiUtils from "../../../game/utils/UiUtils"
@@ -106,7 +107,10 @@ function selectItem(item) {
 }
 
 async function generatePlaceHolder(item: CataloguePageItem): Promise<string> {
-    return await Engine.getInstance()?.userInterfaceManager?.roomImager?.generateRoomPreview(new Room("", "00001111/00001111/00001111/00001111", new Point(0, 0), 0))
+
+    const currentRoom = Engine.getInstance().roomService.CurrentRoom
+
+    return await Engine.getInstance()?.userInterfaceManager?.roomImager?.generateRoomPreview(new Room("", currentRoom != null ? currentRoom.getRoomInfo().roomModel : RoomImager.getRoomPlaceHolder(), new Point(0, 0), 0))
 }
 
 function getIcon(catalogItem: CataloguePageItem) {
