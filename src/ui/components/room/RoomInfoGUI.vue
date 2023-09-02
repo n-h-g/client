@@ -1,6 +1,5 @@
 <template>
     <Dialog :title="roomName" class-name="roomInfo" id="roomEditInfo" :box="UIEventsType.ROOM_INFO">
-
         <div class="RoomEditInfoContainer">
             <div class="RoomEditInfoContainerBg">
                 <div class="roomEditInfoTabs">
@@ -51,7 +50,6 @@
                 </div>
             </div>
         </div>
-
     </Dialog>
 </template>
 

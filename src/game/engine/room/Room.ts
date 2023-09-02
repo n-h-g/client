@@ -11,11 +11,11 @@ export default class Room implements IDisposable {
     private roomId: number
     private _roomEntityRepository: RoomEntityRepository
 
-    constructor(roomName: string, roomModel: string, doorPosition: Point, roomId: number) {
+    constructor(roomName: string, roomModel: string, doorPosition: Point, roomId: number, authorName: string) {
         this.roomName = roomName
         this.roomId = roomId
         this._roomLayout = new RoomLayout(this, roomModel, doorPosition)
-        this.roomInfo = new RoomInfo(roomName, roomModel)
+        this.roomInfo = new RoomInfo(roomName, roomModel, authorName)
 
         this._roomEntityRepository = new RoomEntityRepository()
     }

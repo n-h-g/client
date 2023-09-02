@@ -19,9 +19,9 @@ export default class RoomService extends Service<null, null> implements IDisposa
         super()
     }
 
-    public setRoom(roomName: string, roomModel: string, doorPosition: Point, roomId: number) : Room {
+    public setRoom(roomName: string, roomModel: string, doorPosition: Point, roomId: number, authorName: string): Room {
         Engine.getInstance()?.application.setUpViewport()
-        this._currentRoom = new Room(roomName, roomModel, doorPosition, roomId)
+        this._currentRoom = new Room(roomName, roomModel, doorPosition, roomId, authorName)
         this._currentRoom.roomLayout.Visualization.render()
         this._currentRoom.roomLayout.Logic.registerEvents()
         Engine.getInstance()?.application?.viewport.addChild(this._currentRoom.roomLayout.Visualization.container)

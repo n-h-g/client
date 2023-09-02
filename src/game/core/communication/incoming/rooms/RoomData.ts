@@ -7,4 +7,6 @@ export default interface RoomData {
     door_x: number
     door_y: number
     users_count: number
+    owner_id: number
+    owner_name: string
 }
