@@ -1,12 +1,9 @@
-import ItemVisualization from '../../../../../core/room/object/items/visualization/ItemVisualization'
+import { ItemVisualization } from '../../../../../core/room/object/items/visualization/ItemVisualization'
 import Item from '../Item'
 
-export default class ItemVisualizationAnimated extends ItemVisualization {
-
+export class ItemVisualizationAnimated extends ItemVisualization {
     private animation: number = 0
-
     private _lastAnimation: number = 0
-
     private _currentFrame: number = 0;
 
     constructor(item: Item) {
@@ -14,8 +11,7 @@ export default class ItemVisualizationAnimated extends ItemVisualization {
     }
 
     public async render() {
-        
-        super.render()
+        await super.render()
     }
 
     public nextFrame(): void {
@@ -24,9 +20,6 @@ export default class ItemVisualizationAnimated extends ItemVisualization {
 
     public setAnimation(animation: number) {
         let item = this.entity as Item
-
-        //this.sprite.nextFrame()
-
         this.entity.visualization.draw()
     }
 }

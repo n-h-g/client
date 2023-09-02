@@ -43,16 +43,16 @@
 
 <script setup lang="ts">
 import { ref } from 'vue'
-import { EventManager } from '../../../game/core/events/EventManager';
-import { ItemLogic } from '../../../game/core/room/object/items/logic/ItemLogic';
-import ItemVisualization from '../../../game/core/room/object/items/visualization/ItemVisualization';
-import { Engine } from '../../../game/Engine';
-import { DialogEventData } from '../../../game/engine/events/ui/data/general/Dialog';
-import { PreviewModeEventData } from '../../../game/engine/events/ui/data/general/PreviewUserData';
-import { UIEvents } from '../../../game/engine/events/ui/UIEvents';
-import { UIEventsType } from '../../../game/engine/events/ui/UIEventsType';
-import Item from '../../../game/engine/room/objects/items/Item';
-import { OutgoingPacket } from '../../../game/networking/packets/outgoing/OutgoingPacket';
+import { EventManager } from '../../../game/core/events/EventManager'
+import { ItemLogic } from '../../../game/core/room/object/items/logic/ItemLogic'
+import { ItemVisualization } from '../../../game/core/room/object/items/visualization/ItemVisualization'
+import { Engine } from '../../../game/Engine'
+import { DialogEventData } from '../../../game/engine/events/ui/data/general/Dialog'
+import { PreviewModeEventData } from '../../../game/engine/events/ui/data/general/PreviewUserData'
+import { UIEvents } from '../../../game/engine/events/ui/UIEvents'
+import { UIEventsType } from '../../../game/engine/events/ui/UIEventsType'
+import Item from '../../../game/engine/room/objects/items/Item'
+import { OutgoingPacket } from '../../../game/networking/packets/outgoing/OutgoingPacket'
 
 const mode = ref('')
 const entity = ref({

@@ -1,5 +1,5 @@
-import { ICataloguePage } from "../../../../../core/communication/incoming/catalogue/CataloguePage"
+import { CataloguePage } from "../../../../../core/communication/incoming/catalogue/CataloguePage"
 
 export type CataloguePagesData = {
-    pages: ICataloguePage[]
+    pages: CataloguePage[]
 }

@@ -14,14 +14,10 @@ import { EntityVisualization } from '../../entities/EntityVisualization'
 import { MoveableVisualization } from '../../IMoveable'
 import { FurnidataItemType } from '../../../../../engine/ui/imagers/items/enum/FurniDataItemType'
 
-export default abstract class ItemVisualization extends EntityVisualization implements MoveableVisualization {
-    
+export abstract class ItemVisualization extends EntityVisualization implements MoveableVisualization {
     protected position: Point3d
-
     protected iconImage: string
-
-    protected imagePreview: string
-
+    public imagePreview: string
     protected isIcon: boolean = false 
 
     constructor(item: Item) {

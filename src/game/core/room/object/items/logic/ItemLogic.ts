@@ -4,12 +4,10 @@ import { ItemEvents } from '../../../../../engine/events/room/objects/entities/I
 import Item from '../../../../../engine/room/objects/items/Item'
 import { FurniData } from '../../../../../engine/ui/imagers/items/FurniData'
 import { OutgoingPacket } from '../../../../../networking/packets/outgoing/OutgoingPacket'
-import { MoveableLogic, MoveableVisualization } from '../../IMoveable'
+import { MoveableLogic } from '../../IMoveable'
 import { EntityLogic } from '../../entities/EntityLogic'
-import ItemVisualization from '../visualization/ItemVisualization'
 
 export abstract class ItemLogic extends EntityLogic implements MoveableLogic{
-
     public _roll: boolean = false
 
     constructor(item: Item) {
@@ -41,7 +39,6 @@ export abstract class ItemLogic extends EntityLogic implements MoveableLogic{
         Engine.getInstance().networkingManager?.packetManager.applyOut(OutgoingPacket.RoomPickupItemEvent, {
             id: this.entity.id
         })
-
         Engine.getInstance().networkingManager?.packetManager.applyOut(OutgoingPacket.RoomPlaceItemEvent, {
             id: this.entity.id,
             x: this.entity.position.getX(),
@@ -80,7 +77,6 @@ export abstract class ItemLogic extends EntityLogic implements MoveableLogic{
     }
 
     public stopRolling() {
-
         this.entity.visualization.needsUpdate = false;
 
         this.toggleMovement(false)

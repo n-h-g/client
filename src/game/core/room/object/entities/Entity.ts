@@ -5,13 +5,12 @@ import { EntityLogic } from './EntityLogic'
 import { EntityVisualization } from './EntityVisualization'
 
 export abstract class Entity extends RoomObjectController<EntityVisualization, EntityLogic> {
-
     protected _name: string
 
     public constructor(id: string, name: string) {
         super(id, new Point3d(0, 0, 0), null, null)
 
-        let doorPosition = Engine.getInstance().roomService.CurrentRoom.roomLayout.getDoorPosition()
+        let doorPosition = Engine.getInstance()?.roomService?.CurrentRoom?.roomLayout?.getDoorPosition()
 
         this.position = new Point3d(doorPosition.getX(), doorPosition.getY(), 0)
         this.name = name

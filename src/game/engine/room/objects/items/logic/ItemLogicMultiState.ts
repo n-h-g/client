@@ -1,7 +1,7 @@
 import { ItemLogic } from '../../../../../core/room/object/items/logic/ItemLogic'
 import FurniImager from '../../../../ui/imagers/items/FurniImager'
 import Item from '../Item'
-import ItemVisualizationAnimated from '../visualization/ItemVisualizationAnimated'
+import { ItemVisualizationAnimated } from '../visualization/ItemVisualizationAnimated'
 
 export default class ItemLogicMultiState extends ItemLogic {
 

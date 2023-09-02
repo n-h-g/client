@@ -3,14 +3,12 @@ import RoomLayout from './RoomLayout'
 import RoomInfo from './RoomInfo'
 import { RoomEntityRepository } from './RoomEntityRepository'
 import { IDisposable } from '../../core/room/IDisposable'
-import Point3d from '../../utils/point/Point3d'
 
 export default class Room implements IDisposable {
     private _roomLayout: RoomLayout
     private roomInfo: RoomInfo
     private roomName: string
     private roomId: number
-
     private _roomEntityRepository: RoomEntityRepository
 
     constructor(roomName: string, roomModel: string, doorPosition: Point, roomId: number) {

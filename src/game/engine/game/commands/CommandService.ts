@@ -7,9 +7,7 @@ import ZoomCommand from './ZoomCommand';
 export class CommandService extends Service<string, Command> {
     constructor() {
         super()
-
         this.repository = new CommandRepository()
-
         this.init()
     }
 

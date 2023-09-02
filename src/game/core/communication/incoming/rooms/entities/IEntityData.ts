@@ -1,4 +1,3 @@
-import { Direction } from '../../../../objects/Direction'
 import { IActionsComponent } from "../../../../room/object/entities/components/IActionsComponent"
 import { IAspectComponent } from "../../../../room/object/entities/components/IAspectComponent"
 import { IHeadBodyRotationComponent } from "../../../../room/object/entities/components/IHeadBodyRotation"

@@ -1,7 +1,7 @@
 import { Events } from '../Events'
 
 export class UIEvents extends Events {
-    private constructor(key: string) {
+    protected constructor(key: string) {
         super(key)
     }
 

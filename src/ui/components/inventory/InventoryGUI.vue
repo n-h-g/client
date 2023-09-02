@@ -74,7 +74,7 @@
 
 <script setup lang="ts">
 import { onMounted, ref } from "vue"
-import ItemVisualization from "../../../game/core/room/object/items/visualization/ItemVisualization"
+import { ItemVisualization } from "../../../game/core/room/object/items/visualization/ItemVisualization"
 import { Engine } from "../../../game/Engine"
 import Item from "../../../game/engine/room/objects/items/Item"
 import { OutgoingPacket } from "../../../game/networking/packets/outgoing/OutgoingPacket"

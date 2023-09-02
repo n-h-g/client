@@ -24,9 +24,7 @@ export abstract class HumanVisualization extends EntityVisualization {
 
     public constructor(human: Human) {
         super(human)
-
         this._entity = human
-
         this._actions = new Set()
     }
 
@@ -64,9 +62,8 @@ export abstract class HumanVisualization extends EntityVisualization {
         this._actions.delete(action)
     }
     public removeActions(actions: ActionId[]) {
-        for (let action of actions) {
+        for (let action of actions)
             this.removeAction(action)
-        }
     }
 
     public updateDirection(direction: Direction) {
@@ -79,9 +76,7 @@ export abstract class HumanVisualization extends EntityVisualization {
         this.container.destroy()
 
         if (this.loaded) {
-
             this._avatar = new Avatar(this._entity.figure, this.rotation, this.rotation, this._actions, this.frame)
-
         } else {
             this._avatar = new AvatarPlaceHolder('', this.rotation, this.rotation, this._actions, this.frame)
         }
@@ -94,7 +89,6 @@ export abstract class HumanVisualization extends EntityVisualization {
             Engine.getInstance().roomService?.CurrentRoom?.roomLayout.Visualization.container?.addChild(this.container)
             this.updatePosition()
         }
-
 
         this.entity.logic.events.emit(HumanEvents.HUMAN_RENDERING_COMPLETE)
 
@@ -131,33 +125,26 @@ export abstract class HumanVisualization extends EntityVisualization {
             this.updatePosition()
         }
 
-
         this.entity.logic.events.emit(HumanEvents.HUMAN_RENDERING_COMPLETE)
 
         this.entity.logic.registerEvents()
-
     }
 
     public nextFrame(): void {
-        if (this.frame > this._avatar.Frames) {
+        if (this.frame > this._avatar.Frames)
             this.frame = 0
-        } else {
+        else
             this.frame++
-        }
     }
 
     public getZIndex(): number {
-
         let isAtDoor = Math.floor(this.entity.position.getX()) == Engine.getInstance().roomService.CurrentRoom.roomLayout.getDoorPosition().getX() && Math.floor(this.entity.position.getY()) == Engine.getInstance().roomService.CurrentRoom.roomLayout.getDoorPosition().getY()
-
-
         return RoomVisualization.calculateZIndex(new Point3d(this.entity.position.getX(), this.entity.position.getY(), this.entity.position.getZ() + 0.001), isAtDoor ? RoomPriority.DOOR_FLOOR_USER : RoomPriority.USER)
     }
 
     public calculateOffsetY() {
         let tile: Tile = Engine.getInstance().roomService.CurrentRoom.roomLayout.getFloorPlane().getTilebyPosition(new Point(Math.round(this._entity.position.getX()), Math.round(this.entity.position.getY())))
         let offsetFloor = tile!.position.getZ() > 0 ? -MapData.thickSpace * MapData.stepHeight * tile!.position.getZ() : -AvatarData.AVATAR_TOP_OFFSET
-
         return this.container!.y = ((this.entity.position.getX() + this.entity.position.getY()) * MapData.tileHeight / 2) + (MapData.tileHeight / 2) + offsetFloor
     }
 

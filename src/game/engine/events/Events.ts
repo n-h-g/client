@@ -1,7 +1,7 @@
 export class Events {
     public key: string;
 
-    constructor(key: string) {
+    protected constructor(key: string) {
         this.key = key;
     }
 }

@@ -12,7 +12,6 @@ import { Entity } from "./Entity"
 
 export abstract class EntityLogic extends RoomObjectLogic {
     protected _entity: Entity
-    
     protected frameTracker: number = 0
 
     public constructor(entity: Entity) {
@@ -26,7 +25,7 @@ export abstract class EntityLogic extends RoomObjectLogic {
     }
 
     public dispose(): void {
-        (Engine.getInstance().userInterfaceManager.componentsManager.getComponent(UIComponent.PreviewBoxUI) as IComponentShowableUI).hide()
+        Engine.getInstance().userInterfaceManager.componentsManager.getComponent<IComponentShowableUI>(UIComponent.PreviewBoxUI).hide()
     }
 
     public onHover(): void {
@@ -38,17 +37,13 @@ export abstract class EntityLogic extends RoomObjectLogic {
     }
 
     public togglePreview() {
-
-        if(Engine.getInstance().config.offlineMode) return;
+        if (Engine.getInstance().config.offlineMode)
+            return;
         
         let entity: Entity = this.entity
-
         let isHuman = entity instanceof Human
-
         let mode = isHuman ? "user" : "item"
-
         Engine.getInstance().userInterfaceManager.componentsManager.getComponent<IComponentShowableUI>(UIComponent.PreviewBoxUI).toggle()
-
         EventManager.emit<PreviewModeEventData>(UIEvents.PREVIEW_BOX_MODE, {
             id: entity.id,
             mode: mode,
