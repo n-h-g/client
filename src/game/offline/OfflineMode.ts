@@ -47,7 +47,7 @@ export class  OfflineMode {
         let generatedModel = this._engine.roomService.generateSquareRoomModel(OfflineMode.ROOM_SIZE)
 
 
-        let room = this._engine.roomService.setRoom("prova", generatedModel, new Point(0, 0), 200)
+        let room = this._engine.roomService.setRoom("prova", generatedModel, new Point(0, 0), 200, '')
 
         for(let i = 0; i < OfflineMode.NUMBER_OF_USERS; i++) {
             const randomTile = room.roomLayout.getFloorPlane().getRandomTile() as Tile

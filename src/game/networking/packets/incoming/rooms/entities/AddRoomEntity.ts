@@ -8,7 +8,7 @@ export default class AddRoomEntity extends MessageHandler {
   public handle(): void {
     let data: IEntityData = this.message
 
-    if (Engine.getInstance().roomService.CurrentRoom.roomEntityRepository.get(data.id) != null)
+    if (Engine.getInstance()?.roomService?.CurrentRoom?.roomEntityRepository?.get(data.id) != null)
       return;
 
     let builder = new EntityBuilder()

@@ -231,7 +231,6 @@ export class Furni extends RoomObjectSprite {
     public downloadPlaceHolderTexture(): Promise<Texture> {
         let configUrl = Engine.getInstance().config.proxyUrl + Engine.getInstance().config.roomResourcesUrl + '/furni_placeholder.png'
 
-
         let texture: Promise<Texture> = new Promise((resolve, reject) => {
             try {
                 const texture = Texture.from(configUrl)

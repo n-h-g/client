@@ -17,50 +17,9 @@ export default class AvatarDownloadManager {
         })
     }
 
-    public loadTexture(assetName: string): Promise<any> {
-        return new Promise((resolve, reject) => {
-            const loader = new PIXI.Loader()
-
-            const url = `${Engine.getInstance().config.avatarFigurePath}/${assetName}/${assetName}.png`;
-
-            const onError = () => {
-                //Engine.getInstance().logger?.debug("Failed to load asset " + assetName);
-                loader.destroy()
-                return;
-            }
-
-            loader
-                .add({
-                    url,
-                    crossOrigin: 'anonymous',
-                    loadType: PIXI.LoaderResource.LOAD_TYPE.XHR,
-                    xhrType: PIXI.LoaderResource.XHR_RESPONSE_TYPE.BUFFER
-                });
-
-            loader.load((loader: PIXI.Loader, resources: Partial<Record<string, PIXI.LoaderResource>>) => {
-                for (const key in resources) {
-                    const resource = resources[key] as PIXI.LoaderResource
-
-                    if (!resource || !resource.error) {
-                        onError()
-                    }
-
-                    const resourceType = (resource.xhr?.getResponseHeader('Content-Type'))
-
-                    if (resourceType === 'image/png') {
-                        const base64 = RenderingUtils.arrayBufferToBase64(resource.data);
-
-                        const baseTexture = new PIXI.BaseTexture(`data:${resourceType};base64,${base64}`);
-
-                        const texture = new PIXI.Texture(baseTexture);
-
-                        resolve(texture)
-                    }
-
-                }
-            })
-        })
-
+    public async loadTexture(assetName: string): Promise<any> {
+        const url = `${Engine.getInstance().config.avatarFigurePath}/${assetName}/${assetName}.png`
+        return await PIXI.Assets.load(url);
     }
 
     public loadSpriteSheet(part: string): Promise<any> {

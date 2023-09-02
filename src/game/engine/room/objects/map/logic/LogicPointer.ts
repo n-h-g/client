@@ -1,5 +1,5 @@
 import { RoomObjectLogic } from '../../../../../core/room/object/RoomObjectLogic'
-import ColorRGB from '../../../../../utils/color/ColorRGB'
+import { ColorRGB } from '../../../../../utils/color/ColorRGB'
 import Pointer from '../Pointer'
 
 export default class LogicPointer extends RoomObjectLogic {

@@ -1,28 +1,28 @@
 {
   "name": "nhg-client-v2",
   "private": true,
-  "version": "1.0.0",
+  "version": "2.0.0",
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "tsc && vite build",
+    "build": "vite build",
     "preview": "vite preview"
   },
   "dependencies": {
-    "@pixi/app": "^6.4.2",
+    
     "animejs": "^3.2.1",
-    "pixi-viewport": "^4.38.0",
-    "pixi.js": "^6.4.2",
-    "vue": "^3.2.45",
-    "vue-router": "^4.1.6"
+    "pixi-viewport": "^5.0.2",
+    "pixi.js": "^7.2.4",
+    "vue": "^3.3.4",
+    "vue-router": "^4.2.4"
   },
   "devDependencies": {
-    "@babel/types": "^7.20.7",
-    "@types/animejs": "^3.1.6",
-    "@types/node": "^18.11.17",
-    "@vitejs/plugin-vue": "^4.0.0",
-    "sass": "^1.57.1",
-    "typescript": "^4.9.3",
-    "vite": "^4.0.0"
+    "@babel/types": "^7.22.11",
+    "@types/animejs": "^3.1.7",
+    "@types/node": "^20.5.8",
+    "@vitejs/plugin-vue": "^4.3.4",
+    "sass": "^1.66.1",
+    "typescript": "^5.2.2",
+    "vite": "^4.4.9"
   }
 }

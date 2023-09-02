@@ -2,7 +2,7 @@ import RoomObjectVisualization from '../../../../../core/room/object/RoomObjectV
 import MapData from '../MapData'
 import { WallType } from '../WallTypeEnum'
 import Point3d from '../../.././../../utils/point/Point3d'
-import ColorRGB from '../../../../../utils/color/ColorRGB'
+import { ColorRGB } from '../../../../../utils/color/ColorRGB'
 import { NormalType } from '../../../visualization/NormalTypeEnum'
 import RoomVisualizationColorData from '../../../visualization/RoomVisualizationColorData'
 import { Container, Graphics } from 'pixi.js'

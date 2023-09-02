@@ -33,9 +33,9 @@ export class Engine {
             Engine._instance = this
         }
 
-        PIXI.settings.SCALE_MODE = PIXI.SCALE_MODES.NEAREST;
-        PIXI.settings.ROUND_PIXELS = true;
-        PIXI.settings.FAIL_IF_MAJOR_PERFORMANCE_CAVEAT = true;
+        PIXI.BaseTexture.defaultOptions.scaleMode = PIXI.SCALE_MODES.NEAREST
+        PIXI.settings.ROUND_PIXELS = true
+        PIXI.settings.FAIL_IF_MAJOR_PERFORMANCE_CAVEAT = true
 
         console.log("%cNHG Client v" + this._config.version, "font-size:2rem; background-color:#069; color:#fff; padding:10px 45px;")
 
@@ -50,9 +50,7 @@ export class Engine {
             resizeTo: window
         })
 
-
-
-        document.body.appendChild(this._application.view)
+        document.body.appendChild(this.application.view)
 
         this._roomsService = new RoomService()
         this._commandService = new CommandService()

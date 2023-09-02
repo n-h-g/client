@@ -1,19 +1,17 @@
 import * as PIXI from "pixi.js"
-import { ImageResource, Sprite } from "pixi.js"
 import { Direction } from "../../../../core/objects/Direction"
 import { Engine } from '../../../../Engine'
 import { Logger } from '../../../../utils/Logger'
 import Point from "../../../../utils/point/Point"
 import RenderingUtils from "../../../../utils/RenderingUtils"
 import Action from "./actions/Action"
-import Animation from "./animation/Animation"
 import Avatar from "./Avatar"
 import AvatarFigure from "./AvatarFigure"
 import AvatarFigureComponent from "./AvatarFigureComponent"
 import AvatarImageData from "./AvatarImageData"
 import AvatarSpriteComponent from "./AvatarSpriteComponent"
 import AvatarData from "./enum/AvatarData"
-import { BodyPart, IAnimation, IAnimationFrame, OffsetDirection, OffsetFrame } from "./gamedata/IAvatarAnimations"
+import { BodyPart, IAnimationFrame } from "./gamedata/IAvatarAnimations"
 import { AssetData, Spritesheet } from "./gamedata/IAvatarResource"
 import { IPart } from "./gamedata/IFigureData"
 import AvatarStructure from "./structure/AvatarStructure"
@@ -35,14 +33,12 @@ export type FigureDataPart = {
 export default class AvatarImager {
     private data: AvatarImageData
     private structure: AvatarStructure
-    private loader: PIXI.Loader
     private loaded: boolean = false
     private parts: any
     private textures: Repository<string, PIXI.Texture>
 
     constructor(structure: AvatarStructure) {
         this.data = new AvatarImageData()
-        this.loader = new PIXI.Loader()
         this.textures = new Repository()
 
         this.structure = structure
@@ -272,12 +268,12 @@ export default class AvatarImager {
                 asset = spritesheet[asset.link]
 
             const texture = this.textures.get(component.ResourceName)
-            const sprite = new Sprite(texture)
+            const sprite = new PIXI.Sprite(texture)
 
             sprite.width = parseInt(asset.width)
             sprite.height = parseInt(asset.height)
             sprite.interactive = true
-            sprite.buttonMode = true
+            sprite.cursor = 'pointer'
 
             if (component.Color && component.isColorable)
                 sprite.tint = avatar.IsPlaceHolder ? 0xFFFFFF : parseInt(component.Color, 16)

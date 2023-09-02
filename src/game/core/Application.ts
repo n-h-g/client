@@ -1,6 +1,5 @@
-import { Application, IApplicationOptions } from '@pixi/app'
 import { Viewport } from 'pixi-viewport';
-import { Container, Point, Text } from 'pixi.js';
+import { Container, Point, Text, Application, IApplicationOptions } from 'pixi.js';
 import { Engine } from '../Engine';
 
 export class ApplicationEngine extends Application {
@@ -12,10 +11,10 @@ export class ApplicationEngine extends Application {
 
     private viewPortScreenCords: Point
 
-    constructor(engine: Engine, options?: IApplicationOptions) {
+    constructor(engine: Engine, options?: Partial<IApplicationOptions>) {
         super(options);
 
-        this.stage.interactive = true
+        this.stage.eventMode = 'dynamic'
 
         this.view.style.height = window.innerHeight + "px"
         this.view.style.width = window.innerWidth + "px"
@@ -36,10 +35,10 @@ export class ApplicationEngine extends Application {
             screenHeight: window.innerHeight,
             worldWidth: 1000,
             worldHeight: 1000,
-            interaction: this.renderer.plugins.interaction // the interaction module is important for wheel to work properly when renderer.view is placed or scaled
+            events: this.renderer.events
         })
 
-        this._viewport.interactive = true
+        this._viewport.eventMode = 'dynamic'
 
         this.stage.addChild(this._viewport)
 
@@ -49,7 +48,7 @@ export class ApplicationEngine extends Application {
 
         this._viewport.drag({
             wheel: false
-        }).on('drag-end', (screen: Point, world) => this.viewPortScreenCords = screen)
+        })
     }
 
     public showDebugInfo(fps: number = this.ticker.FPS) {

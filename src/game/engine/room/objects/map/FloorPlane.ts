@@ -1,5 +1,5 @@
 import { RoomPlaneType } from './RoomPlaneTypeEnum'
-import ColorRGB from '../../../../utils/color/ColorRGB'
+import { ColorRGB } from '../../../../utils/color/ColorRGB'
 import { TileType } from './TileTypeEnum'
 import MapTypeChecker from './MapTypeChecker'
 import Point3d from '../../../../utils/point/Point3d'

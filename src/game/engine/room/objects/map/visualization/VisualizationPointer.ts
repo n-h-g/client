@@ -1,8 +1,8 @@
 import RoomObjectVisualization from '../../../../../core/room/object/RoomObjectVisualization'
 import Pointer from '../Pointer'
 import MapData from '../MapData'
-import ColorRGB from '../../../../../utils/color/ColorRGB'
-import { Container, Graphics, Point } from 'pixi.js'
+import { ColorRGB } from '../../../../../utils/color/ColorRGB'
+import { Color, Container, Graphics, Point } from 'pixi.js'
 import { Tile } from '../Tile'
 
 export default class VisualizationPointer extends RoomObjectVisualization {
