@@ -272,7 +272,7 @@ export default class AvatarImager {
 
             sprite.width = parseInt(asset.width)
             sprite.height = parseInt(asset.height)
-            sprite.interactive = true
+            sprite.eventMode = 'dynamic'
             sprite.cursor = 'pointer'
 
             if (component.Color && component.isColorable)

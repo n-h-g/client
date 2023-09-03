@@ -1,8 +1,9 @@
 import { Viewport } from 'pixi-viewport';
-import { Container, Point, Text, Application, IApplicationOptions } from 'pixi.js';
+import { Container, Point, Text, Application, IApplicationOptions, EventSystem } from 'pixi.js';
 import { Engine } from '../Engine';
+import { Events } from '../engine/events/Events';
 
-export class ApplicationEngine extends Application {
+export class ApplicationEngine extends Application<HTMLCanvasElement> {
     private _engine: Engine
     private _lastFrameTime: number
     private _timeElapsed: number = 0
@@ -27,8 +28,8 @@ export class ApplicationEngine extends Application {
     }
 
     public setUpViewport() {
-
-        if(this._viewport != null) this._viewport.destroy();
+        if (this._viewport != null)
+            this._viewport.destroy();
 
         this._viewport = new Viewport({
             screenWidth: window.innerWidth,

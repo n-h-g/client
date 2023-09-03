@@ -68,22 +68,12 @@ export default class FurniBase {
 
 
     public downloadSpritesheet(): Promise<PIXI.Texture> {
-        let loader = new PIXI.Loader()
         let configUrl = Engine.getInstance().config.proxyUrl + Engine.getInstance().config.itemsResourcesUrl + this.itemName + '/' + this.itemName + '.png'
 
-        loader.add(configUrl)
+        const texture = PIXI.Assets.load(configUrl)
 
-        if (this.spritesheet != undefined) {
+        if (this.spritesheet != undefined)
             return Promise.resolve(this.spritesheet)
-        }
-
-        let texture: Promise<PIXI.Texture> = new Promise((resolve, reject) => {
-
-            loader.load((loader: PIXI.Loader) => {
-                let texture = PIXI.Texture.from(loader.resources[configUrl].data)
-                resolve(texture)
-            })
-        })
 
         this.spritesheet = texture
 

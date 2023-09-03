@@ -1,4 +1,4 @@
-import { Matrix, Container, DisplayObject } from 'pixi.js'
+import { Matrix, Container, DisplayObject, ICanvas } from 'pixi.js'
 import { Component, createApp } from 'vue'
 import { Engine } from '../Engine'
 import { UIComponent } from '../engine/ui/components/UIComponent';
@@ -23,19 +23,16 @@ export default class UiUtils {
         return object.worldTransform;
     }
 
-    static generateImageFromObject(object: DisplayObject | Container): HTMLImageElement | undefined {
-        
-        return Engine.getInstance().application?.renderer.plugins.extract.image((object));
+    static async generateImageFromObject(object: DisplayObject | Container): Promise<HTMLImageElement> {
+        return await Engine.getInstance().application?.renderer.extract.image(object);
     }
 
-    static generateCanvasFromObject(object: DisplayObject | Container): HTMLCanvasElement | undefined {
-        
-        return Engine.getInstance().application?.renderer.plugins.extract.canvas((object));
+    static generateCanvasFromObject(object: DisplayObject | Container): ICanvas {
+        return Engine.getInstance().application?.renderer.extract.canvas(object)
     }
 
-    static generateBase64FromObject(object: DisplayObject | Container): string | undefined {
-        const image = Engine.getInstance().application?.renderer.plugins.extract.base64(object)
-        return image;
+    static async generateBase64FromObject(object: DisplayObject | Container): Promise<string> {
+        return await Engine.getInstance().application?.renderer.extract.base64(object)
     }
 
     static getPosition(event: any, container: Container) {

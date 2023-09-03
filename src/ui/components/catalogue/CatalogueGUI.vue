@@ -77,7 +77,8 @@ const currentCataloguePage = ref({items: []} as {
 })
 const preview = ref("")
 
-generatePlaceHolder(null).then((image: string) => {
+generatePlaceHolder().then((image: string) => {
+    console.log(image)
     preview.value = image
 })
 
@@ -106,19 +107,17 @@ function selectItem(item) {
     selectedItem.value = item
 }
 
-async function generatePlaceHolder(item: CataloguePageItem): Promise<string> {
-
-    const currentRoom = Engine.getInstance().roomService.CurrentRoom
-
-    return await Engine.getInstance()?.userInterfaceManager?.roomImager?.generateRoomPreview(new Room("", currentRoom != null ? currentRoom.getRoomInfo().roomModel : RoomImager.getRoomPlaceHolder(), new Point(0, 0), 0))
+async function generatePlaceHolder(): Promise<string> {
+    const room = new Room('', RoomImager.getRoomPlaceHolder(), new Point(0, 0), 0, '')
+    return await Engine.getInstance()?.userInterfaceManager?.roomImager?.generateRoomPreview(room)
 }
 
 function getIcon(catalogItem: CataloguePageItem) {
     Engine.getInstance()?.userInterfaceManager?.furniImager?.loadFurniIcon(FurnidataItemType.FloorItem, catalogItem.name).then((sprite) => {
         sprite.init()
         
-        setTimeout(() => {
-            catalogItem.icon = UiUtils.generateBase64FromObject(sprite.container)
+        setTimeout(async () => {
+            catalogItem.icon = await UiUtils.generateBase64FromObject(sprite.container)
         }, 300);
     })
 

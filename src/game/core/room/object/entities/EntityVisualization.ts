@@ -90,8 +90,8 @@ export abstract class EntityVisualization extends RoomObjectVisualization {
         this.container.y = this.calculateOffsetY()
 
         this.container.zIndex = this.getZIndex()
-        this.container.interactive = true
-        this.container.buttonMode = true
+        this.container.eventMode = 'dynamic'
+        this.container.cursor = 'pointer'
 
         this.entity.logic.events.emit(EntityEvents.POSITION_CHANGED)
 

@@ -36,20 +36,20 @@ export abstract class EntityLogic extends RoomObjectLogic {
         this.togglePreview()
     }
 
-    public togglePreview() {
+    public async togglePreview() {
         if (Engine.getInstance().config.offlineMode)
             return;
         
         let entity: Entity = this.entity
         let isHuman = entity instanceof Human
-        let mode = isHuman ? "user" : "item"
+        let mode = isHuman ? 'user' : 'item'
         Engine.getInstance().userInterfaceManager.componentsManager.getComponent<IComponentShowableUI>(UIComponent.PreviewBoxUI).toggle()
         EventManager.emit<PreviewModeEventData>(UIEvents.PREVIEW_BOX_MODE, {
             id: entity.id,
             mode: mode,
             name: entity.name,
             motto: "",
-            image: UiUtils.generateImageFromObject(this.entity.visualization?.container!).src
+            image: (await UiUtils.generateImageFromObject(this.entity.visualization?.container!)).src
         })
     }
 

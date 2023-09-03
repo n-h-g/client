@@ -129,12 +129,12 @@ export default class Avatar {
 
         this.container.alpha = this.placeHolder ? 0.5 : 1;
         
-        this.container.buttonMode = true;
-        this.container.interactive = true;
+        this.container.cursor = 'pointer'
+        this.container.eventMode = 'dynamic'
         this.container.interactiveChildren = true;
 
         for(let object of this.container.children) {
-            object.interactive = true;
+            object.eventMode = 'dynamic'
         }
 
         this.events.emit(AvatarEventsType.LOAD_COMPLETE)

@@ -1,4 +1,4 @@
-import { BLEND_MODES, Container, Loader, Rectangle, Sprite, Texture } from "pixi.js";
+import { Sprite, Texture } from "pixi.js";
 import FurniBase from "./FurniBase";
 import { FurniData } from "./FurniData";
 import { FurniAsset } from "./FurniAsset";
@@ -13,27 +13,16 @@ import RenderingUtils from "../../../../utils/RenderingUtils";
 import { RoomObjectSprite } from "../../../../core/room/object/RoomObjectSprite";
 
 export class Furni extends RoomObjectSprite {
-
     private _furniBase: FurniBase
-
     private _direction: number = 0
-
     private _animation: number = 0
-
     private _textureCache: Texture
-
     private _isIcon: boolean;
-    
     private _frame: number = 0;
-
     private _isPlaying: boolean = false;
-
     private _events: FurniEvents;
-
     private _isPlaceholder: boolean;
-
     private _multiplier: number = 1
-
     private _lastAnimation: number = 1
     
     public constructor(furniBase: FurniBase, direction: number = 0, animation: number = 0, frame: number = 0, isIcon: boolean = false, isPlaceholder: boolean = false) {
@@ -53,22 +42,22 @@ export class Furni extends RoomObjectSprite {
 
         this._events = new FurniEvents()
     
-        this.container.interactive = true
+        this.container.eventMode = 'dynamic'
         this.container.visible = true
         this.container.sortableChildren = true
     }
 
     public async init() {
-
-        if(this._isPlaceholder) return;
+        if (this._isPlaceholder)
+            return
 
         return new Promise<void>((res, rej)  => {
-            if(Engine.getInstance().userInterfaceManager.furniImager.hasTexture(this._furniBase.itemName)) {
-                this._textureCache = Engine.getInstance().userInterfaceManager.furniImager.getTexture(this._furniBase.itemName)
+            if(Engine.getInstance()?.userInterfaceManager?.furniImager?.hasTexture(this._furniBase.itemName)) {
+                this._textureCache = Engine.getInstance()?.userInterfaceManager?.furniImager?.getTexture(this._furniBase.itemName)
             } else {
-                this._furniBase.downloadSpritesheet().then(async (texture) => { 
-                    this._textureCache = texture as Texture
-                    Engine.getInstance().userInterfaceManager.furniImager.addTexture(this._furniBase.itemName, texture)
+                this._furniBase.downloadSpritesheet().then(async (texture: Texture) => { 
+                    this._textureCache = texture
+                    Engine.getInstance()?.userInterfaceManager?.furniImager?.addTexture(this._furniBase.itemName, texture)
                     res()
                 })
             }
@@ -76,32 +65,29 @@ export class Furni extends RoomObjectSprite {
     }
 
     public update(needsUpdate: boolean = false) {
-        
-        if(this._isPlaceholder) {
+        if (this._isPlaceholder) {
             this.loadPlaceHolder();
             return;
         }
 
         this._isPlaying = true;
 
-        if(this._animation == this._lastAnimation) needsUpdate = false;
+        if (this._animation == this._lastAnimation) needsUpdate = false;
 
         this.updateSprites(true, 1)
 
-        if (this.furniBase.visualizationType !== RoomVisualizationType.FURNITURE_ANIMATED) {
+        if (this.furniBase.visualizationType !== RoomVisualizationType.FURNITURE_ANIMATED)
             this._isPlaying = false
-        }
 
         this._events.onSpriteCreated()
     }
 
     private loadPlaceHolder() {
-
-        this.downloadPlaceHolderTexture().then(async (texture) => { 
-            this._textureCache = texture as Texture
+        this.downloadPlaceHolderTexture().then(async (texture: Texture) => { 
+            this._textureCache = texture
             Engine.getInstance().userInterfaceManager.furniImager.addTexture(this._furniBase ? this._furniBase.itemName : null, texture)
 
-            let placeholder = new Sprite(this._textureCache)
+            let placeholder = Sprite.from(this._textureCache)
 
             placeholder.height = 68 - 10e-3;
             placeholder.width = 68 - 10e-3;
@@ -180,25 +166,19 @@ export class Furni extends RoomObjectSprite {
     }
 
     private getSprite(asset: FurniAsset): Sprite {
-        if (!asset.sprite) {
+        if (!asset.sprite)
             return
-        }
 
-        let texture;
+        let texture: Texture;
 
-        if(Engine.getInstance().userInterfaceManager.furniImager.hasTexture(asset.name)) {
-            texture = Engine.getInstance().userInterfaceManager.furniImager.getTexture(asset.name)
-        } else {   
+        if (Engine.getInstance().userInterfaceManager.furniImager.hasTexture(asset.name))
+            texture = Engine.getInstance()?.userInterfaceManager?.furniImager?.getTexture(asset.name)
+        else {   
             texture = RenderingUtils.cropTexture(this._textureCache, asset.sprite.height, asset.sprite.width, asset.sprite.left, asset.sprite.top)
-
-
-            Engine.getInstance().userInterfaceManager.furniImager.addTexture(asset.name, texture)
+            Engine.getInstance()?.userInterfaceManager?.furniImager?.addTexture(asset.name, texture)
         }
 
-   
-        let sprite = new Sprite(texture)
-
-
+        const sprite = Sprite.from(texture)
         return sprite
     }
 
@@ -210,7 +190,6 @@ export class Furni extends RoomObjectSprite {
                 sprite.blendMode = FurniSpriteUtils.getBlendModeFromInk(layer.ink)
             }
             if (layer.z) {
-
                 let relativeDepth = this._furniBase.getDirection(direction) != null ? this._furniBase.getDirection(direction).getOffsetZ() : layer.z
                 relativeDepth = (relativeDepth - (layer.id * 0.001));
             } else {
@@ -220,7 +199,7 @@ export class Furni extends RoomObjectSprite {
                 sprite.alpha = (layer.alpha / 255) * this._multiplier
             }
             if(layer.ignoreMouse) {
-                sprite.buttonMode = false
+                sprite.cursor = 'default'
             }
         } else {
             sprite.alpha = FurniData.DEFAULT_ALPHA / 255 * this._multiplier

@@ -7,9 +7,6 @@ import { Viewport } from 'pixi-viewport'
 import { RoomPriority } from '../visualization/RoomPriority'
 import RoomVisualization from '../visualization/RoomVisualization'
 import Point3d from '../../../utils/point/Point3d'
-import { UIComponent } from '../../ui/components/UIComponent'
-import RoomUI from '../../ui/components/room/RoomUI'
-import UiUtils from '../../../utils/UiUtils'
 import RenderingUtils from '../../../utils/RenderingUtils'
 
 export class RoomLogic implements IRoomLogic {
@@ -21,8 +18,8 @@ export class RoomLogic implements IRoomLogic {
         this.room = room
         this.canvasFloorHit = this.room.createOrGetRoomCanvas('floorHit')
 
-        if(Engine.getInstance().config.debugRoomClick)
-            this.room.Visualization.Container.addChild(new Sprite(Texture.from(RenderingUtils.convertCanvasToImage(this.canvasFloorHit))));
+        if (Engine.getInstance().config.debugRoomClick)
+            this.room.Visualization.Container.addChild(Sprite.from(Texture.from(RenderingUtils.convertCanvasToImage(this.canvasFloorHit))));
 
         this.canvasWallHit = this.room.createOrGetRoomCanvas('wallHit')
     }

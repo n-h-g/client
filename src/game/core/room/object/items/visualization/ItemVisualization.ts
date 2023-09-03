@@ -24,7 +24,9 @@ export abstract class ItemVisualization extends EntityVisualization implements M
         super(item)
         this.position = item.position
         this.iconImage = this.generateIcon()
-        this.imagePreview = this.generateImagePreview()
+        this.generateImagePreview().then((val: string) => {
+            this.imagePreview = val
+        })
     }
 
     public nextFrame(): void {
@@ -44,7 +46,7 @@ export abstract class ItemVisualization extends EntityVisualization implements M
 
             this.container = temp;
     
-            this.container.interactive = true
+            this.container.eventMode = 'dynamic'
 
             Engine.getInstance().roomService?.CurrentRoom?.roomLayout.Visualization.container?.addChild(this.container)
             this.updatePosition()
@@ -75,8 +77,8 @@ export abstract class ItemVisualization extends EntityVisualization implements M
         this.isIcon = false
     }
 
-    private generateImagePreview() {
-        return this.entity ? UiUtils.generateBase64FromObject(this.container) : null;
+    private async generateImagePreview() {
+        return this.entity ? await UiUtils.generateBase64FromObject(this.container) : null;
     }
 
     private generateIcon(): string {
@@ -125,7 +127,7 @@ export abstract class ItemVisualization extends EntityVisualization implements M
 
         this.sprite.container.zIndex = this.getZIndex(spriteZIndex)
 
-        this.sprite.container.interactive = true
+        this.sprite.container.eventMode = 'dynamic'
 
         this.container = this.sprite.container;
         if (Engine.getInstance().roomService?.CurrentRoom) {

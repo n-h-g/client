@@ -28,7 +28,7 @@ export default class VisualizationWall extends RoomObjectVisualization {
         this.doorContext = roomV.getCanvasDoorWall();
         this.wallCtx = null;
 
-        this.wallContext.interactive = true;
+        this.wallContext.eventMode = 'dynamic'
     }
 
     public getZIndex(): number {

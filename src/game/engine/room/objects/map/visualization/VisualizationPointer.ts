@@ -16,7 +16,7 @@ export default class VisualizationPointer extends RoomObjectVisualization {
         super(pointer.position.getX(), pointer.position.getY(), pointer.position.getZ())
 
         this.pointerContext = pointer.getCanvas()
-        this.pointerContext.interactive = true
+        this.pointerContext.eventMode = 'dynamic'
         this.pointerContext.visible = false
         this.render()
     }

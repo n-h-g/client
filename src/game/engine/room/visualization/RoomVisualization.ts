@@ -41,8 +41,8 @@ export default class RoomVisualization implements IRoomVisualization {
         this.container.x = Engine.getInstance().application.screenCords.x / 2
         this.container.y = Engine.getInstance().application.screenCords.y / 2
 
-        this.canvasDoorTile.interactive = true
-        this.canvasFloor.interactive = true
+        this.canvasDoorTile.eventMode = 'dynamic'
+        this.canvasFloor.eventMode = 'dynamic'
 
         let defaultPoint = new Point3d(1, 1, 1)
 
@@ -52,7 +52,7 @@ export default class RoomVisualization implements IRoomVisualization {
         this.canvasDoorWall.zIndex = RoomVisualization.calculateZIndex(defaultPoint, RoomPriority.DOOR_WALL)
         this.canvasWall.zIndex = RoomVisualization.calculateZIndex(defaultPoint, RoomPriority.WALL)
 
-        this.container.interactive = true
+        this.container.eventMode = 'dynamic'
 
         this.container.sortableChildren = true
     }

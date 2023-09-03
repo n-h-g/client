@@ -67,7 +67,7 @@ EventManager.read(UIEvents.PREVIEW_BOX_MODE, (evt: PreviewModeEventData) => {
     entity.value.name = evt.name
     entity.value.image = evt.image
     entity.value.motto = evt.motto
-    entity.value.id = evt.id
+    entity.value.id = evt.id 
 })
 
 function isAnimated() {

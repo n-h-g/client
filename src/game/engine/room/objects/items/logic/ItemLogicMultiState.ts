@@ -13,7 +13,7 @@ export default class ItemLogicMultiState extends ItemLogic {
 
     public registerEvents() {
         super.registerEvents()
-        this.entity.visualization.container.on("dblclick", (event) => this.changeState())
+        //this.entity.visualization.container.on("dblclick", (event) => this.changeState())
     }
 
     public changeState() {

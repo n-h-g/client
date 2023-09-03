@@ -9,6 +9,10 @@ export class ColorRGB {
         this.blue = b % 256
     }
 
+    public equals(color: ColorRGB): boolean {
+        return this.red == color.getRed() && this.green == color.getGreen() && this.blue == color.getBlue()
+    }
+
     public brightness(percentage: number) : ColorRGB {
         percentage = percentage < -100 ? -100 : percentage > 100 ? 100 : percentage
         let brightness = ((255 * percentage) / 100)
@@ -17,6 +21,18 @@ export class ColorRGB {
         let blue = (this.blue + brightness) < 0 ? 0 : (this.blue + brightness) > 255 ? 255 : this.blue + brightness
 
         return new ColorRGB(red, green, blue)
+    }
+
+    public getRed(): number {
+        return this.red
+    }
+
+    public getGreen(): number {
+        return this.green
+    }
+    
+    public getBlue(): number {
+        return this.blue
     }
 
     public toHexString(): string {

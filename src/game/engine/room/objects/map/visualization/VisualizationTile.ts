@@ -82,7 +82,7 @@ export default class VisualizationTile extends RoomObjectVisualization {
 
     private drawTile(container: Container, isDoor: boolean = false): Container {
         const ctx = new Graphics()
-        ctx.interactive = true
+        ctx.eventMode = 'dynamic'
 
         let fullHeightTick = this.tile.plane.room.HasFullHeightTick ? MapData.thickSpace * MapData.stepHeight * (this.tile.position.getZ() + (isDoor ? 1 : 0)) : 0
         let floorColor = RoomVisualizationColorData.getNormal(this.color, NormalType.LIGHT).toHex()
@@ -160,7 +160,7 @@ export default class VisualizationTile extends RoomObjectVisualization {
     private drawStair(container: Container, isRight: boolean = false): Container {
         const ctx = new Graphics()
 
-        ctx.interactive = true
+        ctx.eventMode = 'dynamic'
 
         let fullHeightTick = this.tile.plane.room.HasFullHeightTick ? MapData.thickSpace * MapData.stepHeight * this.tile.position.getZ() : 0
         let _offsetX = this.offsetX
@@ -207,7 +207,7 @@ export default class VisualizationTile extends RoomObjectVisualization {
 
         let thickness = MapData.stepHeight * 2
 
-        ctx.interactive = true
+        ctx.eventMode = 'dynamic'
 
         if (this.useStroke)
             ctx.lineStyle(MapData.strokeDepth, 0x8a8a5c)

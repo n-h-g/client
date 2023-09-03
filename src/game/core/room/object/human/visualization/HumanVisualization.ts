@@ -92,7 +92,7 @@ export abstract class HumanVisualization extends EntityVisualization {
 
         this.entity.logic.events.emit(HumanEvents.HUMAN_RENDERING_COMPLETE)
 
-        this.container.interactive = true
+        this.container.eventMode = 'dynamic'
 
         this.entity.logic.registerEvents()
     }
@@ -106,8 +106,8 @@ export abstract class HumanVisualization extends EntityVisualization {
             Engine.getInstance()?.userInterfaceManager?.avatarImager.drawAvatar(placeholder)
         })
 
-        placeholder.Container.buttonMode = true
-        placeholder.Container.interactive = true
+        placeholder.Container.cursor = 'pointer'
+        placeholder.Container.eventMode = 'dynamic'
         placeholder.Container.interactiveChildren = true
 
         this.container = this._avatar.Container

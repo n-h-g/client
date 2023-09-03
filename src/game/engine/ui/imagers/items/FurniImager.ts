@@ -9,14 +9,13 @@ import { Sprite, Texture } from 'pixi.js'
 import { FurnidataItemType } from './enum/FurniDataItemType'
 import { FurniSpriteUtils } from './utils/FurniSpriteUtils'
 import { FurniPlaceholder } from './FurniPlaceholder'
+import { Repository } from '../../../../core/Repository'
 
 export default class FurniImager {
 
     public static FPS: number = 36
 
-    private _textureCaches: Map<string, Texture> 
-
-    private _spriteCaches: Sprite[]
+    private _textureCaches: Repository<string, Texture> 
 
     private ready: boolean
     
@@ -41,7 +40,7 @@ export default class FurniImager {
             wallItems: {}
         };
 
-        this._textureCaches = new Map();
+        this._textureCaches = new Repository();
     }
 
     public async init(): Promise<void> {
@@ -166,7 +165,6 @@ export default class FurniImager {
         })
     }
 
-
     private fetchOffsetAsync(uniqueName: string) {
         //console.log('downloading ..' + Engine.getInstance().getConfig().proxyUrl + Engine.getInstance().getConfig().itemsResourcesUrl + uniqueName + '/' + uniqueName + '.json');
         return new Promise((resolve, reject) => {
@@ -177,7 +175,7 @@ export default class FurniImager {
     }
     
     public addTexture(id: string, texture: Texture): void {
-        this._textureCaches.set(id, texture)
+        this._textureCaches.add(id, texture)
     }
 
     public hasTexture(id: string): boolean {
