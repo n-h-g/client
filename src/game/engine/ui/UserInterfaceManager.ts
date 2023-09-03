@@ -23,9 +23,9 @@ export class UserInterfaceManager {
     constructor() {
         this._componentsManager = new ComponentsManager()
 
-        if(!Engine.getInstance().config.offlineMode) {
+        if (!Engine.getInstance().config.offlineMode) {
             this._componentsManager.loadGameComponents()
-             this._componentsManager.initGameComponents()
+            this._componentsManager.initGameComponents()
         }
 
         this._soundManager = new SoundManager(this)

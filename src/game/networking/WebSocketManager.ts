@@ -14,12 +14,10 @@ export class WebSocketManager {
     private _networkingManager: NetworkingManager
 
     constructor(networkingManager: NetworkingManager) {
-
         this._networkingManager = networkingManager;
 
-        if (Engine.getInstance()?.config.debug) {
+        if (Engine.getInstance()?.config.debug)
             Logger.debug('Connection url: ' + this.webSocketUrl);
-        }
 
         this.webSocket = new WebSocket(this.webSocketUrl)
         this.setUpWebSocketEvents()
@@ -35,13 +33,11 @@ export class WebSocketManager {
     }
 
     private setUpWebSocketEvents(): void {
-        this.webSocket.onopen = (event) => {
-            if (Engine.getInstance().config.debug) {
+        this.webSocket.onopen = () => {
+            if (Engine.getInstance().config.debug)
                 Logger.debug('Connected')
-            }
 
             Engine.getInstance().networkingManager.packetManager.applyOut(OutgoingPacket.PingRequest)
-
             this._closed = false
         }
 
@@ -54,26 +50,22 @@ export class WebSocketManager {
             }
 
             EventManager.emit<LoadingProgressEventData>(UIEvents.LOAD, {
-                width: 20,
+                width: 50,
                 message: 'Connection Error'
             })
         }
 
-        this.webSocket.onclose = (event) => {
+        this.webSocket.onclose = () => {
             this._closed = true
             this.reconnectCounter = 0
 
-            if (Engine.getInstance().config.server.reconnectOnFail) {
+            if (Engine.getInstance().config.server.reconnectOnFail)
                 setInterval(() => {
                     while(this._closed && this.reconnectCounter <= Engine.getInstance().config.server.reconnectOnFailTryTimes) { 
                         this.reconnectCounter++;
                         this.setUpWebSocketEvents();
                     }
                 }, 2001)
-                setTimeout(() => {
-
-                }, 4000)
-            }
         }
 
         window.onbeforeunload = () => this.disconnect()
@@ -91,14 +83,12 @@ export class WebSocketManager {
         this.webSocket.close()
     }
 
-
     public get closed(): boolean {
         return this._closed
     }
 
     public sendData(message: any): void {
-        if (!this._closed) {
-            this.webSocket.send(JSON.stringify(message));
-        }
+        if (!this._closed)
+            this.webSocket.send(JSON.stringify(message))
     }
 }

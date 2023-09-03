@@ -14,12 +14,9 @@ export class NetworkingManager {
     }
 
     public setUpPingRequest() : void {
-
-
         window.setInterval(() => {
             this.packetManager.applyOut(OutgoingPacket.PingRequest);
         }, 50000);
-
         window.onbeforeunload = () => {
             this.packetManager.applyOut(OutgoingPacket.DisconnectMessage);
         };
