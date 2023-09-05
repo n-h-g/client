@@ -34,7 +34,6 @@ export default class VisualizationTile extends RoomObjectVisualization {
     }
 
     private static calculateOffsetX(position: Point3d, type: TileType): number {
-        console.log(position)
         return (position?.getY() * MapData.tileHeight) - (position?.getX() * MapData.tileWidth) / 2
     }
 
