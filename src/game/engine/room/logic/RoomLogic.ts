@@ -6,7 +6,7 @@ import { Point, Sprite, Texture } from 'pixi.js'
 import { Viewport } from 'pixi-viewport'
 import { RoomPriority } from '../visualization/RoomPriority'
 import RoomVisualization from '../visualization/RoomVisualization'
-import Point3d from '../../../utils/point/Point3d'
+import { Point3d } from '../../../utils/point/Point3d'
 import RenderingUtils from '../../../utils/RenderingUtils'
 
 export class RoomLogic implements IRoomLogic {

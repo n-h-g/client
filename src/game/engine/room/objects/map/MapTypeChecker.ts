@@ -1,5 +1,5 @@
 import Point from '../../../../utils/point/Point'
-import Point3d from '../../../../utils/point/Point3d'
+import { Point3d } from '../../../../utils/point/Point3d'
 import { TileType } from './TileTypeEnum'
 
 export default class MapTypeChecker {

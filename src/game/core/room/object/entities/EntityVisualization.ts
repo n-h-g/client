@@ -1,7 +1,7 @@
 import { Direction } from '../../../objects/Direction'
 import RoomObjectVisualization from '../RoomObjectVisualization'
 import { Entity } from './Entity'
-import Point3d from '../../../../utils/point/Point3d'
+import { Point3d } from '../../../../utils/point/Point3d'
 import AvatarData from '../../../../engine/ui/imagers/avatars/enum/AvatarData'
 import { EntityEvents } from '../../../../engine/events/room/objects/entities/EntityEvents'
 import { Engine } from '../../../../Engine'

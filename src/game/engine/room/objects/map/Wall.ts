@@ -1,7 +1,7 @@
 import LogicWall from './logic/LogicWall'
 import VisualizationWall from './visualization/VisualizationWall'
 import { WallType } from './/WallTypeEnum'
-import Point3d from '../../../../utils/point/Point3d'
+import { Point3d } from '../../../../utils/point/Point3d'
 import { ColorRGB } from '../../../../utils/color/ColorRGB'
 import { RoomObjectController } from '../../../../core/room/object/RoomObjectController'
 import { IRoomMapObject } from '../../../../core/room/object/map/IRoomMapObject'
@@ -9,22 +9,21 @@ import { WallPlane } from './WallPlane'
 
 export class Wall extends RoomObjectController<VisualizationWall, LogicWall> implements IRoomMapObject {
     private _plane: WallPlane
-    private type: WallType
+    private _type: WallType
     private _color: ColorRGB
-    private corner: boolean
-    private last: boolean
+    private _corner: boolean
+    private _last: boolean
 
-    constructor(plane: WallPlane, id: string, position: Point3d, type: WallType, isCorner: boolean, isLast: boolean, color: ColorRGB) {
-        super(id, position, null, null)
+    constructor(plane: WallPlane, id: string, position: Point3d, type: WallType,
+                isCorner: boolean, isLast: boolean, color: ColorRGB) {
+        super(id)
 
         this._plane = plane
-
-        this.type = type
+        this._type = type
         this._color = color
-
-        this.corner = isCorner
-        this.last = isLast;
-
+        this._corner = isCorner
+        this._last = isLast;
+        this.position = position
         this.visualization = new VisualizationWall(this)
         this.logic = new LogicWall(this)
     }
@@ -33,19 +32,40 @@ export class Wall extends RoomObjectController<VisualizationWall, LogicWall> imp
         return this._color
     }
 
-    public getType(): WallType {
-        return this.type
+    public get type(): WallType {
+        return this._type
     }
 
-    public isCorner(): boolean {
-        return this.corner
+    public get corner(): boolean {
+        return this._corner
     }
 
-    public isLast(): boolean {
-        return this.last
+    public get last(): boolean {
+        return this._last
     }
 
     public get plane(): WallPlane {
         return this._plane
+    }
+    
+    /**
+    * @deprecated Use property "type"
+    */
+    public getType(): WallType {
+        return this._type
+    }
+
+    /**
+    * @deprecated Use property "corner"
+    */
+    public isCorner(): boolean {
+        return this._corner
+    }
+
+    /**
+    * @deprecated Use property "last"
+    */
+    public isLast(): boolean {
+        return this._last
     }
 }

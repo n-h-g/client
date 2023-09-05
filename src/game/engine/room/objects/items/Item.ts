@@ -1,7 +1,7 @@
 import { Entity } from '../../../../core/room/object/entities/Entity'
 import { ItemLogic } from '../../../../core/room/object/items/logic/ItemLogic'
 import { ItemVisualization } from '../../../../core/room/object/items/visualization/ItemVisualization'
-import Point3d from '../../../../utils/point/Point3d'
+import { Point3d } from '../../../../utils/point/Point3d'
 import FurniBase from '../../../ui/imagers/items/FurniBase'
 import ItemLogicBasic from './logic/ItemLogicBasic'
 import ItemLogicMultiState from './logic/ItemLogicMultiState'

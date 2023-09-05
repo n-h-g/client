@@ -3,7 +3,7 @@ import RoomObjectVisualization from '../../../../../core/room/object/RoomObjectV
 import MapData from '../MapData'
 import RoomVisualizationColorData from '../../../visualization/RoomVisualizationColorData'
 import { TileType } from '../TileTypeEnum'
-import Point3d from '../../.././../../utils/point/Point3d'
+import { Point3d } from '../../.././../../utils/point/Point3d'
 import { ColorRGB} from '../../../../../utils/color/ColorRGB'
 import { NormalType } from '../../../visualization/NormalTypeEnum'
 import { Container, Graphics, ObservablePoint } from 'pixi.js'
@@ -34,15 +34,16 @@ export default class VisualizationTile extends RoomObjectVisualization {
     }
 
     private static calculateOffsetX(position: Point3d, type: TileType): number {
-        return (position.getY() * MapData.tileHeight) - (position.getX() * MapData.tileWidth) / 2
+        console.log(position)
+        return (position?.getY() * MapData.tileHeight) - (position?.getX() * MapData.tileWidth) / 2
     }
 
     private static calculateOffsetY(position: Point3d, type: TileType): number {
-        return (position.getY() * MapData.tileHeight) / 2 + (position.getX() * MapData.tileWidth) / 4 - ((position.getZ() + (type == TileType.Door && position.getZ() == 0 ? 1 : 0)) * MapData.thickSpace * MapData.stairSteps)
+        return (position?.getY() * MapData.tileHeight) / 2 + (position?.getX() * MapData.tileWidth) / 4 - ((position?.getZ() + (type == TileType.Door && position.getZ() == 0 ? 1 : 0)) * MapData.thickSpace * MapData.stairSteps)
     }
 
     private static calculateZIndex(position: Point3d, type: TileType): number {
-        return (1 * position.getX()) + (1 * position.getY()) + (1 * (position.getZ() + type == TileType.Door && position.getZ() == 0 ? 1 : 0))
+        return (1 * position?.getX()) + (1 * position?.getY()) + (1 * (position?.getZ() + type == TileType.Door && position?.getZ() == 0 ? 1 : 0))
     }
 
     public render(): void {

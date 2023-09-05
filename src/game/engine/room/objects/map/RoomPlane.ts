@@ -1,5 +1,4 @@
 import { RoomPlaneType } from './RoomPlaneTypeEnum'
-import Point3d from '../../../../utils/point/Point3d'
 import LogicPlane from './logic/LogicPlane'
 import VisualizationPlane from './visualization/VisualizationPlane'
 import RoomLayout from '../../RoomLayout'
@@ -9,10 +8,10 @@ import { IRoomMapObject } from '../../../../core/room/object/map/IRoomMapObject'
 export abstract class RoomPlane extends RoomObjectController<VisualizationPlane, LogicPlane> {
     private _room: RoomLayout
     private _type: RoomPlaneType
-    private objectList: Array<IRoomMapObject> = new Array<IRoomMapObject>()
+    private _mapObjects: Array<IRoomMapObject> = new Array<IRoomMapObject>()
 
     constructor(room: RoomLayout, type: RoomPlaneType) {
-        super('plane' + type, new Point3d(0, 0, 0), null, null)
+        super('plane' + type)
         this._room = room
         this._type = type
         this.logic = new LogicPlane(this)
@@ -20,11 +19,11 @@ export abstract class RoomPlane extends RoomObjectController<VisualizationPlane,
     }
 
     public addObject(obj: IRoomMapObject): void {
-        this.objectList.push(obj)
+        this._mapObjects.push(obj)
     }
 
     public get mapObjects(): Array<IRoomMapObject> {
-        return this.objectList
+        return this._mapObjects
     }
 
     public get type(): RoomPlaneType {

@@ -9,7 +9,7 @@ import AvatarPlaceHolder from '../../../../../engine/ui/imagers/avatars/AvatarPl
 import { ActionId } from '../../../../../engine/ui/imagers/avatars/enum/actions/ActionId'
 import AvatarData from '../../../../../engine/ui/imagers/avatars/enum/AvatarData'
 import Point from '../../../../../utils/point/Point'
-import Point3d from '../../../../../utils/point/Point3d'
+import { Point3d } from '../../../../../utils/point/Point3d'
 import Rotation from '../../../../../utils/Rotation'
 import { Direction } from '../../../../objects/Direction'
 import { EntityVisualization } from '../../entities/EntityVisualization'

@@ -3,7 +3,7 @@ import { HumanVisualization } from "../../../../../core/room/object/human/visual
 import { Engine } from "../../../../../Engine";
 import { ActionId } from "../../../../../engine/ui/imagers/avatars/enum/actions/ActionId";
 import { Logger } from "../../../../../utils/Logger";
-import Point3d from "../../../../../utils/point/Point3d";
+import { Point3d } from "../../../../../utils/point/Point3d";
 import { MessageHandler } from "../../../../handler/MessageHandler";
 
 export default class UpdateEntity extends MessageHandler {

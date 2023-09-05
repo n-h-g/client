@@ -7,7 +7,7 @@ import { Tile } from '../objects/map/Tile'
 import { IRoomVisualization } from '../../../core/room/IRoomVisualization'
 import { RoomObjectController } from '../../../core/room/object/RoomObjectController'
 import { RoomLogic } from '../logic/RoomLogic'
-import Point3d from '../../../utils/point/Point3d'
+import { Point3d } from '../../../utils/point/Point3d'
 import { RoomPriority } from './RoomPriority'
 import { Engine } from '../../../Engine'
 

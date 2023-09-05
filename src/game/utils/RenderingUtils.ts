@@ -1,5 +1,5 @@
-import { Texture, Rectangle, TextureMatrix, Sprite, BaseTexture } from 'pixi.js'
-import Point3d from './point/Point3d'
+import { Texture, Rectangle } from 'pixi.js'
+import { Point3d } from './point/Point3d'
 
 export default class RenderingUtils {
     static arrayBufferToBase64(arrayBuffer: ArrayBuffer) {

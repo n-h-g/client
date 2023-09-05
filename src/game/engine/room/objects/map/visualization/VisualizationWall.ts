@@ -1,7 +1,7 @@
 import RoomObjectVisualization from '../../../../../core/room/object/RoomObjectVisualization'
 import MapData from '../MapData'
 import { WallType } from '../WallTypeEnum'
-import Point3d from '../../.././../../utils/point/Point3d'
+import { Point3d } from '../../.././../../utils/point/Point3d'
 import { ColorRGB } from '../../../../../utils/color/ColorRGB'
 import { NormalType } from '../../../visualization/NormalTypeEnum'
 import RoomVisualizationColorData from '../../../visualization/RoomVisualizationColorData'
@@ -57,7 +57,7 @@ export default class VisualizationWall extends RoomObjectVisualization {
             return
         }
 
-        switch (this.wall.getType()) {
+        switch (this.wall.type) {
             default:
                 return
 
@@ -92,7 +92,7 @@ export default class VisualizationWall extends RoomObjectVisualization {
     
         ctx.beginFill(wallTop) // top
 
-        if (this.wall.isCorner()) {
+        if (this.wall.corner) {
             ctx.moveTo(
                 this.offsetX,
                 this.offsetY + MapData.wallBlankTop);
@@ -227,7 +227,7 @@ export default class VisualizationWall extends RoomObjectVisualization {
         ctx.beginFill(wallTop); // top
         ctx.moveTo(this.offsetX, this.offsetY + MapData.wallBlankTop);
 
-        if (this.wall.isCorner()) {
+        if (this.wall.corner) {
             ctx.lineTo(
                 this.offsetX + (isLeft ? 0 : MapData.wallDepth - MapData.wallDepth),
                 this.offsetY - MapData.wallDepth / 2
@@ -263,8 +263,14 @@ export default class VisualizationWall extends RoomObjectVisualization {
         return this.wallContext;
     }
 
+    public get WallContextGraphics(): Graphics {
+        return this.wallCtx
+    }
+    
+    /**
+    * @deprecated Use property "WallContextGraphics"
+    */
     public getWallCtx(): Graphics | null {
         return this.wallCtx;
     }
-
 }

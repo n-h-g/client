@@ -1,5 +1,5 @@
 import Geometry from "../../../../../core/ui/imagers/avatars/geometry/Geometry";
-import Point3d from "../../../../../utils/point/Point3d";
+import { Point3d } from "../../../../../utils/point/Point3d";
 import { ICanvas, IGeometry, IGeometryElement, IType } from "../gamedata/IAvatarGeometry";
 import { AvatarCanvas } from "../structure/AvatarCanvas";
 import GeometryAvatarSet from "./GeometryAvatarSet";

@@ -1,4 +1,4 @@
-import Point3d from '../../../../utils/point/Point3d'
+import { Point3d } from '../../../../utils/point/Point3d'
 import FurniBase from '../../../ui/imagers/items/FurniBase'
 import Item from './Item'
 

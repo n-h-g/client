@@ -1,7 +1,6 @@
 import { Repository } from '../../core/Repository'
-import { MoveableLogic, MoveableVisualization, isMoveable } from '../../core/room/object/IMoveable'
 import { Entity } from '../../core/room/object/entities/Entity'
-import Point3d from '../../utils/point/Point3d'
+import { Point3d } from '../../utils/point/Point3d'
 import { EntityEvents } from '../events/room/objects/entities/EntityEvents'
 
 export class RoomEntityRepository extends Repository<string, Entity> {

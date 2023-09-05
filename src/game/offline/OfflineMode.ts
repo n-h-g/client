@@ -7,31 +7,22 @@ import { UserEntity } from "../engine/room/objects/users/UserEntity";
 import { ActionId } from "../engine/ui/imagers/avatars/enum/actions/ActionId";
 import { FurnidataItemType } from "../engine/ui/imagers/items/enum/FurniDataItemType";
 import Point from "../utils/point/Point";
-import Point3d from "../utils/point/Point3d";
+import { Point3d } from "../utils/point/Point3d";
 import Rotation from "../utils/Rotation";
 import { Tile } from "../engine/room/objects/map/Tile";
 
-export class  OfflineMode {
-
+export class OfflineMode {
     private _engine: Engine
-
-    private static _instance: OfflineMode
-
     private _entity: Entity
-
+    private static _instance: OfflineMode
     private static ENTITY_ID: string = "473674-34dfbnasb-43423"
-
     private static RANDOM_ITEMS: boolean = false
-
     private static ITEM: string = "hc_tv"
-
     private static NUMBER_OF_ITEMS = 1
-
     private static NUMBER_OF_USERS = 1
-
     private static ROOM_SIZE = 20
 
-    public constructor(engine: Engine) {
+    constructor(engine: Engine) {
         this._engine = engine
     }
 

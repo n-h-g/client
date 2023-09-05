@@ -2,7 +2,7 @@ import { RoomPlaneType } from './RoomPlaneTypeEnum'
 import { RoomPlane } from './RoomPlane'
 import MapTypeChecker from './MapTypeChecker'
 import { WallType } from './WallTypeEnum'
-import Point3d from '../../../../utils/point/Point3d'
+import { Point3d } from '../../../../utils/point/Point3d'
 import { Wall } from './Wall'
 import RoomLayout from '../../RoomLayout'
 

@@ -1,5 +1,5 @@
 import Node3d from "../../../../../utils/node/Node3d";
-import Point3d from "../../../../../utils/point/Point3d";
+import { Point3d } from "../../../../../utils/point/Point3d";
 import { Item } from "../gamedata/IAvatarGeometry";
 
 export default class GeometryItem extends Node3d  {

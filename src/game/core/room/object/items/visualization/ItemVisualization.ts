@@ -8,7 +8,7 @@ import { RoomPriority } from '../../../../../engine/room/visualization/RoomPrior
 import RoomVisualization from '../../../../../engine/room/visualization/RoomVisualization'
 import { FurniData } from '../../../../../engine/ui/imagers/items/FurniData'
 import Point from '../../../../../utils/point/Point'
-import Point3d from '../../../../../utils/point/Point3d'
+import { Point3d } from '../../../../../utils/point/Point3d'
 import UiUtils from '../../../../../utils/UiUtils'
 import { EntityVisualization } from '../../entities/EntityVisualization'
 import { MoveableVisualization } from '../../IMoveable'
