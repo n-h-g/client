@@ -44,18 +44,18 @@ export class UserInterfaceManager {
             this._ready = true;
 
             EventManager.emit<LoadingProgressEventData>(UIEvents.LOAD, {
-                width: 50,
-                message: 'Logged'
+                width: 20,
+                message: 'Assets loaded'
             })
-             
         } catch(e) {
             this._ready = false;
 
-            Logger.error(e)
+            if (Engine.getInstance()?.config?.debug)
+                Logger.error(e)
 
             EventManager.emit<LoadingProgressEventData>(UIEvents.LOAD, {
-                width: 0,
-                message: 'Assets loading failed'
+                width: 20,
+                message: 'Failed assets loading'
             })
         }
     }

@@ -34,7 +34,7 @@
                     Pick</div>
 
                 <div class="previewButton" ref="useItemButton" id="useItemButton"
-                    :class="{hidden: false}" @click.stop="useItem()" v-if="entity ? isAnimated(): true">
+                    :class="{hidden: false}" @click.stop="useItem()" v-if="entity ? isAnimated() : false">
                     Use</div>
             </div>
         </div>
@@ -73,14 +73,13 @@ EventManager.read(UIEvents.PREVIEW_BOX_MODE, (evt: PreviewModeEventData) => {
 function isAnimated() {
     let item = Engine.getInstance()?.roomService?.CurrentRoom?.roomEntityRepository?.get(entity.value.id) as Item
 
-    return item.base.data.visualizationType == "furniture_animated"
+    return item.base.data.visualization.type == 'furniture_animated'
 }
 
 function moveItem() {
     let item = Engine.getInstance()?.roomService?.CurrentRoom?.roomEntityRepository?.get(entity.value.id) as Item
-    let visualization = item.logic as ItemLogic
 
-    Engine.getInstance().roomService.CurrentRoom.roomEntityRepository.setRollingEntity(item);
+    Engine.getInstance()?.roomService?.CurrentRoom?.roomEntityRepository?.setRollingEntity(item);
 }
 
 function pickItem() {

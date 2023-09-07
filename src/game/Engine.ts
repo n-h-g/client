@@ -7,7 +7,6 @@ import { CommandService } from './engine/game/commands/CommandService'
 import * as PIXI from "pixi.js"
 import { OfflineMode } from './offline/OfflineMode'
 import ChatMessageService from './engine/game/chat/ChatService'
-import { Logger } from './utils/Logger'
 
 export class Engine {
     private static _instance: Engine
@@ -50,36 +49,31 @@ export class Engine {
             resizeTo: window
         })
 
-        document.body.appendChild(this.application.view)
+        document.body.appendChild(this._application.view)
 
         this._roomsService = new RoomService()
         this._commandService = new CommandService()
         this._chatService = new ChatMessageService()
 
-
-        this.application.init()
+        this._application.init()
 
         this._userInterfaceManager = new UserInterfaceManager()
-
-        this._userInterfaceManager.init().then(() => {
-            this._networkingManager = new NetworkingManager()
-        
-            if (this._config.debug) {
-                (window as any).engine = this
+        await this._userInterfaceManager.init()
+        if (this._config.offlineMode) {
+            try {
+                (new OfflineMode(this).init().catch((err) =>{
+                    throw err;
+                }))
+            } catch(e) {
+                throw new e;
             }
+        } else {
+            this._networkingManager = new NetworkingManager();
+        }
 
-            //0000000000000000000000000/0000000000044444444444444/0000000000044444444444444/0000000000044444444444444/0000000000444444444444444/0000000000044444444444444/0000000000044444444444444/0000000444444444444444444/0000000444444444444444444/0000000444444444444444444/0000000444444444444444444/0000000444444444444444444/0000000444444444444444444/0555554444400000000000000/0555554444400000000000000/0555554444443330011111100/0555554444443330011111100/0005500000000330011111100/0004400000000220011111100/0004443333332222111111100/0004443333332222111111100/0000000000000000011111100/0000000000000000011111100/0000000000000000011111100/0000000000000000011111100/0000000000000000000000000
-            //00000000000000000000000000000/03333333333333333333333333330/03333333333333333333333333330/33333333333333333333333333330/03333333333333333333333333330/03333000000333333000000033330/03333000000222222000000033330/03333002222222222222220033330/03333002222222222222220033330/03333002200022220000220033330/03333002200011110000220033330/03333322201111111100220033330/03333322201111111100220033330/03333322201111111100220033330/03333322201111111100220033330/03333322201111111100220033330/03333322201111111100220033330/03333002200000000000220033330/03333002200000000000220033330/03333002222222222222220033330/03333002222222222222220033330/03333000000000000000000033330/03333000000000000000000033330/03333333333333333333333333330/03333333333333333333333333330/03333333333333333333333333330/03333333333333333333333333330/00000000000000000000000000000
-            if (this._config.offlineMode) {
-                try {
-                    (new OfflineMode(this).init().catch((err) =>{
-                        throw err;
-                    }))
-                } catch(e) {
-                    throw new e;
-                }
-            }
-        })
+        if (this._config.debug) {
+            (window as any).nhg = this
+        }
     }
     public get config(): typeof generalConfig {
         return this._config;

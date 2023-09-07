@@ -42,6 +42,7 @@ export default class LogicTile extends RoomObjectLogic {
             return
         }
 
+        console.log(this.tile.plane.room.getRoom().roomEntityRepository.isEntityRolling())
         if(this.tile.plane.room.getRoom().roomEntityRepository.isEntityRolling()) {
             this.tile.plane.room.getRoom().roomEntityRepository.stopRollingEntity()
         }

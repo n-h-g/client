@@ -47,21 +47,17 @@ export class Furni extends RoomObjectSprite {
         this.container.sortableChildren = true
     }
 
-    public async init() {
+    public async init(): Promise<void> {
         if (this._isPlaceholder)
             return
 
-        return new Promise<void>((res, rej)  => {
-            if(Engine.getInstance()?.userInterfaceManager?.furniImager?.hasTexture(this._furniBase.itemName)) {
-                this._textureCache = Engine.getInstance()?.userInterfaceManager?.furniImager?.getTexture(this._furniBase.itemName)
-            } else {
-                this._furniBase.downloadSpritesheet().then(async (texture: Texture) => { 
-                    this._textureCache = texture
-                    Engine.getInstance()?.userInterfaceManager?.furniImager?.addTexture(this._furniBase.itemName, texture)
-                    res()
-                })
-            }
-        })
+        if (Engine.getInstance()?.userInterfaceManager?.furniImager?.hasTexture(this._furniBase.itemName))
+            this._textureCache = Engine.getInstance()?.userInterfaceManager?.furniImager?.getTexture(this._furniBase.itemName)
+        else {
+            const texture: Texture = await this._furniBase.downloadSpritesheet()
+            this._textureCache = texture
+            Engine.getInstance()?.userInterfaceManager?.furniImager?.addTexture(this._furniBase.itemName, texture)
+        }
     }
 
     public update(needsUpdate: boolean = false) {
@@ -76,7 +72,7 @@ export class Furni extends RoomObjectSprite {
 
         this.updateSprites(true, 1)
 
-        if (this.furniBase.visualizationType !== RoomVisualizationType.FURNITURE_ANIMATED)
+        if (this._furniBase.visualizationType !== RoomVisualizationType.FURNITURE_ANIMATED)
             this._isPlaying = false
 
         this._events.onSpriteCreated()

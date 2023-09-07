@@ -44,7 +44,7 @@ export class PacketManager {
             18: new LoadInventoryItems,
         }
 
-        Object.keys(incomingPacketsHeader).forEach((index) => {
+        Object.keys(incomingPacketsHeader).forEach((index: string) => {
             let packet = incomingPacketsHeader[index];
             this._incomingPackets.set(parseInt(index), packet);
         });

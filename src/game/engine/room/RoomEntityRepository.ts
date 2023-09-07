@@ -14,8 +14,7 @@ export class RoomEntityRepository extends Repository<string, Entity> {
     }
 
     public isEntityRolling(): boolean {
-        if(this.rollingEntity != null)
-            return true;
+        return this.rollingEntity != null ? true : false
     }
 
     public stopRollingEntity() {

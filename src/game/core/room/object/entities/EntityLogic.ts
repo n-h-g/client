@@ -25,7 +25,7 @@ export abstract class EntityLogic extends RoomObjectLogic {
     }
 
     public dispose(): void {
-        Engine.getInstance().userInterfaceManager.componentsManager.getComponent<IComponentShowableUI>(UIComponent.PreviewBoxUI).hide()
+        Engine.getInstance()?.userInterfaceManager?.componentsManager?.getComponent<IComponentShowableUI>(UIComponent.PreviewBoxUI).hide()
     }
 
     public onHover(): void {

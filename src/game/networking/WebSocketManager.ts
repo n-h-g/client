@@ -79,7 +79,7 @@ export class WebSocketManager {
 
     public disconnect() {
         Logger.info("Disconnected");
-        this._networkingManager.packetManager.applyOut(OutgoingPacket.DisconnectMessage);
+        this._networkingManager.packetManager.applyOut(OutgoingPacket.DisconnectMessage)
         this.webSocket.close()
     }
 
