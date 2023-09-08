@@ -44,8 +44,6 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import { EventManager } from '../../../game/core/events/EventManager'
-import { ItemLogic } from '../../../game/core/room/object/items/logic/ItemLogic'
-import { ItemVisualization } from '../../../game/core/room/object/items/visualization/ItemVisualization'
 import { Engine } from '../../../game/Engine'
 import { DialogEventData } from '../../../game/engine/events/ui/data/general/Dialog'
 import { PreviewModeEventData } from '../../../game/engine/events/ui/data/general/PreviewUserData'
@@ -71,13 +69,22 @@ EventManager.read(UIEvents.PREVIEW_BOX_MODE, (evt: PreviewModeEventData) => {
 })
 
 function isAnimated() {
-    let item = Engine.getInstance()?.roomService?.CurrentRoom?.roomEntityRepository?.get(entity.value.id) as Item
+    const item = Engine.getInstance()?.roomService?.CurrentRoom?.roomEntityRepository?.get(entity.value.id) as Item
 
     return item.base.data.visualization.type == 'furniture_animated'
 }
 
 function moveItem() {
-    let item = Engine.getInstance()?.roomService?.CurrentRoom?.roomEntityRepository?.get(entity.value.id) as Item
+    if (entity.value.id == null)
+        return
+
+    const item = Engine.getInstance()?.roomService?.CurrentRoom?.roomEntityRepository?.get(entity.value.id) as Item
+
+    if (item == null)
+        return
+
+    if (Engine.getInstance()?.roomService?.CurrentRoom?.roomEntityRepository?.isEntityRolling())
+        return
 
     Engine.getInstance()?.roomService?.CurrentRoom?.roomEntityRepository?.setRollingEntity(item);
 }

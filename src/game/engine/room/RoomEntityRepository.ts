@@ -4,13 +4,10 @@ import { Point3d } from '../../utils/point/Point3d'
 import { EntityEvents } from '../events/room/objects/entities/EntityEvents'
 
 export class RoomEntityRepository extends Repository<string, Entity> {
-
     public rollingEntity: Entity
 
     public constructor() {
         super()
-
-        this.rollingEntity = null;
     }
 
     public isEntityRolling(): boolean {
@@ -18,7 +15,7 @@ export class RoomEntityRepository extends Repository<string, Entity> {
     }
 
     public stopRollingEntity() {
-        if(this.rollingEntity == null) return;
+        if (this.rollingEntity == null) return
 
         this.rollingEntity.logic.events.emit(EntityEvents.STOP_ROLL)
 
@@ -26,8 +23,7 @@ export class RoomEntityRepository extends Repository<string, Entity> {
     }
 
     public updateRollingEntity(position: Point3d) {
-
-        if(!this.rollingEntity) return;
+        if (this.rollingEntity == null) return
 
         this.rollingEntity.visualization.setNextPosition(position)
 
@@ -35,10 +31,9 @@ export class RoomEntityRepository extends Repository<string, Entity> {
     }
 
     public setRollingEntity(entity: Entity) {
+        if (entity == null) return
 
-        if(entity == null) return;
-
-        this.rollingEntity = entity;
+        this.rollingEntity = entity
     }
 
     public tick(delta: number) {

@@ -32,7 +32,7 @@ export abstract class ItemLogic extends EntityLogic implements MoveableLogic{
     }
 
     public onPositionChanged(): void {
-      
+        
     }   
 
     public placeItem() {
@@ -50,6 +50,7 @@ export abstract class ItemLogic extends EntityLogic implements MoveableLogic{
     }
 
     public onClick(): void {
+        console.log('cycled on click')
         super.onClick()
     }
 
