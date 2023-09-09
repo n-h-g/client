@@ -27,7 +27,7 @@ export class  OfflineMode {
 
     private static NUMBER_OF_ITEMS = 1
 
-    private static NUMBER_OF_USERS = 1
+    private static NUMBER_OF_USERS = 1000
 
     private static ROOM_SIZE = 20
 
