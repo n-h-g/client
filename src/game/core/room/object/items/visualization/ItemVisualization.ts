@@ -35,12 +35,10 @@ export abstract class ItemVisualization extends EntityVisualization implements M
 
     public draw(): void {
         if (Engine.getInstance().roomService?.CurrentRoom) {
-
             let temp: Container = this.sprite.container;
 
-            if(this.container) {
+            if (this.container)
                 this.sprite.reset()
-            }
 
             this.sprite.update(true)
 
@@ -50,7 +48,6 @@ export abstract class ItemVisualization extends EntityVisualization implements M
 
             Engine.getInstance().roomService?.CurrentRoom?.roomLayout.Visualization.container?.addChild(this.container)
             this.updatePosition()
-            this.entity.logic.registerEvents()
         }
     }
 
@@ -86,10 +83,8 @@ export abstract class ItemVisualization extends EntityVisualization implements M
     }
 
     public async render(): Promise<void> {
-
-        if(this.container) {
+        if (this.container)
             this.container.removeChildren()
-        }
 
         try {
             const sprite = await Engine.getInstance().userInterfaceManager.furniImager.loadFurniSprite(FurnidataItemType.FloorItem, this.entity.name)
@@ -119,11 +114,12 @@ export abstract class ItemVisualization extends EntityVisualization implements M
 
         //console.log(this.sprite.container)
 
-        if(!this._entity) return;
+        if (!this._entity) return
 
-        let spriteZIndex = (this._entity as Item).base.getLogicDimension(2)
+        let item = this._entity as Item
+        let spriteZIndex = item.base.getLogicDimension(2)
         
-        if(!this.sprite.container) return;
+        if (!this.sprite.container) return
 
         this.sprite.container.zIndex = this.getZIndex(spriteZIndex)
 
@@ -131,7 +127,7 @@ export abstract class ItemVisualization extends EntityVisualization implements M
 
         this.container = this.sprite.container;
         if (Engine.getInstance().roomService?.CurrentRoom) {
-            Engine.getInstance().roomService?.CurrentRoom?.roomLayout.Visualization.container?.addChild(this.sprite.container)
+            Engine.getInstance().roomService?.CurrentRoom?.roomLayout?.Visualization?.container?.addChild(this.sprite.container)
             
             this.updatePosition()
         }

@@ -142,13 +142,13 @@ export abstract class HumanVisualization extends EntityVisualization {
         return RoomVisualization.calculateZIndex(new Point3d(this.entity.position.getX(), this.entity.position.getY(), this.entity.position.getZ() + 0.001), isAtDoor ? RoomPriority.DOOR_FLOOR_USER : RoomPriority.USER)
     }
 
-    public calculateOffsetY() {
+    public calculateOffsetY(): number {
         let tile: Tile = Engine.getInstance().roomService.CurrentRoom.roomLayout.getFloorPlane().getTilebyPosition(new Point(Math.round(this._entity.position.getX()), Math.round(this.entity.position.getY())))
         let offsetFloor = tile!.position.getZ() > 0 ? -MapData.thickSpace * MapData.stepHeight * tile!.position.getZ() : -AvatarData.AVATAR_TOP_OFFSET
         return this.container!.y = ((this.entity.position.getX() + this.entity.position.getY()) * MapData.tileHeight / 2) + (MapData.tileHeight / 2) + offsetFloor
     }
 
-    public calculateOffsetX() {
+    public calculateOffsetX(): number {
         return (((this.entity.position.getY() - this.entity.position.getX()) * MapData.tileWidth / 2) + (MapData.tileWidth / 2)) - MapData.tileWidth / 2
     }
 

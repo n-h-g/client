@@ -86,7 +86,7 @@ function moveItem() {
     if (Engine.getInstance()?.roomService?.CurrentRoom?.roomEntityRepository?.isEntityRolling())
         return
 
-    Engine.getInstance()?.roomService?.CurrentRoom?.roomEntityRepository?.setRollingEntity(item);
+    Engine.getInstance()?.roomService?.CurrentRoom?.roomEntityRepository?.setRollingEntity(item)
 }
 
 function pickItem() {

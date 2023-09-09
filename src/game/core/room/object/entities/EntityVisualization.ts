@@ -77,9 +77,9 @@ export abstract class EntityVisualization extends RoomObjectVisualization {
 
     public abstract nextFrame(): void
 
-    public abstract calculateOffsetX()
+    public abstract calculateOffsetX(): number
 
-    public abstract calculateOffsetY()
+    public abstract calculateOffsetY(): number
 
     public abstract getZIndex(): number
 
@@ -99,7 +99,6 @@ export abstract class EntityVisualization extends RoomObjectVisualization {
     }
 
     public dispose(): void {
-
         super.dispose()
     }
 

@@ -36,10 +36,10 @@ export abstract class ItemLogic extends EntityLogic implements MoveableLogic{
     }   
 
     public placeItem() {
-        Engine.getInstance().networkingManager?.packetManager.applyOut(OutgoingPacket.RoomPickupItemEvent, {
+        Engine.getInstance().networkingManager?.packetManager?.applyOut(OutgoingPacket.RoomPickupItemEvent, {
             id: this.entity.id
         })
-        Engine.getInstance().networkingManager?.packetManager.applyOut(OutgoingPacket.RoomPlaceItemEvent, {
+        Engine.getInstance().networkingManager?.packetManager?.applyOut(OutgoingPacket.RoomPlaceItemEvent, {
             id: this.entity.id,
             x: this.entity.position.getX(),
             y: this.entity.position.getY(),
@@ -50,14 +50,13 @@ export abstract class ItemLogic extends EntityLogic implements MoveableLogic{
     }
 
     public onClick(): void {
-        console.log('cycled on click')
         super.onClick()
     }
 
     public toggleMovement(value: boolean): void {
-        this._roll = value;
-        this.entity.visualization.needsUpdate = value;
-        this.entity.visualization.container.alpha = value ? FurniData.LOADING_ALPHA : FurniData.DEFAULT_ALPHA;
+        this._roll = value
+        this.entity.visualization.needsUpdate = value
+        this.entity.visualization.container.alpha = value ? FurniData.LOADING_ALPHA : FurniData.DEFAULT_ALPHA
     }
 
     public onMove(delta: number): void {
@@ -65,15 +64,13 @@ export abstract class ItemLogic extends EntityLogic implements MoveableLogic{
     }
 
     public tick(delta: number) {
-        if (this._roll) {
-            this.onMove(delta);
-        }
+        if (this._roll)
+            this.onMove(delta)
 
-        if(!this.entity) {
-            return;
-        }
+        if (!this.entity) 
+            return
 
-        if(this.entity.visualization.needsUpdate)
+        if (this.entity.visualization.needsUpdate)
             this.entity.visualization.draw()
     }
 

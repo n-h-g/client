@@ -31,22 +31,22 @@ export class FloorPlane extends RoomPlane {
     }
 
     public getRandomTile() {
+        let tiles = []
 
-        let tiles = [];
-
-        let tile = false;
+        let tile = false
 
         while(!tile) {
-            let object = this.mapObjects[Math.floor(Math.random()*this.mapObjects.length)];
+            let object = this.mapObjects[Math.floor(Math.random()*this.mapObjects.length)]
 
-            if(object instanceof Tile) {
-                if(object.type != TileType.Hole) {
-                    tile = true;
-                    return object;
+            if (object instanceof Tile) {
+                if (object.type != TileType.Hole) {
+                    tile = true
+                    return object
                 }
             }
 
         }
+
         return tiles;
     }
 
