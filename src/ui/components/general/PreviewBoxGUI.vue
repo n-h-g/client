@@ -70,22 +70,11 @@ EventManager.read(UIEvents.PREVIEW_BOX_MODE, (evt: PreviewModeEventData) => {
 
 function isAnimated() {
     const item = Engine.getInstance()?.roomService?.CurrentRoom?.roomEntityRepository?.get(entity.value.id) as Item
-
     return item.base.data.visualization.type == 'furniture_animated'
 }
 
 function moveItem() {
-    if (entity.value.id == null)
-        return
-
     const item = Engine.getInstance()?.roomService?.CurrentRoom?.roomEntityRepository?.get(entity.value.id) as Item
-
-    if (item == null)
-        return
-
-    if (Engine.getInstance()?.roomService?.CurrentRoom?.roomEntityRepository?.isEntityRolling())
-        return
-
     Engine.getInstance()?.roomService?.CurrentRoom?.roomEntityRepository?.setRollingEntity(item)
 }
 
