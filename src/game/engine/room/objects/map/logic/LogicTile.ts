@@ -42,9 +42,8 @@ export default class LogicTile extends RoomObjectLogic {
             return
         }
 
-        if(this.tile.plane.room.getRoom().roomEntityRepository.isEntityRolling()) {
+        if (this.tile.plane.room.getRoom().roomEntityRepository.isEntityRolling())
             this.tile.plane.room.getRoom().roomEntityRepository.stopRollingEntity()
-        }
 
         Engine.getInstance().networkingManager.packetManager.applyOut(OutgoingPacket.UserMove, {
             x: this.tile.position.getX(),

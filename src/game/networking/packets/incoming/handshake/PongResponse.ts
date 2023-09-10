@@ -6,22 +6,18 @@ import { MessageHandler } from "../../../handler/MessageHandler"
 import { OutgoingPacket } from "../../outgoing/OutgoingPacket"
 
 export class PongResponse extends MessageHandler {
-    
     public handle() {
         let engine = Engine.getInstance()
 
         if (this.message.data && engine.sso != "") {
-
             EventManager.emit<LoadingProgressEventData>(UIEvents.LOAD, {
-                width: 20,
+                width: 50,
                 message: 'Connected to the server'
             })
             
-            engine.networkingManager?.packetManager.applyOut(OutgoingPacket.LoginMessage,
-                {
-                    sso: String(engine.sso)
-                }
-            )
+            engine.networkingManager?.packetManager.applyOut(OutgoingPacket.LoginMessage, {
+                sso: engine.sso
+            })
         }
     }
 }

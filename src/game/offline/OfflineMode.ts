@@ -11,24 +11,15 @@ import Point3d from "../utils/point/Point3d";
 import Rotation from "../utils/Rotation";
 import { Tile } from "../engine/room/objects/map/Tile";
 
-export class  OfflineMode {
-
+export class OfflineMode {
     private _engine: Engine
-
-    private static _instance: OfflineMode
-
     private _entity: Entity
-
+    private static _instance: OfflineMode
     private static ENTITY_ID: string = "473674-34dfbnasb-43423"
-
     private static RANDOM_ITEMS: boolean = false
-
     private static ITEM: string = "hc_tv"
-
     private static NUMBER_OF_ITEMS = 1
-
     private static NUMBER_OF_USERS = 1000
-
     private static ROOM_SIZE = 20
 
     public constructor(engine: Engine) {
@@ -38,7 +29,7 @@ export class  OfflineMode {
     public static getInstance(): OfflineMode {
         return this._instance
     }
-    
+
     public async init() {
         if (!OfflineMode._instance) {
             OfflineMode._instance = this
@@ -49,7 +40,7 @@ export class  OfflineMode {
 
         let room = this._engine.roomService.setRoom("prova", generatedModel, new Point(0, 0), 200, '')
 
-        for(let i = 0; i < OfflineMode.NUMBER_OF_USERS; i++) {
+        for (let i = 0; i < OfflineMode.NUMBER_OF_USERS; i++) {
             const randomTile = room.roomLayout.getFloorPlane().getRandomTile() as Tile
 
 
@@ -60,9 +51,7 @@ export class  OfflineMode {
             this._entity.visualization.render()
         }
 
-
-       
-        for(let i = 0; i < OfflineMode.NUMBER_OF_ITEMS; i++) {
+        for (let i = 0; i < OfflineMode.NUMBER_OF_ITEMS; i++) {
             const randomTile = room.roomLayout.getFloorPlane().getRandomTile() as Tile
 
             const randomItem = this._engine.userInterfaceManager.furniImager.generateRandomItem()
@@ -72,12 +61,10 @@ export class  OfflineMode {
             item.visualization?.render()
             this._engine.roomService.CurrentRoom.roomEntityRepository.add(item.id, item)
         }
-          
     }
 
     public walk(point: Point3d) {
-
-        if(point == this._entity.position) {
+        if (point == this._entity.position) {
             (this._entity.visualization as HumanVisualization).removeAction(ActionId.WALK);
             (this._entity.visualization as HumanVisualization).addAction(ActionId.STAND)
             this._entity.visualization.needsUpdate = false

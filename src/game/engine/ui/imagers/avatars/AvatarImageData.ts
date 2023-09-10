@@ -38,7 +38,7 @@ export default class AvatarImageData implements IAvatarImageData {
         this.textures = new Map();
     }
 
-    public async loadGameData() {
+    public async loadGameData(): Promise<void> {
         this.figureData = await this.AvatarDownloadManager.loadConfigFile("FigureData");
         this.avatarGeometry = await this.AvatarDownloadManager.loadConfigFile("HabboAvatarGeometry");
         this.figureMap = await this.AvatarDownloadManager.loadConfigFile("FigureMap");
@@ -46,15 +46,6 @@ export default class AvatarImageData implements IAvatarImageData {
         this.avatarPartSets = await this.AvatarDownloadManager.loadConfigFile("HabboAvatarPartSets");
         this.avatarDrawOrder = await this.AvatarDownloadManager.loadConfigFile("AvatarDrawOrder");
         this.avatarAnimations = await this.AvatarDownloadManager.loadConfigFile("HabboAvatarAnimations");
-
-        while (this.figureData == undefined && this.avatarGeometry && undefined && this.figureMap == undefined && this.avatarDrawOrder == undefined && this.avatarPartSets == undefined && this.avatarAnimations == undefined) {
-            
-        }
-
-        return new Promise((resolve: any, reject: any) => {
-            resolve()
-        })
-
     }
 
     public getTexture(assetName: string): Texture | null {
@@ -66,7 +57,7 @@ export default class AvatarImageData implements IAvatarImageData {
     }
 
     public async loadTexture(assetName: string) {
-        if (!(this.textures.has(assetName))) {
+        if (!this.textures.has(assetName)) {
             const texture = await this.AvatarDownloadManager.loadTexture(assetName);
             this.textures.set(assetName, texture)
         }

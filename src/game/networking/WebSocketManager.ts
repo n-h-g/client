@@ -14,7 +14,6 @@ export class WebSocketManager {
     private _networkingManager: NetworkingManager
 
     constructor(networkingManager: NetworkingManager) {
-
         this._networkingManager = networkingManager;
 
         if (Engine.getInstance()?.config.debug) {
@@ -54,7 +53,7 @@ export class WebSocketManager {
             }
 
             EventManager.emit<LoadingProgressEventData>(UIEvents.LOAD, {
-                width: 20,
+                width: 50,
                 message: 'Connection Error'
             })
         }
@@ -87,7 +86,7 @@ export class WebSocketManager {
 
     public disconnect() {
         Logger.info("Disconnected");
-        this._networkingManager.packetManager.applyOut(OutgoingPacket.DisconnectMessage);
+        this._networkingManager.packetManager.applyOut(OutgoingPacket.DisconnectMessage)
         this.webSocket.close()
     }
 

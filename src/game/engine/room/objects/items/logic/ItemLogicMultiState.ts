@@ -4,7 +4,6 @@ import Item from '../Item'
 import { ItemVisualizationAnimated } from '../visualization/ItemVisualizationAnimated'
 
 export default class ItemLogicMultiState extends ItemLogic {
-
     private state: number = 0
 
     constructor(item: Item) {
@@ -17,7 +16,6 @@ export default class ItemLogicMultiState extends ItemLogic {
     }
 
     public changeState() {
-        console.log('changed state');
         let state = this.state;
 
         let item = this.entity as Item;
@@ -30,7 +28,7 @@ export default class ItemLogicMultiState extends ItemLogic {
         }
 
         //(item.visualization.container as FurniSprite).setAnimation(state);
-        
+
 
         //this.entity.visualization.needsUpdate = true
 

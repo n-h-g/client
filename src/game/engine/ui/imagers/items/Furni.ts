@@ -24,7 +24,7 @@ export class Furni extends RoomObjectSprite {
     private _isPlaceholder: boolean;
     private _multiplier: number = 1
     private _lastAnimation: number = 1
-    
+
     public constructor(furniBase: FurniBase, direction: number = 0, animation: number = 0, frame: number = 0, isIcon: boolean = false, isPlaceholder: boolean = false) {
         super();
 
@@ -41,27 +41,23 @@ export class Furni extends RoomObjectSprite {
         this._isPlaceholder = isPlaceholder;
 
         this._events = new FurniEvents()
-    
+
         this.container.eventMode = 'dynamic'
         this.container.visible = true
         this.container.sortableChildren = true
     }
 
-    public async init() {
+    public async init(): Promise<void> {
         if (this._isPlaceholder)
             return
 
-        return new Promise<void>((res, rej)  => {
-            if(Engine.getInstance()?.userInterfaceManager?.furniImager?.hasTexture(this._furniBase.itemName)) {
-                this._textureCache = Engine.getInstance()?.userInterfaceManager?.furniImager?.getTexture(this._furniBase.itemName)
-            } else {
-                this._furniBase.downloadSpritesheet().then(async (texture: Texture) => { 
-                    this._textureCache = texture
-                    Engine.getInstance()?.userInterfaceManager?.furniImager?.addTexture(this._furniBase.itemName, texture)
-                    res()
-                })
-            }
-        })
+        if (Engine.getInstance()?.userInterfaceManager?.furniImager?.hasTexture(this._furniBase.itemName))
+            this._textureCache = Engine.getInstance()?.userInterfaceManager?.furniImager?.getTexture(this._furniBase.itemName)
+        else {
+            const texture: Texture = await this._furniBase.downloadSpritesheet()
+            this._textureCache = texture
+            Engine.getInstance()?.userInterfaceManager?.furniImager?.addTexture(this._furniBase.itemName, texture)
+        }
     }
 
     public update(needsUpdate: boolean = false) {
@@ -76,14 +72,14 @@ export class Furni extends RoomObjectSprite {
 
         this.updateSprites(true, 1)
 
-        if (this.furniBase.visualizationType !== RoomVisualizationType.FURNITURE_ANIMATED)
+        if (this._furniBase.visualizationType !== RoomVisualizationType.FURNITURE_ANIMATED)
             this._isPlaying = false
 
         this._events.onSpriteCreated()
     }
 
     private loadPlaceHolder() {
-        this.downloadPlaceHolderTexture().then(async (texture: Texture) => { 
+        this.downloadPlaceHolderTexture().then(async (texture: Texture) => {
             this._textureCache = texture
             Engine.getInstance().userInterfaceManager.furniImager.addTexture(this._furniBase ? this._furniBase.itemName : null, texture)
 
@@ -110,59 +106,59 @@ export class Furni extends RoomObjectSprite {
         offsetDirection = ((((offsetDirection) % 360) + 360) % 360);
 
         const direction = this._furniBase.getValidDirection(offsetDirection)
-        
+
         const frame = this._isIcon
-          ? 0
-          : this._furniBase.getFrameFrom(
-              direction,
-              this._animation,
-              layer,
-              this._frame
+            ? 0
+            : this._furniBase.getFrameFrom(
+                direction,
+                this._animation,
+                layer,
+                this._frame
             );
 
         let assetName = this._furniBase.assetNameFrom(
-          this._isIcon ? 1 : FurniData.DEFAULT_SIZE,
-          this._isIcon ? 0 : layer,
-          direction,
-          frame
+            this._isIcon ? 1 : FurniData.DEFAULT_SIZE,
+            this._isIcon ? 0 : layer,
+            direction,
+            frame
         );
 
-        if(!assetName) {
+        if (!assetName) {
             Logger.debug("Unable to generate assetName");
             return;
         }
 
         let asset: FurniAsset = this._furniBase.getAsset(assetName)
-        if(!asset) {
+        if (!asset) {
             Logger.debug("No assets found");
             return;
         }
 
 
-        if(!asset.sprite) asset = this._furniBase.getAsset(asset.source)
+        if (!asset.sprite) asset = this._furniBase.getAsset(asset.source)
 
 
         let sprite = this.getSprite(asset)
         if (asset.isFlipped()) {
             sprite.scale.x = -1
-          }
+        }
 
-          let offsets: IOffsets = asset._offsets
+        let offsets: IOffsets = asset._offsets
 
-          if (!sprite) return
+        if (!sprite) return
 
-          sprite.pivot.x = offsets.left
-          sprite.pivot.y = offsets.top
+        sprite.pivot.x = offsets.left
+        sprite.pivot.y = offsets.top
 
-          if (!this._furniBase.hasLayers()) return; 
-        
-            sprite = this.updateSpriteFrom(
-                sprite,
-                this._direction,
-                this._furniBase.getLayer(layer)
-            )
+        if (!this._furniBase.hasLayers()) return;
 
-          this.container.addChild(sprite)
+        sprite = this.updateSpriteFrom(
+            sprite,
+            this._direction,
+            this._furniBase.getLayer(layer)
+        )
+
+        this.container.addChild(sprite)
     }
 
     private getSprite(asset: FurniAsset): Sprite {
@@ -173,7 +169,7 @@ export class Furni extends RoomObjectSprite {
 
         if (Engine.getInstance().userInterfaceManager.furniImager.hasTexture(asset.name))
             texture = Engine.getInstance()?.userInterfaceManager?.furniImager?.getTexture(asset.name)
-        else {   
+        else {
             texture = RenderingUtils.cropTexture(this._textureCache, asset.sprite.height, asset.sprite.width, asset.sprite.left, asset.sprite.top)
             Engine.getInstance()?.userInterfaceManager?.furniImager?.addTexture(asset.name, texture)
         }
@@ -195,10 +191,10 @@ export class Furni extends RoomObjectSprite {
             } else {
                 sprite.zIndex = 1 * this._furniBase.getDirection(direction).getOffsetZ()
             }
-            if(layer.alpha) {
+            if (layer.alpha) {
                 sprite.alpha = (layer.alpha / 255) * this._multiplier
             }
-            if(layer.ignoreMouse) {
+            if (layer.ignoreMouse) {
                 sprite.cursor = 'default'
             }
         } else {
@@ -214,7 +210,7 @@ export class Furni extends RoomObjectSprite {
             try {
                 const texture = Texture.from(configUrl)
                 resolve(texture)
-            }catch (e) {
+            } catch (e) {
                 throw e;
             }
         })

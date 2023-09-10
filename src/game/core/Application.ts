@@ -1,7 +1,6 @@
-import { Viewport } from 'pixi-viewport';
-import { Container, Point, Text, Application, IApplicationOptions, EventSystem } from 'pixi.js';
-import { Engine } from '../Engine';
-import { Events } from '../engine/events/Events';
+import { Viewport } from 'pixi-viewport'
+import { Container, Point, Text, Application, IApplicationOptions } from 'pixi.js'
+import { Engine } from '../Engine'
 
 export class ApplicationEngine extends Application<HTMLCanvasElement> {
     private _engine: Engine
@@ -9,7 +8,6 @@ export class ApplicationEngine extends Application<HTMLCanvasElement> {
     private _timeElapsed: number = 0
     private _viewport: Viewport
     private debugInfoContainer: Container
-
     private viewPortScreenCords: Point
 
     constructor(engine: Engine, options?: Partial<IApplicationOptions>) {
@@ -29,7 +27,7 @@ export class ApplicationEngine extends Application<HTMLCanvasElement> {
 
     public setUpViewport() {
         if (this._viewport != null)
-            this._viewport.destroy();
+            this._viewport.destroy()
 
         this._viewport = new Viewport({
             screenWidth: window.innerWidth,
@@ -53,7 +51,7 @@ export class ApplicationEngine extends Application<HTMLCanvasElement> {
     }
 
     public showDebugInfo(fps: number = this.ticker.FPS) {
-        for(let children of this.debugInfoContainer.children) {
+        for (let children of this.debugInfoContainer.children) {
             this.debugInfoContainer.removeChild(children)
         }
 

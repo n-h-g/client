@@ -12,13 +12,9 @@ import { FurniPlaceholder } from './FurniPlaceholder'
 import { Repository } from '../../../../core/Repository'
 
 export default class FurniImager {
-
     public static FPS: number = 36
-
     private _textureCaches: Repository<string, Texture> 
-
     private ready: boolean
-    
     private bases: {
         flooritem: {
             [id: string]: Promise<FurniBase>
@@ -44,33 +40,31 @@ export default class FurniImager {
     }
 
     public async init(): Promise<void> {
-        await Promise.all(this.loadFiles())
+        await this.loadFurnidata();
     }
 
-    private loadFiles(): Promise<void>[] {
-        return [
-            fetchJsonAsync(Engine.getInstance().config.itemsResourcesUrl + 'furnidata.json')
-                .then(data => {
-                    this.furnidata = data as Furnidata;
-                    this.ready = true;
-                })
-                .catch(err => {
-                    if (Engine.getInstance().config.debug) {
-                        Logger?.error('Cannot load furnidata')
-                    }
-                    this.ready = false;
-                }),
-        ];
+    private async loadFurnidata(): Promise<void> {
+        const data: Furnidata = await fetchJsonAsync<Furnidata>(Engine.getInstance()?.config?.itemsResourcesUrl + 'furnidata.json')
+        if (data == null) {
+            if (Engine.getInstance()?.config?.debug)
+                Logger.error('Cannot load furnidata')
+
+            this.ready = false
+            return
+        }
+
+        this.furnidata = data
+        this.ready = true
     }
 
     public generateRandomItem() {
-        let randomIndex = Math.floor((Math.random() * Object.values(this.furnidata.floorItems).length) );
+        let randomIndex = Math.floor((Math.random() * Object.values(this.furnidata.floorItems).length))
 
         const item = this.furnidata.floorItems[randomIndex]
 
-        if(!item) return;
+        if (!item) return
 
-        return item.className;
+        return item.className
     }
 
     private findItemByName(itemName: string) {
@@ -166,7 +160,6 @@ export default class FurniImager {
     }
 
     private fetchOffsetAsync(uniqueName: string) {
-        //console.log('downloading ..' + Engine.getInstance().getConfig().proxyUrl + Engine.getInstance().getConfig().itemsResourcesUrl + uniqueName + '/' + uniqueName + '.json');
         return new Promise((resolve, reject) => {
             fetchJsonAsync(Engine.getInstance().config.itemsResourcesUrl + uniqueName + '/' + uniqueName + '.json').then(data => {
                 resolve(data);

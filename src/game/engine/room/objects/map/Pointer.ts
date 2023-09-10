@@ -11,7 +11,7 @@ export default class Pointer extends RoomObjectController<VisualizationPointer, 
     private room: RoomLayout
 
     constructor(room: RoomLayout) {
-        super('roomPointer', new Point3d(0,0,0), null, null)
+        super('roomPointer')
 
         this.room = room
 
@@ -19,6 +19,7 @@ export default class Pointer extends RoomObjectController<VisualizationPointer, 
         this.getCanvas().width = MapData.tileWidth
         this.getCanvas().height = MapData.tileHeight
 
+        this.position = new Point3d(0, 0, 0)
         this.visualization = new VisualizationPointer(this)
         this.logic = new LogicPointer(this)
     }

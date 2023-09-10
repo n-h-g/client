@@ -15,7 +15,7 @@ export class Wall extends RoomObjectController<VisualizationWall, LogicWall> imp
     private last: boolean
 
     constructor(plane: WallPlane, id: string, position: Point3d, type: WallType, isCorner: boolean, isLast: boolean, color: ColorRGB) {
-        super(id, position, null, null)
+        super(id)
 
         this._plane = plane
 
@@ -25,6 +25,7 @@ export class Wall extends RoomObjectController<VisualizationWall, LogicWall> imp
         this.corner = isCorner
         this.last = isLast;
 
+        this.position = position
         this.visualization = new VisualizationWall(this)
         this.logic = new LogicWall(this)
     }

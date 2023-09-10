@@ -12,11 +12,12 @@ export class Tile extends RoomObjectController<VisualizationTile, LogicTile> {
     private _plane: FloorPlane
 
     constructor(plane: FloorPlane, id: string, position: Point3d, type: TileType, color: ColorRGB) {
-        super(id, position, null, null)
+        super(id)
 
         this._plane = plane
         this._type = type
         this._color = color
+        this.position = position
         this.visualization = new VisualizationTile(this)
         this.logic = new LogicTile(this)
     }

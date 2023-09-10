@@ -72,19 +72,19 @@ export abstract class EntityVisualization extends RoomObjectVisualization {
 
         this.updatePosition()
     }
-    
+
     public abstract draw(): void
 
     public abstract nextFrame(): void
 
-    public abstract calculateOffsetX()
+    public abstract calculateOffsetX(): number
 
-    public abstract calculateOffsetY()
+    public abstract calculateOffsetY(): number
 
     public abstract getZIndex(): number
 
     public updatePosition() {
-        if(!this.container) return;
+        if (!this.container) return;
 
         this.container.x = this.calculateOffsetX()
         this.container.y = this.calculateOffsetY()

@@ -18,7 +18,7 @@ export abstract class ItemVisualization extends EntityVisualization implements M
     protected position: Point3d
     protected iconImage: string
     public imagePreview: string
-    protected isIcon: boolean = false 
+    protected isIcon: boolean = false
 
     constructor(item: Item) {
         super(item)
@@ -30,27 +30,24 @@ export abstract class ItemVisualization extends EntityVisualization implements M
     }
 
     public nextFrame(): void {
-    
+
     }
 
     public draw(): void {
         if (Engine.getInstance().roomService?.CurrentRoom) {
-
             let temp: Container = this.sprite.container;
 
-            if(this.container) {
+            if (this.container)
                 this.sprite.reset()
-            }
 
             this.sprite.update(true)
 
             this.container = temp;
-    
+
             this.container.eventMode = 'dynamic'
 
             Engine.getInstance().roomService?.CurrentRoom?.roomLayout.Visualization.container?.addChild(this.container)
             this.updatePosition()
-            this.entity.logic.registerEvents()
         }
     }
 
@@ -86,10 +83,8 @@ export abstract class ItemVisualization extends EntityVisualization implements M
     }
 
     public async render(): Promise<void> {
-
-        if(this.container) {
+        if (this.container)
             this.container.removeChildren()
-        }
 
         try {
             const sprite = await Engine.getInstance().userInterfaceManager.furniImager.loadFurniSprite(FurnidataItemType.FloorItem, this.entity.name)
@@ -97,13 +92,13 @@ export abstract class ItemVisualization extends EntityVisualization implements M
             await sprite.init()
 
             let dir = sprite.furniBase.getUIDirection()
-            
+
             sprite.setDirection(dir)
 
             sprite.update(true)
 
             this.sprite = sprite
-        
+
         } catch (e) {
 
             const sprite = await Engine.getInstance().userInterfaceManager.furniImager.loadFurniPlaceholder(FurnidataItemType.FloorItem, this.entity.name)
@@ -113,17 +108,13 @@ export abstract class ItemVisualization extends EntityVisualization implements M
             sprite.update(true)
 
             this.sprite = sprite
-            
-            //console.log(this.container)
         }
 
-        //console.log(this.sprite.container)
-
-        if(!this._entity) return;
+        if (!this._entity) return;
 
         let spriteZIndex = (this._entity as Item).base.getLogicDimension(2)
-        
-        if(!this.sprite.container) return;
+
+        if (!this.sprite.container) return;
 
         this.sprite.container.zIndex = this.getZIndex(spriteZIndex)
 
@@ -132,7 +123,6 @@ export abstract class ItemVisualization extends EntityVisualization implements M
         this.container = this.sprite.container;
         if (Engine.getInstance().roomService?.CurrentRoom) {
             Engine.getInstance().roomService?.CurrentRoom?.roomLayout.Visualization.container?.addChild(this.sprite.container)
-            
             this.updatePosition()
         }
         this.entity.logic?.registerEvents()

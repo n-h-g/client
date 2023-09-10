@@ -12,9 +12,10 @@ export abstract class RoomPlane extends RoomObjectController<VisualizationPlane,
     private objectList: Array<IRoomMapObject> = new Array<IRoomMapObject>()
 
     constructor(room: RoomLayout, type: RoomPlaneType) {
-        super('plane' + type, new Point3d(0, 0, 0), null, null)
+        super('plane' + type)
         this._room = room
         this._type = type
+        this.position = new Point3d(0, 0, 0)
         this.logic = new LogicPlane(this)
         this.visualization = new VisualizationPlane(this)
     }

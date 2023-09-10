@@ -1,15 +1,18 @@
-export function fetchJsonAsync(url: string) {
-    return new Promise((res, rej) => {
-        const options: RequestInit = {
-            method: 'GET',
-            mode: 'cors',
-            cache: 'default',
-            credentials: 'omit'
-        };
+export async function fetchJsonAsync<T>(url: string): Promise<T> {
+    const options: RequestInit = {
+        method: 'GET',
+        mode: 'cors',
+        cache: 'default',
+        credentials: 'omit'
+    };
 
-        fetch(url, options)
-            .then(response => response.json())
-            .then(data => res(data))
-            .catch(err => rej(err))
-    })
+    const result = await fetch(url, options)
+    if (result == null)
+        return null;
+
+    const json = await result.json();
+    if (json == null)
+        return null;
+    
+    return json as T;
 }

@@ -71,37 +71,13 @@ EventManager.read(UIEvents.PREVIEW_BOX_MODE, (evt: PreviewModeEventData) => {
 })
 
 function isAnimated() {
-<<<<<<< HEAD
-    let item = Engine.getInstance()?.roomService?.CurrentRoom?.roomEntityRepository?.get(entity.value.id) as Item
-
-    return item.base.data.visualizationType == "furniture_animated"
-}
-
-function moveItem() {
-    let item = Engine.getInstance()?.roomService?.CurrentRoom?.roomEntityRepository?.get(entity.value.id) as Item
-    let visualization = item.logic as ItemLogic
-
-    Engine.getInstance().roomService.CurrentRoom.roomEntityRepository.setRollingEntity(item);
-=======
     const item = Engine.getInstance()?.roomService?.CurrentRoom?.roomEntityRepository?.get(entity.value.id) as Item
-
     return item.base.data.visualization.type == 'furniture_animated'
 }
 
 function moveItem() {
-    if (entity.value.id == null)
-        return
-
     const item = Engine.getInstance()?.roomService?.CurrentRoom?.roomEntityRepository?.get(entity.value.id) as Item
-
-    if (item == null)
-        return
-
-    if (Engine.getInstance()?.roomService?.CurrentRoom?.roomEntityRepository?.isEntityRolling())
-        return
-
     Engine.getInstance()?.roomService?.CurrentRoom?.roomEntityRepository?.setRollingEntity(item)
->>>>>>> parent of d287298 (Small changes)
 }
 
 function pickItem() {

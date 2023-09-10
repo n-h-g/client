@@ -4,46 +4,43 @@ import { IAsset } from '../../../../core/ui/imagers/items/IAsset'
 import { ILayer } from '../../../../core/ui/imagers/items/ILayer'
 import { fetchJsonAsync } from '../../../../utils/DownloadManager'
 import { Engine } from '../../../../Engine'
-import { FurniData } from './FurniData'
 import { FurniAsset } from './FurniAsset'
 import { VisualizationData } from './data/VisualizationData'
 import { LogicData } from './data/LogicData'
 import { FurniSpriteUtils } from './utils/FurniSpriteUtils'
 import { Layer } from './data/Layer'
+import { Repository } from '../../../../core/Repository'
 
 export default class FurniBase {
     private _data: IFurnidata
-    
     private _spritesheetData: IFurnidata
-
-    private spritesheet: Promise<PIXI.Texture>
-
+    private spritesheet: PIXI.Texture
     public itemName: string
-
     private _visualizationData: VisualizationData
-
     private _logicData: LogicData;
-
-    public _assets: Map<string, FurniAsset>
+    public _assets: Repository<string, FurniAsset>
 
     constructor(data: IFurnidata, itemName: string) {
         this._data = data
-
         this._spritesheetData = null
-
         this._visualizationData = null
-
         this._logicData = null
-
         this.spritesheet = null
-
         this.itemName = itemName
-
-        this._assets = new Map()
+        this._assets = new Repository()
     }
 
-    public init(): Promise<any> {
-        return Promise.all([
+    public async init(): Promise<Repository<string, FurniAsset>> {
+        const url = Engine.getInstance()?.config?.proxyUrl + Engine.getInstance()?.config?.itemsResourcesUrl + this.itemName + '/' + this.itemName + '.json'
+        var data: IFurnidata = await fetchJsonAsync<IFurnidata>(url)
+        if (data != null) {
+            this._visualizationData = new VisualizationData(data.visualization)
+            this._logicData = new LogicData(data.logic)
+            this.loadAssets(data.assets)
+        }
+
+        return this._assets
+        /*return Promise.all([
             new Promise((res, rej) => {
                 let url = Engine.getInstance().config.proxyUrl + Engine.getInstance().config.itemsResourcesUrl + this.itemName + '/' + this.itemName + '.json'
                 fetchJsonAsync(url).then(data => {
@@ -55,25 +52,24 @@ export default class FurniBase {
                     throw err;
                 })
             })
-        ])
+        ])*/
     }
 
     public loadAssets(assets: {[key: string]: IAsset }) {
-        if(assets) {
-            for(let asset of Object.keys(assets)) {
-                this._assets.set(asset, new FurniAsset(asset, (assets[asset] as IAsset)))
+        if (assets) {
+            for (let asset of Object.keys(assets)) {
+                this._assets.add(asset, new FurniAsset(asset, (assets[asset] as IAsset)))
             }
         }
     }
 
-
-    public downloadSpritesheet(): Promise<PIXI.Texture> {
+    public async downloadSpritesheet(): Promise<PIXI.Texture> {
         let configUrl = Engine.getInstance().config.proxyUrl + Engine.getInstance().config.itemsResourcesUrl + this.itemName + '/' + this.itemName + '.png'
 
-        const texture = PIXI.Assets.load(configUrl)
+        const texture = await PIXI.Assets.load<PIXI.Texture>(configUrl)
 
         if (this.spritesheet != undefined)
-            return Promise.resolve(this.spritesheet)
+            return null
 
         this.spritesheet = texture
 
@@ -81,10 +77,8 @@ export default class FurniBase {
     }
 
     public getLogicDimension(dim: number) {
-
-        if(!this._logicData.getDimensions()) return 0;
+        if (!this._logicData.getDimensions()) return 0;
         return this._logicData.getDimensions()[dim];
-
     }
 
     public getUIDirection(): number {
@@ -105,15 +99,14 @@ export default class FurniBase {
     }
 
     public getAvailableDirections(): number[] {
-        const directions: number[] = [];
-        const rawDirections = this.directions;
+        const directions: number[] = []
+        const rawDirections = this.directions
 
         for (let direction in rawDirections) {
             directions.push((parseInt(direction) % 90) * 2)
         }
 
-        return directions;
-
+        return directions
     }
 
 
@@ -139,8 +132,6 @@ export default class FurniBase {
     }
 
     public getFrameFromAsset(assetName: string): any {
-        console.log(this._spritesheetData)
-
         let frameName = this._spritesheetData!.assets[assetName + '.png']
 
         if (frameName == undefined) {
@@ -189,8 +180,6 @@ export default class FurniBase {
     public hasLayers(): boolean {
         return this._visualizationData.hasLayers()
     }
-
-
 
     public hasColorForLayer(color: number, layer: number): boolean {
         return this._visualizationData.hasColor(color) &&
@@ -274,6 +263,7 @@ export default class FurniBase {
     public get data() {
         return this._data
     }
+
     public getLayerCount() {
         return this._visualizationData.layerCount
     }
@@ -283,7 +273,6 @@ export default class FurniBase {
     }
 
     public get directions(): number[] {
-
         return this.data.logic.directions!.map((direction) => direction / 90 * 2)
     }
 }

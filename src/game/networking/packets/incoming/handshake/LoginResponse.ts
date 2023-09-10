@@ -9,25 +9,18 @@ import { GameLoaderUI } from '../../../../engine/ui/components/loader/GameLoader
 
 export class LoginResponse extends MessageHandler {
     public handle(): void {
-
-        if(Engine.getInstance().config.offlineMode) return;
+        if (Engine.getInstance().config.offlineMode) return
 
         if (this.message.data) {
-
-            let GameLoaderUI = Engine.getInstance().userInterfaceManager.componentsManager.getComponent(UIComponent.GameLoaderUI) as GameLoaderUI
-            
-            if(GameLoaderUI.progress == 20 && Engine.getInstance().userInterfaceManager.ready) {
-
+            let GameLoaderUI: GameLoaderUI = Engine.getInstance().userInterfaceManager.componentsManager.getComponent<GameLoaderUI>(UIComponent.GameLoaderUI)
+            if (GameLoaderUI.progress == 50 && Engine.getInstance().userInterfaceManager.ready)
                 EventManager.emit<LoadingProgressEventData>(UIEvents.LOAD, {
                     width: 100,
                     message: 'Logged'
                 })
 
-            }
-
-            Engine.getInstance().networkingManager?.packetManager.applyOut(OutgoingPacket.UserProfileInformation)
-        } else {
-            Engine.getInstance().networkingManager?.webSocketManager.disconnect()
-        }
+            Engine.getInstance()?.networkingManager?.packetManager?.applyOut(OutgoingPacket.UserProfileInformation)
+        } else
+            Engine.getInstance()?.networkingManager?.webSocketManager?.disconnect()
     }
 }
