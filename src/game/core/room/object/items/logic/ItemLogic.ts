@@ -28,7 +28,7 @@ export abstract class ItemLogic extends EntityLogic implements MoveableLogic{
     }
 
     public onHover(): void {
-
+        super.onHover()
     }
 
     public onPositionChanged(): void {

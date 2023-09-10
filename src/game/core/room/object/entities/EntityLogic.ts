@@ -32,7 +32,7 @@ export abstract class EntityLogic extends RoomObjectLogic {
 
     public onHover(): void {
         const tile = Engine.getInstance().roomService.CurrentRoom.roomLayout.getFloorPlane().getTilebyPosition(new Point(this.entity.position.getX(), this.entity.position.getY()))
-        tile.logic.onHover()
+        tile?.logic?.onHover()
     }
 
     public onClick(): void {

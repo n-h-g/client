@@ -65,8 +65,9 @@ export default class UserEntityLogic extends HumanLogic {
     }
 
     public onHover(): void {
-
-        if(!UserEntityLogic.SHOW_LABELS) return;
+        super.onHover()
+        
+        if (!UserEntityLogic.SHOW_LABELS) return
 
         this._showLabel = !this._showLabel
         this.toggleUI()
