@@ -37,7 +37,7 @@ export abstract class EntityLogic extends RoomObjectLogic {
 
     public onClick(): void {
         const tile = Engine.getInstance().roomService.CurrentRoom.roomLayout.getFloorPlane().getTilebyPosition(new Point(this.entity.position.getX(), this.entity.position.getY()))
-        tile.logic.onClick()
+        tile?.logic?.onClick()
         this.togglePreview()
     }
 
