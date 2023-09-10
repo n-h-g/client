@@ -3,6 +3,7 @@ import { EntityEvents } from '../../../../engine/events/room/objects/entities/En
 import { PreviewModeEventData } from '../../../../engine/events/ui/data/general/PreviewUserData'
 import { UIEvents } from '../../../../engine/events/ui/UIEvents'
 import { UIComponent } from '../../../../engine/ui/components/UIComponent'
+import Point from '../../../../utils/point/Point'
 import UiUtils from '../../../../utils/UiUtils'
 import { EventManager } from '../../../events/EventManager'
 import { IComponentShowableUI } from '../../../ui/IComponentShowableUI'
@@ -22,6 +23,7 @@ export abstract class EntityLogic extends RoomObjectLogic {
     public registerEvents(): void {
         this.events.on(EntityEvents.POSITION_CHANGED, () => this.onPositionChanged())
         this.entity.visualization.container.on('pointerdown', () => this.onClick())
+        this.entity.visualization.container.on('pointerover', () => this.onHover())
     }
 
     public dispose(): void {
@@ -29,10 +31,13 @@ export abstract class EntityLogic extends RoomObjectLogic {
     }
 
     public onHover(): void {
-        console.log('hover')
+        const tile = Engine.getInstance().roomService.CurrentRoom.roomLayout.getFloorPlane().getTilebyPosition(new Point(this.entity.position.getX(), this.entity.position.getY()))
+        tile.logic.onHover()
     }
 
     public onClick(): void {
+        const tile = Engine.getInstance().roomService.CurrentRoom.roomLayout.getFloorPlane().getTilebyPosition(new Point(this.entity.position.getX(), this.entity.position.getY()))
+        tile.logic.onClick()
         this.togglePreview()
     }
 
@@ -40,14 +45,13 @@ export abstract class EntityLogic extends RoomObjectLogic {
         if (Engine.getInstance().config.offlineMode)
             return;
         
-        let entity: Entity = this.entity
-        let isHuman = entity instanceof Human
+        let isHuman = this.entity instanceof Human
         let mode = isHuman ? 'user' : 'item'
         Engine.getInstance().userInterfaceManager.componentsManager.getComponent<IComponentShowableUI>(UIComponent.PreviewBoxUI).toggle()
         EventManager.emit<PreviewModeEventData>(UIEvents.PREVIEW_BOX_MODE, {
-            id: entity.id,
+            id: this.entity.id,
             mode: mode,
-            name: entity.name,
+            name: this.entity.name,
             motto: "",
             image: (await UiUtils.generateImageFromObject(this.entity.visualization?.container!)).src
         })
