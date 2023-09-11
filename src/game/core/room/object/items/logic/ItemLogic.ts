@@ -56,7 +56,7 @@ export abstract class ItemLogic extends EntityLogic implements MoveableLogic{
     public toggleMovement(value: boolean): void {
         this._roll = value;
         this.entity.visualization.needsUpdate = value;
-        this.entity.visualization.container.alpha = value ? FurniData.LOADING_ALPHA : FurniData.DEFAULT_ALPHA;
+        this.entity.visualization.container.alpha = (value ? FurniData.LOADING_ALPHA : FurniData.DEFAULT_ALPHA) / 255;
     }
 
     public onMove(delta: number): void {
