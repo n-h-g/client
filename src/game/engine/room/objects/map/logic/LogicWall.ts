@@ -17,10 +17,8 @@ export default class LogicWall extends RoomObjectLogic {
     }
 
     registerEvents(): void {
-        setTimeout(() => {          
-            this.wall.visualization.WallContext?.on('pointerdown', () => this.onClick());
-            this.wall.visualization.WallContext?.on('pointerover', () => this.onHover());
-        }, 200);
+        this.wall.visualization.WallContext?.on('pointerdown', () => this.onClick());
+        this.wall.visualization.WallContext?.on('pointerover', () => this.onHover());
     }
 
     tick() : void {
@@ -36,6 +34,6 @@ export default class LogicWall extends RoomObjectLogic {
     }
 
     public onHover(): void {
-        
+        this.wall.plane.room.getPointer().logic.hidePointer()
     }
 }

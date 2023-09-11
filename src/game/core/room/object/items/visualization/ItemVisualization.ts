@@ -133,7 +133,7 @@ export abstract class ItemVisualization extends EntityVisualization implements M
         let currentRoom = Engine.getInstance().roomService?.CurrentRoom
         let tile: Tile = currentRoom.roomLayout.getFloorPlane().getTilebyPosition(new Point(Math.round(this.position.getX()), Math.round(this.position.getY())))
 
-        return (((tile!.position.getY() - tile!.position.getX()) * MapData.tileWidth / 2) + (MapData.tileWidth / 2))
+        return (((tile!.position.getY() - tile!.position.getX()) * MapData.tileWidth / 2) + (MapData.tileWidth / 2)) + 1
     }
 
     public calculateOffsetY(): number {
@@ -142,7 +142,7 @@ export abstract class ItemVisualization extends EntityVisualization implements M
 
         let offsetFloor = tile!.position.getZ() > 0 ? -MapData.thickSpace * MapData.stepHeight * tile!.position.getZ() : -FurniData.FURNI_TOP_OFFSET
 
-        return ((tile!.position.getY() + tile!.position.getX()) * MapData.tileHeight / 2 + MapData.tileHeight / 2) + offsetFloor + 3
+        return ((tile!.position.getY() + tile!.position.getX()) * MapData.tileHeight / 2 + MapData.tileHeight / 2) + offsetFloor + 2
     }
 
     public getZIndex(zIndex: number = 1): number {
