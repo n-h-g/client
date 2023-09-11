@@ -33,8 +33,10 @@ export class RoomLogic implements IRoomLogic {
 
         roomVisualization.getCanvasFloor().on('pointerover', this.onMouseOver.bind(this))
         roomVisualization.Container.on('pointerdown', this.onMouseClick.bind(this))
-        roomVisualization.getCanvasFloor().on('pointerout', this.onMouseOut.bind(this))
+        this.room.Visualization.getCanvasFloor().on('pointerout', this.onMouseOut.bind(this))
+        roomVisualization.container.on('pointerout', this.onMouseOut.bind(this))
 
+       
         Engine.getInstance().application.viewport.on('drag-end', this.onCameraMove.bind(this))
 
         this.room.getFloorPlane().logic?.registerEvents()
@@ -53,14 +55,12 @@ export class RoomLogic implements IRoomLogic {
     private onMouseOver(e: any) {
         let room: Room = this.room.getRoom()
 
-        this.room.Visualization.getCanvasPointer().zIndex = RoomVisualization.calculateZIndex(new Point3d(1, 1, 1), RoomPriority.POINTER)
+        this.room.Visualization.getCanvasPointer().zIndex = RoomVisualization.calculateZIndex(new Point3d(this.room.getPointer().position.getX(), this.room.getPointer().position.getY(), this.room.getPointer().position.getZ()), RoomPriority.POINTER)
     }
 
     private onMouseOut() {
         let room: Room = this.room.getRoom()
-
-        this.room.Visualization.getCanvasPointer().zIndex = RoomVisualization.calculateZIndex(new Point3d(1, 1, 1), RoomPriority.DOOR_FLOOR_SELECT)
-        this.room.Visualization.getCanvasPointer().visible = false
+        this.room.getPointer().logic.hidePointer()
     }
 
 
