@@ -17,9 +17,9 @@ export class OfflineMode {
     private static _instance: OfflineMode
     private static ENTITY_ID: string = "473674-34dfbnasb-43423"
     private static RANDOM_ITEMS: boolean = false
-    private static ITEM: string = "hc_tv"
+    private static ITEM: string = "habbocake"
     private static NUMBER_OF_ITEMS = 1
-    private static NUMBER_OF_USERS = 1000
+    private static NUMBER_OF_USERS = 1
     private static ROOM_SIZE = 20
 
     public constructor(engine: Engine) {

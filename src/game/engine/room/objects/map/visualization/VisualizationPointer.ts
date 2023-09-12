@@ -11,10 +11,12 @@ export default class VisualizationPointer extends RoomObjectVisualization {
     private pointerPosition: number = 0
     private pointerAlpha: number = 1
     private pointerWidth = 3
+    private pointer: Pointer
 
     constructor(pointer: Pointer) {
         super(pointer.position.getX(), pointer.position.getY(), pointer.position.getZ())
 
+        this.pointer = pointer;
         this.pointerContext = pointer.getCanvas()
         this.pointerContext.eventMode = 'dynamic'
         this.pointerContext.visible = false
@@ -35,12 +37,11 @@ export default class VisualizationPointer extends RoomObjectVisualization {
 
         this.pointerContext.visible = true
 
+        this.pointer.position.setX(tile.position.getX())
+        this.pointer.position.setY(tile.position.getY())
+
         this.pointerContext.x = xpos
         this.pointerContext.y = ypos
-    }
-
-    public getPointerWidth(): number {
-        return this.pointerWidth
     }
 
     drawPointer(container: Container): Container {
@@ -64,5 +65,10 @@ export default class VisualizationPointer extends RoomObjectVisualization {
         container.addChild(ctx)
 
         return container
+    }
+
+
+    public getPointerWidth(): number {
+        return this.pointerWidth
     }
 }
