@@ -35,6 +35,8 @@ export default class UiUtils {
         return await Engine.getInstance().application?.renderer.extract.base64(object)
     }
 
+    
+
     static getPosition(event: any, container: Container) {
         let rect = container.getBounds();
 

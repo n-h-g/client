@@ -2,17 +2,23 @@ import RoomLayout from '../RoomLayout'
 import Room from '../Room'
 import { IRoomLogic } from '../../../core/room/IRoomLogic'
 import { Engine } from '../../../Engine'
-import { Point, Sprite, Texture } from 'pixi.js'
+import { Sprite, Texture } from 'pixi.js'
 import { Viewport } from 'pixi-viewport'
 import { RoomPriority } from '../visualization/RoomPriority'
 import RoomVisualization from '../visualization/RoomVisualization'
 import Point3d from '../../../utils/point/Point3d'
 import RenderingUtils from '../../../utils/RenderingUtils'
+import { EventManager } from '../../../core/events/EventManager'
+import { UIEvents } from '../../events/ui/UIEvents'
+import { RoomChatData } from '../../events/ui/data/room/RoomChatData'
+import Point from '../../../utils/point/Point'
 
 export class RoomLogic implements IRoomLogic {
     private room: RoomLayout
     private canvasFloorHit: HTMLCanvasElement
     private canvasWallHit: HTMLCanvasElement
+
+    private _lastCameraPosition: Point
 
     constructor(room: RoomLayout) {
         this.room = room
@@ -37,7 +43,7 @@ export class RoomLogic implements IRoomLogic {
         roomVisualization.container.on('pointerout', this.onMouseOut.bind(this))
 
        
-        Engine.getInstance().application.viewport.on('drag-end', this.onCameraMove.bind(this))
+        Engine.getInstance().application.viewport.on('moved', this.onCameraMove.bind(this))
 
         this.room.getFloorPlane().logic?.registerEvents()
         this.room.getWallPlane().logic?.registerEvents()
@@ -46,6 +52,13 @@ export class RoomLogic implements IRoomLogic {
     private onCameraMove(e: any) {
         let screen: Point = e.screen
         let viewport: Viewport = e.viewport
+
+        EventManager.emit<RoomChatData>(UIEvents.ROOM_UPDATE_CHAT, {
+            x: viewport.x,
+            y: viewport.y
+        })
+
+        this._lastCameraPosition = Engine.getInstance().roomService.CurrentRoom.roomLayout.getOffset(viewport.x, viewport.y, 0);
     }
 
     private onMouseClick(e: any) {

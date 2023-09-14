@@ -1,18 +1,38 @@
+import { EventManager } from "../../../core/events/EventManager";
 import { Message } from "../../../core/game/chat/Message";
 import { IDisposable } from "../../../core/room/IDisposable";
 import { Engine } from "../../../Engine";
 import { OutgoingPacket } from "../../../networking/packets/outgoing/OutgoingPacket";
+import { RoomChatData } from "../../events/ui/data/room/RoomChatData";
+import { RoomUIEventData } from "../../events/ui/data/room/RoomUIEventData";
+import { UIEvents } from "../../events/ui/UIEvents";
+import RoomChatMessage from "./RoomChatMessage";
 import { ChatMessageRepository } from "./ChatMessageRepository";
 
 export default class ChatMessageService implements IDisposable {
+
   public repository: ChatMessageRepository
+
+  private _messageCounter = 0;
 
   constructor() {
     this.repository = new ChatMessageRepository()
   }
 
-  public addMessage(chatMessage: Message): void {
+  public addMessage(chatMessage: RoomChatMessage): void {
     this.repository?.add(chatMessage.id.toString(), chatMessage)
+
+
+    EventManager.emit<RoomChatData>(UIEvents.ROOM_NEW_MESSAGE, {
+      text: chatMessage.text,
+      author: chatMessage.author,
+      x: chatMessage.x,
+      y: chatMessage.y,
+      width: 0,
+      height: 0,
+    })
+
+    this._messageCounter++
   }
 
   public removeMessage(id: string): boolean {
@@ -51,19 +71,17 @@ export default class ChatMessageService implements IDisposable {
   }
 
   public computeMessage(message: string, shout: boolean = false, whisper: boolean = false, whisperId: number = -1): void {
-    if (!this.checkCommand(message))
+    if (!this.checkCommand(message)) {
       Engine.getInstance().networkingManager?.packetManager?.applyOut(OutgoingPacket.UserSay, {
         text: message,
         shout: shout,
         whisper,
         whisperId
       })
-    else
-      Engine.getInstance().networkingManager?.packetManager?.applyOut(OutgoingPacket.UserSay, {
-        text: message,
-        shout: shout,
-        whisper,
-        whisperId
-      })
+    }
+  }
+
+  public getLastMessageId(): number {
+    return this._messageCounter + 1;
   }
 }

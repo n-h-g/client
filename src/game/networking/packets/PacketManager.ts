@@ -10,6 +10,7 @@ import AllRoomsList from './incoming/navigator/AllRoomsList'
 import MyRoomsList from './incoming/navigator/MyRoomsList'
 import AddRoomEntity from './incoming/rooms/entities/AddRoomEntity'
 import LoadRoomEntities from './incoming/rooms/entities/LoadRoomEntities'
+import { NewRoomMessage } from './incoming/rooms/entities/NewRoomMessage'
 import RemoveEntity from './incoming/rooms/entities/RemoveEntity'
 import UpdateEntity from './incoming/rooms/entities/UpdateEntity'
 import { UpdateRoomData } from './incoming/rooms/UpdateRoomData'
@@ -36,6 +37,7 @@ export class PacketManager {
             203: new UpdateEntity,
             204: new AddRoomEntity,
             205: new RemoveEntity,
+            206: new NewRoomMessage,
             207: new UserTypingStatus,
             400: new UpdateUserInformation,
             401: new LoadInventoryItems,
