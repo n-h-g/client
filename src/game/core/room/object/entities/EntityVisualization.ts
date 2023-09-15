@@ -81,6 +81,8 @@ export abstract class EntityVisualization extends RoomObjectVisualization {
 
     public abstract calculateOffsetY(): number
 
+    public abstract updateRotation(rotation: number): void
+
     public abstract getZIndex(): number
 
     public updatePosition() {

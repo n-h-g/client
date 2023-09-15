@@ -18,7 +18,7 @@ export default class UpdateEntity extends MessageHandler {
             if(entityData.position) {
         
                 if(entityData.rotation) {
-                    entity.visualization.Rot = entityData.rotation.rot
+                    entity.visualization.updateRotation(entityData.rotation.rot)
                 } else {
                     if(entityData.bh_rot) {
                         entity.visualization.Rot = entityData.bh_rot.body_rot

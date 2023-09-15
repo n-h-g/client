@@ -70,7 +70,7 @@ export class Furni extends RoomObjectSprite {
 
         if (this._animation == this._lastAnimation) needsUpdate = false;
 
-        this.updateSprites(true, 1)
+        this.updateSprites(needsUpdate, this._animation)
 
         if (this._furniBase.visualizationType !== RoomVisualizationType.FURNITURE_ANIMATED)
             this._isPlaying = false
@@ -93,6 +93,11 @@ export class Furni extends RoomObjectSprite {
     }
 
     private updateSprites(needsUpdate: boolean = false, animation: number = 0) {
+
+        if(needsUpdate) {
+            this.container.removeChild()
+        }
+
         for (let layer = 0; layer < this._furniBase.getLayerCount(); layer++) {
             this.updateSprite(layer)
         }

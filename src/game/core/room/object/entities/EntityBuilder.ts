@@ -68,6 +68,7 @@ export class EntityBuilder {
         let entity: Entity
 
         if (this._type == EntityType.HUMAN) {
+            
             if (this._user.id != null) {
                 entity = new UserEntity(this._id, this._name, this._figure.look)
                 entity.position = position

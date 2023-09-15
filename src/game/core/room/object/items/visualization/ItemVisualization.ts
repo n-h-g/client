@@ -13,6 +13,9 @@ import UiUtils from '../../../../../utils/UiUtils'
 import { EntityVisualization } from '../../entities/EntityVisualization'
 import { MoveableVisualization } from '../../IMoveable'
 import { FurnidataItemType } from '../../../../../engine/ui/imagers/items/enum/FurniDataItemType'
+import Rotation from '../../../../../utils/Rotation'
+import { Direction } from '../../../../objects/Direction'
+import anime from 'animejs'
 
 export abstract class ItemVisualization extends EntityVisualization implements MoveableVisualization {
     protected position: Point3d
@@ -20,13 +23,12 @@ export abstract class ItemVisualization extends EntityVisualization implements M
     public imagePreview: string
     protected isIcon: boolean = false
 
+    private static USE_ROTATION_ANIMATION = false
+
     constructor(item: Item) {
         super(item)
         this.position = item.position
         this.iconImage = this.generateIcon()
-        this.generateImagePreview().then((val: string) => {
-            this.imagePreview = val
-        })
     }
 
     public nextFrame(): void {
@@ -37,7 +39,7 @@ export abstract class ItemVisualization extends EntityVisualization implements M
         if (Engine.getInstance().roomService?.CurrentRoom) {
             let temp: Container = this.sprite.container;
 
-            if (this.container)
+            if (this.needsUpdate)
                 this.sprite.reset()
 
             this.sprite.update(true)
@@ -49,23 +51,6 @@ export abstract class ItemVisualization extends EntityVisualization implements M
             Engine.getInstance().roomService?.CurrentRoom?.roomLayout.Visualization.container?.addChild(this.container)
             this.updatePosition()
         }
-    }
-
-    public generateImages() {
-        /*if (this.isIcon) {
-            let icon = this.sprite.turnIntoIcon()
-
-            setTimeout(() => {
-                this.iconImage = UiUtils.generateBase64FromObject(icon)
-            }, 2000)
-        }*/
-    }
-
-    public turnIntoIcon() {
-        /*let icon = this.sprite.turnIntoIcon()
-        this.entity.visualization.container = icon
-        this.needsUpdate = false
-        this.isIcon = true*/
     }
 
     public reset() {
@@ -82,6 +67,43 @@ export abstract class ItemVisualization extends EntityVisualization implements M
         return '';
     }
 
+    public rotate(): void {
+
+        this.render()
+
+        const tempY = this.container.y
+
+        if(!ItemVisualization.USE_ROTATION_ANIMATION)
+            return;
+
+        anime({
+            targets: this.container.position,
+            x: this.container.x,
+            y: this.container.y - 20
+        });
+
+        setTimeout(() => {
+            anime({
+                targets:  this.container.position,
+                x: this.container.x,
+                y: this.container.y + 10,
+            });
+        }, 250)
+
+    }
+
+    public updateRotation(rotation: number): void {
+
+        const direction = rotation
+
+        if(direction == this.direction) {
+            return;
+        }
+        this.direction = rotation;
+
+        this.rotate()
+    }
+
     public async render(): Promise<void> {
         if (this.container)
             this.container.removeChildren()
@@ -91,7 +113,7 @@ export abstract class ItemVisualization extends EntityVisualization implements M
 
             await sprite.init()
 
-            let dir = sprite.furniBase.getUIDirection()
+            let dir = sprite.furniBase.getValidDirection(this.direction)
 
             sprite.setDirection(dir)
 
