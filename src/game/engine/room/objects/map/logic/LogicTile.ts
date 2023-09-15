@@ -8,6 +8,8 @@ import { Tile } from '../Tile'
 import { OfflineMode } from '../../../../../offline/OfflineMode'
 import { RoomPriority } from '../../../visualization/RoomPriority'
 import RoomVisualization from '../../../visualization/RoomVisualization'
+import VisualizationPointer from '../visualization/VisualizationPointer'
+import LogicPointer from './LogicPointer'
 
 export default class LogicTile extends RoomObjectLogic {
     private tile: Tile
@@ -61,7 +63,7 @@ export default class LogicTile extends RoomObjectLogic {
         let isDoor = this.tile.position.getX() == this.tile.plane.room.getDoorPosition().getX() && this.tile.position.getY() == this.tile.plane.room.getDoorPosition().getY()
 
         this.tile.plane.room.Visualization.getCanvasPointer().zIndex = RoomVisualization.calculateZIndex(this.tile.position, isDoor ? RoomPriority.DOOR_FLOOR_SELECT : RoomPriority.POINTER);
-        this.tile.plane.room.Visualization.getCanvasPointer().visible = true;
+        (this.tile.plane.room.getPointer().logic as LogicPointer).togglePointer();
         this.tile.plane.room.getPointer().visualization.updatePosition(tileContext!.x, tileContext!.y, this.tile);
         this.tile.plane.room.getRoom().roomEntityRepository.updateRollingEntity(this.tile.position);
     }

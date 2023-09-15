@@ -26,8 +26,8 @@ export default class LogicPointer extends RoomObjectLogic {
 
     public hidePointer() {
         this.currentColor = new ColorRGB(0, 0, 0)
-        this.pointer.getCanvas().visible = this.visible;
-        this.visible = !this.visible;
+        this.visible = false;
+        this.pointer.getCanvas().visible = false;
     }
 
     public togglePointer() {
