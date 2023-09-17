@@ -1,11 +1,11 @@
 import {Engine} from '../../../../../Engine';
 import {IRoomMessageData} from '../../../../../core/communication/incoming/rooms/entities/IRoomMessageData';
 import {MessageType} from '../../../../../core/game/chat/MessageType';
-import RoomChatMessage from '../../../../../engine/game/chat/RoomChatMessage';
+import {RoomChatMessage} from '../../../../../engine/game/chat/RoomChatMessage';
 import {MessageHandler} from '../../../../handler/MessageHandler';
 
 export class NewRoomMessage extends MessageHandler {
-    public handle(): void {
+    handle(): void {
         const data = this.message as IRoomMessageData;
 
         if (!data.authorId) return;
@@ -27,3 +27,4 @@ export class NewRoomMessage extends MessageHandler {
         Engine.getInstance().chatService.addMessage(chatMessage);
     }
 
+}

@@ -2,7 +2,7 @@ import {UIComponent} from '../../engine/ui/components/UIComponent';
 import {IComponentUI} from './IComponentUI';
 import {Component as ComponentGUI} from 'vue';
 
-export default abstract class Component implements IComponentUI {
+export abstract class Component implements IComponentUI {
     private _type: UIComponent;
     private componentGUI: ComponentGUI;
 
@@ -11,13 +11,13 @@ export default abstract class Component implements IComponentUI {
         this._type = type;
     }
 
-    public abstract init(): void;
+    abstract init(): void;
 
-    public get component(): ComponentGUI {
+    get component(): ComponentGUI {
         return this.componentGUI;
     }
 
-    public get type(): UIComponent {
+    get type(): UIComponent {
         return this._type;
     }
 }

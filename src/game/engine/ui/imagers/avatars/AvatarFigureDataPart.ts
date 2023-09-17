@@ -1,20 +1,19 @@
-import AvatarFigure from './AvatarFigure';
-import AvatarFigureComponent from './AvatarFigureComponent';
-import {FigureDataComponent} from './AvatarImager';
+import {AvatarFigure} from './AvatarFigure';
+import {AvatarFigureComponent} from './AvatarFigureComponent';
 import {IPart} from './gamedata/IFigureData';
 
-export default class AvatarFigureDataPart {
-    public components: AvatarFigureComponent[];
+export class AvatarFigureDataPart {
+    components: AvatarFigureComponent[];
 
-    public hidden: string[];
+    hidden: string[];
 
-    public parts: IPart[];
+    parts: IPart[];
 
     private avatarFigure: AvatarFigure;
 
-    public type: string;
+    type: string;
 
-    public constructor(
+    constructor(
         avatarFigure: AvatarFigure,
         type: string,
         parts: IPart[] = []
@@ -27,15 +26,15 @@ export default class AvatarFigureDataPart {
         this.hidden = [];
     }
 
-    public addComponent(figureDataComponent: AvatarFigureComponent) {
+    addComponent(figureDataComponent: AvatarFigureComponent) {
         this.components.push(figureDataComponent);
     }
 
-    public addHidden(hidden: string) {
+    addHidden(hidden: string) {
         this.hidden.push(hidden);
     }
 
-    public setParts(parts: IPart[]) {
+    setParts(parts: IPart[]) {
         this.parts = parts;
     }
 }

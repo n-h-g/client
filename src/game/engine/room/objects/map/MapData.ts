@@ -1,20 +1,20 @@
-export default class MapData {
-    public static tileWidth = 68;
-    public static tileHeight = 34;
-    public static thickSpace = 8;
-    public static stepHeight = 4;
-    public static stairSteps = 4;
-    public static wallWidth = 42;
-    public static wallHeight = 149;
-    public static wallDepth = 8;
-    public static wallBlankTop = 4;
-    public static wallBlankBottom = 17;
-    public static strokeDepth = 0.4;
-    public static maxHeight = 17;
-    public static drawingFurniOffsetX = 32;
-    public static drawingFurniOffsetY = 0;
+export class MapData {
+    static tileWidth = 68;
+    static tileHeight = 34;
+    static thickSpace = 8;
+    static stepHeight = 4;
+    static stairSteps = 4;
+    static wallWidth = 42;
+    static wallHeight = 149;
+    static wallDepth = 8;
+    static wallBlankTop = 4;
+    static wallBlankBottom = 17;
+    static strokeDepth = 0.4;
+    static maxHeight = 17;
+    static drawingFurniOffsetX = 32;
+    static drawingFurniOffsetY = 0;
 
-    public static parseHeight(modelInfo: string) {
+    static parseHeight(modelInfo: string) {
         switch (modelInfo) {
             case 'A':
                 return 10;

@@ -11,14 +11,14 @@ import {FurniSpriteUtils} from './utils/FurniSpriteUtils';
 import {Layer} from './data/Layer';
 import {Repository} from '../../../../core/Repository';
 
-export default class FurniBase {
+export class FurniBase {
     private _data: IFurnidata;
     private _spritesheetData: IFurnidata;
     private spritesheet: PIXI.Texture;
-    public itemName: string;
+    itemName: string;
     private _visualizationData: VisualizationData;
     private _logicData: LogicData;
-    public _assets: Repository<string, FurniAsset>;
+    _assets: Repository<string, FurniAsset>;
 
     constructor(data: IFurnidata, itemName: string) {
         this._data = data;
@@ -30,7 +30,7 @@ export default class FurniBase {
         this._assets = new Repository();
     }
 
-    public async init(): Promise<Repository<string, FurniAsset>> {
+    async init(): Promise<Repository<string, FurniAsset>> {
         const url =
             Engine.getInstance()?.config?.proxyUrl +
             Engine.getInstance()?.config?.itemsResourcesUrl +
@@ -61,7 +61,7 @@ export default class FurniBase {
         ])*/
     }
 
-    public loadAssets(assets: {[key: string]: IAsset}) {
+    loadAssets(assets: {[key: string]: IAsset}) {
         if (assets) {
             for (const asset of Object.keys(assets)) {
                 this._assets.add(
@@ -72,7 +72,7 @@ export default class FurniBase {
         }
     }
 
-    public async downloadSpritesheet(): Promise<PIXI.Texture> {
+    async downloadSpritesheet(): Promise<PIXI.Texture> {
         const configUrl =
             Engine.getInstance().config.proxyUrl +
             Engine.getInstance().config.itemsResourcesUrl +
@@ -90,12 +90,12 @@ export default class FurniBase {
         return texture;
     }
 
-    public getLogicDimension(dim: number) {
+    getLogicDimension(dim: number) {
         if (!this._logicData.getDimensions()) return 0;
         return this._logicData.getDimensions()[dim];
     }
 
-    public getUIDirection(): number {
+    getUIDirection(): number {
         const directions = this.getAvailableDirections();
         let direction = directions[0];
 
@@ -111,7 +111,7 @@ export default class FurniBase {
         return direction;
     }
 
-    public getAvailableDirections(): number[] {
+    getAvailableDirections(): number[] {
         const directions: number[] = [];
         const rawDirections = this.directions;
 
@@ -122,28 +122,28 @@ export default class FurniBase {
         return directions;
     }
 
-    public hasDirection(direction: number): boolean {
+    hasDirection(direction: number): boolean {
         direction = (direction / 90) * 2;
         return this._visualizationData.hasDirection(direction);
     }
 
-    public hasAnimations(): boolean {
+    hasAnimations(): boolean {
         return this._visualizationData.hasAnimations();
     }
 
-    public hasAnimation(animation: number): boolean {
+    hasAnimation(animation: number): boolean {
         return this._visualizationData.hasAnimation(animation);
     }
 
-    public hasAnimationForLayer(animation: number, layer: number): boolean {
+    hasAnimationForLayer(animation: number, layer: number): boolean {
         return this._visualizationData.hasAnimationForLayer(animation, layer);
     }
 
-    public getAnimations(): string[] {
+    getAnimations(): string[] {
         return Object.keys(this.data.visualization.animations!);
     }
 
-    public getFrameFromAsset(assetName: string): any {
+    getFrameFromAsset(assetName: string): any {
         let frameName = this._spritesheetData!.assets[assetName + '.png'];
 
         if (frameName == undefined) {
@@ -153,19 +153,19 @@ export default class FurniBase {
         return frameName;
     }
 
-    public getAsset(assetName: string) {
+    getAsset(assetName: string) {
         return this._assets.get(assetName) ?? null;
     }
 
-    public getValidDirection(direction: number) {
+    getValidDirection(direction: number) {
         return this._visualizationData.getValidDirection(direction);
     }
 
-    public getDirection(direction: number) {
+    getDirection(direction: number) {
         return this._visualizationData.getDirection(direction);
     }
 
-    public getFrameFrom(
+    getFrameFrom(
         direction: number,
         animation: number,
         layer: number,
@@ -196,22 +196,22 @@ export default class FurniBase {
         return 0;
     }
 
-    public getLayer(layer: number): Layer {
+    getLayer(layer: number): Layer {
         return this._visualizationData.getLayer(layer);
     }
 
-    public hasLayers(): boolean {
+    hasLayers(): boolean {
         return this._visualizationData.hasLayers();
     }
 
-    public hasColorForLayer(color: number, layer: number): boolean {
+    hasColorForLayer(color: number, layer: number): boolean {
         return (
             this._visualizationData.hasColor(color) &&
             this.data.visualization.colors![color].layers[layer] != null
         );
     }
 
-    public getColorFrom(color: number, layer: number): number {
+    getColorFrom(color: number, layer: number): number {
         if (this.hasColorForLayer(color, layer)) {
             return this._visualizationData.getColor(color, layer).color;
         }
@@ -219,11 +219,11 @@ export default class FurniBase {
         return 0xffffff;
     }
 
-    public getColors(): string[] {
+    getColors(): string[] {
         return this._visualizationData.getColors();
     }
 
-    public assetNameFrom(
+    assetNameFrom(
         size: number | string,
         layer: number,
         direction?: number,
@@ -248,18 +248,18 @@ export default class FurniBase {
         return this._assets.has(assetName);
     }
 
-    public hasVisualDirections(): boolean {
+    hasVisualDirections(): boolean {
         return this.data.visualization.directions != null;
     }
 
-    public hasVisualDirection(direction: number): boolean {
+    hasVisualDirection(direction: number): boolean {
         return (
             this.hasVisualDirections() &&
             this.data.logic.directions![direction] != null
         );
     }
 
-    public hasVisualDirectionLayer(direction: number, layer: number): boolean {
+    hasVisualDirectionLayer(direction: number, layer: number): boolean {
         if (
             this.hasVisualDirection(direction) &&
             this.data.logic.directions![direction]
@@ -270,7 +270,7 @@ export default class FurniBase {
         return false;
     }
 
-    public isAssetFlipped(
+    isAssetFlipped(
         size: number | string,
         layer: number,
         direction?: number,
@@ -288,31 +288,31 @@ export default class FurniBase {
         return null;
     }
 
-    public get LogicType() {
+    get LogicType() {
         return this.data.logicType;
     }
 
-    public get visualizationType(): string {
+    get visualizationType(): string {
         return this.data.visualization.type;
     }
 
-    public getSpriteSheetData() {
+    getSpriteSheetData() {
         return this._spritesheetData;
     }
 
-    public get data() {
+    get data() {
         return this._data;
     }
 
-    public getLayerCount() {
+    getLayerCount() {
         return this._visualizationData.layerCount;
     }
 
-    public get angle(): number {
+    get angle(): number {
         return this.data.visualization.angle;
     }
 
-    public get directions(): number[] {
+    get directions(): number[] {
         return this.data.logic.directions!.map(
             direction => (direction / 90) * 2
         );

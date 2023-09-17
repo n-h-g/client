@@ -4,7 +4,7 @@ import {Engine} from '../Engine';
 import {UIComponent} from '../engine/ui/components/UIComponent';
 import {Logger} from './Logger';
 
-export default class UiUtils {
+export class UiUtils {
     static guidGenerator() {
         const S4 = function () {
             return (((1 + Math.random()) * 0x10000) | 0).toString(16).substring(1);
@@ -59,7 +59,7 @@ export default class UiUtils {
         return await Engine.getInstance().application?.renderer.extract.base64(
             object
         );
-
+    }
 
     static getPosition(event: any, container: Container) {
         const rect = container.getBounds();

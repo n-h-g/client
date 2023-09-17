@@ -1,16 +1,17 @@
-import RoomObjectVisualization from '../../../../../core/room/object/RoomObjectVisualization';
+import {RoomObjectVisualization} from '../../../../../core/room/object/RoomObjectVisualization';
 import {RoomPlaneType} from '../RoomPlaneTypeEnum';
-import RoomVisualization from '../../../visualization/RoomVisualization';
-import MapData from '../MapData';
+import {RoomVisualization} from '../../../visualization/RoomVisualization';
+import {MapData} from '../MapData';
 import {Tile} from '../Tile';
 import {TilingSprite, ObservablePoint, Texture, Point, Graphics} from 'pixi.js';
-import ImagePatterBase from '../../../../../../assets/images/room/content/floor_texture_64_2_floor_basic.png';
 import {RoomObjectController} from '../../../../../core/room/object/RoomObjectController';
 import {RoomPlane} from '../RoomPlane';
 import {TileType} from '../TileTypeEnum';
 import {IRoomMapObject} from '../../../../../core/room/object/map/IRoomMapObject';
 
-export default class VisualizationPlane extends RoomObjectVisualization {
+import ImagePatterBase from '../../../../../../assets/images/room/content/floor_texture_64_2_floor_basic.png';
+
+export class VisualizationPlane extends RoomObjectVisualization {
     private plane: RoomPlane;
     private imgPattern: HTMLImageElement;
     private useTexture = false;
@@ -21,7 +22,7 @@ export default class VisualizationPlane extends RoomObjectVisualization {
         this.plane = plane;
     }
 
-    public getZIndex(): number {
+    getZIndex(): number {
         throw new Error('Method not implemented.');
     }
 
@@ -173,8 +174,8 @@ export default class VisualizationPlane extends RoomObjectVisualization {
                         tiled.tilePosition = new ObservablePoint(
                             null,
                             null,
-                            mapObject.position.getX(),
-                            mapObject.position.getY()
+                            mapObject.position.x,
+                            mapObject.position.y
                         );
                         tiled.width = MapData.tileWidth;
                         tiled.height = MapData.tileHeight;

@@ -1,4 +1,4 @@
-export default interface IAvatarPartSetsData {
+export interface IAvatarPartSetsData {
     partSets: IPartSets;
 }
 

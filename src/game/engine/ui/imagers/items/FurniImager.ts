@@ -1,4 +1,4 @@
-import FurniBase from './FurniBase';
+import {FurniBase} from './FurniBase';
 import {fetchJsonAsync} from '../../../../utils/DownloadManager';
 import {
     Furnidata,
@@ -8,14 +8,14 @@ import {Engine} from '../../../../Engine';
 import {Logger} from '../../../../utils/Logger';
 import {FurniDataType} from '../../../../core/ui/imagers/items/data/IFurniDataType';
 import {Furni} from './Furni';
-import {Sprite, Texture} from 'pixi.js';
+import {Texture} from 'pixi.js';
 import {FurnidataItemType} from './enum/FurniDataItemType';
 import {FurniSpriteUtils} from './utils/FurniSpriteUtils';
 import {FurniPlaceholder} from './FurniPlaceholder';
 import {Repository} from '../../../../core/Repository';
 
-export default class FurniImager {
-    public static FPS = 36;
+export class FurniImager {
+    static FPS = 36;
     private _textureCaches: Repository<string, Texture>;
     private ready: boolean;
     private bases: {
@@ -42,7 +42,7 @@ export default class FurniImager {
         this._textureCaches = new Repository();
     }
 
-    public async init(): Promise<void> {
+    async init(): Promise<void> {
         await this.loadFurnidata();
     }
 
@@ -62,7 +62,7 @@ export default class FurniImager {
         this.ready = true;
     }
 
-    public generateRandomItem() {
+    generateRandomItem() {
         const randomIndex = Math.floor(
             Math.random() * Object.values(this.furnidata.floorItems).length
         );
@@ -99,7 +99,7 @@ export default class FurniImager {
         return null;
     }
 
-    public loadFurniBase(
+    loadFurniBase(
         type: FurnidataItemType,
         furniBaseName: string
     ): Promise<FurniBase> {
@@ -140,7 +140,7 @@ export default class FurniImager {
         return this.bases[type][itemName];
     }
 
-    public loadFurniPlaceholder(
+    loadFurniPlaceholder(
         type: FurnidataItemType,
         name: string
     ): Promise<Furni> {
@@ -150,7 +150,7 @@ export default class FurniImager {
         });
     }
 
-    public loadFurniSprite(
+    loadFurniSprite(
         type: FurnidataItemType,
         name: string
     ): Promise<Furni> {
@@ -166,7 +166,7 @@ export default class FurniImager {
         });
     }
 
-    public loadFurniIcon(
+    loadFurniIcon(
         type: FurnidataItemType,
         name: string
     ): Promise<Furni> {
@@ -201,23 +201,23 @@ export default class FurniImager {
         });
     }
 
-    public addTexture(id: string, texture: Texture): void {
+    addTexture(id: string, texture: Texture): void {
         this._textureCaches.add(id, texture);
     }
 
-    public hasTexture(id: string): boolean {
+    hasTexture(id: string): boolean {
         return this._textureCaches.has(id);
     }
 
-    public getTexture(id: string): Texture {
+    getTexture(id: string): Texture {
         return this._textureCaches.get(id);
     }
 
-    public get isReady(): boolean {
+    get isReady(): boolean {
         return this.ready;
     }
 
-    public getFurnidata(): Furnidata {
+    getFurnidata(): Furnidata {
         return this.furnidata;
     }
 }

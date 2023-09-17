@@ -1,8 +1,8 @@
 import {RoomPlaneType} from './RoomPlaneTypeEnum';
-import Point3d from '../../../../utils/point/Point3d';
-import LogicPlane from './logic/LogicPlane';
-import VisualizationPlane from './visualization/VisualizationPlane';
-import RoomLayout from '../../RoomLayout';
+import {Point3d} from '../../../../utils/point/Point3d';
+import {LogicPlane} from './logic/LogicPlane';
+import {VisualizationPlane} from './visualization/VisualizationPlane';
+import {RoomLayout} from '../../RoomLayout';
 import {RoomObjectController} from '../../../../core/room/object/RoomObjectController';
 import {IRoomMapObject} from '../../../../core/room/object/map/IRoomMapObject';
 
@@ -23,19 +23,19 @@ export abstract class RoomPlane extends RoomObjectController<
         this.visualization = new VisualizationPlane(this);
     }
 
-    public addObject(obj: IRoomMapObject): void {
+    addObject(obj: IRoomMapObject): void {
         this.objectList.push(obj);
     }
 
-    public get mapObjects(): Array<IRoomMapObject> {
+    get mapObjects(): Array<IRoomMapObject> {
         return this.objectList;
     }
 
-    public get type(): RoomPlaneType {
+    get type(): RoomPlaneType {
         return this._type;
     }
 
-    public get room(): RoomLayout {
+    get room(): RoomLayout {
         return this._room;
     }
 }

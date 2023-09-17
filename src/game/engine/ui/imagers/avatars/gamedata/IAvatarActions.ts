@@ -1,4 +1,4 @@
-export default interface AvatarActions {
+export interface AvatarActions {
     actions: IAction[];
 }
 

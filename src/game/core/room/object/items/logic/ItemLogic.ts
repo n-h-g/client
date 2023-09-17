@@ -1,20 +1,20 @@
 import {Engine} from '../../../../../Engine';
 import {EntityEvents} from '../../../../../engine/events/room/objects/entities/EntityEvents';
 import {ItemEvents} from '../../../../../engine/events/room/objects/entities/ItemEvents';
-import Item from '../../../../../engine/room/objects/items/Item';
+import {Item} from '../../../../../engine/room/objects/items/Item';
 import {FurniData} from '../../../../../engine/ui/imagers/items/FurniData';
 import {OutgoingPacket} from '../../../../../networking/packets/outgoing/OutgoingPacket';
 import {MoveableLogic} from '../../IMoveable';
 import {EntityLogic} from '../../entities/EntityLogic';
 
 export abstract class ItemLogic extends EntityLogic implements MoveableLogic {
-    public _roll = false;
+    _roll = false;
 
     constructor(item: Item) {
         super(item);
     }
 
-    public registerEvents(): void {
+    registerEvents(): void {
         super.registerEvents();
 
         this.events.on(ItemEvents.ITEM_LOADED, () => this.onLoad());
@@ -27,15 +27,15 @@ export abstract class ItemLogic extends EntityLogic implements MoveableLogic {
         this.events.on(EntityEvents.STOP_ROLL, () => this.stopRolling());
     }
 
-    public onLoad() {}
+    onLoad() {}
 
-    public onHover(): void {
+    onHover(): void {
         super.onHover();
     }
 
-    public onPositionChanged(): void {}
+    onPositionChanged(): void {}
 
-    public placeItem() {
+    placeItem() {
         Engine.getInstance().networkingManager?.packetManager.applyOut(
             OutgoingPacket.RoomPickupItemEvent,
             {
@@ -46,31 +46,31 @@ export abstract class ItemLogic extends EntityLogic implements MoveableLogic {
             OutgoingPacket.RoomPlaceItemEvent,
             {
                 id: this.entity.id,
-                x: this.entity.position.getX(),
-                y: this.entity.position.getY(),
-                z: this.entity.position.getZ(),
+                x: this.entity.position.x,
+                y: this.entity.position.y,
+                z: this.entity.position.z,
             }
         );
 
         this.toggleMovement(false);
     }
 
-    public onClick(): void {
+    onClick(): void {
         super.onClick();
     }
 
-    public toggleMovement(value: boolean): void {
+    toggleMovement(value: boolean): void {
         this._roll = value;
         this.entity.visualization.needsUpdate = value;
         this.entity.visualization.sprite.container.alpha =
             (value ? FurniData.LOADING_ALPHA : FurniData.DEFAULT_ALPHA) / 255;
     }
 
-    public onMove(delta: number): void {
+    onMove(delta: number): void {
         this.entity.visualization.move(delta * 1000);
     }
 
-    public tick(delta: number) {
+    tick(delta: number) {
         if (this._roll) {
             this.onMove(delta);
         }
@@ -83,7 +83,7 @@ export abstract class ItemLogic extends EntityLogic implements MoveableLogic {
             this.entity.visualization.draw();
     }
 
-    public stopRolling() {
+    stopRolling() {
         this.entity.visualization.needsUpdate = false;
 
         this.toggleMovement(false);
@@ -93,16 +93,16 @@ export abstract class ItemLogic extends EntityLogic implements MoveableLogic {
             {
                 id: this.entity.id,
                 name: this.entity.name,
-                x: this.entity.position.getX(),
-                y: this.entity.position.getY(),
-                z: this.entity.position.getZ(),
+                x: this.entity.position.x,
+                y: this.entity.position.y,
+                z: this.entity.position.z,
             }
         );
 
         this._roll = false;
     }
 
-    public get roll(): boolean {
+    get roll(): boolean {
         return this._roll;
     }
 }

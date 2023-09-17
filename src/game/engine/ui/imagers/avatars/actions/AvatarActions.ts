@@ -1,9 +1,9 @@
 import {ActionId} from '../enum/actions/ActionId';
-import AvatarActionId from '../enum/actions/AvatarActionId';
-import AvatarActions, {IAction} from '../gamedata/IAvatarActions';
-import Action from './Action';
+import {AvatarActionId} from '../enum/actions/AvatarActionId';
+import {AvatarActions, IAction} from '../gamedata/IAvatarActions';
+import {Action} from './Action';
 
-export default class Actions {
+export class Actions {
     private actions: Map<string, Action>;
 
     constructor(actionsData: AvatarActions) {
@@ -12,7 +12,7 @@ export default class Actions {
         this.loadActions(actionsData.actions);
     }
 
-    public getDefaultAction(): Action | null {
+    getDefaultAction(): Action | null {
         for (const action of this.actions.values()) {
             if (action.isDefault == true) {
                 return action;
@@ -22,7 +22,7 @@ export default class Actions {
         return null;
     }
 
-    public getActionsByIds(actionIds: Set<ActionId>): Action[] {
+    getActionsByIds(actionIds: Set<ActionId>): Action[] {
         const actions: Action[] = [];
 
         const avatarActions: IterableIterator<Action> = this.actions.values();
@@ -51,7 +51,7 @@ export default class Actions {
         return 0;
     }
 
-    public getActionByState(state: string): Action | null {
+    getActionByState(state: string): Action | null {
         const action = this.actions.get(state) as Action;
 
         if (!action) return null;
@@ -59,7 +59,7 @@ export default class Actions {
         return action;
     }
 
-    public getActionById(id: ActionId): Action | null {
+    getActionById(id: ActionId): Action | null {
         const state: string = AvatarActionId.idToAvatarActionState(id);
         return this.getActionByState(state);
     }

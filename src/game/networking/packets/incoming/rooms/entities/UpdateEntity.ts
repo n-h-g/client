@@ -3,11 +3,11 @@ import {HumanVisualization} from '../../../../../core/room/object/human/visualiz
 import {Engine} from '../../../../../Engine';
 import {ActionId} from '../../../../../engine/ui/imagers/avatars/enum/actions/ActionId';
 import {Logger} from '../../../../../utils/Logger';
-import Point3d from '../../../../../utils/point/Point3d';
+import {Point3d} from '../../../../../utils/point/Point3d';
 import {MessageHandler} from '../../../../handler/MessageHandler';
 
-export default class UpdateEntity extends MessageHandler {
-    public handle(): void {
+export class UpdateEntity extends MessageHandler {
+    handle(): void {
         const entityData: IEntityData = this.message;
 
         if (Engine.getInstance().roomService?.CurrentRoom) {
@@ -38,8 +38,8 @@ export default class UpdateEntity extends MessageHandler {
                 );
 
                 entity.visualization.needsUpdate =
-                    (entity.position.getX() != entityData.position.x &&
-                        entity.position.getY() != entityData.position.y) ||
+                    (entity.position.x != entityData.position.x &&
+                        entity.position.y != entityData.position.y) ||
                     entityData.aspect != undefined;
             }
 

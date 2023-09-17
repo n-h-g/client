@@ -1,14 +1,14 @@
 import {IActivePart, IActivePartSets} from '../../gamedata/IAvatarPartSetsData';
 
-export default class ActivePartSet {
-    public id: string;
+export class ActivePartSet {
+    id: string;
 
     /**
      * array of settypes
      */
-    public parts: string[];
+    parts: string[];
 
-    public constructor(activePartSetData: IActivePartSets) {
+    constructor(activePartSetData: IActivePartSets) {
         this.id = activePartSetData.id;
 
         this.parts = [];
@@ -16,7 +16,7 @@ export default class ActivePartSet {
         this.loadParts(activePartSetData.activeParts);
     }
 
-    public loadParts(activePartSetData: IActivePart[]): void {
+    loadParts(activePartSetData: IActivePart[]): void {
         if (activePartSetData && activePartSetData.length > 0) {
             for (const part of activePartSetData) {
                 this.parts.push(part.setType);

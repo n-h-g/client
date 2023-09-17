@@ -4,8 +4,8 @@ import {InventoryItemsEventData} from '../../../../engine/events/ui/data/invento
 import {UIEvents} from '../../../../engine/events/ui/UIEvents';
 import {MessageHandler} from '../../../handler/MessageHandler';
 
-export default class LoadInventoryItems extends MessageHandler {
-    public handle(): void {
+export class LoadInventoryItems extends MessageHandler {
+    handle(): void {
         const items: ItemsData = this.message;
 
         EventManager.emit<InventoryItemsEventData>(
@@ -15,4 +15,5 @@ export default class LoadInventoryItems extends MessageHandler {
             }
         );
 
+    }
 }

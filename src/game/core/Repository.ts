@@ -3,11 +3,11 @@ import {IRepository} from './IRepository';
 export class Repository<S, T> implements IRepository<S, T> {
     private _map: Map<S, T>;
 
-    public constructor() {
+    constructor() {
         this._map = new Map();
     }
 
-    public get(s: S): T {
+    get(s: S): T {
         const value = this._map.get(s);
 
         if (!value) return null;
@@ -15,25 +15,25 @@ export class Repository<S, T> implements IRepository<S, T> {
         return value;
     }
 
-    public delete(a: S): boolean {
+    delete(a: S): boolean {
         return this._map.delete(a);
     }
 
-    public add(t: S, b: T): void {
+    add(t: S, b: T): void {
         this._map.set(t, b);
     }
 
-    public has(a: S): boolean {
+    has(a: S): boolean {
         return this._map.has(a);
     }
 
-    public create<S, T>(): Map<S, T> {
+    create<S, T>(): Map<S, T> {
         return new Map<S, T>();
     }
 
-    public getAll(): Map<S, T> {
+    getAll(): Map<S, T> {
         return this._map;
     }
 
-    public tick(delta: number): void {}
+    tick(delta: number): void {}
 }

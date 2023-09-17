@@ -18,6 +18,7 @@ import { DialogEventData } from '../../../game/engine/events/ui/data/general/Dia
 import { UIEvents } from "../../../game/engine/events/ui/UIEvents"
 import { UIEventsType } from "../../../game/engine/events/ui/UIEventsType"
 
+
 const props = defineProps<{
     title: String,
     box: UIEventsType,

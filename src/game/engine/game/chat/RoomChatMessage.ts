@@ -1,12 +1,11 @@
-import UiUtils from '../../../utils/UiUtils';
+import {UiUtils} from '../../../utils/UiUtils';
 import {MessageType} from '../../../core/game/chat/MessageType';
 import {Message} from '../../../core/game/chat/Message';
-import AvatarData from '../../ui/imagers/avatars/enum/AvatarData';
-import {UserEntity} from '../../room/objects/users/UserEntity';
+import {AvatarData} from '../../ui/imagers/avatars/enum/AvatarData';
 import {Entity} from '../../../core/room/object/entities/Entity';
 import {Engine} from '../../../Engine';
 
-export default class RoomChatMessage extends Message {
+export class RoomChatMessage extends Message {
     private _messageType: MessageType;
     private _x = 0;
     private _y = 0;
@@ -32,7 +31,7 @@ export default class RoomChatMessage extends Message {
         this.compose();
     }
 
-    public compose() {
+    compose() {
         this._x = this._author.id
             ? UiUtils.getGlobalPosition(this._author?.visualization.container)
                   .tx + AvatarData.AVATAR_LEFT_OFFSET
@@ -44,43 +43,43 @@ export default class RoomChatMessage extends Message {
             : 0;
     }
 
-    public set height(height: number) {
+    set height(height: number) {
         this.height = height;
     }
 
-    public set width(width: number) {
+    set width(width: number) {
         this.width = width;
     }
 
-    public get Message(): string {
+    get Message(): string {
         return this.text;
     }
 
-    public get height(): number {
+    get height(): number {
         return 0;
     }
 
-    public get width(): number {
+    get width(): number {
         return 0;
     }
 
-    public get MessageType(): MessageType {
+    get MessageType(): MessageType {
         return this._messageType;
     }
 
-    public get x(): number {
+    get x(): number {
         return this._x;
     }
 
-    public get y(): number {
+    get y(): number {
         return this._y;
     }
 
-    public get _id(): number {
+    get _id(): number {
         return Engine.getInstance().chatService.getLastMessageId() + 1;
     }
 
-    public get author(): Entity {
+    get author(): Entity {
         return this._author;
     }
 }

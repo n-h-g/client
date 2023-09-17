@@ -1,4 +1,4 @@
-export default interface RoomData {
+export interface RoomData {
     id: number;
     name: string;
     desc: string;

@@ -5,14 +5,14 @@ import {CataloguePage} from './incoming/catalogue/CataloguePage';
 import {CataloguePages} from './incoming/catalogue/CataloguePages';
 import {LoginResponse} from './incoming/handshake/LoginResponse';
 import {PongResponse} from './incoming/handshake/PongResponse';
-import LoadInventoryItems from './incoming/items/LoadInventoryItem';
-import AllRoomsList from './incoming/navigator/AllRoomsList';
-import MyRoomsList from './incoming/navigator/MyRoomsList';
-import AddRoomEntity from './incoming/rooms/entities/AddRoomEntity';
-import LoadRoomEntities from './incoming/rooms/entities/LoadRoomEntities';
+import {LoadInventoryItems} from './incoming/items/LoadInventoryItem';
+import {AllRoomsList} from './incoming/navigator/AllRoomsList';
+import {MyRoomsList} from './incoming/navigator/MyRoomsList';
+import {AddRoomEntity} from './incoming/rooms/entities/AddRoomEntity';
+import {LoadRoomEntities} from './incoming/rooms/entities/LoadRoomEntities';
 import {NewRoomMessage} from './incoming/rooms/entities/NewRoomMessage';
-import RemoveEntity from './incoming/rooms/entities/RemoveEntity';
-import UpdateEntity from './incoming/rooms/entities/UpdateEntity';
+import {RemoveEntity} from './incoming/rooms/entities/RemoveEntity';
+import {UpdateEntity} from './incoming/rooms/entities/UpdateEntity';
 import {UpdateRoomData} from './incoming/rooms/UpdateRoomData';
 import {UserTypingStatus} from './incoming/rooms/users/UserTypingStatus';
 import {UpdateUserInformation} from './incoming/users/UpdateUserInformation';
@@ -52,7 +52,7 @@ export class PacketManager {
         });
     }
 
-    public applyIn(packetHeader: number, packetBody: any): any {
+    applyIn(packetHeader: number, packetBody: any): any {
         const messageHandler: MessageHandler | undefined =
             this._incomingPackets.get(packetHeader);
 
@@ -77,7 +77,7 @@ export class PacketManager {
         }
     }
 
-    public applyOut(packetHeader: OutgoingPacket, packetBody: any = {}): void {
+    applyOut(packetHeader: OutgoingPacket, packetBody: any = {}): void {
         if (Engine.getInstance().networkingManager?.webSocketManager?.closed)
             return;
 

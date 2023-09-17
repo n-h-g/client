@@ -1,11 +1,11 @@
 import {fetchJsonAsync} from '../../../../utils/DownloadManager';
 
 import * as PIXI from 'pixi.js';
-import RenderingUtils from '../../../../utils/RenderingUtils';
+
 import {Engine} from '../../../../Engine';
 
-export default class AvatarDownloadManager {
-    public loadConfigFile(resource: string): any {
+export class AvatarDownloadManager {
+    loadConfigFile(resource: string): any {
         return new Promise((resolve, reject) => {
             try {
                 resolve(
@@ -21,14 +21,14 @@ export default class AvatarDownloadManager {
         });
     }
 
-    public async loadTexture(assetName: string): Promise<any> {
+    async loadTexture(assetName: string): Promise<any> {
         const url = `${
             Engine.getInstance().config.avatarFigurePath
         }/${assetName}/${assetName}.png`;
         return await PIXI.Assets.load(url);
     }
 
-    public loadSpriteSheet(part: string): Promise<any> {
+    loadSpriteSheet(part: string): Promise<any> {
         return new Promise((resolve, reject) => {
             try {
                 resolve(
@@ -43,7 +43,7 @@ export default class AvatarDownloadManager {
             }
         });
     }
-    public loadOffsets(part: string) {
+    loadOffsets(part: string) {
         return new Promise((resolve, reject) => {
             const request = new XMLHttpRequest();
             try {

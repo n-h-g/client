@@ -1,5 +1,5 @@
 import {Repository} from '../../core/Repository';
-import Item from './objects/items/Item';
+import {Item} from './objects/items/Item';
 
 export class RoomItemRepository extends Repository<string, Item> {
     private _movingItem: Item;
@@ -8,15 +8,15 @@ export class RoomItemRepository extends Repository<string, Item> {
         super();
     }
 
-    public get movingItem(): Item {
+    get movingItem(): Item {
         return this._movingItem;
     }
 
-    public set movingItem(item: Item) {
+    set movingItem(item: Item) {
         this._movingItem = item;
     }
 
-    public tick(delta: number) {
+    tick(delta: number) {
         this.getAll().forEach((item: Item) => {
             item.logic.tick(delta);
         });

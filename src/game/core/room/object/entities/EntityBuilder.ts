@@ -1,9 +1,9 @@
 import {Engine} from '../../../../Engine';
-import FloorItem from '../../../../engine/room/objects/items/FloorItem';
-import WallItem from '../../../../engine/room/objects/items/WallItem';
+import {FloorItem} from '../../../../engine/room/objects/items/FloorItem';
+import {WallItem} from '../../../../engine/room/objects/items/WallItem';
 import {UserEntity} from '../../../../engine/room/objects/users/UserEntity';
 import {FurnidataItemType} from '../../../../engine/ui/imagers/items/enum/FurniDataItemType';
-import Point3d from '../../../../utils/point/Point3d';
+import {Point3d} from '../../../../utils/point/Point3d';
 import {IAspectComponent} from './components/IAspectComponent';
 import {IHeadBodyRotationComponent} from './components/IHeadBodyRotation';
 import {IPositionComponent} from './components/IPositionComponent';
@@ -12,7 +12,7 @@ import {Entity} from './Entity';
 import {EntityType} from './EntityType';
 
 export class EntityBuilder {
-    public _entity: Entity;
+    _entity: Entity;
     private _id: string;
     private _name: string;
     private _type: EntityType;
@@ -22,33 +22,33 @@ export class EntityBuilder {
     private _user?: IUserComponent;
     private _figure?: IAspectComponent;
 
-    public setId(id: string) {
+    setId(id: string) {
         this._id = id;
         return this;
     }
 
-    public setFigure(figure: IAspectComponent) {
+    setFigure(figure: IAspectComponent) {
         this._figure = figure;
         return this;
     }
 
-    public setType(type: EntityType) {
+    setType(type: EntityType) {
         this._type = type;
         return this;
     }
 
-    public setUser(user: IUserComponent) {
+    setUser(user: IUserComponent) {
         this._user = user;
         this._entity = new UserEntity();
         return this;
     }
 
-    public setPosition(position: IPositionComponent) {
+    setPosition(position: IPositionComponent) {
         this._position = position;
         return this;
     }
 
-    public setHeadBodyRotation(headBodyRotation: IHeadBodyRotationComponent) {
+    setHeadBodyRotation(headBodyRotation: IHeadBodyRotationComponent) {
         if (headBodyRotation) {
             this._bodyRotation = headBodyRotation.body_rot;
             this._headRotation = headBodyRotation.head_rot;
@@ -57,7 +57,7 @@ export class EntityBuilder {
         return this;
     }
 
-    public setName(name: string) {
+    setName(name: string) {
         this._name = name;
         return this;
     }
@@ -96,7 +96,7 @@ export class EntityBuilder {
         return entity;
     }
 
-    public async build() {
+    async build() {
         const entity = await this.getEntityInstance();
         return entity;
     }

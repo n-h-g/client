@@ -5,5 +5,5 @@ export class RoomEvents extends Events {
         super(key);
     }
 
-    public LOAD: RoomEvents = new RoomEvents('room_loaded');
+    LOAD: RoomEvents = new RoomEvents('room_loaded');
 }

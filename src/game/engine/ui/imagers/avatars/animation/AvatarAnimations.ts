@@ -1,13 +1,13 @@
-import IAvatarAnimations, {IAnimation} from '../gamedata/IAvatarAnimations';
-import Animation from './Animation';
+import {IAvatarAnimations, IAnimation} from '../gamedata/IAvatarAnimations';
+import {Animation} from './Animation';
 
-export default class AvatarAnimations {
+export class AvatarAnimations {
     /**
      *  action id       |       Animation
      */
     private animations: Map<string, Animation>;
 
-    public constructor(animationsData: IAvatarAnimations) {
+    constructor(animationsData: IAvatarAnimations) {
         this.animations = new Map();
 
         this.loadAnimations(animationsData.animations);
@@ -15,7 +15,7 @@ export default class AvatarAnimations {
         //console.log(this.animations)
     }
 
-    public getAnimation(actionId: string): Animation | null {
+    getAnimation(actionId: string): Animation | null {
         const animation = this.animations.get(actionId);
 
         if (!animation) return;

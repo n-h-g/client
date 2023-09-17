@@ -5,13 +5,13 @@ export class DirectionData {
 
     private _z = 0;
 
-    public static USE_DEFAULT_DIRECTION = -1;
+    static USE_DEFAULT_DIRECTION = -1;
 
-    public constructor(direction: number, data: IDirection) {
+    constructor(direction: number, data: IDirection) {
         this._direction = direction;
     }
 
-    public getOffsetZ(): number {
+    getOffsetZ(): number {
         return this._z;
     }
 }

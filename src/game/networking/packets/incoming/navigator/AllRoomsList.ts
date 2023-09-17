@@ -5,8 +5,8 @@ import {NavigatorRoomsEventData} from '../../../../engine/events/ui/data/navigat
 import {UIEvents} from '../../../../engine/events/ui/UIEvents';
 import {MessageHandler} from '../../../handler/MessageHandler';
 
-export default class AllRoomsList extends MessageHandler {
-    public handle() {
+export class AllRoomsList extends MessageHandler {
+    handle() {
         const rooms = this.message.data as NavigatorRoom[];
 
         EventManager.emit<NavigatorRoomsEventData>(

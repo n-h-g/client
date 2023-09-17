@@ -1,18 +1,18 @@
 import {Container} from 'pixi.js';
-import Point from '../../../../../utils/point/Point';
+import {Point} from '../../../../../utils/point/Point';
 
-export default class AvatarImageContainer {
-    public imageContainer: Container;
+export class AvatarImageContainer {
+    imageContainer: Container;
 
     private offsets: Point;
 
-    public constructor(image: Container) {
+    constructor(image: Container) {
         this.imageContainer = image;
 
         this.offsets = new Point(0, 0);
     }
 
-    public get image(): Container {
+    get image(): Container {
         return this.imageContainer;
     }
 }

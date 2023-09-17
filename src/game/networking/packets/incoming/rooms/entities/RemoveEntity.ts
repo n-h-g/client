@@ -3,8 +3,8 @@ import {Entity} from '../../../../../core/room/object/entities/Entity';
 import {Engine} from '../../../../../Engine';
 import {MessageHandler} from '../../../../handler/MessageHandler';
 
-export default class RemoveEntity extends MessageHandler {
-    public handle(): void {
+export class RemoveEntity extends MessageHandler {
+    handle(): void {
         const data: string = this.message.data;
 
         if (!Engine.getInstance().roomService.CurrentRoom) return;

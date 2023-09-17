@@ -1,19 +1,20 @@
-import Action from '../actions/Action';
-import IAvatarPartSetsData, {
+import {Action} from '../actions/Action';
+import {
+	IAvatarPartSetsData,
     IActivePartSets,
     IPartSets,
 } from '../gamedata/IAvatarPartSetsData';
-import ActivePartSet from './parts/ActivePartSet';
-import Part from './parts/Part';
+import {ActivePartSet} from './parts/ActivePartSet';
+import {Part} from './parts/Part';
 
-export default class AvatarPartSets {
+export class AvatarPartSets {
     /**
      *  setType     |       Part
      */
     private parts: Map<string, Part>;
     private activeParts: Map<string, ActivePartSet>;
 
-    public constructor(partSetsData: IAvatarPartSetsData) {
+    constructor(partSetsData: IAvatarPartSetsData) {
         this.parts = new Map();
         this.activeParts = new Map();
 
@@ -21,13 +22,13 @@ export default class AvatarPartSets {
         this.loadActivePartSets(partSetsData.partSets.activePartSets);
     }
 
-    public getFlippedSetType(setType: string): string {
+    getFlippedSetType(setType: string): string {
         const part = this.getPart(setType) as Part;
 
         return part.flippedSetType ? part.flippedSetType : part.setType;
     }
 
-    public getActiveParts(activePartId: string): string[] {
+    getActiveParts(activePartId: string): string[] {
         const activePart = this.getActivePart(activePartId);
 
         if (!activePart) return [];
@@ -54,7 +55,7 @@ export default class AvatarPartSets {
         }
     }
 
-    public getPart(type: string): Part | null {
+    getPart(type: string): Part | null {
         const part = this.parts.get(type) as Part;
 
         if (!part) return null;
@@ -62,7 +63,7 @@ export default class AvatarPartSets {
         return part;
     }
 
-    public getActivePart(activePartId: string): ActivePartSet | null {
+    getActivePart(activePartId: string): ActivePartSet | null {
         const activePart: ActivePartSet = this.activeParts.get(
             activePartId
         ) as ActivePartSet;
@@ -72,7 +73,7 @@ export default class AvatarPartSets {
         return activePart;
     }
 
-    public getActivePartForAction(action: Action): string[] {
+    getActivePartForAction(action: Action): string[] {
         const parts: string[] = [];
 
         const activePart = this.getActivePart(action.activePartSet);

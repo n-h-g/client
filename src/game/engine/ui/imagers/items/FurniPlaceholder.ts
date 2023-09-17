@@ -1,5 +1,5 @@
 import {Furni} from './Furni';
-import FurniBase from './FurniBase';
+import {FurniBase} from './FurniBase';
 
 export class FurniPlaceholder extends Furni {
     constructor(

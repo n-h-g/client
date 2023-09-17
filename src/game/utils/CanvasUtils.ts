@@ -1,5 +1,5 @@
-export default class CanvasUtils {
-    public static trimCanvas(c: HTMLCanvasElement) {
+export class CanvasUtils {
+    static trimCanvas(c: HTMLCanvasElement) {
         const ctx = c.getContext('2d')
 
         if (ctx == null) return;
@@ -56,7 +56,8 @@ export default class CanvasUtils {
                 bound.top,
                 trimWidth,
                 trimHeight
-
+			);
+			
         copy!.canvas.width = trimWidth;
         copy!.canvas.height = trimHeight;
         copy!.putImageData(trimmed, 0, 0);
@@ -65,7 +66,7 @@ export default class CanvasUtils {
         return copy!.canvas;
     }
 
-    public static imageToCanvas(image: HTMLImageElement): HTMLCanvasElement {
+    static imageToCanvas(image: HTMLImageElement): HTMLCanvasElement {
         const canavs = document.createElement("canvas")
         const ctx = canavs.getContext("2d")
 
@@ -76,7 +77,7 @@ export default class CanvasUtils {
         return canavs;
     }
 
-    public static canvasToImage(canvas: HTMLCanvasElement): HTMLImageElement {
+    static canvasToImage(canvas: HTMLCanvasElement): HTMLImageElement {
         let image = document.createElement('img') as HTMLImageElement;
         image.src = canvas.toDataURL();
         return image;

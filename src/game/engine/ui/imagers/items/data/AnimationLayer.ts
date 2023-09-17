@@ -9,12 +9,12 @@ import {AnimationFrameSequence} from './AnimationFrameSequence';
 export class AnimationLayer {
     private _sequences: Map<number, AnimationFrameSequence>;
 
-    public constructor(data: IAnimationLayer) {
+    constructor(data: IAnimationLayer) {
         this._sequences = new Map();
 
         this.loadSequences(data.sequences);
     }
-    public loadSequences(sequences: {
+    loadSequences(sequences: {
         [index: number]: IAnimationLayerFrameSequence;
     }) {
         for (const sequence of Object.keys(sequences)) {
@@ -25,7 +25,7 @@ export class AnimationLayer {
         }
     }
 
-    public getFrame(direction: number, frameId: number) {
+    getFrame(direction: number, frameId: number) {
         const sequence = this._sequences.get(direction);
 
         if (!sequence) return;
@@ -35,11 +35,11 @@ export class AnimationLayer {
         return frame;
     }
 
-    public hasSequences(): boolean {
+    hasSequences(): boolean {
         return this._sequences.size > 0;
     }
 
-    public getSequence(direction: number): AnimationFrameSequence {
+    getSequence(direction: number): AnimationFrameSequence {
         const sequence = this._sequences.get(direction);
 
         if (!sequence) return null;

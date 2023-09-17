@@ -1,19 +1,19 @@
 import {FigurePart} from '../Avatar';
-import IFigureData, {
-    ISet,
+import {
+	IFigureData,
     CA,
     IPart,
     IPaletteColor,
 } from '../gamedata/IFigureData';
 import {Palette} from './figure/Palette';
-import PartSet from './figure/Set';
-import SetType from './figure/SetType';
+import {PartSet} from './figure/Set';
+import {SetType} from './figure/SetType';
 
-export default class AvatarFigureData {
-    public palettes: Map<string, Palette>;
-    public setTypes: Map<string, SetType>;
+export class AvatarFigureData {
+    palettes: Map<string, Palette>;
+    setTypes: Map<string, SetType>;
 
-    public constructor(figureData: IFigureData) {
+    constructor(figureData: IFigureData) {
         this.palettes = new Map();
         this.setTypes = new Map();
 
@@ -43,7 +43,7 @@ export default class AvatarFigureData {
         }
     }
 
-    public getSetByType(type: string): SetType | null {
+    getSetByType(type: string): SetType | null {
         const set = this.setTypes.get(type);
 
         if (!set) return null;
@@ -51,7 +51,7 @@ export default class AvatarFigureData {
         return set;
     }
 
-    public getSetByFigurePart(figurePart: FigurePart): PartSet | null {
+    getSetByFigurePart(figurePart: FigurePart): PartSet | null {
         const setType = this.setTypes.get(figurePart.type);
         const set = setType?.partSets.get(figurePart.id);
 
@@ -60,7 +60,7 @@ export default class AvatarFigureData {
         return set;
     }
 
-    public getSetByPartId(type: string, id: string): PartSet | null {
+    getSetByPartId(type: string, id: string): PartSet | null {
         const set = this.getSetByType(type);
 
         if (!set) return null;
@@ -72,7 +72,7 @@ export default class AvatarFigureData {
         return setType;
     }
 
-    public getFigureDataParts(figurePart: FigurePart): IPart[] {
+    getFigureDataParts(figurePart: FigurePart): IPart[] {
         const parts: IPart[] = [];
 
         const setType = this.setTypes.get(figurePart.type);
@@ -96,7 +96,7 @@ export default class AvatarFigureData {
         return parts;
     }
 
-    public getPalette(paletteId: string): Palette | null {
+    getPalette(paletteId: string): Palette | null {
         const palette = this.palettes.get(paletteId.toString());
 
         if (!palette) return null;

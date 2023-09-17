@@ -1,30 +1,30 @@
 import {ActionId} from '../enum/actions/ActionId';
-import AvatarActionId from '../enum/actions/AvatarActionId';
+import {AvatarActionId} from '../enum/actions/AvatarActionId';
 import {GeometryType} from '../enum/geometry/GeometryType';
 import {IAction, IActionType} from '../gamedata/IAvatarActions';
 
-export default class Action {
-    public id: ActionId;
-    public state: string;
-    public precedence: number;
-    public main: boolean;
+export class Action {
+    id: ActionId;
+    state: string;
+    precedence: number;
+    main: boolean;
 
-    public geometryType: string;
+    geometryType: string;
 
-    public activePartSet: string;
-    public assetPartDefiniton: string;
+    activePartSet: string;
+    assetPartDefiniton: string;
 
-    public prevents: string[];
+    prevents: string[];
 
-    public isDefault: boolean | undefined;
+    isDefault: boolean | undefined;
 
-    public lay: string;
+    lay: string;
 
-    public preventHeadTurn: boolean | undefined;
+    preventHeadTurn: boolean | undefined;
 
-    public types: IActionType[];
+    types: IActionType[];
 
-    public constructor(actionData: IAction) {
+    constructor(actionData: IAction) {
         this.id = actionData.id as ActionId;
         this.state = actionData.state;
         this.precedence = actionData.precedence;
@@ -39,7 +39,7 @@ export default class Action {
         this.types = actionData.types;
     }
 
-    public getActionStateName() {
+    getActionStateName() {
         return AvatarActionId.idToAvatarActionState(this.id);
     }
 }

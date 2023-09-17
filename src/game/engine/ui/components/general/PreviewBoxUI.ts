@@ -8,7 +8,7 @@ export class PreviewBoxUI extends ShowableComponent {
         super(PreviewBoxGUI, UIComponent.PreviewBoxUI);
     }
 
-    public getEventTypeFromComponent(): UIEventsType {
+    getEventTypeFromComponent(): UIEventsType {
         return UIEventsType.PREVIEWBOX;
     }
 }

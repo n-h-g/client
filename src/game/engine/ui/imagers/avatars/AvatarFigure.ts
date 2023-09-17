@@ -1,19 +1,19 @@
 import {Engine} from '../../../../Engine';
 import {FigurePart} from './Avatar';
-import AvatarFigureComponent from './AvatarFigureComponent';
-import AvatarFigureDataPart from './AvatarFigureDataPart';
-import AvatarFigurePart from './AvatarFigurePart';
-import AvatarStructure from './structure/AvatarStructure';
-import PaletteColor from './structure/figure/PaletteColor';
+import {AvatarFigureComponent} from './AvatarFigureComponent';
+import {AvatarFigureDataPart} from './AvatarFigureDataPart';
+import {AvatarFigurePart} from './AvatarFigurePart';
+import {AvatarStructure} from './structure/AvatarStructure';
+import {PaletteColor} from './structure/figure/PaletteColor';
 
-export default class AvatarFigure {
+export class AvatarFigure {
     private parts: FigurePart[];
 
     private figureDataParts: Map<string, AvatarFigureDataPart>;
 
     private avatarStructure: AvatarStructure | null;
 
-    public constructor(figure: string) {
+    constructor(figure: string) {
         this.avatarStructure =
             Engine.getInstance().userInterfaceManager?.avatarImager.Structure!;
         this.parts = this.getPartsFromFigure(figure);
@@ -22,7 +22,7 @@ export default class AvatarFigure {
         this.loadFigureDataParts();
     }
 
-    public getAllComponents(): AvatarFigureComponent[] {
+    getAllComponents(): AvatarFigureComponent[] {
         const figureComponents: AvatarFigureComponent[] = [];
 
         for (let part of this.figureDataParts.values()) {
@@ -34,7 +34,7 @@ export default class AvatarFigure {
         return figureComponents;
     }
 
-    public getAllHidden(): string[] {
+    getAllHidden(): string[] {
         const hiddens: string[] = [];
 
         for (let part of this.figureDataParts.values()) {
@@ -45,11 +45,11 @@ export default class AvatarFigure {
     }
 
 
-    public getFigureDataParts(): Map<string, AvatarFigureDataPart> {
+    getFigureDataParts(): Map<string, AvatarFigureDataPart> {
         return this.figureDataParts;
     }
 
-    public getPartColorIds(id: string): number[] {
+    getPartColorIds(id: string): number[] {
         const part = this.getPartSetId(id);
 
         if (!part) return [];
@@ -57,7 +57,7 @@ export default class AvatarFigure {
         return part.colors;
     }
 
-    public getPartSetId(id: string): FigurePart | null {
+    getPartSetId(id: string): FigurePart | null {
         for (let part of this.parts) {
             if (part.id == id) {
                 return part;
@@ -67,7 +67,7 @@ export default class AvatarFigure {
         return null;
     }
 
-    public getFigureDataPart(type: string): AvatarFigureDataPart | null {
+    getFigureDataPart(type: string): AvatarFigureDataPart | null {
         const AvatarFigureDataPart = this.figureDataParts.get(type);
 
         if (!AvatarFigureDataPart) return null;
@@ -75,16 +75,17 @@ export default class AvatarFigure {
         return AvatarFigureDataPart;
     }
 
-    public loadFigureDataParts() {
+    loadFigureDataParts() {
         for (let part of this.parts) {
             this.loadFigureDataPart(part);
         }
     }
 
-    public loadFigureDataPart(figurePart: FigurePart) {
+    loadFigureDataPart(figurePart: FigurePart) {
         let figureDataPart: AvatarFigureDataPart = new AvatarFigureDataPart(
             this,
             figurePart.type
+        );
 
         const setType = this.avatarStructure?.AvatarFigureData?.getSetByType(
             figurePart.type
@@ -101,6 +102,7 @@ export default class AvatarFigure {
                 this,
                 figurePart.type,
                 set.parts
+            );
 
             for (let part of set?.parts) {
                 const colorId =
@@ -136,7 +138,7 @@ export default class AvatarFigure {
         this.figureDataParts.set(figurePart.type, figureDataPart);
     }
 
-    public loadAvatarFigure() {
+    loadAvatarFigure() {
         /*for (let figurePart of this.look) {
             let fdPart = this.getFigureDataPart(figurePart)
 
@@ -179,11 +181,11 @@ export default class AvatarFigure {
         return look;
     }
 
-    public get look(): FigurePart[] {
+    get look(): FigurePart[] {
         return this.parts;
     }
 
-    public set structure(avatarStructure: AvatarStructure) {
+    set structure(avatarStructure: AvatarStructure) {
         this.avatarStructure = avatarStructure;
     }
 }

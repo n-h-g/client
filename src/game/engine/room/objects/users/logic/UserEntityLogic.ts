@@ -1,12 +1,10 @@
 import {EventManager} from '../../../../../core/events/EventManager';
-import {Entity} from '../../../../../core/room/object/entities/Entity';
 import {HumanLogic} from '../../../../../core/room/object/human/logic/HumanLogic';
 import {IComponentShowableUI} from '../../../../../core/ui/IComponentShowableUI';
 import {Engine} from '../../../../../Engine';
 import {OutgoingPacket} from '../../../../../networking/packets/outgoing/OutgoingPacket';
-import Point from '../../../../../utils/point/Point';
-import UiUtils from '../../../../../utils/UiUtils';
-import {EntityEvents} from '../../../../events/room/objects/entities/EntityEvents';
+import {Point} from '../../../../../utils/point/Point';
+import {UiUtils} from '../../../../../utils/UiUtils';
 import {HumanEvents} from '../../../../events/room/objects/entities/HumanEvents';
 import {UserEvents} from '../../../../events/room/objects/entities/UserEvents';
 import {AvatarContainerData} from '../../../../events/ui/data/avatar/AvatarContainerData';
@@ -14,18 +12,18 @@ import {UIEvents} from '../../../../events/ui/UIEvents';
 import {ChatData} from '../../../../game/chat/ChatData';
 import {UIComponent} from '../../../../ui/components/UIComponent';
 import {ActionId} from '../../../../ui/imagers/avatars/enum/actions/ActionId';
-import AvatarData from '../../../../ui/imagers/avatars/enum/AvatarData';
-import UserEntityVisualization from '../visualization/UserEntityVisualization';
+import {AvatarData} from '../../../../ui/imagers/avatars/enum/AvatarData';
+import {UserEntityVisualization} from '../visualization/UserEntityVisualization';
 
-export default class UserEntityLogic extends HumanLogic {
+export class UserEntityLogic extends HumanLogic {
     private _typing = false;
     private _showLabel = false;
 
     private static SHOW_LABELS = false;
 
-    public onDance(): void {}
+    onDance(): void {}
 
-    public registerEvents() {
+    registerEvents() {
         this.entity.visualization.container.on('pointerdown', () =>
             this.onClick()
         );
@@ -45,12 +43,12 @@ export default class UserEntityLogic extends HumanLogic {
         );
     }
 
-    public onToggleTyping(typing): void {
+    onToggleTyping(typing): void {
         this._typing = typing;
         this._showLabel = false;
     }
 
-    public onTalk(length?: number): void {
+    onTalk(length?: number): void {
         setTimeout(
             () => {
                 const EntityVisualization = this._entity
@@ -64,7 +62,7 @@ export default class UserEntityLogic extends HumanLogic {
         );
     }
 
-    public onMove(delta: number): void {
+    onMove(delta: number): void {
         const userVisualization = this.entity
             .visualization as UserEntityVisualization;
 
@@ -73,7 +71,7 @@ export default class UserEntityLogic extends HumanLogic {
         }
     }
 
-    public onHover(): void {
+    onHover(): void {
         super.onHover();
 
         if (!UserEntityLogic.SHOW_LABELS) return;
@@ -99,11 +97,11 @@ export default class UserEntityLogic extends HumanLogic {
         const position = new Point(
             UiUtils.getGlobalPosition(this.entity.visualization?.container!)
                 .tx +
-                dimension.getY() / 2 +
+                dimension.y / 2 +
                 AvatarData.AVATAR_CONTAINER_OFFSET_LEFT,
             UiUtils.getGlobalPosition(this.entity.visualization?.container!)
                 .ty -
-                dimension.getX() +
+                dimension.x +
                 AvatarData.AVATAR_CONTAINER_OFFSET_TOP
         );
 
@@ -113,26 +111,26 @@ export default class UserEntityLogic extends HumanLogic {
                 label: this.entity.name,
                 showLabel: this._showLabel,
                 bounds: {
-                    x: position.getX(),
-                    y: position.getY(),
-                    w: dimension.getY(),
-                    h: dimension.getX(),
+                    x: position.x,
+                    y: position.y,
+                    w: dimension.y,
+                    h: dimension.x,
                 },
                 typing: this._typing,
             }
         );
     }
 
-    public onPositionChanged() {}
+    onPositionChanged() {}
 
-    public onLoad(): void {
+    onLoad(): void {
         this._showLabel = false;
     }
 
-    public onClick() {
+    onClick() {
         const roomId = Engine.getInstance().roomService?.CurrentRoom?.id;
-        const x = this.entity.position.getX();
-        const y = this.entity.position.getY();
+        const x = this.entity.position.x;
+        const y = this.entity.position.y;
 
         Engine.getInstance().networkingManager?.packetManager.applyOut(
             OutgoingPacket.UserLookAtPoint,
@@ -146,5 +144,5 @@ export default class UserEntityLogic extends HumanLogic {
         super.onClick();
     }
 
-    public figureChanged() {}
+    figureChanged() {}
 }

@@ -1,16 +1,16 @@
 import {Engine} from '../../../../../Engine';
 import {HumanEvents} from '../../../../../engine/events/room/objects/entities/HumanEvents';
-import MapData from '../../../../../engine/room/objects/map/MapData';
+import {MapData} from '../../../../../engine/room/objects/map/MapData';
 import {Tile} from '../../../../../engine/room/objects/map/Tile';
 import {RoomPriority} from '../../../../../engine/room/visualization/RoomPriority';
-import RoomVisualization from '../../../../../engine/room/visualization/RoomVisualization';
-import Avatar from '../../../../../engine/ui/imagers/avatars/Avatar';
-import AvatarPlaceHolder from '../../../../../engine/ui/imagers/avatars/AvatarPlaceholder';
+import {RoomVisualization} from '../../../../../engine/room/visualization/RoomVisualization';
+import {Avatar} from '../../../../../engine/ui/imagers/avatars/Avatar';
+import {AvatarPlaceHolder} from '../../../../../engine/ui/imagers/avatars/AvatarPlaceholder';
 import {ActionId} from '../../../../../engine/ui/imagers/avatars/enum/actions/ActionId';
-import AvatarData from '../../../../../engine/ui/imagers/avatars/enum/AvatarData';
-import Point from '../../../../../utils/point/Point';
-import Point3d from '../../../../../utils/point/Point3d';
-import Rotation from '../../../../../utils/Rotation';
+import {AvatarData} from '../../../../../engine/ui/imagers/avatars/enum/AvatarData';
+import {Point} from '../../../../../utils/point/Point';
+import {Point3d} from '../../../../../utils/point/Point3d';
+import {Rotation} from '../../../../../utils/Rotation';
 import {Direction} from '../../../../objects/Direction';
 import {EntityVisualization} from '../../entities/EntityVisualization';
 import {Human} from '../Human';
@@ -18,28 +18,28 @@ import {Human} from '../Human';
 export abstract class HumanVisualization extends EntityVisualization {
     protected _actions: Set<ActionId>;
     protected _avatar: Avatar;
-    public _entity: Human = null;
+    _entity: Human = null;
     protected _headDirection: Direction = Direction.SOUTH;
     protected loaded = false;
 
-    public constructor(human: Human) {
+    constructor(human: Human) {
         super(human);
         this._entity = human;
         this._actions = new Set();
     }
 
-    public setNextPosition(point: Point3d): void {
+    setNextPosition(point: Point3d): void {
         super.setNextPosition(point);
         this.headRotation = Rotation.calculateDirection(
             new Point(
-                this.entity.position.getX(),
-                this._entity.position.getY()
+                this.entity.position.x,
+                this._entity.position.y
             ),
-            new Point(this.entity.position.getX(), this.entity.position.getY())
+            new Point(this.entity.position.x, this.entity.position.y)
         );
     }
 
-    public async loadAvatar(): Promise<void> {
+    async loadAvatar(): Promise<void> {
         return new Promise((resolve, reject) => {
             const avatar = new Avatar(
                 this._entity.figure,
@@ -60,15 +60,15 @@ export abstract class HumanVisualization extends EntityVisualization {
         });
     }
 
-    public dispose(): void {
+    dispose(): void {
         super.dispose();
     }
 
-    public set headRotation(direction: Direction) {
+    set headRotation(direction: Direction) {
         this._headDirection = direction;
     }
 
-    public addAction(action: ActionId): void {
+    addAction(action: ActionId): void {
         this.removeActions([
             ActionId.STAND,
             ActionId.WALK,
@@ -78,20 +78,20 @@ export abstract class HumanVisualization extends EntityVisualization {
         this._actions.add(action);
     }
 
-    public removeAction(action: ActionId): void {
+    removeAction(action: ActionId): void {
         this._actions.delete(action);
     }
-    public removeActions(actions: ActionId[]) {
+    removeActions(actions: ActionId[]) {
         for (const action of actions) this.removeAction(action);
     }
 
-    public updateDirection(direction: Direction) {
+    updateDirection(direction: Direction) {
         const avatar = this._avatar;
         this.container!.removeChildren();
         avatar!.Direction = direction;
     }
 
-    public async draw(): Promise<void> {
+    async draw(): Promise<void> {
         this.container.destroy();
 
         if (this.loaded) {
@@ -132,7 +132,7 @@ export abstract class HumanVisualization extends EntityVisualization {
         this.entity.logic.registerEvents();
     }
 
-    public async render(): Promise<void> {
+    async render(): Promise<void> {
         const placeholder = new AvatarPlaceHolder(
             '',
             this.rotation,
@@ -178,57 +178,57 @@ export abstract class HumanVisualization extends EntityVisualization {
         this.entity.logic.registerEvents();
     }
 
-    public nextFrame(): void {
+    nextFrame(): void {
         if (this.frame > this._avatar.Frames) this.frame = 0;
         else this.frame++;
     }
 
-    public getZIndex(): number {
+    getZIndex(): number {
         const isAtDoor =
-            Math.floor(this.entity.position.getX()) ==
+            Math.floor(this.entity.position.x) ==
                 Engine.getInstance()
                     .roomService.CurrentRoom.roomLayout.getDoorPosition()
-                    .getX() &&
-            Math.floor(this.entity.position.getY()) ==
+                    .x &&
+            Math.floor(this.entity.position.y) ==
                 Engine.getInstance()
                     .roomService.CurrentRoom.roomLayout.getDoorPosition()
-                    .getY();
+                    .y;
         return RoomVisualization.calculateZIndex(
             new Point3d(
-                this.entity.position.getX(),
-                this.entity.position.getY(),
-                this.entity.position.getZ() + 0.001
+                this.entity.position.x,
+                this.entity.position.y,
+                this.entity.position.z + 0.001
             ),
             isAtDoor ? RoomPriority.DOOR_FLOOR_USER : RoomPriority.USER
         );
     }
 
-    public calculateOffsetY(): number {
+    calculateOffsetY(): number {
         const tile: Tile = Engine.getInstance()
             .roomService.CurrentRoom.roomLayout.getFloorPlane()
             .getTilebyPosition(
                 new Point(
-                    Math.round(this._entity.position.getX()),
-                    Math.round(this.entity.position.getY())
+                    Math.round(this._entity.position.x),
+                    Math.round(this.entity.position.y)
                 )
             );
         const offsetFloor =
-            tile!.position.getZ() > 0
+            tile!.position.z > 0
                 ? -MapData.thickSpace *
                   MapData.stepHeight *
-                  tile!.position.getZ()
+                  tile!.position.z
                 : -AvatarData.AVATAR_TOP_OFFSET;
         return (this.container!.y =
-            ((this.entity.position.getX() + this.entity.position.getY()) *
+            ((this.entity.position.x + this.entity.position.y) *
                 MapData.tileHeight) /
                 2 +
             MapData.tileHeight / 2 +
             offsetFloor);
     }
 
-    public calculateOffsetX(): number {
+    calculateOffsetX(): number {
         return (
-            ((this.entity.position.getY() - this.entity.position.getX()) *
+            ((this.entity.position.y - this.entity.position.x) *
                 MapData.tileWidth) /
                 2 +
             MapData.tileWidth / 2 -
@@ -236,7 +236,7 @@ export abstract class HumanVisualization extends EntityVisualization {
         );
     }
 
-    public get actions(): Set<ActionId> {
+    get actions(): Set<ActionId> {
         return this._actions;
     }
 }

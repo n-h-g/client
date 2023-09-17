@@ -1,24 +1,24 @@
 import {RoomPlaneType} from './RoomPlaneTypeEnum';
 import {RoomPlane} from './RoomPlane';
-import MapTypeChecker from './MapTypeChecker';
+import {MapTypeChecker} from './MapTypeChecker';
 import {WallType} from './WallTypeEnum';
-import Point3d from '../../../../utils/point/Point3d';
+import {Point3d} from '../../../../utils/point/Point3d';
 import {Wall} from './Wall';
-import RoomLayout from '../../RoomLayout';
+import {RoomLayout} from '../../RoomLayout';
 
 export class WallPlane extends RoomPlane {
     constructor(room: RoomLayout, isRight = false) {
         super(room, isRight ? RoomPlaneType.RightWall : RoomPlaneType.LeftWall);
     }
 
-    public prepareWalls(): void {
+    prepareWalls(): void {
         let minY = this.room.getModelMaltrix()[0].length;
         let minX = this.room.getModelMaltrix().length;
         let isCorner = false;
         let isDoor = false;
         let isLast = false;
-        const doorX = this.room.getDoorPosition().getX();
-        const doorY = this.room.getDoorPosition().getY();
+        const doorX = this.room.getDoorPosition().x;
+        const doorY = this.room.getDoorPosition().y;
 
         for (let x = 0; x < this.room.getModelMaltrix().length; x++) {
             for (let y = 0; y < this.room.getModelMaltrix()[x].length; y++) {
@@ -121,7 +121,7 @@ export class WallPlane extends RoomPlane {
         }
     }
 
-    public getWalls(): Array<Wall> {
+    getWalls(): Array<Wall> {
         return this.mapObjects as Array<Wall>;
     }
 }

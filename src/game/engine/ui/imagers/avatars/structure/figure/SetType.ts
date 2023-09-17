@@ -1,14 +1,14 @@
-import {CA, IPart, ISet} from '../../gamedata/IFigureData';
-import PartSet from './Set';
+import {CA, ISet} from '../../gamedata/IFigureData';
+import {PartSet} from './Set';
 
-export default class SetType {
-    public paletteid: number;
-    public partSets: Map<string, PartSet>;
+export class SetType {
+    paletteid: number;
+    partSets: Map<string, PartSet>;
 
-    public isMandatoryM: boolean[] = [];
-    public isMandatoryF: boolean[] = [];
+    isMandatoryM: boolean[] = [];
+    isMandatoryF: boolean[] = [];
 
-    public constructor(setTypeData: CA) {
+    constructor(setTypeData: CA) {
         this.paletteid = setTypeData.paletteid;
         this.partSets = new Map();
 
@@ -18,7 +18,7 @@ export default class SetType {
         this.loadSets(setTypeData.set);
     }
 
-    public loadSets(sets: {[key: string]: ISet}): void {
+    loadSets(sets: {[key: string]: ISet}): void {
         if (sets) {
             for (const set of Object.keys(sets)) {
                 this.partSets.set(set, new PartSet(sets[set] as ISet));
@@ -26,7 +26,7 @@ export default class SetType {
         }
     }
 
-    public get PaletteId(): number {
+    get PaletteId(): number {
         return this.paletteid;
     }
 }

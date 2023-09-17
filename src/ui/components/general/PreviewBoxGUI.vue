@@ -51,7 +51,7 @@ import { DialogEventData } from '../../../game/engine/events/ui/data/general/Dia
 import { PreviewModeEventData } from '../../../game/engine/events/ui/data/general/PreviewUserData'
 import { UIEvents } from '../../../game/engine/events/ui/UIEvents'
 import { UIEventsType } from '../../../game/engine/events/ui/UIEventsType'
-import Item from '../../../game/engine/room/objects/items/Item'
+import {Item} from '../../../game/engine/room/objects/items/Item'
 import { OutgoingPacket } from '../../../game/networking/packets/outgoing/OutgoingPacket'
 
 const mode = ref('')

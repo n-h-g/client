@@ -1,5 +1,5 @@
 import GameLoaderGUI from '../../../../../ui/components/loader/GameLoaderGUI.vue';
-import UiUtils from '../../../../utils/UiUtils';
+import {UiUtils} from '../../../../utils/UiUtils';
 import {LoadingProgressEventData} from '../../../events/ui/data/loader/LoadingProgress';
 import {EventManager} from '../../../../core/events/EventManager';
 import {UIComponent} from '../UIComponent';
@@ -44,7 +44,7 @@ export class GameLoaderUI extends DeletableComponent {
         UiUtils.dismountComponent(UIComponent.GameLoaderUI);
     }
 
-    public get progress() {
+    get progress() {
         return this._progress;
     }
 }

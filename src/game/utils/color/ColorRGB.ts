@@ -1,74 +1,76 @@
 export class ColorRGB {
-    private red: number;
-    private green: number;
-    private blue: number;
+    private wrappedRed: number;
+    private wrappedGreen: number;
+    private wrappedBlue: number;
 
     constructor(r: number, g: number, b: number) {
-        this.red = r % 256;
-        this.green = g % 256;
-        this.blue = b % 256;
+        this.wrappedRed = r % 256;
+        this.wrappedGreen = g % 256;
+        this.wrappedBlue = b % 256;
     }
 
-    public equals(color: ColorRGB): boolean {
+    equals(color: ColorRGB): boolean {
         return (
-            this.red == color.getRed() &&
-            this.green == color.getGreen() &&
-            this.blue == color.getBlue()
+            this.wrappedRed == color.red &&
+            this.wrappedGreen == color.green &&
+            this.wrappedBlue == color.blue
         );
     }
 
-    public brightness(percentage: number): ColorRGB {
+    brightness(percentage: number): ColorRGB {
         percentage =
             percentage < -100 ? -100 : percentage > 100 ? 100 : percentage;
         const brightness = (255 * percentage) / 100;
         const red =
-            this.red + brightness < 0
+            this.wrappedRed + brightness < 0
                 ? 0
-                : this.red + brightness > 255
+                : this.wrappedRed + brightness > 255
                 ? 255
-                : this.red + brightness;
+                : this.wrappedRed + brightness;
+
         const green =
-            this.green + brightness < 0
+            this.wrappedGreen + brightness < 0
                 ? 0
-                : this.green + brightness > 255
+                : this.wrappedGreen + brightness > 255
                 ? 255
-                : this.green + brightness;
+                : this.wrappedGreen + brightness;
+
         const blue =
-            this.blue + brightness < 0
+            this.wrappedBlue + brightness < 0
                 ? 0
-                : this.blue + brightness > 255
+                : this.wrappedBlue + brightness > 255
                 ? 255
-                : this.blue + brightness;
+                : this.wrappedBlue + brightness;
 
         return new ColorRGB(red, green, blue);
     }
 
-    public getRed(): number {
-        return this.red;
+    get red(): number {
+        return this.wrappedRed;
     }
 
-    public getGreen(): number {
-        return this.green;
+    get green(): number {
+        return this.wrappedGreen;
     }
 
-    public getBlue(): number {
-        return this.blue;
+    get blue(): number {
+        return this.wrappedBlue;
     }
 
-    public toHexString(): string {
+    toHexString(): string {
         return (
             '#' +
-            ((1 << 24) + (this.red << 16) + (this.green << 8) + this.blue)
+            ((1 << 24) + (this.wrappedRed << 16) + (this.wrappedGreen << 8) + this.wrappedBlue)
                 .toString(16)
                 .slice(1)
         );
     }
 
-    public toHex(): string {
+    toHex(): string {
         return this.toHexString().split('.')[0];
     }
 
-    public static getRandomColor(): ColorRGB {
+    static getRandomColor(): ColorRGB {
         const r = Math.round(Math.random() * 256);
         const g = Math.round(Math.random() * 256);
         const b = Math.round(Math.random() * 256);
@@ -76,7 +78,7 @@ export class ColorRGB {
         return new ColorRGB(r, g, b);
     }
 
-    public static getColorFromHex(hex: string): ColorRGB {
+    static getColorFromHex(hex: string): ColorRGB {
         if (hex.length == 4)
             return new ColorRGB(
                 parseInt('0x' + hex[1] + hex[1], 16),
@@ -93,7 +95,7 @@ export class ColorRGB {
         return new ColorRGB(0, 0, 0);
     }
 
-    public static getColorFromNumber(num: number): ColorRGB {
+    static getColorFromNumber(num: number): ColorRGB {
         return new ColorRGB((num >> 16) & 0xff, (num >> 8) & 0xff, num & 0xff);
     }
 }

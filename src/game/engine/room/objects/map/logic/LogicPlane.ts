@@ -2,7 +2,7 @@ import {RoomObjectController} from '../../../../../core/room/object/RoomObjectCo
 import {RoomObjectLogic} from '../../../../../core/room/object/RoomObjectLogic';
 import {RoomPlane} from '../RoomPlane';
 
-export default class LogicPlane extends RoomObjectLogic {
+export class LogicPlane extends RoomObjectLogic {
     private plane: RoomPlane;
 
     constructor(plane: RoomPlane) {
@@ -35,5 +35,5 @@ export default class LogicPlane extends RoomObjectLogic {
         });
     }
 
-    public onClick(): void {}
+    onClick(): void {}
 }

@@ -2,7 +2,7 @@ import {Service} from '../../../core/Service';
 import {CommandRepository} from './CommandRepository';
 import {Command} from './Command';
 import {ChooserCommand} from './ChooserCommand';
-import ZoomCommand from './ZoomCommand';
+import {ZoomCommand} from './ZoomCommand';
 
 export class CommandService extends Service<string, Command> {
     constructor() {
@@ -11,7 +11,7 @@ export class CommandService extends Service<string, Command> {
         this.init();
     }
 
-    public init() {
+    init() {
         this.addCommand(new ChooserCommand());
         this.addCommand(new ZoomCommand());
     }

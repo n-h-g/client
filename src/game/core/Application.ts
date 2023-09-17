@@ -31,7 +31,7 @@ export class ApplicationEngine extends Application<HTMLCanvasElement> {
         this._engine = engine;
     }
 
-    public setUpViewport() {
+    setUpViewport() {
         if (this._viewport != null) this._viewport.destroy();
 
         this._viewport = new Viewport({
@@ -58,7 +58,7 @@ export class ApplicationEngine extends Application<HTMLCanvasElement> {
         });
     }
 
-    public showDebugInfo(fps: number = this.ticker.FPS) {
+    showDebugInfo(fps: number = this.ticker.FPS) {
         for (const children of this.debugInfoContainer.children) {
             this.debugInfoContainer.removeChild(children);
         }
@@ -73,7 +73,7 @@ export class ApplicationEngine extends Application<HTMLCanvasElement> {
         this.debugInfoContainer.addChild(fpsText);
     }
 
-    public init(): void {
+    init(): void {
         this.setUpEvents();
         this.setUpGameLoop();
     }
@@ -127,11 +127,11 @@ export class ApplicationEngine extends Application<HTMLCanvasElement> {
         this.renderer.resize(window.innerWidth, window.innerHeight);
     }
 
-    public get viewport(): Viewport {
+    get viewport(): Viewport {
         return this._viewport;
     }
 
-    public get screenCords(): Point {
+    get screenCords(): Point {
         return this.viewPortScreenCords;
     }
 }

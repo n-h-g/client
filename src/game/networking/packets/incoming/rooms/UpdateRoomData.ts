@@ -1,10 +1,10 @@
-import RoomData from '../../../../core/communication/incoming/rooms/RoomData';
+import {RoomData} from '../../../../core/communication/incoming/rooms/RoomData';
 import {Engine} from '../../../../Engine';
-import Point from '../../../../utils/point/Point';
+import {Point} from '../../../../utils/point/Point';
 import {MessageHandler} from '../../../handler/MessageHandler';
 
 export class UpdateRoomData extends MessageHandler {
-    public handle(): void {
+    handle(): void {
         const room: RoomData = this.message;
 
         if (room.id == -1) {

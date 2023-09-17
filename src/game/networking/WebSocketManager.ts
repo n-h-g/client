@@ -94,7 +94,7 @@ export class WebSocketManager {
         };
     }
 
-    public disconnect() {
+    disconnect() {
         Logger.info('Disconnected');
         this._networkingManager.packetManager.applyOut(
             OutgoingPacket.DisconnectMessage
@@ -102,11 +102,11 @@ export class WebSocketManager {
         this.webSocket.close();
     }
 
-    public get closed(): boolean {
+    get closed(): boolean {
         return this._closed;
     }
 
-    public sendData(message: any): void {
+    sendData(message: any): void {
         if (!this._closed) {
             this.webSocket.send(JSON.stringify(message));
         }

@@ -1,20 +1,19 @@
 import {Container} from 'pixi.js';
 import {Engine} from '../../../../../Engine';
 import {ItemEvents} from '../../../../../engine/events/room/objects/entities/ItemEvents';
-import Item from '../../../../../engine/room/objects/items/Item';
-import MapData from '../../../../../engine/room/objects/map/MapData';
+import {Item} from '../../../../../engine/room/objects/items/Item';
+import {MapData} from '../../../../../engine/room/objects/map/MapData';
 import {Tile} from '../../../../../engine/room/objects/map/Tile';
 import {RoomPriority} from '../../../../../engine/room/visualization/RoomPriority';
-import RoomVisualization from '../../../../../engine/room/visualization/RoomVisualization';
+import {RoomVisualization} from '../../../../../engine/room/visualization/RoomVisualization';
 import {FurniData} from '../../../../../engine/ui/imagers/items/FurniData';
-import Point from '../../../../../utils/point/Point';
-import Point3d from '../../../../../utils/point/Point3d';
-import UiUtils from '../../../../../utils/UiUtils';
+import {Point} from '../../../../../utils/point/Point';
+import {Point3d} from '../../../../../utils/point/Point3d';
+import {UiUtils} from '../../../../../utils/UiUtils';
 import {EntityVisualization} from '../../entities/EntityVisualization';
 import {MoveableVisualization} from '../../IMoveable';
 import {FurnidataItemType} from '../../../../../engine/ui/imagers/items/enum/FurniDataItemType';
-import Rotation from '../../../../../utils/Rotation';
-import {Direction} from '../../../../objects/Direction';
+
 import anime from 'animejs';
 
 export abstract class ItemVisualization
@@ -23,7 +22,7 @@ export abstract class ItemVisualization
 {
     protected position: Point3d;
     protected iconImage: string;
-    public imagePreview: string;
+    imagePreview: string;
     protected isIcon = false;
 
     private static USE_ROTATION_ANIMATION = false;
@@ -34,9 +33,9 @@ export abstract class ItemVisualization
         this.iconImage = this.generateIcon();
     }
 
-    public nextFrame(): void {}
+    nextFrame(): void {}
 
-    public draw(): void {
+    draw(): void {
         if (Engine.getInstance().roomService?.CurrentRoom) {
             const temp: Container = this.sprite.container;
 
@@ -55,7 +54,7 @@ export abstract class ItemVisualization
         }
     }
 
-    public reset() {
+    reset() {
         this.entity.visualization.container = this.container;
         this.needsUpdate = false;
         this.isIcon = false;
@@ -71,7 +70,7 @@ export abstract class ItemVisualization
         return '';
     }
 
-    public rotate(): void {
+    rotate(): void {
         this.render();
 
         const tempY = this.container.y;
@@ -93,7 +92,7 @@ export abstract class ItemVisualization
         }, 250);
     }
 
-    public updateRotation(rotation: number): void {
+    updateRotation(rotation: number): void {
         const direction = rotation;
 
         if (direction == this.direction) {
@@ -104,7 +103,7 @@ export abstract class ItemVisualization
         this.rotate();
     }
 
-    public async render(): Promise<void> {
+    async render(): Promise<void> {
         if (this.container) this.container.removeChildren();
 
         try {
@@ -158,19 +157,19 @@ export abstract class ItemVisualization
         this.entity.logic?.events.emit(ItemEvents.ITEM_LOADED);
     }
 
-    public calculateOffsetX(): number {
+    calculateOffsetX(): number {
         const currentRoom = Engine.getInstance().roomService?.CurrentRoom;
         const tile: Tile = currentRoom.roomLayout
             .getFloorPlane()
             .getTilebyPosition(
                 new Point(
-                    Math.round(this.position.getX()),
-                    Math.round(this.position.getY())
+                    Math.round(this.position.x),
+                    Math.round(this.position.y)
                 )
             );
 
         return (
-            ((tile!.position.getY() - tile!.position.getX()) *
+            ((tile!.position.y - tile!.position.x) *
                 MapData.tileWidth) /
                 2 +
             MapData.tileWidth / 2 +
@@ -178,26 +177,26 @@ export abstract class ItemVisualization
         );
     }
 
-    public calculateOffsetY(): number {
+    calculateOffsetY(): number {
         const currentRoom = Engine.getInstance().roomService?.CurrentRoom;
         const tile: Tile = currentRoom.roomLayout
             .getFloorPlane()
             .getTilebyPosition(
                 new Point(
-                    Math.round(this.position.getX()),
-                    Math.round(this.position.getY())
+                    Math.round(this.position.x),
+                    Math.round(this.position.y)
                 )
             );
 
         const offsetFloor =
-            tile!.position.getZ() > 0
+            tile!.position.z > 0
                 ? -MapData.thickSpace *
                   MapData.stepHeight *
-                  tile!.position.getZ()
+                  tile!.position.z
                 : -FurniData.FURNI_TOP_OFFSET;
 
         return (
-            ((tile!.position.getY() + tile!.position.getX()) *
+            ((tile!.position.y + tile!.position.x) *
                 MapData.tileHeight) /
                 2 +
             MapData.tileHeight / 2 +
@@ -206,15 +205,15 @@ export abstract class ItemVisualization
         );
     }
 
-    public getZIndex(zIndex = 1): number {
+    getZIndex(zIndex = 1): number {
         const compareY =
             Math.trunc((this._entity as Item).base.getLogicDimension(2) / 100) /
             10;
         return RoomVisualization.calculateZIndex(
             new Point3d(
-                this.entity.position.getX(),
-                this.entity.position.getY() + compareY,
-                this.entity.position.getZ()
+                this.entity.position.x,
+                this.entity.position.y + compareY,
+                this.entity.position.z
             ),
             RoomPriority.ROOM_ITEM
         );

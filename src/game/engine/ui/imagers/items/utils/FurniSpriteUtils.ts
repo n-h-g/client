@@ -2,7 +2,7 @@ import {BLEND_MODES} from 'pixi.js';
 import {NameColorPair} from '../enum/NameColorPair';
 
 export class FurniSpriteUtils {
-    public static getBlendModeFromInk(ink: string) {
+    static getBlendModeFromInk(ink: string) {
         if (ink.toString() == '33') {
             return BLEND_MODES.ADD;
         }
@@ -19,11 +19,11 @@ export class FurniSpriteUtils {
         }
     }
 
-    public static hex2int(hex: string): number {
+    static hex2int(hex: string): number {
         return parseInt(hex, 16);
     }
 
-    public static splitItemNameAndColor = (itemName: string): NameColorPair => {
+    static splitItemNameAndColor = (itemName: string): NameColorPair => {
         let colorId = 0;
         if (itemName.includes('*')) {
             const longFurniName = itemName.split('*');
@@ -36,7 +36,7 @@ export class FurniSpriteUtils {
         };
     };
 
-    public static layerFromNumber(layer: number): string {
+    static layerFromNumber(layer: number): string {
         return String.fromCharCode(layer + 97); // a
     }
 }

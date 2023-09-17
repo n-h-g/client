@@ -8,7 +8,7 @@ export class InventoryUI extends ShowableComponent {
         super(InventoryGUI, UIComponent.InventoryUI);
     }
 
-    public getEventTypeFromComponent(): UIEventsType {
+    getEventTypeFromComponent(): UIEventsType {
         return UIEventsType.INVENTORY;
     }
 }

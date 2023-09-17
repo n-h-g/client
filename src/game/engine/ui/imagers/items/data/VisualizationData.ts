@@ -12,7 +12,7 @@ import {DirectionData} from './DirectionData';
 import {Layer} from './Layer';
 
 export class VisualizationData {
-    public static MAX_LAYERS = 26;
+    static MAX_LAYERS = 26;
 
     private _layerCount: number;
 
@@ -26,7 +26,7 @@ export class VisualizationData {
 
     private _layers: Map<number, Layer>;
 
-    public constructor(data: IVisualization) {
+    constructor(data: IVisualization) {
         this._layerCount = data.layerCount;
 
         this._angle = data.angle < 1 ? 1 : data.angle > 360 ? 360 : data.angle;
@@ -43,7 +43,7 @@ export class VisualizationData {
         this.loadAnimations(data.animations)
     }
 
-    public getAnimationLayer(layerId, animationId) {
+    getAnimationLayer(layerId, animationId) {
         const animation = this._animations.get(animationId);
 
         if (!animation) return;
@@ -53,7 +53,7 @@ export class VisualizationData {
         return layer;
     }
 
-    public getLayer(layerId: number) {
+    getLayer(layerId: number) {
         if (!this._layers) return;
 
         const layer = this._layers.get(layerId);
@@ -61,7 +61,7 @@ export class VisualizationData {
         return layer;
     }
 
-    public getValidDirection(direction: number) {
+    getValidDirection(direction: number) {
         const existing = this.hasDirection(direction);
 
         if (existing) return direction;
@@ -87,11 +87,11 @@ export class VisualizationData {
         return 0;
     }
 
-    public hasLayers() {
+    hasLayers() {
         return this._layers.size > 0;
     }
 
-    public hasAnimationForLayer(animation: number, layer: number): boolean {
+    hasAnimationForLayer(animation: number, layer: number): boolean {
         const data = this._animations.get(animation)
 
         if (!animation) return false;
@@ -100,21 +100,21 @@ export class VisualizationData {
         return this.hasAnimation(animation) && layerData != null;
     }
 
-    public hasColors(): boolean {
+    hasColors(): boolean {
         return this._colors != null && this._colors.size > 0;
     }
 
-    public hasColor(color: number): boolean {
+    hasColor(color: number): boolean {
         return this.hasColors() && this._colors![color] != null;
     }
 
-    public getColor(colorId, layerId): ColorData {
+    getColor(colorId, layerId): ColorData {
         const color = this._colors[colorId];
 
         return color;
     }
 
-    public getDirection(number): DirectionData {
+    getDirection(number): DirectionData {
         const direction = this._directions.get(number);
 
         if (!direction) return null;
@@ -122,20 +122,20 @@ export class VisualizationData {
         return direction;
     }
 
-    public hasAnimation(animation: number): boolean {
+    hasAnimation(animation: number): boolean {
         return this.hasAnimations() && this._animations.get(animation) != null;
     }
 
-    public hasAnimations(): boolean {
+    hasAnimations(): boolean {
         return this._animations != null && this._animations.size > 0;
     }
 
-    public hasDirection(direction: number): boolean {
+    hasDirection(direction: number): boolean {
         direction = (direction / 90) * 2;
         return this._directions.has(direction);
     }
 
-    public loadLayers(layers: {[key: string]: ILayer}) {
+    loadLayers(layers: {[key: string]: ILayer}) {
         for (let layer of Object.keys(layers)) {
             this._layers.set(
                 parseInt(layer),
@@ -144,36 +144,38 @@ export class VisualizationData {
         }
     }
 
-    public loadAnimations(animations: {[key: string]: IAnimation}) {
+    loadAnimations(animations: {[key: string]: IAnimation}) {
         for (let animation of Object.keys(animations)) {
             this._animations.set(
                 parseInt(animation),
                 new AnimationData(parseInt(animation), animations[animation])
             );
         }
+    };
 
-    public loadDirections(directions: {[key: string]: IDirection}) {
+    loadDirections(directions: {[key: string]: IDirection}) {
         for (let direction of Object.keys(directions)) {
             this._directions.set(
                 parseInt(direction),
                 new DirectionData(parseInt(direction), directions[direction])
             );
         }
+    }
 
-    public loadColors(colors: {[key: string]: IColor}) {
+    loadColors(colors: {[key: string]: IColor}) {
         for (let color of Object.keys(colors)) {
             this._colors.set(parseInt(color), new ColorData(colors[color]));
         }
     }
 
-    public getColors(): string[] {
+    getColors(): string[] {
         return Object.keys(this._colors);
     }
 
-    public getDirections(): Map<number, DirectionData> {
+    getDirections(): Map<number, DirectionData> {
         return this._directions;
     }
-    public get layerCount(): number {
+    get layerCount(): number {
         return this._layerCount;
     }
 }

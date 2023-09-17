@@ -1,4 +1,4 @@
-import MapData from '../MapData';
+import {MapData} from '../MapData';
 import {TileType} from '../TileTypeEnum';
 import {Container, Texture} from 'pixi.js';
 import {Engine} from '../../../../../Engine';
@@ -7,11 +7,10 @@ import {RoomObjectLogic} from '../../../../../core/room/object/RoomObjectLogic';
 import {Tile} from '../Tile';
 import {OfflineMode} from '../../../../../offline/OfflineMode';
 import {RoomPriority} from '../../../visualization/RoomPriority';
-import RoomVisualization from '../../../visualization/RoomVisualization';
-import VisualizationPointer from '../visualization/VisualizationPointer';
-import LogicPointer from './LogicPointer';
+import {RoomVisualization} from '../../../visualization/RoomVisualization';
+import {LogicPointer} from './LogicPointer';
 
-export default class LogicTile extends RoomObjectLogic {
+export class LogicTile extends RoomObjectLogic {
     private tile: Tile;
 
     private hitContext: CanvasRenderingContext2D | null;
@@ -27,7 +26,7 @@ export default class LogicTile extends RoomObjectLogic {
         this.checkTileAndDrawHitBox();
     }
 
-    public registerEvents() {
+    registerEvents() {
         setTimeout(() => {
             this.tile.visualization?.container?.on('pointerdown', () =>
                 this.onClick()
@@ -42,7 +41,7 @@ export default class LogicTile extends RoomObjectLogic {
         throw new Error('Method not implemented.');
     }
 
-    public onClick(): void {
+    onClick(): void {
         if (Engine.getInstance().config.offlineMode) {
             OfflineMode.getInstance().walk(this.tile.position);
             return;
@@ -60,23 +59,23 @@ export default class LogicTile extends RoomObjectLogic {
         Engine.getInstance().networkingManager.packetManager.applyOut(
             OutgoingPacket.UserMove,
             {
-                x: this.tile.position.getX(),
-                y: this.tile.position.getY(),
+                x: this.tile.position.x,
+                y: this.tile.position.y,
             }
         );
     }
 
-    public onMove(delta: number): void {}
+    onMove(delta: number): void {}
 
-    public onHover() {
+    onHover() {
         const tileContext: Container | null | undefined =
             this.tile.visualization?.container;
 
         const isDoor =
-            this.tile.position.getX() ==
-                this.tile.plane.room.getDoorPosition().getX() &&
-            this.tile.position.getY() ==
-                this.tile.plane.room.getDoorPosition().getY();
+            this.tile.position.x ==
+                this.tile.plane.room.getDoorPosition().x &&
+            this.tile.position.y ==
+                this.tile.plane.room.getDoorPosition().y;
 
         this.tile.plane.room.Visualization.getCanvasPointer().zIndex =
             RoomVisualization.calculateZIndex(
@@ -98,7 +97,7 @@ export default class LogicTile extends RoomObjectLogic {
             .roomEntityRepository.updateRollingEntity(this.tile.position);
     }
 
-    public checkTileAndDrawHitBox() {
+    checkTileAndDrawHitBox() {
         if (this.tile.type != TileType.Hole) {
             if (this.hitContext != null) {
                 const ctx = this.drawTileHitBox(this.hitContext);

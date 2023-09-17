@@ -4,8 +4,8 @@ import {EntityBuilder} from '../../../../../core/room/object/entities/EntityBuil
 import {Engine} from '../../../../../Engine';
 import {MessageHandler} from '../../../../handler/MessageHandler';
 
-export default class AddRoomEntity extends MessageHandler {
-    public handle(): void {
+export class AddRoomEntity extends MessageHandler {
+    handle(): void {
         const data: IEntityData = this.message;
 
         if (

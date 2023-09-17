@@ -5,9 +5,9 @@ import {
 } from '../gamedata/IAvatarAnimations';
 
 export class AnimationOffset {
-    public frames: Map<number, OffsetDirection[]>;
+    frames: Map<number, OffsetDirection[]>;
 
-    public constructor(offsetData: Offsets) {
+    constructor(offsetData: Offsets) {
         this.frames = new Map();
 
         this.loadFrames(offsetData.frames);
@@ -17,7 +17,7 @@ export class AnimationOffset {
         return this.frames.get(id);
     }
 
-    public getFrameDirectionParts(id: number, directionId: number) {
+    getFrameDirectionParts(id: number, directionId: number) {
         const direction = this.getFrameDirection(id);
 
         if (!direction) return;

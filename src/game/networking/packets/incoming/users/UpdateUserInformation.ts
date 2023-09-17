@@ -5,7 +5,7 @@ import {MessageHandler} from '../../../handler/MessageHandler';
 import {UIEvents} from '../../../../engine/events/ui/UIEvents';
 
 export class UpdateUserInformation extends MessageHandler {
-    public handle(): void {
+    handle(): void {
         const userInfo: UserData = this.message;
 
         EventManager.emit<TopbarEventData>(UIEvents.SET_TOPBAR, {

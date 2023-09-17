@@ -2,19 +2,19 @@ import * as PIXI from 'pixi.js';
 import {Direction} from '../../../../core/objects/Direction';
 import {Engine} from '../../../../Engine';
 import {Logger} from '../../../../utils/Logger';
-import Point from '../../../../utils/point/Point';
-import RenderingUtils from '../../../../utils/RenderingUtils';
-import Action from './actions/Action';
-import Avatar from './Avatar';
-import AvatarFigure from './AvatarFigure';
-import AvatarFigureComponent from './AvatarFigureComponent';
-import AvatarImageData from './AvatarImageData';
-import AvatarSpriteComponent from './AvatarSpriteComponent';
-import AvatarData from './enum/AvatarData';
+import {Point} from '../../../../utils/point/Point';
+import {RenderingUtils} from '../../../../utils/RenderingUtils';
+import {Action} from './actions/Action';
+import {Avatar} from './Avatar';
+import {AvatarFigure} from './AvatarFigure';
+import {AvatarFigureComponent} from './AvatarFigureComponent';
+import {AvatarImageData} from './AvatarImageData';
+import {AvatarSpriteComponent} from './AvatarSpriteComponent';
+import {AvatarData} from './enum/AvatarData';
 import {BodyPart, IAnimationFrame} from './gamedata/IAvatarAnimations';
 import {AssetData, Spritesheet} from './gamedata/IAvatarResource';
 import {IPart} from './gamedata/IFigureData';
-import AvatarStructure from './structure/AvatarStructure';
+import {AvatarStructure} from './structure/AvatarStructure';
 import {Repository} from '../../../../core/Repository';
 
 export type FigureDataComponent = {
@@ -30,7 +30,7 @@ export type FigureDataPart = {
     hidden: string[];
 };
 
-export default class AvatarImager {
+export class AvatarImager {
     private data: AvatarImageData;
     private structure: AvatarStructure;
     private loaded = false;
@@ -44,7 +44,7 @@ export default class AvatarImager {
         this.structure = structure;
     }
 
-    public loadStructure(): void {
+    loadStructure(): void {
         this.structure.setGeometry(this.data.avatarGeometry!.geometry);
         this.structure.setPartSets(this.data.avatarPartSets!);
         this.structure.setAvatarFigureData(this.data.figureData!);
@@ -53,11 +53,11 @@ export default class AvatarImager {
         this.structure.setAnimations(this.data.avatarAnimations!);
     }
 
-    public createFigureContainer(figure: string): AvatarFigure {
+    createFigureContainer(figure: string): AvatarFigure {
         return new AvatarFigure(figure);
     }
 
-    public async loadAvatar(avatar: Avatar) {
+    async loadAvatar(avatar: Avatar) {
         if (!this.structure) {
             return;
         }
@@ -65,7 +65,7 @@ export default class AvatarImager {
         await this.loadAvatarAssets(avatar);
     }
 
-    public async loadAvatarAssets(avatar: Avatar) {
+    async loadAvatarAssets(avatar: Avatar) {
         for (const part of avatar.AvatarFigure.look) {
             //console.log(part)
             const figurePart = avatar.AvatarFigure.getFigureDataPart(part.type);
@@ -96,7 +96,7 @@ export default class AvatarImager {
         return assets;
     }
 
-    public drawAvatar(avatar: Avatar) {
+    drawAvatar(avatar: Avatar) {
         this.structure.setGeometry(this.data.avatarGeometry?.geometry!);
         const actions = this.structure.Actions?.getActionsByIds(avatar.Actions);
 
@@ -342,11 +342,11 @@ export default class AvatarImager {
                 );
 
                 sprite.pivot.x = bodyPartOffset
-                    ? bodyPartOffset.dx + offset.getX()
-                    : offset.getX();
+                    ? bodyPartOffset.dx + offset.x
+                    : offset.x;
                 sprite.pivot.y = bodyPartOffset
-                    ? bodyPartOffset.dy + offset.getY()
-                    : offset.getY();
+                    ? bodyPartOffset.dy + offset.y
+                    : offset.y;
             }
 
             if (component.IsFlipped) {
@@ -417,11 +417,11 @@ export default class AvatarImager {
         }
     }
 
-    public get Structure(): AvatarStructure {
+    get Structure(): AvatarStructure {
         return this.structure;
     }
 
-    public get Data(): AvatarImageData {
+    get Data(): AvatarImageData {
         return this.data;
     }
 }

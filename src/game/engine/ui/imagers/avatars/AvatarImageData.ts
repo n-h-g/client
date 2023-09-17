@@ -1,27 +1,27 @@
-import AvatarDownloadManager from './AvatarDownloadManager';
-import AvatarActions from './gamedata/IAvatarActions';
-import IAvatarAnimations from './gamedata/IAvatarAnimations';
-import AvatarDrawOrder from './gamedata/IAvatarDrawOrder';
-import IAvatarGeometry from './gamedata/IAvatarGeometry';
-import IAvatarPartSetsData from './gamedata/IAvatarPartSetsData';
-import IFigureData from './gamedata/IFigureData';
-import FigureMap from './gamedata/IFigureMap';
+import {AvatarDownloadManager} from './AvatarDownloadManager';
+import {AvatarActions} from './gamedata/IAvatarActions';
+import {IAvatarAnimations} from './gamedata/IAvatarAnimations';
+import {AvatarDrawOrder} from './gamedata/IAvatarDrawOrder';
+import {IAvatarGeometry} from './gamedata/IAvatarGeometry';
+import {IAvatarPartSetsData} from './gamedata/IAvatarPartSetsData';
+import {IFigureData} from './gamedata/IFigureData';
+import {FigureMap} from './gamedata/IFigureMap';
 import {IAvatarImageData} from './gamedata/IAvatarImageData';
 import {Texture} from 'pixi.js';
 
-export default class AvatarImageData implements IAvatarImageData {
-    public AvatarDownloadManager: AvatarDownloadManager;
+export class AvatarImageData implements IAvatarImageData {
+    AvatarDownloadManager: AvatarDownloadManager;
 
-    public avatarActions?: AvatarActions;
-    public avatarPartSets?: IAvatarPartSetsData;
-    public avatarGeometry?: IAvatarGeometry;
-    public avatarDrawOrder?: AvatarDrawOrder;
-    public avatarAnimations?: IAvatarAnimations;
+    avatarActions?: AvatarActions;
+    avatarPartSets?: IAvatarPartSetsData;
+    avatarGeometry?: IAvatarGeometry;
+    avatarDrawOrder?: AvatarDrawOrder;
+    avatarAnimations?: IAvatarAnimations;
 
     private ready = false;
 
-    public figureMap?: FigureMap;
-    public figureData?: IFigureData;
+    figureMap?: FigureMap;
+    figureData?: IFigureData;
 
     private offsets: Map<string, any>;
 
@@ -36,7 +36,7 @@ export default class AvatarImageData implements IAvatarImageData {
         this.textures = new Map();
     }
 
-    public async loadGameData(): Promise<void> {
+    async loadGameData(): Promise<void> {
         this.figureData = await this.AvatarDownloadManager.loadConfigFile(
             'FigureData'
         );
@@ -60,7 +60,7 @@ export default class AvatarImageData implements IAvatarImageData {
         );
     }
 
-    public getTexture(assetName: string): Texture | null {
+    getTexture(assetName: string): Texture | null {
         const texture = this.textures.get(assetName);
 
         if (!texture) return null;
@@ -68,7 +68,7 @@ export default class AvatarImageData implements IAvatarImageData {
         return texture;
     }
 
-    public async loadTexture(assetName: string) {
+    async loadTexture(assetName: string) {
         if (!this.textures.has(assetName)) {
             const texture = await this.AvatarDownloadManager.loadTexture(
                 assetName
@@ -77,7 +77,7 @@ export default class AvatarImageData implements IAvatarImageData {
         }
     }
 
-    public async loadPart(part: string) {
+    async loadPart(part: string) {
         if (!this.offsets.has(part)) {
             const offset = await this.AvatarDownloadManager.loadOffsets(part);
             this.offsets.set(part, offset);
@@ -90,7 +90,7 @@ export default class AvatarImageData implements IAvatarImageData {
         }
     }
 
-    public async getSpriteSheet(partType: string): Promise<any> {
+    async getSpriteSheet(partType: string): Promise<any> {
         return new Promise((resolve, reject) => {
             if (this.spritesheets.has(partType)) {
                 resolve(this.spritesheets.get(partType));
@@ -100,13 +100,13 @@ export default class AvatarImageData implements IAvatarImageData {
         });
     }
 
-    public get Ready(): boolean {
+    get Ready(): boolean {
         return this.ready;
     }
-    public get Offsets(): Map<string, any> {
+    get Offsets(): Map<string, any> {
         return this.offsets;
     }
-    public get SpriteSheets(): Map<string, any> {
+    get SpriteSheets(): Map<string, any> {
         return this.spritesheets;
     }
 }

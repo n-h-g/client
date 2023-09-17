@@ -1,10 +1,10 @@
 import {RoomPlaneType} from './RoomPlaneTypeEnum';
 import {ColorRGB} from '../../../../utils/color/ColorRGB';
 import {TileType} from './TileTypeEnum';
-import MapTypeChecker from './MapTypeChecker';
-import Point3d from '../../../../utils/point/Point3d';
-import RoomLayout from '../../RoomLayout';
-import Point from '../../../../utils/point/Point';
+import {MapTypeChecker} from './MapTypeChecker';
+import {Point3d} from '../../../../utils/point/Point3d';
+import {RoomLayout} from '../../RoomLayout';
+import {Point} from '../../../../utils/point/Point';
 import {RoomPlane} from './RoomPlane';
 import {Tile} from './Tile';
 
@@ -13,7 +13,7 @@ export class FloorPlane extends RoomPlane {
         super(room, RoomPlaneType.Floor);
     }
 
-    public prepareTiles(): void {
+    prepareTiles(): void {
         this.room.getModelMaltrix().forEach((xRow, x) => {
             xRow.forEach((_, y) => {
                 const position = new Point3d(
@@ -25,7 +25,7 @@ export class FloorPlane extends RoomPlane {
                 this.addObject(
                     new Tile(
                         this,
-                        `tile${position.getX()}-${position.getY()}`,
+                        `tile${position.x}-${position.y}`,
                         position,
                         MapTypeChecker.checkTileType(
                             position,
@@ -39,7 +39,7 @@ export class FloorPlane extends RoomPlane {
         });
     }
 
-    public getRandomTile() {
+    getRandomTile() {
         const tiles = [];
 
         let tile = false;
@@ -60,10 +60,10 @@ export class FloorPlane extends RoomPlane {
         return tiles;
     }
 
-    public setTileType(x: number, y: number, type: TileType): void {
+    setTileType(x: number, y: number, type: TileType): void {
         this.mapObjects.find(obj => {
             if (obj instanceof Tile) {
-                if (obj.position.getX() == x && obj.position.getY() == y) {
+                if (obj.position.x == x && obj.position.y == y) {
                     obj.type = type;
                     if (type == TileType.Hole) {
                         this.room.setModelMatrixElement(x, y, 0);
@@ -73,7 +73,7 @@ export class FloorPlane extends RoomPlane {
         });
     }
 
-    public getTileByColor(color: ColorRGB): Tile {
+    getTileByColor(color: ColorRGB): Tile {
         return this.mapObjects.find(obj => {
             if (obj instanceof Tile) {
                 if (obj.color.equals(color)) {
@@ -83,12 +83,12 @@ export class FloorPlane extends RoomPlane {
         }) as Tile;
     }
 
-    public getTilebyPosition(point: Point): Tile {
+    getTilebyPosition(point: Point): Tile {
         return this.mapObjects.find(obj => {
             if (obj instanceof Tile) {
                 if (
-                    obj.position.getX() === point.getX() &&
-                    obj.position.getY() === point.getY()
+                    obj.position.x === point.x &&
+                    obj.position.y === point.y
                 ) {
                     return obj;
                 }
@@ -96,7 +96,7 @@ export class FloorPlane extends RoomPlane {
         }) as Tile;
     }
 
-    public getTileByName(name: string): Tile {
+    getTileByName(name: string): Tile {
         return this.mapObjects.find(obj => {
             if (obj instanceof Tile) {
                 if (obj.id === name) {
@@ -106,7 +106,7 @@ export class FloorPlane extends RoomPlane {
         }) as Tile;
     }
 
-    public getTiles(): Array<Tile> {
+    getTiles(): Array<Tile> {
         return this.mapObjects as Array<Tile>;
     }
 }

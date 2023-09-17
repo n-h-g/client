@@ -1,12 +1,12 @@
 import {ISprite} from '../../../../../core/ui/imagers/items/IAsset';
 
 export class SpriteData {
-    public height = 0;
-    public left = 0;
-    public top = 0;
-    public width = 0;
+    height = 0;
+    left = 0;
+    top = 0;
+    width = 0;
 
-    public constructor(data: ISprite) {
+    constructor(data: ISprite) {
         if (!data) return;
 
         this.height = data.height ? data.height : 0;

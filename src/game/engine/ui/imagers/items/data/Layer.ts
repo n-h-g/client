@@ -11,7 +11,7 @@ export class Layer {
 
     private _id: number;
 
-    public constructor(id: number, data: ILayer) {
+    constructor(id: number, data: ILayer) {
         this._id = id;
         this._ignoreMouse = data.ignoreMouse;
         this._alpha = data.alpha;
@@ -23,7 +23,7 @@ export class Layer {
      * Getter alpha
      * @return {number}
      */
-    public get alpha(): number {
+    get alpha(): number {
         return this._alpha;
     }
 
@@ -31,7 +31,7 @@ export class Layer {
      * Setter alpha
      * @param {number} value
      */
-    public set alpha(value: number) {
+    set alpha(value: number) {
         this._alpha = value;
     }
 
@@ -39,7 +39,7 @@ export class Layer {
      * Getter z
      * @return {number}
      */
-    public get z(): number {
+    get z(): number {
         return this._z;
     }
 
@@ -47,7 +47,7 @@ export class Layer {
      * Setter z
      * @param {number} value
      */
-    public set z(value: number) {
+    set z(value: number) {
         this._z = value;
     }
 
@@ -55,7 +55,7 @@ export class Layer {
      * Getter ignoreMouse
      * @return {boolean}
      */
-    public get ignoreMouse(): boolean {
+    get ignoreMouse(): boolean {
         return this._ignoreMouse;
     }
 
@@ -63,7 +63,7 @@ export class Layer {
      * Getter ink
      * @return {string}
      */
-    public get ink(): string {
+    get ink(): string {
         return this._ink;
     }
 
@@ -71,7 +71,7 @@ export class Layer {
      * Setter ignoreMouse
      * @param {boolean} value
      */
-    public set ignoreMouse(value: boolean) {
+    set ignoreMouse(value: boolean) {
         this._ignoreMouse = value;
     }
 
@@ -79,11 +79,11 @@ export class Layer {
      * Setter ink
      * @param {string} value
      */
-    public set ink(value: string) {
+    set ink(value: string) {
         this._ink = value;
     }
 
-    public get id(): number {
+    get id(): number {
         return this._id;
     }
 }

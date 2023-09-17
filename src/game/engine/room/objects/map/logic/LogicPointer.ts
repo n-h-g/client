@@ -1,8 +1,8 @@
 import {RoomObjectLogic} from '../../../../../core/room/object/RoomObjectLogic';
 import {ColorRGB} from '../../../../../utils/color/ColorRGB';
-import Pointer from '../Pointer';
+import {Pointer} from '../Pointer';
 
-export default class LogicPointer extends RoomObjectLogic {
+export class LogicPointer extends RoomObjectLogic {
     private pointer: Pointer;
     private visible = false;
     private currentColor: ColorRGB = new ColorRGB(0, 0, 0);
@@ -16,27 +16,27 @@ export default class LogicPointer extends RoomObjectLogic {
         throw new Error('Method not implemented.');
     }
 
-    public registerEvents() {}
+    registerEvents() {}
 
-    public onMove() {
+    onMove() {
         throw new Error('Method not implemented.');
     }
 
-    public hidePointer() {
+    hidePointer() {
         this.currentColor = new ColorRGB(0, 0, 0);
         this.visible = false;
         this.pointer.getCanvas().visible = false;
     }
 
-    public togglePointer() {}
+    togglePointer() {}
 
-    public onHover(): void {}
+    onHover(): void {}
 
-    public getCurrentColor() {
+    getCurrentColor() {
         return this.currentColor;
     }
 
-    public onClick(): void {}
+    onClick(): void {}
 
     tick(delta: number): void {}
 }

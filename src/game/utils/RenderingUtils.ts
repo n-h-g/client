@@ -1,7 +1,7 @@
 import {Texture, Rectangle} from 'pixi.js';
-import Point3d from './point/Point3d';
+import {Point3d} from './point/Point3d';
 
-export default class RenderingUtils {
+export class RenderingUtils {
     static arrayBufferToBase64(arrayBuffer: ArrayBuffer) {
         let binary = '';
         const bytes = new Uint8Array(arrayBuffer);

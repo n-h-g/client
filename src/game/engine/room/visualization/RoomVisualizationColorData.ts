@@ -1,14 +1,14 @@
 import {ColorRGB} from '../../../utils/color/ColorRGB';
 import {NormalType} from './NormalTypeEnum';
 
-export default class RoomVisualizationColorData {
-    public static MASK_BRIGHTNESS_LIGHT = 0;
-    public static MASK_BRIGHTNESS_MEDIUM = -10;
-    public static MASK_BRIGHTNESS_DARK = -20;
-    public static WALL_COLOR = 0xa5afc0;
-    public static TILE_COLOR = 0x969664;
+export class RoomVisualizationColorData {
+    static MASK_BRIGHTNESS_LIGHT = 0;
+    static MASK_BRIGHTNESS_MEDIUM = -10;
+    static MASK_BRIGHTNESS_DARK = -20;
+    static WALL_COLOR = 0xa5afc0;
+    static TILE_COLOR = 0x969664;
 
-    public static getNormal(color: ColorRGB, type: NormalType): ColorRGB {
+    static getNormal(color: ColorRGB, type: NormalType): ColorRGB {
         if (type == NormalType.DARK) {
             return color.brightness(
                 RoomVisualizationColorData.MASK_BRIGHTNESS_DARK

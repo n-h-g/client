@@ -1,8 +1,7 @@
-import Action from '../../actions/Action';
 import {ActionId} from './ActionId';
 
-export default class AvatatActionId {
-    public static idToAvatarActionState(id: ActionId): string {
+export class AvatarActionId {
+    static idToAvatarActionState(id: ActionId): string {
         switch (id) {
             case ActionId.LAY:
                 return 'lay';

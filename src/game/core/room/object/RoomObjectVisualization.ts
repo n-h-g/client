@@ -2,7 +2,7 @@ import {Container} from 'pixi.js';
 import {IRoomObjectSprite} from './IRoomObjectSprite';
 import {RoomObjectSprite} from './RoomObjectSprite';
 
-export default abstract class RoomObjectVisualization {
+export abstract class RoomObjectVisualization {
     protected _offsetX: number;
     protected _offsetY: number;
     protected _zIndex: number;
@@ -21,55 +21,55 @@ export default abstract class RoomObjectVisualization {
         this._sprite = new RoomObjectSprite();
     }
 
-    public get sprite(): IRoomObjectSprite {
+    get sprite(): IRoomObjectSprite {
         return this._sprite;
     }
 
-    public set sprite(sprite: IRoomObjectSprite) {
+    set sprite(sprite: IRoomObjectSprite) {
         this._sprite = sprite;
     }
 
-    public abstract getZIndex(): number;
+    abstract getZIndex(): number;
 
-    public dispose(): void {
+    dispose(): void {
         this.container.destroy();
     }
 
-    public abstract render(): void;
+    abstract render(): void;
 
-    public set needsUpdate(update: boolean) {
+    set needsUpdate(update: boolean) {
         this._needsUpdate = update;
     }
 
-    public get needsUpdate(): boolean {
+    get needsUpdate(): boolean {
         return this._needsUpdate;
     }
 
-    public get offsetX(): number {
+    get offsetX(): number {
         return this._offsetX;
     }
 
-    public get offsetY(): number {
+    get offsetY(): number {
         return this._offsetY;
     }
 
-    public set offsetX(x: number) {
+    set offsetX(x: number) {
         this._offsetX = x;
     }
 
-    public set offsetY(y: number) {
+    set offsetY(y: number) {
         this._offsetY = y;
     }
 
-    public get zIndex(): number {
+    get zIndex(): number {
         return this._zIndex;
     }
 
-    public get container(): Container {
+    get container(): Container {
         return this._container;
     }
 
-    public set container(container: Container) {
+    set container(container: Container) {
         this._container = container;
     }
 }

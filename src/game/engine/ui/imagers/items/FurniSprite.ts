@@ -6,7 +6,7 @@ export class FurniSprite extends Sprite {
     private _frame: number;
     private _direction: number;
 
-    public constructor(animation: number, direction: number, frame: number) {
+    constructor(animation: number, direction: number, frame: number) {
         super();
 
         this._animation = animation;

@@ -1,4 +1,4 @@
-export default interface IFigureData {
+export interface IFigureData {
     palette: {[key: string]: {[key: string]: IPaletteColor}};
     settype: {[key: string]: CA};
 }

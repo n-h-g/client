@@ -1,18 +1,18 @@
 import {Item, ITypeBodyPart} from '../gamedata/IAvatarGeometry';
-import GeometryItem from './GeometryItem';
+import {GeometryItem} from './GeometryItem';
 
-export default class GeometryBodyPart {
-    public id: string;
+export class GeometryBodyPart {
+    id: string;
     private items: Map<string, GeometryItem>;
 
-    public constructor(bodyPart: ITypeBodyPart) {
+    constructor(bodyPart: ITypeBodyPart) {
         this.id = bodyPart.id;
         this.items = new Map();
 
         if (bodyPart.items) this.loadItems(bodyPart.items);
     }
 
-    public getPartIds(): string[] {
+    getPartIds(): string[] {
         const ids: string[] = [];
 
         for (const part of this.items.values()) {

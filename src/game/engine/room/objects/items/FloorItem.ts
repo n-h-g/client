@@ -1,8 +1,8 @@
-import Point3d from '../../../../utils/point/Point3d';
-import FurniBase from '../../../ui/imagers/items/FurniBase';
-import Item from './Item';
+import {Point3d} from '../../../../utils/point/Point3d';
+import {FurniBase} from '../../../ui/imagers/items/FurniBase';
+import {Item} from './Item';
 
-export default class FloorItem extends Item {
+export class FloorItem extends Item {
     constructor(
         id = '',
         name = '',

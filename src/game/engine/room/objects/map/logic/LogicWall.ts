@@ -1,7 +1,7 @@
 import {Wall} from '../Wall';
 import {RoomObjectLogic} from '../../../../../core/room/object/RoomObjectLogic';
 
-export default class LogicWall extends RoomObjectLogic {
+export class LogicWall extends RoomObjectLogic {
     private wall: Wall;
 
     constructor(wall: Wall) {
@@ -27,11 +27,11 @@ export default class LogicWall extends RoomObjectLogic {
 
     tick(): void {}
 
-    public onClick(): void {}
+    onClick(): void {}
 
-    public onMove?(delta: number): void {}
+    onMove?(delta: number): void {}
 
-    public onHover(): void {
+    onHover(): void {
         this.wall.plane.room.getPointer().logic.hidePointer();
     }
 }

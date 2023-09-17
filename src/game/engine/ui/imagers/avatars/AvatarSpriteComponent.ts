@@ -1,7 +1,7 @@
 import {Direction} from '../../../../core/objects/Direction';
 import {IAction} from './gamedata/IAvatarActions';
 
-export default class AvatarSpriteComponent {
+export class AvatarSpriteComponent {
     private state: string;
     private partType: string;
     private resourceType: string;
@@ -24,7 +24,7 @@ export default class AvatarSpriteComponent {
         color: string | null,
         flippedType: string | undefined,
         isSmall = false
-
+    ) {
         if (partType === 'hd' && isSmall)
             this.partId = '1';
         if (
@@ -95,14 +95,14 @@ export default class AvatarSpriteComponent {
         this.resourceType = partType;
     }
 
-    public calcFlip = (d: number) => (d > 3 && d < 7 ? 6 - d : d);
+    calcFlip = (d: number) => (d > 3 && d < 7 ? 6 - d : d);
 
-    public get isColorable(): boolean {
+    get isColorable(): boolean {
         return this.colorable;
     }
 
     // h_sit_lg_3596_0_0
-    public get ResourceName(): string {
+    get ResourceName(): string {
         return (
             (this.isSmall ? 'sh' : 'h') +
             '_' +
@@ -118,56 +118,56 @@ export default class AvatarSpriteComponent {
         );
     }
 
-    public get State() {
+    get State() {
         return this.state;
     }
 
-    public set State(state: string) {
+    set State(state: string) {
         this.state = state;
     }
 
-    public get PartType() {
+    get PartType() {
         return this.partType;
     }
 
-    public get ResourceType() {
+    get ResourceType() {
         return this.resourceType;
     }
 
-    public get PartId() {
+    get PartId() {
         return this.partId;
     }
 
-    public get Direction() {
+    get Direction() {
         return this.direction;
     }
 
-    public get Frame() {
+    get Frame() {
         return this.frame;
     }
 
-    public get Color() {
+    get Color() {
         return this.color;
     }
 
-    public get IsFlipped() {
+    get IsFlipped() {
         return this.isFlipped;
     }
 
-    public get IsSmall() {
+    get IsSmall() {
         return this.isSmall;
     }
 
-    public set IsFlipped(flipped: boolean) {
+    set IsFlipped(flipped: boolean) {
         this.isFlipped = flipped;
     }
-    public get ResourceDirection(): number {
+    get ResourceDirection(): number {
         return this.resourceDirection;
     }
-    public set ResourceDirection(direction: number) {
+    set ResourceDirection(direction: number) {
         this.resourceDirection = direction;
     }
-    public set Frame(frame: number) {
+    set Frame(frame: number) {
         this.frame = frame;
     }
 }

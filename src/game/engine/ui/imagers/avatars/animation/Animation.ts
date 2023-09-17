@@ -1,26 +1,24 @@
-import Action from '../actions/Action';
 import {ActionId} from '../enum/actions/ActionId';
 import {
     IAnimation,
     IAnimationPart,
     OffsetDirection,
-    OffsetFrame,
     Offsets,
 } from '../gamedata/IAvatarAnimations';
 import {AnimationOffset} from './AnimationOffset';
-import AnimationPart from './AnimationPart';
+import {AnimationPart} from './AnimationPart';
 
-export default class Animation {
-    public id: string | ActionId;
+export class Animation {
+    id: string | ActionId;
 
     /**
      *  SetType    |    AnimationPart
      */
-    public parts: Map<string, AnimationPart>;
+    parts: Map<string, AnimationPart>;
 
-    public offsets: AnimationOffset;
+    offsets: AnimationOffset;
 
-    public constructor(animationData: IAnimation) {
+    constructor(animationData: IAnimation) {
         this.id = animationData.id;
 
         this.parts = new Map();
@@ -29,7 +27,7 @@ export default class Animation {
         this.loadAnimationOffsets(animationData.offsets);
     }
 
-    public getAnimationOffset(
+    getAnimationOffset(
         action: string,
         partFrame: number,
         direction: number
@@ -48,7 +46,7 @@ export default class Animation {
         return partDirection.bodyParts[0];
     }
 
-    public getAnimationPart(type: string): AnimationPart | null {
+    getAnimationPart(type: string): AnimationPart | null {
         const animationPart = this.parts.get(type);
 
         if (!animationPart) return null;

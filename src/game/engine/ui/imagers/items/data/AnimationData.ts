@@ -7,22 +7,22 @@ import {AnimationLayer} from './AnimationLayer';
 export class AnimationData {
     private _layers: Map<number, AnimationLayer>;
 
-    public static DEFAULT_FRAME_NUMBER = 0;
+    static DEFAULT_FRAME_NUMBER = 0;
 
     private static frameCount = -1;
 
     private _animationId = -1;
 
-    public constructor(animation: number, animationData: IAnimation) {
+    constructor(animation: number, animationData: IAnimation) {
         this._animationId = animation;
         this._layers = new Map();
 
         this.loadLayers(animationData.layers);
     }
 
-    public hasLayers() {}
+    hasLayers() {}
 
-    public getLayer(layer: number) {
+    getLayer(layer: number) {
         return this._layers.get(layer);
     }
 
@@ -35,7 +35,7 @@ export class AnimationData {
         }
     }
 
-    public getFrame(
+    getFrame(
         direction: number,
         layerId: number,
         frameCount: number

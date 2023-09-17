@@ -2,16 +2,16 @@ import {AvatarEventsType} from '../enum/events/AvatarEventsType';
 
 import * as PIXI from 'pixi.js';
 
-export default class AvatarEvents extends PIXI.utils.EventEmitter {
-    public onPlaceHolderLoad() {
+export class AvatarEvents extends PIXI.utils.EventEmitter {
+    onPlaceHolderLoad() {
         this.emit(AvatarEventsType.PLACEHOLDER_LOAD_COMPLETE);
     }
 
-    public onAssetsLoaded() {
+    onAssetsLoaded() {
         this.emit(AvatarEventsType.ASSETS_LOADED);
     }
 
-    public onLoad() {
+    onLoad() {
         this.emit(AvatarEventsType.LOAD_COMPLETE);
     }
 }

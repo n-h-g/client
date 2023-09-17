@@ -1,3 +1,3 @@
-export default class Asset {
-    public constructor(name: string) {}
+export class Asset {
+    constructor(name: string) {}
 }

@@ -1,17 +1,17 @@
-import RoomLayout from '../RoomLayout';
-import Room from '../Room';
+import {RoomLayout} from '../RoomLayout';
+import {Room} from '../Room';
 import {IRoomLogic} from '../../../core/room/IRoomLogic';
 import {Engine} from '../../../Engine';
 import {Sprite, Texture} from 'pixi.js';
 import {Viewport} from 'pixi-viewport';
 import {RoomPriority} from '../visualization/RoomPriority';
-import RoomVisualization from '../visualization/RoomVisualization';
-import Point3d from '../../../utils/point/Point3d';
-import RenderingUtils from '../../../utils/RenderingUtils';
+import {RoomVisualization} from '../visualization/RoomVisualization';
+import {Point3d} from '../../../utils/point/Point3d';
+import {RenderingUtils} from '../../../utils/RenderingUtils';
 import {EventManager} from '../../../core/events/EventManager';
 import {UIEvents} from '../../events/ui/UIEvents';
 import {RoomChatData} from '../../events/ui/data/room/RoomChatData';
-import Point from '../../../utils/point/Point';
+import {Point} from '../../../utils/point/Point';
 
 export class RoomLogic implements IRoomLogic {
     private room: RoomLayout;
@@ -36,9 +36,9 @@ export class RoomLogic implements IRoomLogic {
         this.canvasWallHit = this.room.createOrGetRoomCanvas('wallHit');
     }
 
-    public dispose(): void {}
+    dispose(): void {}
 
-    public registerEvents(): void {
+    registerEvents(): void {
         const roomVisualization = this.room.Visualization
 
         roomVisualization
@@ -93,9 +93,9 @@ export class RoomLogic implements IRoomLogic {
         this.room.Visualization.getCanvasPointer().zIndex =
             RoomVisualization.calculateZIndex(
                 new Point3d(
-                    this.room.getPointer().position.getX(),
-                    this.room.getPointer().position.getY(),
-                    this.room.getPointer().position.getZ()
+                    this.room.getPointer().position.x,
+                    this.room.getPointer().position.y,
+                    this.room.getPointer().position.z
                 ),
                 RoomPriority.POINTER
             );
@@ -106,16 +106,16 @@ export class RoomLogic implements IRoomLogic {
         this.room.getPointer().logic.hidePointer();
     }
 
-    public tick(delta: number): void {
+    tick(delta: number): void {
         this.room.getWallPlane().logic?.tick(delta);
         this.room.getFloorPlane().logic?.tick(delta);
     }
 
-    public getCanvasFloorHit(): HTMLCanvasElement {
+    getCanvasFloorHit(): HTMLCanvasElement {
         return this.canvasFloorHit;
     }
 
-    public getCanvasWallHit(): HTMLCanvasElement {
+    getCanvasWallHit(): HTMLCanvasElement {
         return this.canvasWallHit;
     }
 }

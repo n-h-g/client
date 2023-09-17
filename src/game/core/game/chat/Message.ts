@@ -1,11 +1,11 @@
 import {IMessage} from '../IMessage';
 
 export abstract class Message implements IMessage {
-    public id: number;
-    public senderId: number;
-    public destinationId: number;
-    public friendshipId: number;
-    public text: string;
+    id: number;
+    senderId: number;
+    destinationId: number;
+    friendshipId: number;
+    text: string;
 
     constructor(
         id: number,

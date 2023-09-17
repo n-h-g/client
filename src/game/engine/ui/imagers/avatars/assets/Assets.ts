@@ -1,7 +1,7 @@
-import FigureMap from '../gamedata/IFigureMap';
-import Asset from './Asset';
+import {FigureMap} from '../gamedata/IFigureMap';
+import {Asset} from './Asset';
 
-export default class Assets {
+export class Assets {
     /**
      *  partSetType - Asset
      */
@@ -11,14 +11,14 @@ export default class Assets {
 
     private figureMap: FigureMap;
 
-    public constructor(figureMap: FigureMap) {
+    constructor(figureMap: FigureMap) {
         this.assets = new Map();
         this.missingAssets = new Map();
 
         this.figureMap = figureMap;
     }
 
-    public getUniqueName(type: string, partId: number): string {
+    getUniqueName(type: string, partId: number): string {
         let uniqueName = this.figureMap[type][partId];
 
         if (uniqueName == null && type == 'hrb') {

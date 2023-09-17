@@ -3,7 +3,7 @@ export class AnimationFrame {
 
     private _repeats = 0;
 
-    public constructor(id: number, repeats: number) {
+    constructor(id: number, repeats: number) {
         if (repeats < 1) repeats = 1;
 
         if (repeats < 0) repeats = -1;
@@ -12,15 +12,15 @@ export class AnimationFrame {
         this._repeats = repeats;
     }
 
-    public get repeats(): number {
+    get repeats(): number {
         return this._repeats;
     }
 
-    public get id(): number {
+    get id(): number {
         return this._id;
     }
 
-    public repeatsForever() {
+    repeatsForever() {
         return this._repeats == -1;
     }
 }

@@ -6,7 +6,7 @@ import {MessageHandler} from '../../../handler/MessageHandler';
 import {OutgoingPacket} from '../../outgoing/OutgoingPacket';
 
 export class PongResponse extends MessageHandler {
-    public handle() {
+    handle() {
         const engine = Engine.getInstance();
 
         if (this.message.data && engine.sso != '') {

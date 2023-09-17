@@ -1,7 +1,7 @@
 import {RoomObjectController} from '../../../../core/room/object/RoomObjectController';
 import {RoomObjectLogic} from '../../../../core/room/object/RoomObjectLogic';
-import RoomObjectVisualization from '../../../../core/room/object/RoomObjectVisualization';
-import Room from '../../../room/Room';
+import {RoomObjectVisualization} from '../../../../core/room/object/RoomObjectVisualization';
+import {Room} from '../../../room/Room';
 
 export class RoomImagerBuilder {
     private _room: Room;
@@ -10,11 +10,11 @@ export class RoomImagerBuilder {
         RoomObjectLogic
     >[];
 
-    public constructor() {
+    constructor() {
         this.objects = [];
     }
 
-    public setRoom(room: Room) {
+    setRoom(room: Room) {
         this._room = new Room(
             room.name,
             room.getRoomInfo().roomModel,
@@ -25,14 +25,14 @@ export class RoomImagerBuilder {
         return this;
     }
 
-    public setObject(
+    setObject(
         object: RoomObjectController<RoomObjectVisualization, RoomObjectLogic>
     ) {
         this.objects.push(object);
         return this;
     }
 
-    public build() {
+    build() {
         for (const object of this.objects) {
             object.visualization.render();
         }

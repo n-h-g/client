@@ -1,16 +1,14 @@
 import {EventManager} from '../../../core/events/EventManager';
-import {Message} from '../../../core/game/chat/Message';
 import {IDisposable} from '../../../core/room/IDisposable';
 import {Engine} from '../../../Engine';
 import {OutgoingPacket} from '../../../networking/packets/outgoing/OutgoingPacket';
 import {RoomChatData} from '../../events/ui/data/room/RoomChatData';
-import {RoomUIEventData} from '../../events/ui/data/room/RoomUIEventData';
 import {UIEvents} from '../../events/ui/UIEvents';
-import RoomChatMessage from './RoomChatMessage';
+import {RoomChatMessage} from './RoomChatMessage';
 import {ChatMessageRepository} from './ChatMessageRepository';
 
-export default class ChatMessageService implements IDisposable {
-    public repository: ChatMessageRepository;
+export class ChatMessageService implements IDisposable {
+    repository: ChatMessageRepository;
 
     private _messageCounter = 0;
 
@@ -18,7 +16,7 @@ export default class ChatMessageService implements IDisposable {
         this.repository = new ChatMessageRepository();
     }
 
-    public addMessage(chatMessage: RoomChatMessage): void {
+    addMessage(chatMessage: RoomChatMessage): void {
         this.repository?.add(chatMessage.id.toString(), chatMessage);
 
         EventManager.emit<RoomChatData>(UIEvents.ROOM_NEW_MESSAGE, {
@@ -33,17 +31,17 @@ export default class ChatMessageService implements IDisposable {
         this._messageCounter++;
     }
 
-    public removeMessage(id: string): boolean {
+    removeMessage(id: string): boolean {
         if (!this.repository?.has(id)) return false;
 
         return this.repository.delete(id);
     }
 
-    public dispose(): void {
+    dispose(): void {
         throw new Error('Method not implemented');
     }
 
-    public checkCommand(message: string): boolean {
+    checkCommand(message: string): boolean {
         if (message.startsWith(':')) {
             const commandService = Engine.getInstance()?.commandService;
 
@@ -67,7 +65,7 @@ export default class ChatMessageService implements IDisposable {
         return false;
     }
 
-    public computeMessage(
+    computeMessage(
         message: string,
         shout = false,
         whisper = false,
@@ -86,7 +84,7 @@ export default class ChatMessageService implements IDisposable {
         }
     }
 
-    public getLastMessageId(): number {
+    getLastMessageId(): number {
         return this._messageCounter + 1;
     }
 }

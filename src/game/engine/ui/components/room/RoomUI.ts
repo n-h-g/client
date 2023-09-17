@@ -3,8 +3,8 @@ import {UIComponent} from '../UIComponent';
 import {ShowableComponent} from '../../../../core/ui/ShowableComponent';
 import {UIEventsType} from '../../../events/ui/UIEventsType';
 
-export default class RoomUI extends ShowableComponent {
-    public constructor() {
+export class RoomUI extends ShowableComponent {
+    constructor() {
         super(RoomGUI, UIComponent.RoomUI);
     }
 

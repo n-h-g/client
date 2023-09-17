@@ -3,8 +3,8 @@ import {EntityEvents} from '../../../../engine/events/room/objects/entities/Enti
 import {PreviewModeEventData} from '../../../../engine/events/ui/data/general/PreviewUserData';
 import {UIEvents} from '../../../../engine/events/ui/UIEvents';
 import {UIComponent} from '../../../../engine/ui/components/UIComponent';
-import Point from '../../../../utils/point/Point';
-import UiUtils from '../../../../utils/UiUtils';
+import {Point} from '../../../../utils/point/Point';
+import {UiUtils} from '../../../../utils/UiUtils';
 import {EventManager} from '../../../events/EventManager';
 import {IComponentShowableUI} from '../../../ui/IComponentShowableUI';
 import {Human} from '../human/Human';
@@ -15,12 +15,12 @@ export abstract class EntityLogic extends RoomObjectLogic {
     protected _entity: Entity;
     protected frameTracker = 0;
 
-    public constructor(entity: Entity) {
+    constructor(entity: Entity) {
         super();
         this._entity = entity;
     }
 
-    public registerEvents(): void {
+    registerEvents(): void {
         this.events.on(EntityEvents.POSITION_CHANGED, () =>
             this.onPositionChanged()
         );
@@ -32,7 +32,7 @@ export abstract class EntityLogic extends RoomObjectLogic {
         );
     }
 
-    public dispose(): void {
+    dispose(): void {
         Engine.getInstance()
             .userInterfaceManager.componentsManager.getComponent<IComponentShowableUI>(
                 UIComponent.PreviewBoxUI
@@ -40,41 +40,41 @@ export abstract class EntityLogic extends RoomObjectLogic {
             .hide();
     }
 
-    public onHover(): void {
+    onHover(): void {
         const tile = Engine.getInstance()
             .roomService.CurrentRoom.roomLayout.getFloorPlane()
             .getTilebyPosition(
                 new Point(
-                    this.entity.position.getX(),
-                    this.entity.position.getY()
+                    this.entity.position.x,
+                    this.entity.position.y
                 )
             );
 
         const pointer = tile.plane.room.getPointer();
 
         if (
-            pointer.position.getX() < tile.position.getX() &&
-            pointer.position.getY() < tile.position.getY()
+            pointer.position.x < tile.position.x &&
+            pointer.position.y < tile.position.y
         )
             return;
 
         tile?.logic?.onHover();
     }
 
-    public onClick(): void {
+    onClick(): void {
         const tile = Engine.getInstance()
             .roomService.CurrentRoom.roomLayout.getFloorPlane()
             .getTilebyPosition(
                 new Point(
-                    this.entity.position.getX(),
-                    this.entity.position.getY()
+                    this.entity.position.x,
+                    this.entity.position.y
                 )
             );
         tile?.logic?.onClick();
         this.togglePreview();
     }
 
-    public async togglePreview() {
+    async togglePreview() {
         if (Engine.getInstance().config.offlineMode) return;
 
         const isHuman = this.entity instanceof Human;
@@ -99,11 +99,11 @@ export abstract class EntityLogic extends RoomObjectLogic {
 
     abstract onMove?(delta: number): void;
 
-    public abstract onPositionChanged(): void;
+    abstract onPositionChanged(): void;
 
-    public abstract onLoad(): void;
+    abstract onLoad(): void;
 
-    public get entity(): Entity {
+    get entity(): Entity {
         return this._entity;
     }
 }

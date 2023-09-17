@@ -13,7 +13,7 @@ export class NetworkingManager {
         this.setUpPingRequest();
     }
 
-    public setUpPingRequest(): void {
+    setUpPingRequest(): void {
         window.setInterval(() => {
             this.packetManager.applyOut(OutgoingPacket.PingRequest);
         }, 50000);
@@ -23,11 +23,11 @@ export class NetworkingManager {
         };
     }
 
-    public get webSocketManager(): WebSocketManager {
+    get webSocketManager(): WebSocketManager {
         return this._webSocketManager;
     }
 
-    public get packetManager(): PacketManager {
+    get packetManager(): PacketManager {
         return this._packetManager;
     }
 }

@@ -1,6 +1,6 @@
 import {IComponentUI} from '../../../../core/ui/IComponentUI';
 import BottomBarGUI from '../../../../../ui/components/static/bottomBar/BottomBarGUI.vue';
-import UiUtils from '../../../../utils/UiUtils';
+import {UiUtils} from '../../../../utils/UiUtils';
 import {EventManager} from '../../../../core/events/EventManager';
 import {LoadingProgressEventData} from '../../../events/ui/data/loader/LoadingProgress';
 import {UIComponent} from '../UIComponent';

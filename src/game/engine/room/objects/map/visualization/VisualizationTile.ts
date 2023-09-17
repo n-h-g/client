@@ -1,16 +1,16 @@
-import RoomVisualization from '../../../visualization/RoomVisualization';
-import RoomObjectVisualization from '../../../../../core/room/object/RoomObjectVisualization';
-import MapData from '../MapData';
-import RoomVisualizationColorData from '../../../visualization/RoomVisualizationColorData';
+import {RoomVisualization} from '../../../visualization/RoomVisualization';
+import {RoomObjectVisualization} from '../../../../../core/room/object/RoomObjectVisualization';
+import {MapData} from '../MapData';
+import {RoomVisualizationColorData} from '../../../visualization/RoomVisualizationColorData';
 import {TileType} from '../TileTypeEnum';
-import Point3d from '../../.././../../utils/point/Point3d';
+import {Point3d} from '../../.././../../utils/point/Point3d';
 import {ColorRGB} from '../../../../../utils/color/ColorRGB';
 import {NormalType} from '../../../visualization/NormalTypeEnum';
 import {Container, Graphics, ObservablePoint} from 'pixi.js';
 import {Tile} from '../Tile';
 import {RoomPriority} from '../../../visualization/RoomPriority';
 
-export default class VisualizationTile extends RoomObjectVisualization {
+export class VisualizationTile extends RoomObjectVisualization {
     private tile: Tile;
     private floorContext: Container;
     private doorContext: Container;
@@ -33,23 +33,23 @@ export default class VisualizationTile extends RoomObjectVisualization {
         this.doorContext = roomV.getCanvasDoorTile();
     }
 
-    public getZIndex(): number {
+    getZIndex(): number {
         return RoomPriority.FLOOR;
     }
 
     private static calculateOffsetX(position: Point3d, type: TileType): number {
         return (
-            position.getY() * MapData.tileHeight -
-            (position.getX() * MapData.tileWidth) / 2
+            position.y * MapData.tileHeight -
+            (position.x * MapData.tileWidth) / 2
         );
     }
 
     private static calculateOffsetY(position: Point3d, type: TileType): number {
         return (
-            (position.getY() * MapData.tileHeight) / 2 +
-            (position.getX() * MapData.tileWidth) / 4 -
-            (position.getZ() +
-                (type == TileType.Door && position.getZ() == 0 ? 1 : 0)) *
+            (position.y * MapData.tileHeight) / 2 +
+            (position.x * MapData.tileWidth) / 4 -
+            (position.z +
+                (type == TileType.Door && position.z == 0 ? 1 : 0)) *
                 MapData.thickSpace *
                 MapData.stairSteps
         );
@@ -57,16 +57,16 @@ export default class VisualizationTile extends RoomObjectVisualization {
 
     private static calculateZIndex(position: Point3d, type: TileType): number {
         return (
-            1 * position.getX() +
-            1 * position.getY() +
+            1 * position.x +
+            1 * position.y +
             1 *
-                (position.getZ() + type == TileType.Door && position.getZ() == 0
+                (position.z + type == TileType.Door && position.z == 0
                     ? 1
                     : 0)
         );
     }
 
-    public render(): void {
+    render(): void {
         this.checkTypeAndDraw();
     }
 
@@ -107,7 +107,7 @@ export default class VisualizationTile extends RoomObjectVisualization {
         const fullHeightTick = this.tile.plane.room.HasFullHeightTick
             ? MapData.thickSpace *
               MapData.stepHeight *
-              (this.tile.position.getZ() + (isDoor ? 1 : 0))
+              (this.tile.position.z + (isDoor ? 1 : 0))
             : 0;
         const floorColor = RoomVisualizationColorData.getNormal(
             this.color,
@@ -206,7 +206,7 @@ export default class VisualizationTile extends RoomObjectVisualization {
         const fullHeightTick = this.tile.plane.room.HasFullHeightTick
             ? MapData.thickSpace *
               MapData.stepHeight *
-              this.tile.position.getZ()
+              this.tile.position.z
             : 0;
         let _offsetX = this.offsetX;
         ctx.pivot.x = 0.2;
@@ -350,7 +350,7 @@ export default class VisualizationTile extends RoomObjectVisualization {
         const fullHeightTick = this.tile.plane.room.HasFullHeightTick
             ? MapData.thickSpace *
               MapData.stepHeight *
-              this.tile.position.getZ()
+              this.tile.position.z
             : 0;
         ctx.transform.position = new ObservablePoint(
             () => {},

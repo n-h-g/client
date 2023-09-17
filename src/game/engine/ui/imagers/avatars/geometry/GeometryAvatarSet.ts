@@ -2,15 +2,15 @@ import {
     IAvatarSetAvatarSet,
     IGeometryAvatarSet,
 } from '../gamedata/IAvatarGeometry';
-import AvatarSet from './AvatarSet';
+import {AvatarSet} from './AvatarSet';
 
-export default class GeometryAvatarSet {
-    public id: string;
+export class GeometryAvatarSet {
+    id: string;
     private avatarSet: IGeometryAvatarSet;
 
     private avatarSets: Map<string, AvatarSet>;
 
-    public constructor(avatarSet: IGeometryAvatarSet) {
+    constructor(avatarSet: IGeometryAvatarSet) {
         this.avatarSet = avatarSet;
         this.avatarSets = new Map();
         this.id = avatarSet.id;

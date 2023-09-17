@@ -6,14 +6,14 @@ export class LogicData {
     private _directions: number[];
     private _dimensions: number[];
 
-    public constructor(data: ILogic) {
+    constructor(data: ILogic) {
         this._directions = [];
 
         this._directions = data.directions;
         this._dimensions = data.dimensions;
     }
 
-    public getDimensions(): number[] {
+    getDimensions(): number[] {
         return this._dimensions;
     }
 }

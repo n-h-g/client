@@ -1,13 +1,13 @@
-import Point3d from '../../../../utils/point/Point3d';
-import VisualizationPointer from './visualization/VisualizationPointer';
-import LogicPointer from './logic/LogicPointer';
-import RoomVisualization from '../../visualization/RoomVisualization';
-import MapData from './MapData';
-import RoomLayout from '../../RoomLayout';
+import {Point3d} from '../../../../utils/point/Point3d';
+import {VisualizationPointer} from './visualization/VisualizationPointer';
+import {LogicPointer} from './logic/LogicPointer';
+import {RoomVisualization} from '../../visualization/RoomVisualization';
+import {MapData} from './MapData';
+import {RoomLayout} from '../../RoomLayout';
 import {Container} from 'pixi.js';
 import {RoomObjectController} from '../../../../core/room/object/RoomObjectController';
 
-export default class Pointer extends RoomObjectController<
+export class Pointer extends RoomObjectController<
     VisualizationPointer,
     LogicPointer
 > {
@@ -27,13 +27,13 @@ export default class Pointer extends RoomObjectController<
         this.logic = new LogicPointer(this);
     }
 
-    public getCanvas(): Container {
+    getCanvas(): Container {
         return (
             this.room.Visualization as RoomVisualization
         ).getCanvasPointer();
     }
 
-    public getRoomLayout(): RoomLayout {
+    getRoomLayout(): RoomLayout {
         return this.room;
     }
 }

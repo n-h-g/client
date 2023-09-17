@@ -1,26 +1,26 @@
-import RoomLayout from '../RoomLayout';
+import {RoomLayout} from '../RoomLayout';
 import {Container} from '@pixi/display';
-import Point from '../../../utils/point/Point';
-import MapData from '../objects/map/MapData';
-import UiUtils from '../../../utils/UiUtils';
+import {Point} from '../../../utils/point/Point';
+import {MapData} from '../objects/map/MapData';
+import {UiUtils} from '../../../utils/UiUtils';
 import {Tile} from '../objects/map/Tile';
 import {IRoomVisualization} from '../../../core/room/IRoomVisualization';
 import {RoomObjectController} from '../../../core/room/object/RoomObjectController';
 import {RoomLogic} from '../logic/RoomLogic';
-import Point3d from '../../../utils/point/Point3d';
+import {Point3d} from '../../../utils/point/Point3d';
 import {RoomPriority} from './RoomPriority';
 import {Engine} from '../../../Engine';
 
-export default class RoomVisualization implements IRoomVisualization {
+export class RoomVisualization implements IRoomVisualization {
     private roomLayout: RoomLayout;
     private canvasFloor: Container;
     private canvasWall: Container;
     private canvasDoorTile: Container;
     private canvasDoorWall: Container;
     private canvasPointer: Container;
-    public container: Container;
+    container: Container;
 
-    public needsUpdate = false;
+    needsUpdate = false;
 
     constructor(room: RoomLayout) {
         this.roomLayout = room;
@@ -72,34 +72,34 @@ export default class RoomVisualization implements IRoomVisualization {
         this.container.sortableChildren = true;
     }
 
-    public dispose(): void {
+    dispose(): void {
         this.container.destroy();
     }
 
-    public render() {
+    render() {
         this.roomLayout.getWallPlane().visualization?.render();
         this.roomLayout.getFloorPlane().visualization?.render();
     }
 
-    public tileToLocal(x: number, y: number, z: number): Point {
+    tileToLocal(x: number, y: number, z: number): Point {
         return new Point(
             (x - y) * MapData.tileWidth,
             (x + y) * MapData.tileHeight - z * MapData.tileHeight * 2
         );
     }
 
-    public static calculateZIndex(
+    static calculateZIndex(
         point: Point3d,
         priority: RoomPriority
     ): number {
         return (
-            (point.getX() + point.getY()) * 1000000 +
-            point.getZ() * 10000 +
+            (point.x + point.y) * 1000000 +
+            point.z * 10000 +
             10000000 * priority
         );
     }
 
-    public getTileByEvent(event: Event): Tile | undefined {
+    getTileByEvent(event: Event): Tile | undefined {
         const hitCtx = this.canvasFloor;
         const coords = UiUtils.getPosition(event, hitCtx);
         console.log(coords);
@@ -110,7 +110,7 @@ export default class RoomVisualization implements IRoomVisualization {
             );
     }
 
-    public globalToTileWithHeight(x: number, y: number, z: number): Point {
+    globalToTileWithHeight(x: number, y: number, z: number): Point {
         const offsetX = this.container.x;
         const offsetY = this.container.y - z * MapData.tileHeight * 2;
 
@@ -123,13 +123,13 @@ export default class RoomVisualization implements IRoomVisualization {
         return new Point(tileX, tileY);
     }
 
-    public flip() {
+    flip() {
         const scale = this.container.scale.y == 1 ? -1 : 1;
 
         this.container.scale.y = scale;
     }
 
-    public zoom(scale: number) {
+    zoom(scale: number) {
         if (scale < 0) {
             return;
         }
@@ -138,7 +138,7 @@ export default class RoomVisualization implements IRoomVisualization {
         this.container.scale.y = +scale;
     }
 
-    public add(
+    add(
         object: RoomObjectController<RoomVisualization, RoomLogic>,
         follow = false
     ) {
@@ -149,26 +149,26 @@ export default class RoomVisualization implements IRoomVisualization {
         this.container.addChild(object.visualization.container);
     }
 
-    public getCanvasFloor(): Container {
+    getCanvasFloor(): Container {
         return this.canvasFloor;
     }
 
-    public getCanvasWall(): Container {
+    getCanvasWall(): Container {
         return this.canvasWall;
     }
 
-    public getCanvasDoorWall(): Container {
+    getCanvasDoorWall(): Container {
         return this.canvasDoorWall;
     }
 
-    public getCanvasPointer(): Container {
+    getCanvasPointer(): Container {
         return this.canvasPointer;
     }
-    public getCanvasDoorTile(): Container {
+    getCanvasDoorTile(): Container {
         return this.canvasDoorTile;
     }
 
-    public get Container(): Container {
+    get Container(): Container {
         return this.container;
     }
 }

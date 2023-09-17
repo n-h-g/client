@@ -1,21 +1,20 @@
 import {ItemLogic} from '../../../../../core/room/object/items/logic/ItemLogic';
-import FurniImager from '../../../../ui/imagers/items/FurniImager';
-import Item from '../Item';
-import {ItemVisualizationAnimated} from '../visualization/ItemVisualizationAnimated';
+import {FurniImager} from '../../../../ui/imagers/items/FurniImager';
+import {Item} from '../Item';
 
-export default class ItemLogicMultiState extends ItemLogic {
+export class ItemLogicMultiState extends ItemLogic {
     private state = 0;
 
     constructor(item: Item) {
         super(item);
     }
 
-    public registerEvents() {
+    registerEvents() {
         super.registerEvents();
         //this.entity.visualization.container.on("dblclick", (event) => this.changeState())
     }
 
-    public changeState() {
+    changeState() {
         let state = this.state;
 
         const item = this.entity as Item;
@@ -33,7 +32,7 @@ export default class ItemLogicMultiState extends ItemLogic {
         this.state = state;
     }
 
-    public tick(delta: number) {
+    tick(delta: number) {
         super.tick(delta);
 
         const item = this.entity as Item;

@@ -4,11 +4,11 @@ import {Logger} from '../../utils/Logger';
 import {LoadingProgressEventData} from '../events/ui/data/loader/LoadingProgress';
 import {UIEvents} from '../events/ui/UIEvents';
 import {ComponentsManager} from './components/ComponentsManager';
-import AvatarImager from './imagers/avatars/AvatarImager';
-import AvatarStructure from './imagers/avatars/structure/AvatarStructure';
-import FurniImager from './imagers/items/FurniImager';
+import {AvatarImager} from './imagers/avatars/AvatarImager';
+import {AvatarStructure} from './imagers/avatars/structure/AvatarStructure';
+import {FurniImager} from './imagers/items/FurniImager';
 import {RoomImager} from './imagers/room/RoomImager';
-import SoundManager from './sound/SoundManager';
+import {SoundManager} from './sound/SoundManager';
 
 export class UserInterfaceManager {
     private _soundManager: SoundManager;
@@ -35,7 +35,7 @@ export class UserInterfaceManager {
         this._roomImager = new RoomImager();
     }
 
-    public async init(): Promise<void> {
+    async init(): Promise<void> {
         try {
             await this._avatarImager.Data.loadGameData(),
                 this._avatarImager.loadStructure();
@@ -59,31 +59,31 @@ export class UserInterfaceManager {
         }
     }
 
-    public get soundManager(): SoundManager {
+    get soundManager(): SoundManager {
         return this._soundManager;
     }
 
-    public get componentsManager(): ComponentsManager {
+    get componentsManager(): ComponentsManager {
         return this._componentsManager;
     }
 
-    public get furniImager(): FurniImager {
+    get furniImager(): FurniImager {
         return this._furniImager;
     }
 
-    public get roomImager(): RoomImager {
+    get roomImager(): RoomImager {
         return this._roomImager;
     }
 
-    public get avatarStructure(): AvatarStructure {
+    get avatarStructure(): AvatarStructure {
         return this._avatarStructure;
     }
 
-    public get avatarImager(): AvatarImager {
+    get avatarImager(): AvatarImager {
         return this._avatarImager;
     }
 
-    public get ready(): boolean {
+    get ready(): boolean {
         return this._ready;
     }
 }

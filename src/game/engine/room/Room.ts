@@ -1,10 +1,10 @@
-import Point from '../../utils/point/Point';
-import RoomLayout from './RoomLayout';
-import RoomInfo from './RoomInfo';
+import {Point} from '../../utils/point/Point';
+import {RoomLayout} from './RoomLayout';
+import {RoomInfo} from './RoomInfo';
 import {RoomEntityRepository} from './RoomEntityRepository';
 import {IDisposable} from '../../core/room/IDisposable';
 
-export default class Room implements IDisposable {
+export class Room implements IDisposable {
     private _roomLayout: RoomLayout;
     private roomInfo: RoomInfo;
     private roomName: string;
@@ -26,32 +26,32 @@ export default class Room implements IDisposable {
         this._roomEntityRepository = new RoomEntityRepository();
     }
 
-    public dispose(): void {
+    dispose(): void {
         this.roomLayout.Visualization.dispose();
         this.roomLayout.Logic.dispose();
     }
 
-    public get roomLayout(): RoomLayout {
+    get roomLayout(): RoomLayout {
         return this._roomLayout;
     }
 
-    public getRoomInfo(): RoomInfo {
+    getRoomInfo(): RoomInfo {
         return this.roomInfo;
     }
 
-    public getRoomId(): number {
+    getRoomId(): number {
         return this.roomId;
     }
 
-    public get roomEntityRepository(): RoomEntityRepository {
+    get roomEntityRepository(): RoomEntityRepository {
         return this._roomEntityRepository;
     }
 
-    public get name(): string {
+    get name(): string {
         return this.roomName;
     }
 
-    public get id(): number {
+    get id(): number {
         return this.roomId;
     }
 }

@@ -8,8 +8,8 @@ import {InventoryUI} from './inventory/InventoryUI';
 import {PreviewBoxUI} from './general/PreviewBoxUI';
 import {CreateRoomUI} from './navigator/CreateRoomUI';
 import {CatalogueUI} from './catalogue/CatalogueUI';
-import StaticContainerUI from './static/StaticContainerUI';
-import RoomUI from './room/RoomUI';
+import {StaticContainerUI} from './static/StaticContainerUI';
+import {RoomUI} from './room/RoomUI';
 import {AvatarContainerUI} from './avatar/AvatarContainerUI';
 import {RoomInfoUI} from './room/RoomInfoUI';
 import {Repository} from '../../../core/Repository';
@@ -23,7 +23,7 @@ export class ComponentsManager {
         this._gameComponents = new Repository();
     }
 
-    public loadGameComponents(): void {
+    loadGameComponents(): void {
         this.addComponent(UIComponent.GameLoaderUI, new GameLoaderUI());
         this.addComponent(UIComponent.BottomBarUI, new BottomBarUI());
         this.addComponent(
@@ -44,13 +44,13 @@ export class ComponentsManager {
         this.addComponent(UIComponent.RoomInfoUI, new RoomInfoUI());
     }
 
-    public initGameComponents(): void {
+    initGameComponents(): void {
         for (const component of this._gameComponents.getAll().values()) {
             component.init();
         }
     }
 
-    public get rootComponent(): HTMLElement {
+    get rootComponent(): HTMLElement {
         return this._rootComponent;
     }
 
@@ -63,11 +63,11 @@ export class ComponentsManager {
         this._gameComponents.add(componentKey, component);
     }
 
-    public getComponents(): Repository<UIComponent, IComponentUI> {
+    getComponents(): Repository<UIComponent, IComponentUI> {
         return this._gameComponents;
     }
 
-    public getComponent<T>(componentKey: UIComponent): T {
+    getComponent<T>(componentKey: UIComponent): T {
         return this._gameComponents.get(componentKey) as T;
     }
 }

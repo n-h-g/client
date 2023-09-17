@@ -1,15 +1,15 @@
 import {Entity} from '../../../../core/room/object/entities/Entity';
 import {ItemLogic} from '../../../../core/room/object/items/logic/ItemLogic';
 import {ItemVisualization} from '../../../../core/room/object/items/visualization/ItemVisualization';
-import Point3d from '../../../../utils/point/Point3d';
-import FurniBase from '../../../ui/imagers/items/FurniBase';
-import ItemLogicBasic from './logic/ItemLogicBasic';
-import ItemLogicMultiState from './logic/ItemLogicMultiState';
+import {Point3d} from '../../../../utils/point/Point3d';
+import {FurniBase} from '../../../ui/imagers/items/FurniBase';
+import {ItemLogicBasic} from './logic/ItemLogicBasic';
+import {ItemLogicMultiState} from './logic/ItemLogicMultiState';
 import {ItemVisualizationAnimated} from './visualization/ItemVisualizationAnimated';
 import {ItemVisualizationStatic} from './visualization/ItemVisualizationStatic';
 
-export default abstract class Item extends Entity {
-    public base: FurniBase;
+export abstract class Item extends Entity {
+    base: FurniBase;
 
     constructor(
         id: string,

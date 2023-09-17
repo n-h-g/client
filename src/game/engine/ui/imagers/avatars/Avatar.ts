@@ -1,12 +1,11 @@
 import {Container} from 'pixi.js';
 
 import {Direction} from '../../../../core/objects/Direction';
-import AvatarFigure from './AvatarFigure';
+import {AvatarFigure} from './AvatarFigure';
 import {ActionId} from './enum/actions/ActionId';
-import AvatarData from './enum/AvatarData';
+import {AvatarData} from './enum/AvatarData';
 import {AvatarEventsType} from './enum/events/AvatarEventsType';
-import AvatarEvents from './events/AvatarEvents';
-import AvatarStructure from './structure/AvatarStructure';
+import {AvatarEvents} from './events/AvatarEvents';
 
 const DEFAULT_FIGURE =
     'hd-180-1.ch-255-66.lg-280-110.sh-305-62.ha-1012-110.hr-828-61';
@@ -17,7 +16,7 @@ export type FigurePart = {
     colors: number[];
 };
 
-export default class Avatar {
+export class Avatar {
     private look: string;
 
     private avatarFigure: AvatarFigure;
@@ -98,7 +97,7 @@ export default class Avatar {
         })*/
     }
 
-    public assemble(): void {
+    assemble(): void {
         this.container.addChild(this.bodyContainer);
         this.container.addChild(this.legContainer);
         this.container.addChild(this.headContainer);
@@ -138,112 +137,112 @@ export default class Avatar {
         this.events.emit(AvatarEventsType.LOAD_COMPLETE);
     }
 
-    public addAction(action: ActionId) {
+    addAction(action: ActionId) {
         this.actions.add(action);
     }
 
-    public get Look() {
+    get Look() {
         return this.look;
     }
 
-    public set TotalFrames(frames: number) {
+    set TotalFrames(frames: number) {
         this.totalFrames = frames;
     }
 
-    public get Frames() {
+    get Frames() {
         return this.totalFrames;
     }
 
-    public get BodyDirection() {
+    get BodyDirection() {
         return this.bodyDirection;
     }
 
-    public get FaceContainer() {
+    get FaceContainer() {
         return this.faceContainer;
     }
 
-    public get HeadDirection() {
+    get HeadDirection() {
         return this.headDirection;
     }
 
-    public get Actions() {
+    get Actions() {
         return this.actions;
     }
 
-    public set Direction(direction: Direction) {
+    set Direction(direction: Direction) {
         this.bodyDirection = direction;
         this.headDirection = direction;
     }
 
-    public set Frame(frame: number) {
+    set Frame(frame: number) {
         this.bodyFrame = frame;
         this.headFrame = frame;
     }
 
-    public get IsSmall() {
+    get IsSmall() {
         return this.isSmall;
     }
 
-    public get IsPlaceHolder() {
+    get IsPlaceHolder() {
         return this.placeHolder;
     }
 
-    public get BodyFrame() {
+    get BodyFrame() {
         return this.bodyFrame;
     }
 
-    public get ArmsContainer() {
+    get ArmsContainer() {
         return this.armsContainer;
     }
 
-    public set BodyFrame(value: number) {
+    set BodyFrame(value: number) {
         this.bodyFrame = value;
     }
 
-    public get HeadFrame() {
+    get HeadFrame() {
         return this.headFrame;
     }
 
-    public get Container() {
+    get Container() {
         return this.container!;
     }
 
-    public get Events(): AvatarEvents | null {
+    get Events(): AvatarEvents | null {
         return this.events;
     }
 
-    public set Container(container: Container) {
+    set Container(container: Container) {
         this.container = container;
     }
 
-    public get BodyContainer(): Container {
+    get BodyContainer(): Container {
         return this.bodyContainer;
     }
-    public get HeadContainer(): Container {
+    get HeadContainer(): Container {
         return this.headContainer;
     }
-    public get ShoesContainer(): Container {
+    get ShoesContainer(): Container {
         return this.shoesContainer;
     }
-    public get LegContainer(): Container {
+    get LegContainer(): Container {
         return this.legContainer;
     }
-    public get HairContainer(): Container {
+    get HairContainer(): Container {
         return this.legContainer;
     }
 
-    public get HeadAccessoryContainer(): Container {
+    get HeadAccessoryContainer(): Container {
         return this.headAccessoryContainer;
     }
 
-    public get HatContainer() {
+    get HatContainer() {
         return this.hatContainer;
     }
-    public get TorsoContainer() {
+    get TorsoContainer() {
         return this.torsoContainer;
     }
 
-    public get AvatarFigure(): AvatarFigure {
+    get AvatarFigure(): AvatarFigure {
         return this.avatarFigure;
     }
 }

@@ -8,7 +8,7 @@ import {UIComponent} from '../../../../engine/ui/components/UIComponent';
 import {GameLoaderUI} from '../../../../engine/ui/components/loader/GameLoaderUI';
 
 export class LoginResponse extends MessageHandler {
-    public handle(): void {
+    handle(): void {
         if (Engine.getInstance().config.offlineMode) return;
 
         if (this.message.data) {

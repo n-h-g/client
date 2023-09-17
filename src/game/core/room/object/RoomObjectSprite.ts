@@ -20,7 +20,7 @@ export class RoomObjectSprite implements IRoomObjectSprite {
 
     protected _container: Container;
 
-    public constructor() {
+    constructor() {
         this._width = 0;
         this._height = 0;
         this._offsetX = 0;
@@ -29,22 +29,22 @@ export class RoomObjectSprite implements IRoomObjectSprite {
         this._container = new Container();
     }
 
-    public reset(): void {}
+    reset(): void {}
 
-    public update(needsUpdate = false): void {}
+    update(needsUpdate = false): void {}
 
-    public dispose(): void {
+    dispose(): void {
         this._texture = null;
         this._alpha = 255;
         this._height = 0;
         this._width = 0;
     }
 
-    public get container(): Container {
+    get container(): Container {
         return this._container;
     }
 
-    public set container(container: Container) {
+    set container(container: Container) {
         if (this._container === container) return;
 
         this._texture = Texture.EMPTY;

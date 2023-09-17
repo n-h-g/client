@@ -1,6 +1,6 @@
-import SoundManager from './SoundManager';
+import {SoundManager} from './SoundManager';
 
-class SoundResource {
+export class SoundResource {
     private soundManager: SoundManager;
     private name: string;
     private audio: HTMLAudioElement;
@@ -18,13 +18,11 @@ class SoundResource {
         );
     }
 
-    public getName(): string {
+    getName(): string {
         return this.name;
     }
 
-    public play() {
+    play() {
         this.audio.play();
     }
 }
-
-export default SoundResource;

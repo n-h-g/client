@@ -1,17 +1,17 @@
 import {Direction} from '../../../objects/Direction';
-import RoomObjectVisualization from '../RoomObjectVisualization';
+import {RoomObjectVisualization} from '../RoomObjectVisualization';
 import {Entity} from './Entity';
-import Point3d from '../../../../utils/point/Point3d';
-import AvatarData from '../../../../engine/ui/imagers/avatars/enum/AvatarData';
+import {Point3d} from '../../../../utils/point/Point3d';
+import {AvatarData} from '../../../../engine/ui/imagers/avatars/enum/AvatarData';
 import {EntityEvents} from '../../../../engine/events/room/objects/entities/EntityEvents';
 import {Engine} from '../../../../Engine';
 
 export abstract class EntityVisualization extends RoomObjectVisualization {
-    public _entity: Entity;
+    _entity: Entity;
 
     protected rotation: Direction = Direction.SOUTH;
     private _nextPosition: Point3d;
-    public frame = 0;
+    frame = 0;
 
     constructor(entity: Entity) {
         super(0, 0, 0);
@@ -19,101 +19,93 @@ export abstract class EntityVisualization extends RoomObjectVisualization {
         this._nextPosition = new Point3d(0, 0, 0);
     }
 
-    public setNextPosition(point: Point3d) {
-        this._nextPosition.setX(point.getX());
-        this._nextPosition.setY(point.getY());
-        this._nextPosition.setZ(point.getZ());
+    setNextPosition(point: Point3d) {
+        this._nextPosition.x = point.x;
+        this._nextPosition.y = point.y;
+        this._nextPosition.z = point.z;
         this.entity.logic.events.emit(EntityEvents.POSITION_CHANGED);
         this.updatePosition();
     }
 
-    public move(delta: number): void {
+    move(delta: number): void {
         delta = delta / 1000;
 
-        if (this._entity.position.getX() < this._nextPosition.getX()) {
-            this._entity.position.setX(
-                this._entity.position.getX() +
-                    delta * AvatarData.AVATAR_WALK_SPEED
-            );
-            if (this._entity.position.getX() > this._nextPosition.getX()) {
+        if (this._entity.position.x < this._nextPosition.x) {
+            this._entity.position.x =
+                this._entity.position.x +
+                    delta * AvatarData.AVATAR_WALK_SPEED;
+            if (this._entity.position.x > this._nextPosition.x) {
                 //this.isWalking = false
-                this._entity.position.setX(this._nextPosition.getX());
+                this._entity.position.x = this._nextPosition.x;
             }
-        } else if (this._entity.position.getX() > this._nextPosition.getX()) {
-            this._entity.position.setX(
-                this._entity.position.getX() -
-                    delta * AvatarData.AVATAR_WALK_SPEED
-            );
-            if (this._entity.position.getX() < this._nextPosition.getX()) {
+        } else if (this._entity.position.x > this._nextPosition.x) {
+            this._entity.position.x = 
+                this._entity.position.x -
+                    delta * AvatarData.AVATAR_WALK_SPEED;
+            if (this._entity.position.x < this._nextPosition.x) {
                 //this.isWalking = false
-                this._entity.position.setX(this._nextPosition.getX());
+                this._entity.position.x = this._nextPosition.x;
             }
         }
 
-        if (this._entity.position.getY() < this._nextPosition.getY()) {
-            this._entity.position.setY(
-                this._entity.position.getY() +
-                    delta * AvatarData.AVATAR_WALK_SPEED
-            );
-            if (this._entity.position.getY() > this._nextPosition.getY()) {
+        if (this._entity.position.y < this._nextPosition.y) {
+            this._entity.position.y = this._entity.position.y + delta * AvatarData.AVATAR_WALK_SPEED;
+
+            if (this._entity.position.y > this._nextPosition.y) {
                 //this.isWalking = false
-                this._entity.position.setY(this._nextPosition.getY());
+                this._entity.position.y = this._nextPosition.y;
             }
-        } else if (this._entity.position.getY() > this._nextPosition.getY()) {
-            this._entity.position.setY(
-                this._entity.position.getY() -
-                    delta * AvatarData.AVATAR_WALK_SPEED
-            );
-            if (this._entity.position.getY() < this._nextPosition.getY()) {
+        } else if (this._entity.position.y > this._nextPosition.y) {
+            this._entity.position.y = this._entity.position.y - delta * AvatarData.AVATAR_WALK_SPEED;
+
+            if (this._entity.position.y < this._nextPosition.y) {
                 //this.isWalking = false
-                this._entity.position.setY(this._nextPosition.getY());
+                this._entity.position.y = this._nextPosition.y;
             }
         }
 
-        if (this._nextPosition.getZ() > this._entity.position.getZ()) {
-            this._entity.position.setZ(
-                this._entity.position.getZ() +
-                    (Math.abs(
-                        this.entity.position.getZ() - this.nextPosition.getZ()
-                    ) > 1.5
+        if (this._nextPosition.z > this._entity.position.z) {
+            this._entity.position.z = 
+                this._entity.position.z +
+                    (Math.abs(this.entity.position.z - this.nextPosition.z) > 1.5
                         ? 9.8
                         : AvatarData.AVATAR_WALK_SPEED) *
-                        delta
-            );
-            if (this._entity.position.getZ() > this._nextPosition.getZ()) {
-                this._entity.position.setZ(this._nextPosition.getZ());
+                        delta;
+
+            if (this._entity.position.z > this._nextPosition.z) {
+                this._entity.position.z = this._nextPosition.z;
             }
-        } else if (this.nextPosition.getZ() < this._entity.position.getZ()) {
-            this._entity.position.setZ(
-                this._entity.position.getZ() -
+        } else if (this.nextPosition.z < this._entity.position.z) {
+            this._entity.position.z = 
+                this._entity.position.z -
                     (Math.abs(
-                        this._entity.position.getZ() - this._nextPosition.getZ()
+                        this._entity.position.z - this._nextPosition.z
                     ) > 1.5
                         ? 9.8
                         : AvatarData.AVATAR_WALK_SPEED) *
-                        delta
-            );
-            if (this._entity.position.getZ() < this._nextPosition.getZ()) {
-                this._entity.position.setZ(this._nextPosition.getZ());
+                        delta;
+
+            if (this._entity.position.z < this._nextPosition.z) {
+                this._entity.position.z = this._nextPosition.z;
             }
         }
 
         this.updatePosition();
     }
 
-    public abstract draw(): void;
+    abstract draw(): void;
 
-    public abstract nextFrame(): void;
+    abstract nextFrame(): void;
 
-    public abstract calculateOffsetX(): number;
+    abstract calculateOffsetX(): number;
 
-    public abstract calculateOffsetY(): number;
+    abstract calculateOffsetY(): number;
 
-    public abstract updateRotation(rotation: number): void;
+    abstract updateRotation(rotation: number): void;
 
-    public abstract getZIndex(): number;
+    abstract getZIndex(): number;
 
-    public updatePosition() {
+    updatePosition() {
         if (!this.container) return;
 
         this.container.x = this.calculateOffsetX();
@@ -128,27 +120,27 @@ export abstract class EntityVisualization extends RoomObjectVisualization {
         Engine.getInstance().roomService.CurrentRoom.roomLayout.Visualization.container.sortChildren();
     }
 
-    public dispose(): void {
+    dispose(): void {
         super.dispose();
     }
 
-    public set direction(direction: Direction) {
+    set direction(direction: Direction) {
         this.rotation = direction;
     }
 
-    public get entity(): Entity {
+    get entity(): Entity {
         return this._entity;
     }
 
-    public set Rot(direction: Direction) {
+    set Rot(direction: Direction) {
         this.rotation = direction;
     }
 
-    public get nextPosition(): Point3d {
+    get nextPosition(): Point3d {
         return this._nextPosition;
     }
 
-    public set nextPosition(point: Point3d) {
+    set nextPosition(point: Point3d) {
         this.nextPosition = point;
     }
 }

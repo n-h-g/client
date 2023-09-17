@@ -1,4 +1,4 @@
-export default class Container {
+export class Container {
     private domNode: HTMLDivElement;
 
     constructor() {
@@ -6,23 +6,23 @@ export default class Container {
         this.domNode.style.position = 'absolute';
     }
 
-    public removeChildren() {
+    removeChildren() {
         this.domNode.innerHTML = '';
     }
 
-    public appendChild(child: HTMLElement) {
+    appendChild(child: HTMLElement) {
         this.domNode.appendChild(child);
     }
 
-    public getChildren() {
+    getChildren() {
         return this.domNode.children;
     }
 
-    public destroy() {
+    destroy() {
         this.domNode.remove();
     }
 
-    public getDomNode() {
+    getDomNode() {
         return this.domNode;
     }
 }

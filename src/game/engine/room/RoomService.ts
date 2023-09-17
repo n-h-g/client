@@ -1,5 +1,5 @@
-import Room from './Room';
-import Point from '../../utils/point/Point';
+import {Room} from './Room';
+import {Point} from '../../utils/point/Point';
 import {Engine} from '../../Engine';
 import {EventManager} from '../../core/events/EventManager';
 import {HotelViewData} from '../events/ui/data/static/HotelView';
@@ -12,17 +12,17 @@ import {IDisposable} from '../../core/room/IDisposable';
 import {EnterRoomUIEventData} from '../events/ui/data/room/EnterRoomUIEventData';
 import {OutgoingPacket} from '../../networking/packets/outgoing/OutgoingPacket';
 
-export default class RoomService
+export class RoomService
     extends Service<null, null>
     implements IDisposable
 {
     private _currentRoom: Room;
 
-    public constructor() {
+    constructor() {
         super();
     }
 
-    public setRoom(
+    setRoom(
         roomName: string,
         roomModel: string,
         doorPosition: Point,
@@ -51,7 +51,7 @@ export default class RoomService
      * @param size the number of tiles you want to generate (n * n)
      * @returns
      */
-    public generateSquareRoomModel(size: number) {
+    generateSquareRoomModel(size: number) {
         let count = 1;
 
         let model = '';
@@ -71,7 +71,7 @@ export default class RoomService
         return model;
     }
 
-    public toggleUI() {
+    toggleUI() {
         if (Engine.getInstance().config.offlineMode) return;
 
         Engine.getInstance()
@@ -94,7 +94,7 @@ export default class RoomService
         });
     }
 
-    public dispose(): void {
+    dispose(): void {
         if (!this._currentRoom) {
             return;
         }
@@ -105,12 +105,12 @@ export default class RoomService
         this._currentRoom = null;
     }
 
-    public tick(delta: number): void {
+    tick(delta: number): void {
         this._currentRoom?.roomLayout.Logic.tick(delta);
         this._currentRoom?.roomEntityRepository.tick(delta);
     }
 
-    public get CurrentRoom(): Room {
+    get CurrentRoom(): Room {
         return this._currentRoom;
     }
 }

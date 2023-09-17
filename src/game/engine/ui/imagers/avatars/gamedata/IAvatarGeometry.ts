@@ -1,4 +1,4 @@
-export default interface IAvatarGeometry {
+export interface IAvatarGeometry {
     geometry: IGeometry;
 }
 

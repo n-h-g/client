@@ -38,8 +38,8 @@ import { RoomChatData } from '../../../game/engine/events/ui/data/room/RoomChatD
 import { UIEvents } from '../../../game/engine/events/ui/UIEvents'
 import { ChatData } from '../../../game/engine/game/chat/ChatData'
 import { UIComponent } from '../../../game/engine/ui/components/UIComponent'
-import AvatarData from '../../../game/engine/ui/imagers/avatars/enum/AvatarData'
-import UiUtils from '../../../game/utils/UiUtils'
+import {AvatarData} from '../../../game/engine/ui/imagers/avatars/enum/AvatarData'
+import {UiUtils} from '../../../game/utils/UiUtils'
 import { Container } from 'pixi.js'
 
 const chatDelayTimer = 2000 // in ms

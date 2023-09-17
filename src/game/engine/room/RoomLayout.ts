@@ -1,14 +1,14 @@
-import Room from './Room';
-import Point from '../../utils/point/Point';
-import RoomVisualization from './visualization/RoomVisualization';
+import {Room} from './Room';
+import {Point} from '../../utils/point/Point';
+import {RoomVisualization} from './visualization/RoomVisualization';
 import {RoomLogic} from './logic/RoomLogic';
 import {FloorPlane} from './objects/map/FloorPlane';
 import {ColorRGB} from '../../utils/color/ColorRGB';
 import {WallPlane} from './objects/map/WallPlane';
-import Pointer from './objects/map/Pointer';
-import MapData from './objects/map/MapData';
+import {Pointer} from './objects/map/Pointer';
+import {MapData} from './objects/map/MapData';
 
-export default class RoomLayout {
+export class RoomLayout {
     private visualization: RoomVisualization;
     private logic: RoomLogic;
     private room: Room;
@@ -80,17 +80,17 @@ export default class RoomLayout {
         this.wallPlane.prepareWalls();
     }
 
-    public getExtraHeight() {
+    getExtraHeight() {
         let extra =
             MapData.tileHeight * this.mapSizeZ -
             (MapData.tileHeight / 2) *
-                (this.heighestPosition.getX() + this.heighestPosition.getY());
+                (this.heighestPosition.x + this.heighestPosition.y);
         if (extra < 0) extra = 0;
 
         return extra;
     }
 
-    public getCanvasSize(): Point {
+    getCanvasSize(): Point {
         const tileBorder = Math.sqrt(
             Math.pow(MapData.tileWidth / 2, 2) +
                 Math.pow(MapData.tileHeight / 2, 2)
@@ -126,7 +126,7 @@ export default class RoomLayout {
         );
     }
 
-    public createOrGetRoomCanvas(name: string): HTMLCanvasElement {
+    createOrGetRoomCanvas(name: string): HTMLCanvasElement {
         let canvas = document.getElementById(name) as HTMLCanvasElement;
 
         if (canvas == undefined) canvas = document.createElement('canvas');
@@ -134,19 +134,19 @@ export default class RoomLayout {
         canvas.id = name;
 
         const canvasSize = this.getCanvasSize();
-        canvas.width = canvasSize.getX();
-        canvas.height = canvasSize.getY();
+        canvas.width = canvasSize.x;
+        canvas.height = canvasSize.y;
 
         const roomOffset = this.getRoomOffset();
         canvas
             .getContext('2d')!
-            .translate(roomOffset.getX(), roomOffset.getY());
+            .translate(roomOffset.x, roomOffset.y);
         canvas.getContext('2d')!.imageSmoothingEnabled = false;
 
         return canvas;
     }
 
-    public getRoomOffset(): Point {
+    getRoomOffset(): Point {
         return new Point(
             ((this.mapSizeX - 1) * MapData.tileWidth) / 2 + MapData.wallDepth,
             MapData.wallHeight -
@@ -157,14 +157,14 @@ export default class RoomLayout {
         );
     }
 
-    public getOffset(x: number, y: number, z: number): Point {
+    getOffset(x: number, y: number, z: number): Point {
         return new Point(
             (y - x) * MapData.tileWidth,
             (x + y) * MapData.tileHeight - z * MapData.tileHeight * 2
         );
     }
 
-    public getUniqueColor(): ColorRGB {
+    getUniqueColor(): ColorRGB {
         const color: ColorRGB = ColorRGB.getRandomColor();
 
         if (this.colorsHash.includes(color)) {
@@ -175,65 +175,65 @@ export default class RoomLayout {
         return color;
     }
 
-    public getModelMaltrix(): number[][] {
+    getModelMaltrix(): number[][] {
         return this.modelMatrix;
     }
 
-    public setModelMatrixElement(x: number, y: number, height: number): void {
+    setModelMatrixElement(x: number, y: number, height: number): void {
         if (this.modelMatrix[x] && this.modelMatrix[x][y]) {
             this.modelMatrix[x][y] = height;
         }
     }
 
-    public getMapSizeX(): number {
+    getMapSizeX(): number {
         return this.mapSizeX;
     }
 
-    public getMapSizeY(): number {
+    getMapSizeY(): number {
         return this.mapSizeY;
     }
 
-    public getMapSizeZ(): number {
+    getMapSizeZ(): number {
         return this.mapSizeZ;
     }
 
-    public getDoorPosition(): Point {
+    getDoorPosition(): Point {
         return this.doorPosition;
     }
 
-    public getPointer(): Pointer {
+    getPointer(): Pointer {
         return this.pointer;
     }
 
-    public getFloorPlane(): FloorPlane {
+    getFloorPlane(): FloorPlane {
         return this.floorPlane;
     }
 
-    public getWallPlane(): WallPlane {
+    getWallPlane(): WallPlane {
         return this.wallPlane;
     }
 
-    public getZoom(): number {
+    getZoom(): number {
         return this.zoom;
     }
 
-    public get HasFullHeightTick(): boolean {
+    get HasFullHeightTick(): boolean {
         return this.fullHeightTick;
     }
 
-    public get Visualization(): RoomVisualization {
+    get Visualization(): RoomVisualization {
         return this.visualization;
     }
 
-    public get Logic(): RoomLogic {
+    get Logic(): RoomLogic {
         return this.logic;
     }
 
-    public getModelMatrix(): number[][] {
+    getModelMatrix(): number[][] {
         return this.modelMatrix;
     }
 
-    public getRoom(): Room {
+    getRoom(): Room {
         return this.room;
     }
 }

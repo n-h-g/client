@@ -1,5 +1,5 @@
 /* eslint-disable */
-export default interface IAvatarAnimations {
+export interface IAvatarAnimations {
     animations: IAnimation[]
   }
   

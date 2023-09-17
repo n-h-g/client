@@ -1,11 +1,11 @@
-import RoomObjectVisualization from '../../../../../core/room/object/RoomObjectVisualization';
-import Pointer from '../Pointer';
-import MapData from '../MapData';
+import {RoomObjectVisualization} from '../../../../../core/room/object/RoomObjectVisualization';
+import {Pointer} from '../Pointer';
+import {MapData} from '../MapData';
 import {ColorRGB} from '../../../../../utils/color/ColorRGB';
-import {Color, Container, Graphics, Point} from 'pixi.js';
+import {Container, Graphics, Point} from 'pixi.js';
 import {Tile} from '../Tile';
 
-export default class VisualizationPointer extends RoomObjectVisualization {
+export class VisualizationPointer extends RoomObjectVisualization {
     private pointerContext: Container;
     private pointerColor: ColorRGB = new ColorRGB(255, 255, 255);
     private pointerPosition = 0;
@@ -15,9 +15,9 @@ export default class VisualizationPointer extends RoomObjectVisualization {
 
     constructor(pointer: Pointer) {
         super(
-            pointer.position.getX(),
-            pointer.position.getY(),
-            pointer.position.getZ()
+            pointer.position.x,
+            pointer.position.y,
+            pointer.position.z
         );
 
         this.pointer = pointer;
@@ -27,7 +27,7 @@ export default class VisualizationPointer extends RoomObjectVisualization {
         this.render();
     }
 
-    public getZIndex(): number {
+    getZIndex(): number {
         return -1;
     }
 
@@ -35,7 +35,7 @@ export default class VisualizationPointer extends RoomObjectVisualization {
         this.drawPointer(this.pointerContext);
     }
 
-    public updatePosition(x: number, y: number, tile: Tile) {
+    updatePosition(x: number, y: number, tile: Tile) {
         const xpos =
             (x - y) * (MapData.tileWidth / 2) + tile!.visualization!.offsetX;
         const ypos =
@@ -43,8 +43,8 @@ export default class VisualizationPointer extends RoomObjectVisualization {
 
         this.pointerContext.visible = true;
 
-        this.pointer.position.setX(tile.position.getX());
-        this.pointer.position.setY(tile.position.getY());
+        this.pointer.position.x = tile.position.z;
+        this.pointer.position.y = tile.position.y;
 
         this.pointerContext.x = xpos;
         this.pointerContext.y = ypos;
@@ -78,7 +78,7 @@ export default class VisualizationPointer extends RoomObjectVisualization {
         return container;
     }
 
-    public getPointerWidth(): number {
+    getPointerWidth(): number {
         return this.pointerWidth;
     }
 }

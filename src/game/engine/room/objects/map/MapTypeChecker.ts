@@ -1,65 +1,65 @@
-import Point from '../../../../utils/point/Point';
-import Point3d from '../../../../utils/point/Point3d';
+import {Point} from '../../../../utils/point/Point';
+import {Point3d} from '../../../../utils/point/Point3d';
 import {TileType} from './TileTypeEnum';
 
-export default class MapTypeChecker {
-    public static checkTileType(
+export class MapTypeChecker {
+    static checkTileType(
         position: Point3d,
         doorPosition: Point,
         modelMatrix: Array<Array<number>>
     ): TileType {
         if (
-            doorPosition.getY() == position.getY() &&
-            doorPosition.getX() == position.getX()
+            doorPosition.y == position.y &&
+            doorPosition.x == position.x
         ) {
             return TileType.Door;
-        } else if (modelMatrix[position.getX()][position.getY()] == 0) {
+        } else if (modelMatrix[position.x][position.y] == 0) {
             return TileType.Hole;
         } else if (
-            modelMatrix[position.getX() - 1] &&
-            modelMatrix[position.getX() - 1][position.getY()] != 0 &&
-            modelMatrix[position.getX()][position.getY()] + 1 ==
-                modelMatrix[position.getX() - 1][position.getY()]
+            modelMatrix[position.x - 1] &&
+            modelMatrix[position.x - 1][position.y] != 0 &&
+            modelMatrix[position.x][position.y] + 1 ==
+                modelMatrix[position.x - 1][position.y]
         ) {
             return TileType.StairRight;
         } else if (
-            modelMatrix[position.getX()] &&
-            modelMatrix[position.getX()][position.getY() - 1] != 0 &&
-            modelMatrix[position.getX()][position.getY()] + 1 ==
-                modelMatrix[position.getX()][position.getY() - 1]
+            modelMatrix[position.x] &&
+            modelMatrix[position.x][position.y - 1] != 0 &&
+            modelMatrix[position.x][position.y] + 1 ==
+                modelMatrix[position.x][position.y - 1]
         ) {
             return TileType.StairLeft;
         } else if (
-            modelMatrix[position.getX() - 1] &&
-            modelMatrix[position.getX() - 1][position.getY() - 1] &&
-            modelMatrix[position.getX() - 1][position.getY() - 1] != 0 &&
-            (modelMatrix[position.getX() - 1][position.getY()] == 0 ||
-                modelMatrix[position.getX() - 1][position.getY()] <=
-                    modelMatrix[position.getX()][position.getY()]) &&
-            modelMatrix[position.getX()][position.getY()] + 1 ==
-                modelMatrix[position.getX() - 1][position.getY() - 1]
+            modelMatrix[position.x - 1] &&
+            modelMatrix[position.x - 1][position.y - 1] &&
+            modelMatrix[position.x - 1][position.y - 1] != 0 &&
+            (modelMatrix[position.x - 1][position.y] == 0 ||
+                modelMatrix[position.x - 1][position.y] <=
+                    modelMatrix[position.x][position.y]) &&
+            modelMatrix[position.x][position.y] + 1 ==
+                modelMatrix[position.x - 1][position.y - 1]
         ) {
             return TileType.StairCornerFront;
         } else if (
-            modelMatrix[position.getX() - 1] &&
-            modelMatrix[position.getX() - 1][position.getY() + 1] &&
-            modelMatrix[position.getX() - 1][position.getY() + 1] != 0 &&
-            (modelMatrix[position.getX() - 1][position.getY()] == 0 ||
-                modelMatrix[position.getX() - 1][position.getY()] <=
-                    modelMatrix[position.getX()][position.getY()]) &&
-            modelMatrix[position.getX()][position.getY()] + 1 ==
-                modelMatrix[position.getX() - 1][position.getY() + 1]
+            modelMatrix[position.x - 1] &&
+            modelMatrix[position.x - 1][position.y + 1] &&
+            modelMatrix[position.x - 1][position.y + 1] != 0 &&
+            (modelMatrix[position.x - 1][position.y] == 0 ||
+                modelMatrix[position.x - 1][position.y] <=
+                    modelMatrix[position.x][position.y]) &&
+            modelMatrix[position.x][position.y] + 1 ==
+                modelMatrix[position.x - 1][position.y + 1]
         ) {
             return TileType.StairCornerLeft;
         } else if (
-            modelMatrix[position.getX() + 1] &&
-            modelMatrix[position.getX() + 1][position.getY() - 1] &&
-            modelMatrix[position.getX() + 1][position.getY() - 1] != 0 &&
-            (modelMatrix[position.getX() + 1][position.getY()] == 0 ||
-                modelMatrix[position.getX() + 1][position.getY()] <=
-                    modelMatrix[position.getX()][position.getY()]) &&
-            modelMatrix[position.getX()][position.getY()] + 1 ==
-                modelMatrix[position.getX() + 1][position.getY() - 1]
+            modelMatrix[position.x + 1] &&
+            modelMatrix[position.x + 1][position.y - 1] &&
+            modelMatrix[position.x + 1][position.y - 1] != 0 &&
+            (modelMatrix[position.x + 1][position.y] == 0 ||
+                modelMatrix[position.x + 1][position.y] <=
+                    modelMatrix[position.x][position.y]) &&
+            modelMatrix[position.x][position.y] + 1 ==
+                modelMatrix[position.x + 1][position.y - 1]
         ) {
             return TileType.StairCornerRight;
         }
@@ -67,7 +67,7 @@ export default class MapTypeChecker {
         return TileType.Flat;
     }
 
-    public static checkWallCorner(
+    static checkWallCorner(
         x: number,
         y: number,
         modelMatrix: Array<Array<number>>

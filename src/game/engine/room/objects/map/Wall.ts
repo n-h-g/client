@@ -1,7 +1,7 @@
-import LogicWall from './logic/LogicWall';
-import VisualizationWall from './visualization/VisualizationWall';
+import {LogicWall} from './logic/LogicWall';
+import {VisualizationWall} from './visualization/VisualizationWall';
 import {WallType} from './/WallTypeEnum';
-import Point3d from '../../../../utils/point/Point3d';
+import {Point3d} from '../../../../utils/point/Point3d';
 import {ColorRGB} from '../../../../utils/color/ColorRGB';
 import {RoomObjectController} from '../../../../core/room/object/RoomObjectController';
 import {IRoomMapObject} from '../../../../core/room/object/map/IRoomMapObject';
@@ -41,23 +41,23 @@ export class Wall
         this.logic = new LogicWall(this);
     }
 
-    public get color(): ColorRGB {
+    get color(): ColorRGB {
         return this._color;
     }
 
-    public getType(): WallType {
+    getType(): WallType {
         return this.type;
     }
 
-    public isCorner(): boolean {
+    isCorner(): boolean {
         return this.corner;
     }
 
-    public isLast(): boolean {
+    isLast(): boolean {
         return this.last;
     }
 
-    public get plane(): WallPlane {
+    get plane(): WallPlane {
         return this._plane;
     }
 }

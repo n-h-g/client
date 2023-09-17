@@ -1,15 +1,15 @@
-import RoomObjectVisualization from '../../../../../core/room/object/RoomObjectVisualization';
-import MapData from '../MapData';
+import {RoomObjectVisualization} from '../../../../../core/room/object/RoomObjectVisualization';
+import {MapData} from '../MapData';
 import {WallType} from '../WallTypeEnum';
-import Point3d from '../../.././../../utils/point/Point3d';
+import {Point3d} from '../../.././../../utils/point/Point3d';
 import {ColorRGB} from '../../../../../utils/color/ColorRGB';
 import {NormalType} from '../../../visualization/NormalTypeEnum';
-import RoomVisualizationColorData from '../../../visualization/RoomVisualizationColorData';
+import {RoomVisualizationColorData} from '../../../visualization/RoomVisualizationColorData';
 import {Container, Graphics} from 'pixi.js';
 import {Wall} from '../Wall';
 import {RoomPriority} from '../../../visualization/RoomPriority';
 
-export default class VisualizationWall extends RoomObjectVisualization {
+export class VisualizationWall extends RoomObjectVisualization {
     private wall: Wall;
     private wallContext: Container;
     private wallCtx: Graphics;
@@ -35,15 +35,15 @@ export default class VisualizationWall extends RoomObjectVisualization {
         this.wallContext.eventMode = 'dynamic';
     }
 
-    public getZIndex(): number {
+    getZIndex(): number {
         return RoomPriority.WALL;
     }
 
     //TODO SET WALL OFFSET
     private static calculateOffsetX(position: Point3d): number {
         return (
-            position.getY() * MapData.tileHeight -
-            (position.getX() * MapData.tileWidth) / 2 +
+            position.y * MapData.tileHeight -
+            (position.x * MapData.tileWidth) / 2 +
             MapData.wallWidth -
             MapData.wallDepth
         );
@@ -51,9 +51,9 @@ export default class VisualizationWall extends RoomObjectVisualization {
 
     private static calculateOffsetY(position: Point3d): number {
         return (
-            (position.getY() * MapData.tileHeight) / 2 +
-            (position.getX() * MapData.tileWidth) / 4 -
-            position.getZ() * MapData.thickSpace * MapData.stairSteps -
+            (position.y * MapData.tileHeight) / 2 +
+            (position.x * MapData.tileWidth) / 4 -
+            position.z * MapData.thickSpace * MapData.stairSteps -
             MapData.wallHeight +
             MapData.wallDepth +
             MapData.wallBlankBottom
@@ -61,10 +61,10 @@ export default class VisualizationWall extends RoomObjectVisualization {
     }
 
     private static calculateZIndex(position: Point3d): number {
-        return 1 * position.getX() + 1 * position.getY() + 1 * position.getZ();
+        return 1 * position.x + 1 * position.y + 1 * position.z;
     }
 
-    public render(): void {
+    render(): void {
         this.checkAndDraw();
     }
 
@@ -118,7 +118,7 @@ export default class VisualizationWall extends RoomObjectVisualization {
         const fullHeightTick = this.wall.plane.room.HasFullHeightTick
             ? MapData.thickSpace *
               MapData.stepHeight *
-              this.wall.position.getZ()
+              this.wall.position.z
             : 0;
 
         ctx.beginFill(wallTop); // top
@@ -262,7 +262,7 @@ export default class VisualizationWall extends RoomObjectVisualization {
             NormalType.DARK
         ).toHex();
 
-        //ctx.translate(0, MapData.thickSpace * MapData.stepHeight * this.wall.position.getZ());
+        //ctx.translate(0, MapData.thickSpace * MapData.stepHeight * this.wall.position.z);
 
         const doorHeight = Math.floor(MapData.wallHeight * 0.64);
 
@@ -333,11 +333,11 @@ export default class VisualizationWall extends RoomObjectVisualization {
         //    this.drawWall(ctx, isLeft, false)
     }
 
-    public get WallContext(): Container {
+    get WallContext(): Container {
         return this.wallContext;
     }
 
-    public getWallCtx(): Graphics | null {
+    getWallCtx(): Graphics | null {
         return this.wallCtx;
     }
 }

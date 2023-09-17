@@ -1,8 +1,8 @@
 import {Direction} from '../core/objects/Direction';
-import Point from './point/Point';
+import {Point} from './point/Point';
 
-export default class Rotation {
-    public static parseRotation(rot: string): Direction {
+export class Rotation {
+    static parseRotation(rot: string): Direction {
         switch (rot) {
             case 'NORTH':
                 return Direction.NORTH;
@@ -25,28 +25,28 @@ export default class Rotation {
         }
     }
 
-    public static calculateDirection(point1: Point, point2: Point): Direction {
-        if (point1.getX() > point2.getX()) {
-            if (point1.getY() > point2.getY()) {
+    static calculateDirection(point1: Point, point2: Point): Direction {
+        if (point1.x > point2.x) {
+            if (point1.y > point2.y) {
                 return Direction.NORTH_EAST;
             }
-            if (point1.getY() < point2.getY()) {
+            if (point1.y < point2.y) {
                 return Direction.SOUTH_EAST;
             }
             return Direction.EAST;
         }
 
-        if (point1.getX() < point2.getX()) {
-            if (point1.getY() > point2.getY()) {
+        if (point1.x < point2.x) {
+            if (point1.y > point2.y) {
                 return Direction.NORTH_WEST;
             }
-            if (point1.getY() < point2.getY()) {
+            if (point1.y < point2.y) {
                 return Direction.SOUTH_WEST;
             }
             return Direction.WEST;
         }
 
-        if (point1.getY() > point2.getY()) {
+        if (point1.y > point2.y) {
             return Direction.NORTH;
         }
 

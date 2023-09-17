@@ -1,4 +1,4 @@
-import Point3d from '../../../utils/point/Point3d';
+import {Point3d} from '../../../utils/point/Point3d';
 import {IDisposable} from '../IDisposable';
 import {Positionable} from './IPositionable';
 
@@ -17,36 +17,36 @@ export abstract class RoomObjectController<
         this._id = id;
     }
 
-    public get id(): string {
+    get id(): string {
         return this._id;
     }
 
-    public dispose(): void {
+    dispose(): void {
         this._objectVisualization.dispose();
         this._objectLogic.dispose();
     }
 
-    public get position(): Point3d {
+    get position(): Point3d {
         return this._objectPosition;
     }
 
-    public get visualization(): IRoomObjectVisualization {
+    get visualization(): IRoomObjectVisualization {
         return this._objectVisualization;
     }
 
-    public get logic(): IRoomObjectLogic {
+    get logic(): IRoomObjectLogic {
         return this._objectLogic;
     }
 
-    public set visualization(objectVisualization: IRoomObjectVisualization) {
+    set visualization(objectVisualization: IRoomObjectVisualization) {
         this._objectVisualization = objectVisualization;
     }
 
-    public set logic(objectLogic: IRoomObjectLogic) {
+    set logic(objectLogic: IRoomObjectLogic) {
         this._objectLogic = objectLogic;
     }
 
-    public set position(point: Point3d) {
+    set position(point: Point3d) {
         this._objectPosition = point;
     }
 }

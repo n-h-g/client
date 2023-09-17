@@ -1,7 +1,7 @@
-import MapData from '../engine/room/objects/map/MapData';
+import {MapData} from '../engine/room/objects/map/MapData';
 
-export default class ScreenUtils {
-    public static mobileCheck() {
+export class ScreenUtils {
+    static mobileCheck() {
         let check = false;
         (function (a) {
             // eslint-disable-next-line
@@ -10,7 +10,7 @@ export default class ScreenUtils {
         return check;
     }
 
-    public static mousePosition(event: MouseEvent) {
+    static mousePosition(event: MouseEvent) {
         if (event.pageX || event.pageY) {
             return {
                 x: event.pageX,
@@ -29,7 +29,7 @@ export default class ScreenUtils {
         };
     }
 
-    public static getPosition(event: any, id: string) {
+    static getPosition(event: any, id: string) {
         try {
             const element = document.getElementById(id);
 
@@ -74,7 +74,7 @@ export default class ScreenUtils {
         }
     }
 
-    public static localToScreenPosition(
+    static localToScreenPosition(
         element: HTMLElement,
         offsetX = 0,
         offsetY = 0
@@ -95,7 +95,7 @@ export default class ScreenUtils {
         };
     }
 
-    public static getAbsolutePosition(event: any) {
+    static getAbsolutePosition(event: any) {
         try {
             let x = null;
             let y = null;
@@ -135,7 +135,7 @@ export default class ScreenUtils {
         }
     }
 
-    public static getPositionByElement(event: any, element: HTMLDivElement) {
+    static getPositionByElement(event: any, element: HTMLDivElement) {
         try {
             const rect = element.getBoundingClientRect();
 

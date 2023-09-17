@@ -4,7 +4,7 @@ import {UIEvents} from '../../../../engine/events/ui/UIEvents';
 import {MessageHandler} from '../../../handler/MessageHandler';
 
 export class CataloguePage extends MessageHandler {
-    public handle(): void {
+    handle(): void {
         const items = this.message.data;
 
         EventManager.emit<CataloguePageData>(UIEvents.CATALOG_ITEMS_UPDATED, {

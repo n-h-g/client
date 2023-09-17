@@ -1,5 +1,5 @@
 import {ItemVisualization} from '../../../../../core/room/object/items/visualization/ItemVisualization';
-import Item from '../Item';
+import {Item} from '../Item';
 
 export class ItemVisualizationAnimated extends ItemVisualization {
     private animation = 0;
@@ -10,13 +10,13 @@ export class ItemVisualizationAnimated extends ItemVisualization {
         super(item);
     }
 
-    public async render() {
+    async render() {
         await super.render();
     }
 
-    public nextFrame(): void {}
+    nextFrame(): void {}
 
-    public setAnimation(animation: number) {
+    setAnimation(animation: number) {
         const item = this.entity as Item;
         this.entity.visualization.draw();
     }

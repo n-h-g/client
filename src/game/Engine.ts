@@ -1,12 +1,12 @@
 import {ApplicationEngine} from './core/Application';
-import RoomService from './engine/room/RoomService';
+import {RoomService} from './engine/room/RoomService';
 import generalConfig from './configuration/general.json';
 import {NetworkingManager} from './networking/NetworkingManager';
 import {UserInterfaceManager} from './engine/ui/UserInterfaceManager';
 import {CommandService} from './engine/game/commands/CommandService';
 import * as PIXI from 'pixi.js';
 import {OfflineMode} from './offline/OfflineMode';
-import ChatMessageService from './engine/game/chat/ChatService';
+import {ChatMessageService} from './engine/game/chat/ChatService';
 import {Logger} from './utils/Logger';
 
 export class Engine {
@@ -24,11 +24,11 @@ export class Engine {
     lastFrameTime: number;
     timeElapsed: number;
 
-    public static getInstance(): Engine {
+    static getInstance(): Engine {
         return this._instance;
     }
 
-    public async init(): Promise<void> {
+    async init(): Promise<void> {
         if (!Engine._instance) {
             Engine._instance = this;
         }
@@ -80,38 +80,38 @@ export class Engine {
             (window as any).nhg = this;
         }
     }
-    public get config(): typeof generalConfig {
+    get config(): typeof generalConfig {
         return this._config;
     }
 
-    public set sso(sso: string) {
+    set sso(sso: string) {
         this._sso = sso;
     }
 
-    public get sso(): string {
+    get sso(): string {
         return this._sso;
     }
 
-    public get application(): ApplicationEngine {
+    get application(): ApplicationEngine {
         return this._application;
     }
 
-    public get commandService(): CommandService {
+    get commandService(): CommandService {
         return this._commandService;
     }
-    public get roomService(): RoomService {
+    get roomService(): RoomService {
         return this._roomsService;
     }
 
-    public get userInterfaceManager(): UserInterfaceManager {
+    get userInterfaceManager(): UserInterfaceManager {
         return this._userInterfaceManager;
     }
 
-    public get chatService(): ChatMessageService {
+    get chatService(): ChatMessageService {
         return this._chatService;
     }
 
-    public get networkingManager(): NetworkingManager {
+    get networkingManager(): NetworkingManager {
         return this._networkingManager;
     }
 }

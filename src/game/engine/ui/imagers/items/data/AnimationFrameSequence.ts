@@ -6,7 +6,7 @@ export class AnimationFrameSequence {
 
     private _frameCount = 0;
 
-    public constructor(framesData: IAnimationLayerFrameSequence) {
+    constructor(framesData: IAnimationLayerFrameSequence) {
         this._frameCount = framesData.frame;
 
         this._frames = [];
@@ -14,7 +14,7 @@ export class AnimationFrameSequence {
         this.loadFrames(framesData);
     }
 
-    public getFrame(frameId: number): AnimationFrame {
+    getFrame(frameId: number): AnimationFrame {
         if (this._frames.length == 0) return null;
 
         const frame = this._frames[frameId];
@@ -22,10 +22,10 @@ export class AnimationFrameSequence {
         return frame;
     }
 
-    public getFrameCount() {
+    getFrameCount() {
         return this._frameCount;
     }
-    public loadFrames(framesData: IAnimationLayerFrameSequence): void {
+    loadFrames(framesData: IAnimationLayerFrameSequence): void {
         if (!framesData.frames) return;
 
         for (const frame of Object.keys(framesData.frames)) {

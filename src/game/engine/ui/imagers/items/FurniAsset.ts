@@ -6,9 +6,9 @@ import {
 import {SpriteData} from './data/SpriteData';
 
 export class FurniAsset {
-    public _assetName: string;
+    _assetName: string;
 
-    public _offsets: IOffsets;
+    _offsets: IOffsets;
 
     private _flipH = 0;
 
@@ -16,7 +16,7 @@ export class FurniAsset {
 
     private _sprite?: ISprite;
 
-    public constructor(assetName: string, data: IAsset) {
+    constructor(assetName: string, data: IAsset) {
         this._assetName = assetName;
 
         this._flipH = data.flipH || 0;
@@ -28,19 +28,19 @@ export class FurniAsset {
         this._sprite = new SpriteData(data.sprite);
     }
 
-    public get name() {
+    get name() {
         return this._assetName;
     }
 
-    public get source() {
+    get source() {
         return this._source;
     }
 
-    public get sprite() {
+    get sprite() {
         return this._sprite;
     }
 
-    public isFlipped(): boolean {
+    isFlipped(): boolean {
         return this._flipH == 1;
     }
 }

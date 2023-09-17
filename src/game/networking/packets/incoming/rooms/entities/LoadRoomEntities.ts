@@ -4,8 +4,8 @@ import {EntityBuilder} from '../../../../../core/room/object/entities/EntityBuil
 import {Engine} from '../../../../../Engine';
 import {MessageHandler} from '../../../../handler/MessageHandler';
 
-export default class LoadRoomEntities extends MessageHandler {
-    public handle(): void {
+export class LoadRoomEntities extends MessageHandler {
+    handle(): void {
         for (const entityData of this.message.data) {
             const data: IEntityData = entityData;
 

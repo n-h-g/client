@@ -1,5 +1,5 @@
 import {IPaletteColor} from '../../gamedata/IFigureData';
-import PaletteColor from './PaletteColor';
+import {PaletteColor} from './PaletteColor';
 
 export class Palette {
     /**
@@ -7,13 +7,13 @@ export class Palette {
      */
     private colors: Map<string, PaletteColor>;
 
-    public constructor(data: any) {
+    constructor(data: any) {
         this.colors = new Map();
 
         this.loadColors(data);
     }
 
-    public getColor(colorId: string): PaletteColor | null {
+    getColor(colorId: string): PaletteColor | null {
         const color = this.colors.get(colorId);
 
         if (!color) return null;

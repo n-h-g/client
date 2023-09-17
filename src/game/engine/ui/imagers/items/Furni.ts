@@ -1,15 +1,15 @@
 import {Sprite, Texture} from 'pixi.js';
-import FurniBase from './FurniBase';
+import {FurniBase} from './FurniBase';
 import {FurniData} from './FurniData';
 import {FurniAsset} from './FurniAsset';
 import {IOffsets} from '../../../../core/ui/imagers/items/IAsset';
 import {Layer} from './data/Layer';
 import {FurniSpriteUtils} from './utils/FurniSpriteUtils';
-import FurniEvents from './events/FurniEvents';
+import {FurniEvents} from './events/FurniEvents';
 import {Engine} from '../../../../Engine';
 import {RoomVisualizationType} from '../../../../core/room/object/RoomVisualizationType';
 import {Logger} from '../../../../utils/Logger';
-import RenderingUtils from '../../../../utils/RenderingUtils';
+import {RenderingUtils} from '../../../../utils/RenderingUtils';
 import {RoomObjectSprite} from '../../../../core/room/object/RoomObjectSprite';
 
 export class Furni extends RoomObjectSprite {
@@ -25,7 +25,7 @@ export class Furni extends RoomObjectSprite {
     private _multiplier = 1;
     private _lastAnimation = 1;
 
-    public constructor(
+    constructor(
         furniBase: FurniBase,
         direction = 0,
         animation = 0,
@@ -54,7 +54,7 @@ export class Furni extends RoomObjectSprite {
         this.container.sortableChildren = true;
     }
 
-    public async init(): Promise<void> {
+    async init(): Promise<void> {
         if (this._isPlaceholder) return;
 
         if (
@@ -77,7 +77,7 @@ export class Furni extends RoomObjectSprite {
         }
     }
 
-    public update(needsUpdate = false) {
+    update(needsUpdate = false) {
         if (this._isPlaceholder) {
             this.loadPlaceHolder();
             return;
@@ -252,7 +252,7 @@ export class Furni extends RoomObjectSprite {
         return sprite;
     }
 
-    public downloadPlaceHolderTexture(): Promise<Texture> {
+    downloadPlaceHolderTexture(): Promise<Texture> {
         const configUrl =
             Engine.getInstance().config.proxyUrl +
             Engine.getInstance().config.roomResourcesUrl +
@@ -270,25 +270,25 @@ export class Furni extends RoomObjectSprite {
         return texture;
     }
 
-    public getNextDirection(direction: number) {
+    getNextDirection(direction: number) {
         const directions = this._furniBase.getAvailableDirections();
         const pos = directions.indexOf(direction);
         return directions[(pos + 1) % directions.length];
     }
 
-    public setIcon(icon: boolean) {
+    setIcon(icon: boolean) {
         this._isIcon = icon;
     }
 
-    public get furniBase() {
+    get furniBase() {
         return this._furniBase;
     }
 
-    public setPlaceHolder(placeholder: boolean) {
+    setPlaceHolder(placeholder: boolean) {
         this._isPlaceholder = placeholder;
     }
 
-    public setDirection(direction) {
+    setDirection(direction) {
         this._direction = direction;
     }
 }

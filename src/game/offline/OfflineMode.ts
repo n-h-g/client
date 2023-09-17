@@ -2,13 +2,13 @@ import {Direction} from '../core/objects/Direction';
 import {Entity} from '../core/room/object/entities/Entity';
 import {HumanVisualization} from '../core/room/object/human/visualization/HumanVisualization';
 import {Engine} from '../Engine';
-import FloorItem from '../engine/room/objects/items/FloorItem';
+import {FloorItem} from '../engine/room/objects/items/FloorItem';
 import {UserEntity} from '../engine/room/objects/users/UserEntity';
 import {ActionId} from '../engine/ui/imagers/avatars/enum/actions/ActionId';
 import {FurnidataItemType} from '../engine/ui/imagers/items/enum/FurniDataItemType';
-import Point from '../utils/point/Point';
-import Point3d from '../utils/point/Point3d';
-import Rotation from '../utils/Rotation';
+import {Point} from '../utils/point/Point';
+import {Point3d} from '../utils/point/Point3d';
+import {Rotation} from '../utils/Rotation';
 import {Tile} from '../engine/room/objects/map/Tile';
 
 export class OfflineMode {
@@ -22,15 +22,15 @@ export class OfflineMode {
     private static NUMBER_OF_USERS = 1;
     private static ROOM_SIZE = 20;
 
-    public constructor(engine: Engine) {
+    constructor(engine: Engine) {
         this._engine = engine;
     }
 
-    public static getInstance(): OfflineMode {
+    static getInstance(): OfflineMode {
         return this._instance;
     }
 
-    public async init() {
+    async init() {
         if (!OfflineMode._instance) {
             OfflineMode._instance = this;
         }
@@ -60,8 +60,8 @@ export class OfflineMode {
             this._entity.position =
                 OfflineMode.NUMBER_OF_USERS == 1
                     ? new Point3d(
-                          room.roomLayout.getDoorPosition().getX(),
-                          room.roomLayout.getDoorPosition().getY(),
+                          room.roomLayout.getDoorPosition().x,
+                          room.roomLayout.getDoorPosition().y,
                           0
                       )
                     : randomTile.position;
@@ -89,8 +89,8 @@ export class OfflineMode {
                 OfflineMode.ENTITY_ID,
                 OfflineMode.ITEM,
                 new Point3d(
-                    randomTile.position.getX(),
-                    randomTile.position.getY(),
+                    randomTile.position.x,
+                    randomTile.position.y,
                     1
                 ),
                 base
@@ -103,7 +103,7 @@ export class OfflineMode {
         }
     }
 
-    public walk(point: Point3d) {
+    walk(point: Point3d) {
         if (point == this._entity.position) {
             (this._entity.visualization as HumanVisualization).removeAction(
                 ActionId.WALK
@@ -119,10 +119,10 @@ export class OfflineMode {
 
         this._entity.visualization.Rot = Rotation.calculateDirection(
             new Point(
-                this._entity.position.getX(),
-                this._entity.position.getY()
+                this._entity.position.x,
+                this._entity.position.y
             ),
-            new Point(point.getX(), point.getY())
+            new Point(point.x, point.y)
         );
 
         (this._entity.visualization as HumanVisualization).addAction(

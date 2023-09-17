@@ -1,7 +1,7 @@
 import {Container, Sprite, Texture} from 'pixi.js';
-import RenderingUtils from '../../../../utils/RenderingUtils';
-import UiUtils from '../../../../utils/UiUtils';
-import Room from '../../../room/Room';
+import {RenderingUtils} from '../../../../utils/RenderingUtils';
+import {UiUtils} from '../../../../utils/UiUtils';
+import {Room} from '../../../room/Room';
 import {RoomImagerBuilder} from './RoomImagerBuilder';
 import {Engine} from '../../../../Engine';
 
@@ -18,11 +18,11 @@ export class RoomImager {
 
     private static ROOM_PREVIEW_OFFSET_LEFT = 0;
 
-    public constructor() {
+    constructor() {
         this._roomImagerBuilder = new RoomImagerBuilder();
     }
 
-    public static getRoomPlaceHolder() {
+    static getRoomPlaceHolder() {
         return Engine.getInstance().roomService.generateSquareRoomModel(10);
     }
 
@@ -31,7 +31,7 @@ export class RoomImager {
      * @param room The room you want to generate the preview.
      * @returns
      */
-    public async generateRoomPreview(room: Room): Promise<string> {
+    async generateRoomPreview(room: Room): Promise<string> {
         //TODO REFACTOR THIS
         if (!room) return;
 
@@ -67,9 +67,9 @@ export class RoomImager {
         preview.scale.y = 1;
         preview.scale.x = 1;
         preview.anchor.x =
-            generatedRoom.roomLayout.getDoorPosition().getX() + 50;
+            generatedRoom.roomLayout.getDoorPosition().x + 50;
         preview.anchor.y =
-            generatedRoom.roomLayout.getDoorPosition().getY() + 50;
+            generatedRoom.roomLayout.getDoorPosition().y + 50;
 
         const image = await UiUtils.generateBase64FromObject(preview);
         console.log(image);
@@ -79,7 +79,7 @@ export class RoomImager {
 
     private async loadPattern(pattern) {}
 
-    public get roomImagerBuilder() {
+    get roomImagerBuilder() {
         return this._roomImagerBuilder;
     }
 }

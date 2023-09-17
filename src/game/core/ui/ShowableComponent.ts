@@ -1,7 +1,7 @@
 import {UIComponent} from '../../engine/ui/components/UIComponent';
 import {EventManager} from '../events/EventManager';
 import {DialogEventData} from '../../engine/events/ui/data/general/Dialog';
-import UiUtils from '../../utils/UiUtils';
+import {UiUtils} from '../../utils/UiUtils';
 import {InteractiveComponent} from './InteractiveComponent';
 import {IComponentShowableUI} from './IComponentShowableUI';
 import {Component} from 'vue';
@@ -11,30 +11,30 @@ export abstract class ShowableComponent
     extends InteractiveComponent
     implements IComponentShowableUI
 {
-    public visible = false;
+    visible = false;
 
-    public constructor(component: Component, type: UIComponent) {
+    constructor(component: Component, type: UIComponent) {
         super(component, type);
         this.registerEvents();
     }
 
-    public init(): void {}
+    init(): void {}
 
-    public toggle() {
+    toggle() {
         this.visible ? this.hide() : this.show();
     }
 
-    public hide(): void {
+    hide(): void {
         UiUtils.dismountComponent(this.type);
         this.visible = false;
     }
 
-    public show(): void {
+    show(): void {
         UiUtils.mountComponent(this.component, this.type);
         this.visible = true;
     }
 
-    public registerEvents(): void {
+    registerEvents(): void {
         EventManager.read(UIEvents.CLOSE, (payload: DialogEventData) => {
             if (payload.type == this.eventType) {
                 this.hide();
