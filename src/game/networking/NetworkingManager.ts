@@ -3,12 +3,12 @@ import {PacketManager} from './packets/PacketManager';
 import {WebSocketManager} from './WebSocketManager';
 
 export class NetworkingManager {
-    private _webSocketManager: WebSocketManager;
-    private _packetManager: PacketManager;
+    readonly webSocketManager: WebSocketManager;
+    readonly packetManager: PacketManager;
 
     constructor() {
-        this._webSocketManager = new WebSocketManager(this);
-        this._packetManager = new PacketManager();
+        this.webSocketManager = new WebSocketManager(this);
+        this.packetManager = new PacketManager();
 
         this.setUpPingRequest();
     }
@@ -21,13 +21,5 @@ export class NetworkingManager {
         window.onbeforeunload = () => {
             this.packetManager.applyOut(OutgoingPacket.DisconnectMessage);
         };
-    }
-
-    get webSocketManager(): WebSocketManager {
-        return this._webSocketManager;
-    }
-
-    get packetManager(): PacketManager {
-        return this._packetManager;
     }
 }

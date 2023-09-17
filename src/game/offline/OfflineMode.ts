@@ -12,9 +12,9 @@ import {Rotation} from '../utils/Rotation';
 import {Tile} from '../engine/room/objects/map/Tile';
 
 export class OfflineMode {
-    private _engine: Engine;
-    private _entity: Entity;
-    private static _instance: OfflineMode;
+    private engine: Engine;
+    private entity: Entity;
+    private static instance: OfflineMode;
     private static ENTITY_ID = '473674-34dfbnasb-43423';
     private static RANDOM_ITEMS = false;
     private static ITEM = 'habbocake';
@@ -23,22 +23,22 @@ export class OfflineMode {
     private static ROOM_SIZE = 20;
 
     constructor(engine: Engine) {
-        this._engine = engine;
+        this.engine = engine;
     }
 
     static getInstance(): OfflineMode {
-        return this._instance;
+        return this.instance;
     }
 
     async init() {
-        if (!OfflineMode._instance) {
-            OfflineMode._instance = this;
+        if (!OfflineMode.instance) {
+            OfflineMode.instance = this;
         }
 
         const generatedModel =
             '00000000000000000000000000000000000000000000/00000000000000000000000000000000000000000000/00000000000000000000000000000010000000000000/00000000000000000000000000000011000000000000/00000000000001011000000000001011100000000000/00000000000011111111111111111111110000000000/00000000000111111111111111111111111000000000/00000000000111111111111111111111111100000000/00000000000111111111111111111111111110000000/00000000111111111111111111111111111111000000/00000001111111111111111111111111111111100000/00000001111111111111111111111111111111110000/00000001111111111111111111111111111111111000/00000000011111111111111111111111111111111100/11111111111111111111001111111111111111111100/11111111111111111110000111111111110000000100/11111111111111111110000111111111110111110000/00000110111111111100000100000011110111111100/00000111111111111100000100111011110111111000/00000111111111111100000101111111110111110000/00000111111011111110000101111111110001100000/00000000111011111110001100011111101111000000/00000000111011111100001011111111111110000000/00000000111011111111111111111111111100000000/00000000111011111111111111111111111000000000/00000000011011111111110111111110110000000000/00000000001011111110001111111000000000000000/00000000000011111100001111111000000000000000/00000000000011111100011000001100000000000000/00000000000000000100010011101100000000000000/00000000000000000100010111111000000000000000/00000000000000000100010111110000000000000000/00000000000000000100000110000000000000000000/00000000000000000100000100000000000000000000';
 
-        const room = this._engine.roomService.setRoom(
+        const room = this.engine.roomService.setRoom(
             'prova',
             generatedModel,
             new Point(0, 0),
@@ -51,13 +51,13 @@ export class OfflineMode {
                 .getFloorPlane()
                 .getRandomTile() as Tile;
 
-            this._entity = new UserEntity(
+            this.entity = new UserEntity(
                 'id',
                 'prova',
                 'hd-615-18.ch-822-79.lg-710-81.sh-905-108.ha-1002-96.wa-2001-'
             );
-            this._entity.visualization.direction = Direction.WEST;
-            this._entity.position =
+            this.entity.visualization.direction = Direction.WEST;
+            this.entity.position =
                 OfflineMode.NUMBER_OF_USERS == 1
                     ? new Point3d(
                           room.roomLayout.getDoorPosition().x,
@@ -65,11 +65,11 @@ export class OfflineMode {
                           0
                       )
                     : randomTile.position;
-            this._engine.roomService.currentRoom.roomEntityRepository.add(
-                this._entity.id,
-                this._entity
+            this.engine.roomService.currentRoom.roomEntityRepository.add(
+                this.entity.id,
+                this.entity
             );
-            this._entity.visualization.render();
+            this.entity.visualization.render();
         }
 
         for (let i = 0; i < OfflineMode.NUMBER_OF_ITEMS; i++) {
@@ -78,10 +78,10 @@ export class OfflineMode {
                 .getRandomTile() as Tile;
 
             const randomItem =
-                this._engine.userInterfaceManager.furniImager.generateRandomItem();
+                this.engine.userInterfaceManager.furniImager.generateRandomItem();
 
             const base =
-                await this._engine.userInterfaceManager!.furniImager.loadFurniBase(
+                await this.engine.userInterfaceManager!.furniImager.loadFurniBase(
                     FurnidataItemType.FloorItem,
                     OfflineMode.RANDOM_ITEMS ? randomItem : OfflineMode.ITEM
                 );
@@ -96,7 +96,7 @@ export class OfflineMode {
                 base
             );
             item.visualization?.render();
-            this._engine.roomService.currentRoom.roomEntityRepository.add(
+            this.engine.roomService.currentRoom.roomEntityRepository.add(
                 item.id,
                 item
             );
@@ -104,31 +104,31 @@ export class OfflineMode {
     }
 
     walk(point: Point3d) {
-        if (point == this._entity.position) {
-            (this._entity.visualization as HumanVisualization).removeAction(
+        if (point == this.entity.position) {
+            (this.entity.visualization as HumanVisualization).removeAction(
                 ActionId.WALK
             );
-            (this._entity.visualization as HumanVisualization).addAction(
+            (this.entity.visualization as HumanVisualization).addAction(
                 ActionId.STAND
             );
-            this._entity.visualization.needsUpdate = false;
+            this.entity.visualization.needsUpdate = false;
             return;
         }
 
-        this._entity.visualization.setNextPosition(point);
+        this.entity.visualization.setNextPosition(point);
 
-        this._entity.visualization.direction = Rotation.calculateDirection(
+        this.entity.visualization.direction = Rotation.calculateDirection(
             new Point(
-                this._entity.position.x,
-                this._entity.position.y
+                this.entity.position.x,
+                this.entity.position.y
             ),
             new Point(point.x, point.y)
         );
 
-        (this._entity.visualization as HumanVisualization).addAction(
+        (this.entity.visualization as HumanVisualization).addAction(
             ActionId.WALK
         );
 
-        this._entity.visualization.needsUpdate = true;
+        this.entity.visualization.needsUpdate = true;
     }
 }

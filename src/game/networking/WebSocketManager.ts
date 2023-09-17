@@ -8,13 +8,12 @@ import {UIEvents} from '../engine/events/ui/UIEvents';
 
 export class WebSocketManager {
     private webSocket: WebSocket;
-    private _closed = false;
     private reconnectCounter = 0;
-
-    private _networkingManager: NetworkingManager;
+    private networkingManager: NetworkingManager;
+	private wrappedClosed = false;
 
     constructor(networkingManager: NetworkingManager) {
-        this._networkingManager = networkingManager;
+        this.networkingManager = networkingManager;
 
         if (Engine.getInstance()?.config.debug) {
             Logger.debug('Connection url: ' + this.webSocketUrl);
@@ -45,11 +44,11 @@ export class WebSocketManager {
                 OutgoingPacket.PingRequest
             );
 
-            this._closed = false;
+            this.wrappedClosed = false;
         };
 
         this.webSocket.onerror = event => {
-            this._closed = true;
+            this.wrappedClosed = true;
 
             if (Engine.getInstance().config.debug) {
                 Logger.debug('Connection error - event details: ');
@@ -63,13 +62,13 @@ export class WebSocketManager {
         };
 
         this.webSocket.onclose = event => {
-            this._closed = true;
+            this.wrappedClosed = true;
             this.reconnectCounter = 0;
 
             if (Engine.getInstance().config.server.reconnectOnFail) {
                 setInterval(() => {
                     while (
-                        this._closed &&
+                        this.wrappedClosed &&
                         this.reconnectCounter <=
                             Engine.getInstance().config.server
                                 .reconnectOnFailTryTimes
@@ -96,18 +95,18 @@ export class WebSocketManager {
 
     disconnect() {
         Logger.info('Disconnected');
-        this._networkingManager.packetManager.applyOut(
+        this.networkingManager.packetManager.applyOut(
             OutgoingPacket.DisconnectMessage
         );
         this.webSocket.close();
     }
 
     get closed(): boolean {
-        return this._closed;
+        return this.wrappedClosed;
     }
 
     sendData(message: any): void {
-        if (!this._closed) {
+        if (!this.wrappedClosed) {
             this.webSocket.send(JSON.stringify(message));
         }
     }
