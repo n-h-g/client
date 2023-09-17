@@ -19,10 +19,10 @@ import {UpdateUserInformation} from './incoming/users/UpdateUserInformation';
 import {OutgoingPacket} from './outgoing/OutgoingPacket';
 
 export class PacketManager {
-    private _incomingPackets: Map<number, MessageHandler>;
+    private incomingPackets: Map<number, MessageHandler>;
 
     constructor() {
-        this._incomingPackets = new Map<number, MessageHandler>();
+        this.incomingPackets = new Map<number, MessageHandler>();
         this.bindIncomingPackets();
     }
 
@@ -48,13 +48,13 @@ export class PacketManager {
 
         Object.keys(incomingPacketsHeader).forEach(index => {
             const packet = incomingPacketsHeader[index];
-            this._incomingPackets.set(parseInt(index), packet);
+            this.incomingPackets.set(parseInt(index), packet);
         });
     }
 
     applyIn(packetHeader: number, packetBody: any): any {
         const messageHandler: MessageHandler | undefined =
-            this._incomingPackets.get(packetHeader);
+            this.incomingPackets.get(packetHeader);
 
         if (messageHandler instanceof MessageHandler) {
             if (Engine.getInstance().config.debug) {

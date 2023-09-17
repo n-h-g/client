@@ -14,7 +14,7 @@ export class GameLoaderUI extends DeletableComponent {
         50 = assets loading
         100 = game connected
     */
-    private _progress = 0;
+    private wrappedProgress = 0;
 
     constructor() {
         super(GameLoaderGUI, UIComponent.GameLoaderUI);
@@ -36,7 +36,7 @@ export class GameLoaderUI extends DeletableComponent {
                 this.delete();
             }
 
-            this._progress = event.width;
+            this.wrappedProgress = event.width;
         });
     }
 
@@ -45,6 +45,6 @@ export class GameLoaderUI extends DeletableComponent {
     }
 
     get progress() {
-        return this._progress;
+        return this.wrappedProgress;
     }
 }

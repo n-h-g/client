@@ -2,34 +2,34 @@ import {IAnimationLayerFrameSequence} from '../../../../../core/ui/imagers/items
 import {AnimationFrame} from './AnimationFrame';
 
 export class AnimationFrameSequence {
-    private _frames: AnimationFrame[];
+    private frames: AnimationFrame[];
 
-    private _frameCount = 0;
+    private frameCount = 0;
 
     constructor(framesData: IAnimationLayerFrameSequence) {
-        this._frameCount = framesData.frame;
+        this.frameCount = framesData.frame;
 
-        this._frames = [];
+        this.frames = [];
 
         this.loadFrames(framesData);
     }
 
     getFrame(frameId: number): AnimationFrame {
-        if (this._frames.length == 0) return null;
+        if (this.frames.length == 0) return null;
 
-        const frame = this._frames[frameId];
+        const frame = this.frames[frameId];
 
         return frame;
     }
 
     getFrameCount() {
-        return this._frameCount;
+        return this.frameCount;
     }
     loadFrames(framesData: IAnimationLayerFrameSequence): void {
         if (!framesData.frames) return;
 
         for (const frame of Object.keys(framesData.frames)) {
-            this._frames.push(
+            this.frames.push(
                 new AnimationFrame(Object.keys(framesData).indexOf(frame), 1)
             );
         }

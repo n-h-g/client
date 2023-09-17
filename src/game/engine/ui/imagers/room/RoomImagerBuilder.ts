@@ -4,7 +4,7 @@ import {RoomObjectVisualization} from '../../../../core/room/object/RoomObjectVi
 import {Room} from '../../../room/Room';
 
 export class RoomImagerBuilder {
-    private _room: Room;
+    private wrappedRoom: Room;
     private objects: RoomObjectController<
         RoomObjectVisualization,
         RoomObjectLogic
@@ -15,7 +15,7 @@ export class RoomImagerBuilder {
     }
 
     setRoom(room: Room) {
-        this._room = new Room(
+        this.wrappedRoom = new Room(
             room.name,
             room.roomInfo.roomModel,
             room.roomLayout.getDoorPosition(),
@@ -37,6 +37,6 @@ export class RoomImagerBuilder {
             object.visualization.render();
         }
 
-        return this._room;
+        return this.wrappedRoom;
     }
 }

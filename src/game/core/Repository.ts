@@ -1,14 +1,14 @@
 import {IRepository} from './IRepository';
 
 export class Repository<S, T> implements IRepository<S, T> {
-    private _map: Map<S, T>;
+    private map: Map<S, T>;
 
     constructor() {
-        this._map = new Map();
+        this.map = new Map();
     }
 
     get(s: S): T {
-        const value = this._map.get(s);
+        const value = this.map.get(s);
 
         if (!value) return null;
 
@@ -16,15 +16,15 @@ export class Repository<S, T> implements IRepository<S, T> {
     }
 
     delete(a: S): boolean {
-        return this._map.delete(a);
+        return this.map.delete(a);
     }
 
     add(t: S, b: T): void {
-        this._map.set(t, b);
+        this.map.set(t, b);
     }
 
     has(a: S): boolean {
-        return this._map.has(a);
+        return this.map.has(a);
     }
 
     create<S, T>(): Map<S, T> {
@@ -32,7 +32,7 @@ export class Repository<S, T> implements IRepository<S, T> {
     }
 
     getAll(): Map<S, T> {
-        return this._map;
+        return this.map;
     }
 
     tick(delta: number): void {}

@@ -10,7 +10,7 @@ import { Message } from '../../../core/chat/Message';
 import { Service } from '../../../core/Service';
 
 export class ChatMessageService extends Service<string, Message> implements Disposable {
-    private _messageCounter = 0;
+    private messageCounter = 0;
 
     constructor() {
 		super();
@@ -29,7 +29,7 @@ export class ChatMessageService extends Service<string, Message> implements Disp
             height: 0,
         });
 
-        this._messageCounter++;
+        this.messageCounter++;
     }
 
     removeMessage(id: string): boolean {
@@ -46,13 +46,13 @@ export class ChatMessageService extends Service<string, Message> implements Disp
 
             if (commandService == null) return false;
 
-            const _args = message.split(' ');
+            const argsStr = message.split(' ');
             const args = [];
-            for (let i = 1; i < _args.length; i++) {
-                args.push(_args[i]);
+            for (let i = 1; i < argsStr.length; i++) {
+                args.push(argsStr[i]);
             }
 
-            const splittedMessage = _args[0].substring(1);
+            const splittedMessage = argsStr[0].substring(1);
             if (commandService?.repository?.has(splittedMessage)) {
                 const commandClass =
                     commandService.repository?.get(splittedMessage);
@@ -84,6 +84,6 @@ export class ChatMessageService extends Service<string, Message> implements Disp
     }
 
     getLastMessageId(): number {
-        return this._messageCounter + 1;
+        return this.messageCounter + 1;
     }
 }

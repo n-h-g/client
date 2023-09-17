@@ -2,15 +2,13 @@ import {
     IAnimationLayer,
     IAnimationLayerFrameSequence,
 } from '../../../../../core/ui/imagers/items/IAnimationLayer';
-import {ILayer} from '../../../../../core/ui/imagers/items/ILayer';
-import {AnimationFrame} from './AnimationFrame';
 import {AnimationFrameSequence} from './AnimationFrameSequence';
 
 export class AnimationLayer {
-    private _sequences: Map<number, AnimationFrameSequence>;
+    private sequences: Map<number, AnimationFrameSequence>;
 
     constructor(data: IAnimationLayer) {
-        this._sequences = new Map();
+        this.sequences = new Map();
 
         this.loadSequences(data.sequences);
     }
@@ -18,7 +16,7 @@ export class AnimationLayer {
         [index: number]: IAnimationLayerFrameSequence;
     }) {
         for (const sequence of Object.keys(sequences)) {
-            this._sequences.set(
+            this.sequences.set(
                 parseInt(sequence),
                 new AnimationFrameSequence(sequences[sequence])
             );
@@ -26,7 +24,7 @@ export class AnimationLayer {
     }
 
     getFrame(direction: number, frameId: number) {
-        const sequence = this._sequences.get(direction);
+        const sequence = this.sequences.get(direction);
 
         if (!sequence) return;
 
@@ -36,11 +34,11 @@ export class AnimationLayer {
     }
 
     hasSequences(): boolean {
-        return this._sequences.size > 0;
+        return this.sequences.size > 0;
     }
 
     getSequence(direction: number): AnimationFrameSequence {
-        const sequence = this._sequences.get(direction);
+        const sequence = this.sequences.get(direction);
 
         if (!sequence) return null;
 

@@ -6,7 +6,7 @@ import {RoomImagerBuilder} from './RoomImagerBuilder';
 import {Engine} from '../../../../Engine';
 
 export class RoomImager {
-    private _roomImagerBuilder: RoomImagerBuilder;
+    private wrappedRoomImagerBuilder: RoomImagerBuilder;
 
     private static ROOM_PLACEHOLDER_SIZE = 10;
 
@@ -19,7 +19,7 @@ export class RoomImager {
     private static ROOM_PREVIEW_OFFSET_LEFT = 0;
 
     constructor() {
-        this._roomImagerBuilder = new RoomImagerBuilder();
+        this.wrappedRoomImagerBuilder = new RoomImagerBuilder();
     }
 
     static getRoomPlaceHolder() {
@@ -35,7 +35,7 @@ export class RoomImager {
         //TODO REFACTOR THIS
         if (!room) return;
 
-        const generatedRoom = this._roomImagerBuilder.setRoom(room).build();
+        const generatedRoom = this.wrappedRoomImagerBuilder.setRoom(room).build();
 
         generatedRoom.roomLayout.visualization.render();
 
@@ -80,6 +80,6 @@ export class RoomImager {
     private async loadPattern(pattern) {}
 
     get roomImagerBuilder() {
-        return this._roomImagerBuilder;
+        return this.wrappedRoomImagerBuilder;
     }
 }

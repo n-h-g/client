@@ -5,17 +5,17 @@ import {AnimationFrame} from './AnimationFrame';
 import {AnimationLayer} from './AnimationLayer';
 
 export class AnimationData {
-    private _layers: Map<number, AnimationLayer>;
+    private layers: Map<number, AnimationLayer>;
 
     static DEFAULT_FRAME_NUMBER = 0;
 
     private static frameCount = -1;
 
-    private _animationId = -1;
+    private animationId = -1;
 
     constructor(animation: number, animationData: IAnimation) {
-        this._animationId = animation;
-        this._layers = new Map();
+        this.animationId = animation;
+        this.layers = new Map();
 
         this.loadLayers(animationData.layers);
     }
@@ -23,12 +23,12 @@ export class AnimationData {
     hasLayers() {}
 
     getLayer(layer: number) {
-        return this._layers.get(layer);
+        return this.layers.get(layer);
     }
 
     private loadLayers(layers: {[key: string]: IAnimationLayer}) {
         for (const layer of Object.keys(layers)) {
-            this._layers.set(
+            this.layers.set(
                 parseInt(layer),
                 new AnimationLayer(layers[layer])
             );
@@ -40,7 +40,7 @@ export class AnimationData {
         layerId: number,
         frameCount: number
     ): AnimationFrame {
-        const layer = this._layers.get(layerId);
+        const layer = this.layers.get(layerId);
 
         if (!layer) return null;
 

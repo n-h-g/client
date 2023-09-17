@@ -11,44 +11,44 @@ import {RoomImager} from './imagers/room/RoomImager';
 import {SoundManager} from './sound/SoundManager';
 
 export class UserInterfaceManager {
-    private _soundManager: SoundManager;
-    private _componentsManager: ComponentsManager;
-    private _avatarStructure: AvatarStructure;
-    private _avatarImager: AvatarImager;
-    private _furniImager: FurniImager;
-    private _roomImager: RoomImager;
+    readonly soundManager: SoundManager;
+    readonly componentsManager: ComponentsManager;
+    readonly avatarStructure: AvatarStructure;
+    readonly avatarImager: AvatarImager;
+    readonly furniImager: FurniImager;
+    readonly roomImager: RoomImager;
 
-    private _ready = false;
+    private wrappedReady = false;
 
     constructor() {
-        this._componentsManager = new ComponentsManager();
+        this.componentsManager = new ComponentsManager();
 
         if (!Engine.getInstance().config.offlineMode) {
-            this._componentsManager.loadGameComponents();
-            this._componentsManager.initGameComponents();
+            this.componentsManager.loadGameComponents();
+            this.componentsManager.initGameComponents();
         }
 
-        this._soundManager = new SoundManager(this);
-        this._avatarStructure = new AvatarStructure();
-        this._avatarImager = new AvatarImager(this._avatarStructure);
-        this._furniImager = new FurniImager();
-        this._roomImager = new RoomImager();
+        this.soundManager = new SoundManager(this);
+        this.avatarStructure = new AvatarStructure();
+        this.avatarImager = new AvatarImager(this.avatarStructure);
+        this.furniImager = new FurniImager();
+        this.roomImager = new RoomImager();
     }
 
     async init(): Promise<void> {
         try {
-            await this._avatarImager.Data.loadGameData(),
-                this._avatarImager.loadStructure();
-            await this._furniImager.init();
+            await this.avatarImager.Data.loadGameData(),
+                this.avatarImager.loadStructure();
+            await this.furniImager.init();
 
-            this._ready = true;
+            this.wrappedReady = true;
 
             EventManager.emit<LoadingProgressEventData>(UIEvents.LOAD, {
                 width: 20,
                 message: 'Assets loaded',
             });
         } catch (e) {
-            this._ready = false;
+            this.wrappedReady = false;
 
             Logger.error(e);
 
@@ -59,31 +59,7 @@ export class UserInterfaceManager {
         }
     }
 
-    get soundManager(): SoundManager {
-        return this._soundManager;
-    }
-
-    get componentsManager(): ComponentsManager {
-        return this._componentsManager;
-    }
-
-    get furniImager(): FurniImager {
-        return this._furniImager;
-    }
-
-    get roomImager(): RoomImager {
-        return this._roomImager;
-    }
-
-    get avatarStructure(): AvatarStructure {
-        return this._avatarStructure;
-    }
-
-    get avatarImager(): AvatarImager {
-        return this._avatarImager;
-    }
-
     get ready(): boolean {
-        return this._ready;
+        return this.wrappedReady;
     }
 }

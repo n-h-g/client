@@ -13,28 +13,28 @@ import {Layer} from './Layer';
 export class VisualizationData {
     static MAX_LAYERS = 26;
 
-    private _layerCount: number;
+    private wrappedLayerCount: number;
 
-    private _angle: number;
+    private wrappedAngle: number;
 
-    private _colors: Map<number, ColorData>;
+    private wrappedColors: Map<number, ColorData>;
 
-    private _directions: Map<number, DirectionData>;
+    private wrappedDirections: Map<number, DirectionData>;
 
-    private _animations: Map<number, AnimationData>;
+    private wrappedAnimations: Map<number, AnimationData>;
 
-    private _layers: Map<number, Layer>;
+    private wrappedLayers: Map<number, Layer>;
 
     constructor(data: IVisualization) {
-        this._layerCount = data.layerCount;
+        this.wrappedLayerCount = data.layerCount;
 
-        this._angle = data.angle < 1 ? 1 : data.angle > 360 ? 360 : data.angle;
+        this.wrappedAngle = data.angle < 1 ? 1 : data.angle > 360 ? 360 : data.angle;
 
-        this._colors = new Map();
+        this.wrappedColors = new Map();
 
-        this._animations = new Map();
-        this._layers = new Map();
-        this._directions = new Map();
+        this.wrappedAnimations = new Map();
+        this.wrappedLayers = new Map();
+        this.wrappedDirections = new Map();
 
         this.loadLayers(data.layers);
         this.loadColors(data.colors);
@@ -43,7 +43,7 @@ export class VisualizationData {
     }
 
     getAnimationLayer(layerId, animationId) {
-        const animation = this._animations.get(animationId);
+        const animation = this.wrappedAnimations.get(animationId);
 
         if (!animation) return;
 
@@ -53,9 +53,9 @@ export class VisualizationData {
     }
 
     getLayer(layerId: number) {
-        if (!this._layers) return;
+        if (!this.wrappedLayers) return;
 
-        const layer = this._layers.get(layerId);
+        const layer = this.wrappedLayers.get(layerId);
 
         return layer;
     }
@@ -70,8 +70,8 @@ export class VisualizationData {
         let currentAngle = -1;
         let validDirection = -1;
 
-        for (const key of this._directions.keys()) {
-            let angle = (key * this._angle - direction + 360) % 360;
+        for (const key of this.wrappedDirections.keys()) {
+            let angle = (key * this.wrappedAngle - direction + 360) % 360;
 
             if (angle > 180) angle = 360 - angle;
 
@@ -87,11 +87,11 @@ export class VisualizationData {
     }
 
     hasLayers() {
-        return this._layers.size > 0;
+        return this.wrappedLayers.size > 0;
     }
 
     hasAnimationForLayer(animation: number, layer: number): boolean {
-        const data = this._animations.get(animation)
+        const data = this.wrappedAnimations.get(animation)
 
         if (!animation) return false;
         const layerData = data.getLayer(layer)
@@ -100,19 +100,19 @@ export class VisualizationData {
     }
 
     hasColors(): boolean {
-        return this._colors != null && this._colors.size > 0;
+        return this.wrappedColors != null && this.wrappedColors.size > 0;
     }
 
     hasColor(color: number): boolean {
-        return this.hasColors() && this._colors![color] != null;
+        return this.hasColors() && this.wrappedColors![color] != null;
     }
 
     getColor(colorId: number, layerId): ColorData {
-        return this._colors[colorId];
+        return this.wrappedColors[colorId];
     }
 
     getDirection(number: number): DirectionData {
-        const direction = this._directions.get(number);
+        const direction = this.wrappedDirections.get(number);
 
         if (!direction) return null;
 
@@ -120,21 +120,21 @@ export class VisualizationData {
     }
 
     hasAnimation(animation: number): boolean {
-        return this.hasAnimations() && this._animations.get(animation) != null;
+        return this.hasAnimations() && this.wrappedAnimations.get(animation) != null;
     }
 
     hasAnimations(): boolean {
-        return this._animations != null && this._animations.size > 0;
+        return this.wrappedAnimations != null && this.wrappedAnimations.size > 0;
     }
 
     hasDirection(direction: number): boolean {
         direction = (direction / 90) * 2;
-        return this._directions.has(direction);
+        return this.wrappedDirections.has(direction);
     }
 
     loadLayers(layers: {[key: string]: ILayer}) {
         for (let layer of Object.keys(layers)) {
-            this._layers.set(
+            this.wrappedLayers.set(
                 parseInt(layer),
                 new Layer(parseInt(layer), layers[layer])
             );
@@ -143,7 +143,7 @@ export class VisualizationData {
 
     loadAnimations(animations: {[key: string]: IAnimation}) {
         for (let animation of Object.keys(animations)) {
-            this._animations.set(
+            this.wrappedAnimations.set(
                 parseInt(animation),
                 new AnimationData(parseInt(animation), animations[animation])
             );
@@ -152,7 +152,7 @@ export class VisualizationData {
 
     loadDirections(directions: {[key: string]: IDirection}) {
         for (let direction of Object.keys(directions)) {
-            this._directions.set(
+            this.wrappedDirections.set(
                 parseInt(direction),
                 new DirectionData(parseInt(direction), directions[direction])
             );
@@ -161,18 +161,18 @@ export class VisualizationData {
 
     loadColors(colors: {[key: string]: IColor}) {
         for (let color of Object.keys(colors)) {
-            this._colors.set(parseInt(color), new ColorData(colors[color]));
+            this.wrappedColors.set(parseInt(color), new ColorData(colors[color]));
         }
     }
 
     getColors(): string[] {
-        return Object.keys(this._colors);
+        return Object.keys(this.wrappedColors);
     }
 
     get directions(): Map<number, DirectionData> {
-        return this._directions;
+        return this.wrappedDirections;
     }
     get layerCount(): number {
-        return this._layerCount;
+        return this.wrappedLayerCount;
     }
 }

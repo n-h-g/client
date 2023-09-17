@@ -16,7 +16,7 @@ import {Repository} from '../../../../core/Repository';
 
 export class FurniImager {
     static FPS = 36;
-    private _textureCaches: Repository<string, Texture>;
+    private textureCaches: Repository<string, Texture>;
     private ready: boolean;
     private bases: {
         flooritem: {
@@ -39,7 +39,7 @@ export class FurniImager {
             wallItems: {},
         };
 
-        this._textureCaches = new Repository();
+        this.textureCaches = new Repository();
     }
 
     async init(): Promise<void> {
@@ -202,15 +202,15 @@ export class FurniImager {
     }
 
     addTexture(id: string, texture: Texture): void {
-        this._textureCaches.add(id, texture);
+        this.textureCaches.add(id, texture);
     }
 
     hasTexture(id: string): boolean {
-        return this._textureCaches.has(id);
+        return this.textureCaches.has(id);
     }
 
     getTexture(id: string): Texture {
-        return this._textureCaches.get(id);
+        return this.textureCaches.get(id);
     }
 
     get isReady(): boolean {
