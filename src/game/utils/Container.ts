@@ -1,35 +1,28 @@
-export default class Container
-{
-    private domNode: HTMLDivElement
+export default class Container {
+    private domNode: HTMLDivElement;
 
-    constructor()
-    {
-        this.domNode = document.createElement("div")
-        this.domNode.style.position = "absolute"
+    constructor() {
+        this.domNode = document.createElement('div');
+        this.domNode.style.position = 'absolute';
     }
 
-    public removeChildren()
-    {
-        this.domNode.innerHTML = ''
+    public removeChildren() {
+        this.domNode.innerHTML = '';
     }
 
-    public appendChild(child: HTMLElement)
-    {
-        this.domNode.appendChild(child)
+    public appendChild(child: HTMLElement) {
+        this.domNode.appendChild(child);
     }
 
-    public getChildren()
-    {
-        return this.domNode.children
+    public getChildren() {
+        return this.domNode.children;
     }
 
-    public destroy()
-    {
-        this.domNode.remove()
+    public destroy() {
+        this.domNode.remove();
     }
 
-    public getDomNode()
-    {
-        return this.domNode
+    public getDomNode() {
+        return this.domNode;
     }
 }

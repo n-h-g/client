@@ -11,5 +11,5 @@ export enum RoomPriority {
     WALL_ITEM = 9,
     POINTER = 6,
     USER = 11,
-    ROOM_ITEM = 11
+    ROOM_ITEM = 11,
 }

@@ -1,10 +1,9 @@
-import { Container, DisplayObject, Resource, Texture } from "pixi.js";
-import { IDisposable } from "../IDisposable";
-import { IRoomObjectSprite } from "./IRoomObjectSprite";
+import {Container, DisplayObject, Resource, Texture} from 'pixi.js';
+import {IDisposable} from '../IDisposable';
+import {IRoomObjectSprite} from './IRoomObjectSprite';
 
 export class RoomObjectSprite implements IRoomObjectSprite {
-
-    private _id: number
+    private _id: number;
 
     private _width: number;
     private _height: number;
@@ -15,11 +14,11 @@ export class RoomObjectSprite implements IRoomObjectSprite {
 
     private _visible: boolean;
 
-    private _clickable: boolean
+    private _clickable: boolean;
 
-    private _alpha: number = 255
+    private _alpha = 255;
 
-    protected _container: Container
+    protected _container: Container;
 
     public constructor() {
         this._width = 0;
@@ -27,16 +26,12 @@ export class RoomObjectSprite implements IRoomObjectSprite {
         this._offsetX = 0;
         this._offsetY = 0;
 
-        this._container = new Container()
+        this._container = new Container();
     }
 
-    public reset(): void {
+    public reset(): void {}
 
-    }
-
-    public update(needsUpdate: boolean = false): void {
-
-    }
+    public update(needsUpdate = false): void {}
 
     public dispose(): void {
         this._texture = null;
@@ -45,19 +40,16 @@ export class RoomObjectSprite implements IRoomObjectSprite {
         this._width = 0;
     }
 
-    public get container(): Container
-    {
+    public get container(): Container {
         return this._container;
     }
 
-    public set container(container: Container)
-    {
-        if(this._container === container) return;
+    public set container(container: Container) {
+        if (this._container === container) return;
 
         this._texture = Texture.EMPTY;
 
-        if(container)
-        {
+        if (container) {
             this._width = container.width;
             this._height = container.height;
         }

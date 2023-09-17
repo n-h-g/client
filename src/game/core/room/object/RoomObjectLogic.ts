@@ -1,24 +1,24 @@
-import EventEmitter from "eventemitter3";
-import { IDisposable } from "../IDisposable";
+import EventEmitter from 'eventemitter3';
+import {IDisposable} from '../IDisposable';
 
 export abstract class RoomObjectLogic implements IDisposable {
-    private _events: EventEmitter
+    private _events: EventEmitter;
 
     public constructor() {
-        this._events = new EventEmitter()
+        this._events = new EventEmitter();
     }
 
-    abstract dispose(): void
+    abstract dispose(): void;
 
-    abstract tick(delta: number): void
+    abstract tick(delta: number): void;
 
-    abstract registerEvents(): void
+    abstract registerEvents(): void;
 
-    abstract onClick(): void
+    abstract onClick(): void;
 
-    abstract onHover?(): void
+    abstract onHover?(): void;
 
     public get events(): EventEmitter {
-        return this._events
-    } 
+        return this._events;
+    }
 }

@@ -1,3 +1,3 @@
 export default interface AvatarDrawOrder {
-    [key: string]: { [key: string]: string[] };
+    [key: string]: {[key: string]: string[]};
 }

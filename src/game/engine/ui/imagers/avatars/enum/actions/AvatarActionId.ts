@@ -1,25 +1,23 @@
-import Action from "../../actions/Action";
-import { ActionId } from "./ActionId";
+import Action from '../../actions/Action';
+import {ActionId} from './ActionId';
 
 export default class AvatatActionId {
-
-    public static idToAvatarActionState(id: ActionId): string
-    {
-        switch(id) {
+    public static idToAvatarActionState(id: ActionId): string {
+        switch (id) {
             case ActionId.LAY:
                 return 'lay';
             case ActionId.FLOAT:
                 return 'float';
             case ActionId.SWIM:
-                return 'lay';   
+                return 'lay';
             case ActionId.SIT:
                 return 'sit';
-            case ActionId.RESPECT:   
+            case ActionId.RESPECT:
                 return 'respect';
             case ActionId.WAVE:
                 return 'wave';
             case ActionId.IDLE:
-                return 'idle';  
+                return 'idle';
             case ActionId.DANCE:
                 return 'dance';
             case ActionId.USE_ITEM:
@@ -36,8 +34,7 @@ export default class AvatatActionId {
                 return 'lag';
             default:
             case ActionId.STAND:
-                return 'std';                             
+                return 'std';
         }
     }
-
 }

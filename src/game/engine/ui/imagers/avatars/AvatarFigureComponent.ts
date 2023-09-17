@@ -1,9 +1,8 @@
-import { IPart } from "./gamedata/IFigureData";
-import PartSet from "./structure/figure/Set";
+import {IPart} from './gamedata/IFigureData';
+import PartSet from './structure/figure/Set';
 
 export default class AvatarFigureComponent {
-
-    public part: IPart
+    public part: IPart;
 
     public color: string | null;
 

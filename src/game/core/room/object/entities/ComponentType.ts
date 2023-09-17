@@ -4,5 +4,5 @@ export enum ComponentType {
     POSITION = 'position',
     MOVEMENT = 'movement',
     BODY_AND_HEAD_ROTATION = 'bh_rot',
-    HUMAN_ASPECT = 'aspect'
+    HUMAN_ASPECT = 'aspect',
 }

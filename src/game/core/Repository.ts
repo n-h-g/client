@@ -1,41 +1,39 @@
-import { IRepository } from './IRepository';
+import {IRepository} from './IRepository';
 
 export class Repository<S, T> implements IRepository<S, T> {
-    private _map: Map<S, T>
+    private _map: Map<S, T>;
 
     public constructor() {
-        this._map = new Map()
+        this._map = new Map();
     }
 
     public get(s: S): T {
-        const value = this._map.get(s)
+        const value = this._map.get(s);
 
-        if (!value) return null
+        if (!value) return null;
 
-        return value
+        return value;
     }
 
     public delete(a: S): boolean {
-        return this._map.delete(a)
+        return this._map.delete(a);
     }
 
     public add(t: S, b: T): void {
-        this._map.set(t, b)
+        this._map.set(t, b);
     }
 
     public has(a: S): boolean {
-        return this._map.has(a)
+        return this._map.has(a);
     }
 
     public create<S, T>(): Map<S, T> {
-        return new Map<S, T>()
+        return new Map<S, T>();
     }
 
     public getAll(): Map<S, T> {
-        return this._map
+        return this._map;
     }
 
-    public tick(delta: number): void {
-
-    }
+    public tick(delta: number): void {}
 }

@@ -1,22 +1,27 @@
-import { IEntityData } from "../../../../../core/communication/incoming/rooms/entities/IEntityData"
-import { Entity } from "../../../../../core/room/object/entities/Entity"
-import { Engine } from "../../../../../Engine"
-import { MessageHandler } from "../../../../handler/MessageHandler"
+import {IEntityData} from '../../../../../core/communication/incoming/rooms/entities/IEntityData';
+import {Entity} from '../../../../../core/room/object/entities/Entity';
+import {Engine} from '../../../../../Engine';
+import {MessageHandler} from '../../../../handler/MessageHandler';
 
 export default class RemoveEntity extends MessageHandler {
     public handle(): void {
-        let data: string = this.message.data
+        const data: string = this.message.data;
 
-        if(!Engine.getInstance().roomService.CurrentRoom) return;
+        if (!Engine.getInstance().roomService.CurrentRoom) return;
 
-        let entity: Entity = Engine.getInstance().roomService.CurrentRoom.roomEntityRepository.get(data)
+        const entity: Entity =
+            Engine.getInstance().roomService.CurrentRoom.roomEntityRepository.get(
+                data
+            );
 
-        if(entity == null) {
+        if (entity == null) {
             return;
         }
 
-        entity.dispose()
+        entity.dispose();
 
-        Engine.getInstance().roomService.CurrentRoom.roomEntityRepository.delete(data)
+        Engine.getInstance().roomService.CurrentRoom.roomEntityRepository.delete(
+            data
+        );
     }
 }

@@ -1,5 +1,5 @@
-import { Container } from "pixi.js";
-import Point from "../../../../../utils/point/Point";
+import {Container} from 'pixi.js';
+import Point from '../../../../../utils/point/Point';
 
 export default class AvatarImageContainer {
     public imageContainer: Container;

@@ -1,5 +1,5 @@
-import { NavigatorRoom } from "./NavigatorRoom";
+import {NavigatorRoom} from './NavigatorRoom';
 
 export interface NavigatorRoomsList {
-    [index: number]: NavigatorRoom
+    [index: number]: NavigatorRoom;
 }

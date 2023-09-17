@@ -1,3 +1,3 @@
 export type HotelViewData = {
-    mode: boolean
-}
+    mode: boolean;
+};

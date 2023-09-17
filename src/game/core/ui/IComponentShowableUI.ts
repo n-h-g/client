@@ -1,7 +1,7 @@
-import { IComponentUI } from "./IComponentUI"
+import {IComponentUI} from './IComponentUI';
 
 export interface IComponentShowableUI extends IComponentUI {
-    toggle(): void
-    hide(): void
-    show(): void
+    toggle(): void;
+    hide(): void;
+    show(): void;
 }

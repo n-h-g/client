@@ -1,20 +1,18 @@
-import Actions from "../actions/AvatarActions";
-import AvatarAnimations from "../animation/AvatarAnimations";
-import Assets from "../assets/Assets";
-import AvatarData from "../enum/AvatarData";
-import AvatarActions from "../gamedata/IAvatarActions";
-import IAvatarAnimations from "../gamedata/IAvatarAnimations";
-import { IGeometry } from "../gamedata/IAvatarGeometry";
-import IAvatarPartSetsData from "../gamedata/IAvatarPartSetsData";
-import IFigureData from "../gamedata/IFigureData";
-import FigureMap from "../gamedata/IFigureMap";
-import AvatarGeometry from "../geometry/AvatarGeometry";
-import AvatarFigureData from "./AvatarFigureData";
-import AvatarPartSets from "./AvatarPartSets";
-
+import Actions from '../actions/AvatarActions';
+import AvatarAnimations from '../animation/AvatarAnimations';
+import Assets from '../assets/Assets';
+import AvatarData from '../enum/AvatarData';
+import AvatarActions from '../gamedata/IAvatarActions';
+import IAvatarAnimations from '../gamedata/IAvatarAnimations';
+import {IGeometry} from '../gamedata/IAvatarGeometry';
+import IAvatarPartSetsData from '../gamedata/IAvatarPartSetsData';
+import IFigureData from '../gamedata/IFigureData';
+import FigureMap from '../gamedata/IFigureMap';
+import AvatarGeometry from '../geometry/AvatarGeometry';
+import AvatarFigureData from './AvatarFigureData';
+import AvatarPartSets from './AvatarPartSets';
 
 export default class AvatarStructure {
-
     private geometry: AvatarGeometry | null = null;
     private partSets: AvatarPartSets | null = null;
     private avatarFigureData: AvatarFigureData | null = null;
@@ -23,7 +21,6 @@ export default class AvatarStructure {
     private animations: AvatarAnimations | null = null;
 
     public constructor() {
-
         this.geometry = null;
         this.partSets = null;
         this.avatarFigureData = null;
@@ -37,7 +34,7 @@ export default class AvatarStructure {
     }
 
     public setAnimations(animations: IAvatarAnimations) {
-        this.animations = new AvatarAnimations(animations)
+        this.animations = new AvatarAnimations(animations);
     }
 
     public setGeometry(geometry: IGeometry): void {

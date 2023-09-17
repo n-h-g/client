@@ -1,4 +1,3 @@
-export abstract class FurnitureLogic {
+export abstract class FurnitureLogic {}
 
-    
 }

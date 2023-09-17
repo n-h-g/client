@@ -1,3 +1,3 @@
 export interface IMessageHandler {
-    handle(): void
+    handle(): void;
 }

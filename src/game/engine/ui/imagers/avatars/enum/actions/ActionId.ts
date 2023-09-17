@@ -1,49 +1,49 @@
 export enum ActionId {
     // Figure
-    STAND = "Default",
-    LAY = "Lay",
-    RIDE_JUMP = "RideJump",
-    DANCE = "Dance",
+    STAND = 'Default',
+    LAY = 'Lay',
+    RIDE_JUMP = 'RideJump',
+    DANCE = 'Dance',
 
     // Walk
-    WALK = "Move",
+    WALK = 'Move',
 
     // Head
-    IDLE = "Idle",
+    IDLE = 'Idle',
 
     // Eye
-    SLEEP = "Sleep",
+    SLEEP = 'Sleep',
 
     // Speak
-    TALK = "Talk",
+    TALK = 'Talk',
 
     // Gesture
-    GESTURE = "Gesture",
-    SMILE = "GestureSmile",
-    SAD = "GestureSad",
-    ANGRY = "GestureAngry",
-    SURPRISED = "GestureSurprised",
+    GESTURE = 'Gesture',
+    SMILE = 'GestureSmile',
+    SAD = 'GestureSad',
+    ANGRY = 'GestureAngry',
+    SURPRISED = 'GestureSurprised',
 
     // Sit
-    SIT = "Sit",
+    SIT = 'Sit',
 
     // Hand Left
-    RESPECT = "Respect",
-    WAVE = "Wave",
-    SIGN = "Sign",
+    RESPECT = 'Respect',
+    WAVE = 'Wave',
+    SIGN = 'Sign',
 
     // Hand Right
-    USE_ITEM = "UseItem",
-    CARRY_ITEM = "CarryItem",
+    USE_ITEM = 'UseItem',
+    CARRY_ITEM = 'CarryItem',
 
     // Hand Right and Head
-    BLOW = "Blow",
-    LAUGH = "Laugh",
+    BLOW = 'Blow',
+    LAUGH = 'Laugh',
 
     // Swim
-    FLOAT = "Float",
-    SWIM = "Swim",
+    FLOAT = 'Float',
+    SWIM = 'Swim',
 
     // Effect
-    EFFECT = "AvatarEffect",
+    EFFECT = 'AvatarEffect',
 }

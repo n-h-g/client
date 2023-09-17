@@ -7,5 +7,5 @@ export enum UIEventsType {
     PREVIEWBOX = 'preview_box',
     HOTELVIEW = 'hotelview',
     ROOM = 'room',
-    ROOM_INFO = 'room_info'
+    ROOM_INFO = 'room_info',
 }

@@ -1,6 +1,6 @@
 export default interface IFigureData {
-    palette: { [key: string]: { [key: string]: IPaletteColor } };
-    settype: { [key: string]: CA };
+    palette: {[key: string]: {[key: string]: IPaletteColor}};
+    settype: {[key: string]: CA};
 }
 
 export interface IPaletteColor {
@@ -16,7 +16,7 @@ export interface CA {
     mand_m_1: boolean;
     mand_f_0: boolean;
     mand_f_1: boolean;
-    set: { [key: string]: ISet };
+    set: {[key: string]: ISet};
 }
 
 export interface ISet {
@@ -32,9 +32,9 @@ export interface ISet {
 }
 
 export enum Gender {
-    F = "F",
-    M = "M",
-    U = "U",
+    F = 'F',
+    M = 'M',
+    U = 'U',
 }
 
 // part color

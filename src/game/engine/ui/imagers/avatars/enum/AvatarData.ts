@@ -1,5 +1,5 @@
-import { Direction } from "../../../../../core/objects/Direction";
-import { ActionId } from "./actions/ActionId";
+import {Direction} from '../../../../../core/objects/Direction';
+import {ActionId} from './actions/ActionId';
 
 export default class AvatarData {
     // dimensions
@@ -15,14 +15,24 @@ export default class AvatarData {
 
     // frame
     public static AVATAR_FRAME_SPEED = 100;
-    public static AVATAR_WALK_SPEED = 2.1
+    public static AVATAR_WALK_SPEED = 2.1;
 
     //misc
     public static DEFAULT_ACTION: string = ActionId.STAND;
     public static DEFAULT_DIRECTION: number = Direction.SOUTH;
 
     // angles
-    public static AVATAR_ANGLES: number[] = [45, 90, 135, 180, 225, 270, 315, 0]
-    
-    public static FLIPPED_DIRECTIONS: boolean[] = [false, false, false, false, true, true, true, false];
+    public static AVATAR_ANGLES: number[] = [
+        45, 90, 135, 180, 225, 270, 315, 0,
+
+    public static FLIPPED_DIRECTIONS: boolean[] = [
+        false,
+        false,
+        false,
+        false,
+        true,
+        true,
+        true,
+        false,
+    ];
 }

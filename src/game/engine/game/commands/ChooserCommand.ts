@@ -1,12 +1,12 @@
-import { Engine } from '../../../Engine'
-import { Command } from './Command'
+import {Engine} from '../../../Engine';
+import {Command} from './Command';
 
 export class ChooserCommand extends Command {
     public constructor() {
-        super("chooser")
+        super('chooser');
     }
 
     public handle(args: string[]): void {
-        let currentRoom = Engine.getInstance()?.roomService?.CurrentRoom
+        const currentRoom = Engine.getInstance()?.roomService?.CurrentRoom;
     }
 }

@@ -1,3 +1,3 @@
 export type TopbarEventData = {
-    credits: number
-}
+    credits: number;
+};

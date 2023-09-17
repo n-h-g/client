@@ -1,9 +1,5 @@
-import { IOffsets } from "../../../../../core/ui/imagers/items/IAsset";
+import {IOffsets} from '../../../../../core/ui/imagers/items/IAsset';
 
 export class OffsetData {
-
-    
-    public constructor(data: IOffsets) {
-
-    }
+    public constructor(data: IOffsets) {}
 }

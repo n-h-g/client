@@ -1,3 +1,4 @@
 export enum FurnidataItemType {
-    FloorItem = 'flooritem', WallItem = 'wallitem'
+    FloorItem = 'flooritem',
+    WallItem = 'wallitem',
 }

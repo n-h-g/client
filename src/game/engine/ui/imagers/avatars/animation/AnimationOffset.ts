@@ -1,31 +1,34 @@
-import { OffsetDirection, OffsetFrame, Offsets } from "../gamedata/IAvatarAnimations";
+import {
+    OffsetDirection,
+    OffsetFrame,
+    Offsets,
+} from '../gamedata/IAvatarAnimations';
 
 export class AnimationOffset {
-
-    public frames: Map<number, OffsetDirection[]>
+    public frames: Map<number, OffsetDirection[]>;
 
     public constructor(offsetData: Offsets) {
-        this.frames = new Map()
+        this.frames = new Map();
 
-        this.loadFrames(offsetData.frames)
+        this.loadFrames(offsetData.frames);
     }
 
     private getFrameDirection(id: number) {
-        return this.frames.get(id)
+        return this.frames.get(id);
     }
 
     public getFrameDirectionParts(id: number, directionId: number) {
-        const direction = this.getFrameDirection(id)
+        const direction = this.getFrameDirection(id);
 
-        if(!direction) return;
+        if (!direction) return;
 
-        return direction[directionId]
+        return direction[directionId];
     }
 
     private loadFrames(frames: OffsetFrame[]) {
-        if(frames) {
-            for(let frame of frames) {
-                this.frames.set(frame.id, frame.directions)
+        if (frames) {
+            for (const frame of frames) {
+                this.frames.set(frame.id, frame.directions);
             }
         }
     }

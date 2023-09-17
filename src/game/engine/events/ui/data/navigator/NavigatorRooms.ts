@@ -1,6 +1,6 @@
-import { NavigatorRoom } from "../../../../../core/communication/incoming/navigator/NavigatorRoom"
+import {NavigatorRoom} from '../../../../../core/communication/incoming/navigator/NavigatorRoom';
 
 export type NavigatorRoomsEventData = {
-    rooms: NavigatorRoom[]
-    tab: string
-}
+    rooms: NavigatorRoom[];
+    tab: string;
+};

@@ -3,16 +3,14 @@ export async function fetchJsonAsync<T>(url: string): Promise<T> {
         method: 'GET',
         mode: 'cors',
         cache: 'default',
-        credentials: 'omit'
+        credentials: 'omit',
     };
 
-    const result = await fetch(url, options)
-    if (result == null)
-        return null;
+    const result = await fetch(url, options);
+    if (result == null) return null;
 
     const json = await result.json();
-    if (json == null)
-        return null;
-    
+    if (json == null) return null;
+
     return json as T;
 }

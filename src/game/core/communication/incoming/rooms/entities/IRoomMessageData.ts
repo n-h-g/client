@@ -1,4 +1,4 @@
 export interface IRoomMessageData {
-    authorId: string
-    text: string
+    authorId: string;
+    text: string;
 }

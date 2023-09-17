@@ -1,5 +1,5 @@
-import { IColorLayer } from './IColorLayer'
+import {IColorLayer} from './IColorLayer';
 
 export interface IColor {
-    layers: { [key: string] : IColorLayer }
+    layers: {[key: string]: IColorLayer};
 }

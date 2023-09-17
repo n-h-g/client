@@ -1,3 +1,3 @@
 export interface IRoomUserRepository {
-    tick(delta: number): void
+    tick(delta: number): void;
 }

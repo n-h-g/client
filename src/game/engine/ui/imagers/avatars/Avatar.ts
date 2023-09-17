@@ -1,14 +1,15 @@
-import { Container } from "pixi.js";
+import {Container} from 'pixi.js';
 
-import { Direction } from "../../../../core/objects/Direction"
-import AvatarFigure from "./AvatarFigure";
-import { ActionId } from "./enum/actions/ActionId";
-import AvatarData from "./enum/AvatarData";
-import { AvatarEventsType } from "./enum/events/AvatarEventsType";
-import AvatarEvents from "./events/AvatarEvents";
-import AvatarStructure from "./structure/AvatarStructure";
+import {Direction} from '../../../../core/objects/Direction';
+import AvatarFigure from './AvatarFigure';
+import {ActionId} from './enum/actions/ActionId';
+import AvatarData from './enum/AvatarData';
+import {AvatarEventsType} from './enum/events/AvatarEventsType';
+import AvatarEvents from './events/AvatarEvents';
+import AvatarStructure from './structure/AvatarStructure';
 
-const DEFAULT_FIGURE = "hd-180-1.ch-255-66.lg-280-110.sh-305-62.ha-1012-110.hr-828-61";
+const DEFAULT_FIGURE =
+    'hd-180-1.ch-255-66.lg-280-110.sh-305-62.ha-1012-110.hr-828-61';
 
 export type FigurePart = {
     type: string;
@@ -31,7 +32,7 @@ export default class Avatar {
 
     private isSmall: boolean;
 
-    private placeHolder: boolean = false;
+    private placeHolder = false;
 
     private container: Container;
 
@@ -46,7 +47,7 @@ export default class Avatar {
     private armsContainer: Container;
     private faceContainer: Container;
 
-    private totalFrames: number = 0;
+    private totalFrames = 0;
 
     private events: AvatarEvents | null = null;
 
@@ -55,12 +56,11 @@ export default class Avatar {
         bodyDirection: Direction = AvatarData.DEFAULT_DIRECTION,
         headDirecton: Direction = AvatarData.DEFAULT_DIRECTION,
         actions: Set<ActionId>,
-        bodyFrame: number = 0,
-        headFrame: number = 0,
-        isSmall: boolean = false,
-        placeholder: boolean = false
+        bodyFrame = 0,
+        headFrame = 0,
+        isSmall = false,
+        placeholder = false
     ) {
-
         this.avatarFigure = new AvatarFigure(figure);
 
         this.events = new AvatarEvents();
@@ -70,18 +70,17 @@ export default class Avatar {
         this.bodyDirection = bodyDirection;
         this.headDirection = headDirecton;
 
-        this.actions = actions
+        this.actions = actions;
 
         this.bodyFrame = bodyFrame;
 
-   
         this.headFrame = headFrame;
 
         this.isSmall = isSmall;
 
         this.placeHolder = placeholder;
-    
-        this.container = new Container()
+
+        this.container = new Container();
         this.bodyContainer = new Container();
         this.hairContainer = new Container();
         this.headContainer = new Container();
@@ -97,7 +96,6 @@ export default class Avatar {
         /*this.events.on(AvatarEventsType.LOAD_COMPLETE, () => {
             this.assemble()
         })*/
- 
     }
 
     public assemble(): void {
@@ -110,34 +108,34 @@ export default class Avatar {
         this.container.addChild(this.headAccessoryContainer);
         this.container.addChild(this.armsContainer);
         this.container.addChild(this.torsoContainer);
-        this.container.addChild(this.faceContainer)
+        this.container.addChild(this.faceContainer);
 
         this.container.sortableChildren = true;
 
         this.bodyContainer.zIndex = 0;
         this.legContainer.zIndex = 1;
-        this.armsContainer.zIndex = 3
+        this.armsContainer.zIndex = 3;
         this.torsoContainer.zIndex = 2;
         this.headContainer.zIndex = 4;
         this.hairContainer.zIndex = 5;
         this.shoesContainer.zIndex = 6;
         this.hatContainer.zIndex = 7;
-        this.faceContainer.zIndex = 8
+        this.faceContainer.zIndex = 8;
         this.headAccessoryContainer.zIndex = 9;
-        
-        this.container.sortChildren()
+
+        this.container.sortChildren();
 
         this.container.alpha = this.placeHolder ? 0.5 : 1;
-        
-        this.container.cursor = 'pointer'
-        this.container.eventMode = 'dynamic'
+
+        this.container.cursor = 'pointer';
+        this.container.eventMode = 'dynamic';
         this.container.interactiveChildren = true;
 
-        for(let object of this.container.children) {
-            object.eventMode = 'dynamic'
+        for (const object of this.container.children) {
+            object.eventMode = 'dynamic';
         }
 
-        this.events.emit(AvatarEventsType.LOAD_COMPLETE)
+        this.events.emit(AvatarEventsType.LOAD_COMPLETE);
     }
 
     public addAction(action: ActionId) {
@@ -178,8 +176,8 @@ export default class Avatar {
     }
 
     public set Frame(frame: number) {
-        this.bodyFrame = frame
-        this.headFrame = frame
+        this.bodyFrame = frame;
+        this.headFrame = frame;
     }
 
     public get IsSmall() {
@@ -210,12 +208,12 @@ export default class Avatar {
         return this.container!;
     }
 
-    public get Events(): AvatarEvents | null{
+    public get Events(): AvatarEvents | null {
         return this.events;
     }
 
     public set Container(container: Container) {
-        this.container = container
+        this.container = container;
     }
 
     public get BodyContainer(): Container {

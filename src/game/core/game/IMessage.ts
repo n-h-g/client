@@ -1,4 +1,4 @@
 export interface IMessage {
-    id: number,
-    text: string
+    id: number;
+    text: string;
 }

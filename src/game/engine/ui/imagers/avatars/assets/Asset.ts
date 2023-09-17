@@ -1,6 +1,3 @@
 export default class Asset {
-    
-    public constructor(name: string) {
-        
-    }
+    public constructor(name: string) {}
 }

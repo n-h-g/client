@@ -1,3 +1,3 @@
 export enum ItemEvents {
-    ITEM_LOADED = 'item_loaded'
+    ITEM_LOADED = 'item_loaded',
 }

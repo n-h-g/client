@@ -1,4 +1,4 @@
 export enum GeometryType {
-    VERTICAL = "vertical",
-    HORIZONTAL = "horizontal"
+    VERTICAL = 'vertical',
+    HORIZONTAL = 'horizontal',
 }

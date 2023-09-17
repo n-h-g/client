@@ -1,5 +1,5 @@
-import { ItemVisualization } from '../../../../../core/room/object/items/visualization/ItemVisualization'
-import Item from '../Item'
+import {ItemVisualization} from '../../../../../core/room/object/items/visualization/ItemVisualization';
+import Item from '../Item';
 
 export class ItemVisualizationStatic extends ItemVisualization {
     constructor(item: Item) {
@@ -7,6 +7,6 @@ export class ItemVisualizationStatic extends ItemVisualization {
     }
 
     public async render(): Promise<void> {
-        await super.render()
+        await super.render();
     }
 }

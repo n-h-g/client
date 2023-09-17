@@ -1,3 +1,3 @@
 export default interface FigureMap {
-    [key: string]: Array<any>
+    [key: string]: Array<any>;
 }

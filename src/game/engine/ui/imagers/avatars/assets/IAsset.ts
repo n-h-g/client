@@ -1,4 +1,4 @@
 export default interface IAsset {
-    key: string,
-    spritesheet: any
+    key: string;
+    spritesheet: any;
 }

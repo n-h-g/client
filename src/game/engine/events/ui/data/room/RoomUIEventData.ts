@@ -1,3 +1,3 @@
 export type RoomUIEventData = {
-    enabled: boolean
-}
+    enabled: boolean;
+};

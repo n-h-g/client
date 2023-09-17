@@ -1,25 +1,25 @@
-import { Direction } from "../core/objects/Direction";
-import Point from "./point/Point";
+import {Direction} from '../core/objects/Direction';
+import Point from './point/Point';
 
 export default class Rotation {
     public static parseRotation(rot: string): Direction {
         switch (rot) {
-            case "NORTH":
+            case 'NORTH':
                 return Direction.NORTH;
-            case "SOUTH":
+            case 'SOUTH':
                 return Direction.SOUTH;
-            case "WEST":
+            case 'WEST':
                 return Direction.WEST;
-            case "NORTH_EAST":
+            case 'NORTH_EAST':
                 return Direction.NORTH_EAST;
-            case "SOUTH_WEST":
+            case 'SOUTH_WEST':
                 return Direction.SOUTH_WEST;
-            case "NORTH_WEST":
-                return Direction.NORTH_WEST;  
-            case "SOUTH_EAST":
-                return Direction.SOUTH_EAST;  
-            case "EAST":
-                return Direction.EAST;                    
+            case 'NORTH_WEST':
+                return Direction.NORTH_WEST;
+            case 'SOUTH_EAST':
+                return Direction.SOUTH_EAST;
+            case 'EAST':
+                return Direction.EAST;
             default:
                 return Direction.SOUTH;
         }
@@ -51,7 +51,5 @@ export default class Rotation {
         }
 
         return Direction.SOUTH;
-
-
     }
 }

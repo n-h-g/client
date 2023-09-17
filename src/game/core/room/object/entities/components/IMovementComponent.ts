@@ -1,3 +1,3 @@
 export interface IMovementComponent {
-    movement: boolean
+    movement: boolean;
 }

@@ -1,5 +1,5 @@
-import { IComponentUI } from "./IComponentUI";
+import {IComponentUI} from './IComponentUI';
 
 export interface IComponentDeletableUI extends IComponentUI {
-    delete(): void
+    delete(): void;
 }

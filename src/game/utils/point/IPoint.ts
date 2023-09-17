@@ -1,4 +1,4 @@
 export default interface IPoint {
-    getX() : number
-    getY() : number
+    getX(): number;
+    getY(): number;
 }

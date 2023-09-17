@@ -1,4 +1,4 @@
-import { Gender, IPart, ISet } from "../../gamedata/IFigureData";
+import {Gender, IPart, ISet} from '../../gamedata/IFigureData';
 
 export default class PartSet {
     public gender: Gender;
@@ -8,7 +8,7 @@ export default class PartSet {
     public preselectable: boolean;
     public sellable: boolean;
     public legacy: boolean;
-    
+
     public hidden?: string[];
     public parts: IPart[] | undefined;
 
@@ -21,26 +21,25 @@ export default class PartSet {
         this.sellable = setData.sellable;
         this.legacy = setData.legacy;
 
-        this.parts = []
+        this.parts = [];
 
         this.loadParts(setData.parts);
-        
-        if(setData.hidden)
-            this.loadHiddenParts(setData.hidden);
+
+        if (setData.hidden) this.loadHiddenParts(setData.hidden);
     }
 
     public loadParts(parts: IPart[]): void {
-        if(parts) {
-            for(let part of parts) {
+        if (parts) {
+            for (const part of parts) {
                 this.parts?.push(part);
             }
         }
     }
 
     public loadHiddenParts(hiddens: string[]) {
-        if(hiddens && hiddens.length > 0) {
-            for(let hidden of hiddens) {
-                hiddens.push(hidden)
+        if (hiddens && hiddens.length > 0) {
+            for (const hidden of hiddens) {
+                hiddens.push(hidden);
             }
         }
     }

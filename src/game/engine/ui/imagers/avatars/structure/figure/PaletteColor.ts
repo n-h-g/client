@@ -1,7 +1,6 @@
-import { IPaletteColor } from "../../gamedata/IFigureData";
+import {IPaletteColor} from '../../gamedata/IFigureData';
 
 export default class PaletteColor {
-
     public index: number;
     public club: number;
     public selectable: boolean;
@@ -13,6 +12,4 @@ export default class PaletteColor {
         this.selectable = paletteData.selectable;
         this.color = paletteData.color;
     }
-
-
 }

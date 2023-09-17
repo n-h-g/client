@@ -1,3 +1,3 @@
 export class ChatData {
-    public static SPEAK_SPEED = 250
+    public static SPEAK_SPEED = 250;
 }

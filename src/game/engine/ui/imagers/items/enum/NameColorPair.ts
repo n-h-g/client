@@ -1,4 +1,4 @@
-
 export interface NameColorPair {
-    itemName: string, colorId: number
+    itemName: string;
+    colorId: number;
 }

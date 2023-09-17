@@ -12,7 +12,7 @@ export enum OutgoingPacket {
     NavigatorMyRooms = 7,
     UserEnterRoom = 8,
     CreateNewRoom = 36,
-    
+
     //#region User
     UserMove = 10,
     UserSay = 11,
@@ -36,7 +36,7 @@ export enum OutgoingPacket {
     //#region Items
     RotateMoveItemEvent = 22,
     RoomPickupItemEvent = 23,
-    RoomRotateItemEvent = 24, 
+    RoomRotateItemEvent = 24,
     RoomPlaceItemEvent = 25,
     RoomMoveItemEvent = 26,
     MoveWallItemEvent = 33,
@@ -51,7 +51,7 @@ export enum OutgoingPacket {
     DeclineTrade = 30,
     AcceptTrade = 31,
     CatalogBuyItemEvent = 32,
-  
+
     //#region rooms
     SaveRoomAdsEvent = 38,
     ChangeRoomColors = 42,
@@ -61,10 +61,9 @@ export enum OutgoingPacket {
     UserChangeLookEvent = 48,
     RequestRoomDataEvent = 40,
 
-    
     RequestRoomSettingsEvent = 43,
     SaveRoomSettingsEvent = 44,
-   
+
     //#region generic
     DevTerminalSaveCodeEvent = 100,
     HotelViewEvent = 41,

@@ -1,3 +1,3 @@
 export interface IUserComponent {
-    id: number
+    id: number;
 }

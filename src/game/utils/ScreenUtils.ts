@@ -1,7 +1,6 @@
-import MapData from "../engine/room/objects/map/MapData";
+import MapData from '../engine/room/objects/map/MapData';
 
 export default class ScreenUtils {
-
     public static mobileCheck() {
         let check = false;
         (function (a) {
@@ -11,26 +10,32 @@ export default class ScreenUtils {
         return check;
     }
 
-    public static mousePosition(event : MouseEvent) {
+    public static mousePosition(event: MouseEvent) {
         if (event.pageX || event.pageY) {
             return {
                 x: event.pageX,
-                y: event.pageY
+                y: event.pageY,
             };
         }
         return {
-            x: event.clientX + document.body.scrollLeft - document.body.clientLeft,
-            y: event.clientY + document.body.scrollTop - document.body.clientTop
+            x:
+                event.clientX +
+                document.body.scrollLeft -
+                document.body.clientLeft,
+            y:
+                event.clientY +
+                document.body.scrollTop -
+                document.body.clientTop,
         };
     }
 
-    public static getPosition(event:any, id: string) {
+    public static getPosition(event: any, id: string) {
         try {
-            let element = document.getElementById(id)
+            const element = document.getElementById(id);
 
-            if (element == null) return
+            if (element == null) return;
 
-            let rect = element.getBoundingClientRect();
+            const rect = element.getBoundingClientRect();
 
             let x = null;
             let y = null;
@@ -40,10 +45,15 @@ export default class ScreenUtils {
                 y = event.originalEvent.pageY - rect.top;
                 return {
                     x: x,
-                    y: y
-                }
+                    y: y,
+                };
             } else {
-                if (event.type == 'touchstart' || event.type == 'touchmove' || event.type == 'touchend' || event.type == 'touchcancel') {
+                if (
+                    event.type == 'touchstart' ||
+                    event.type == 'touchmove' ||
+                    event.type == 'touchend' ||
+                    event.type == 'touchcancel'
+                ) {
                     x = event.originalEvent.pageX - rect.left;
                     y = event.originalEvent.pageY - rect.top;
                 } else {
@@ -52,38 +62,41 @@ export default class ScreenUtils {
                 }
             }
 
-
             return {
                 x: x,
-                y: y
-            }
-
+                y: y,
+            };
         } catch (exception) {
             return {
                 x: null,
-                y: null
-            }
+                y: null,
+            };
         }
     }
 
-    public static localToScreenPosition(element: HTMLElement, offsetX = 0, offsetY = 0) {
-        let x = 0, y = 0, rect
+    public static localToScreenPosition(
+        element: HTMLElement,
+        offsetX = 0,
+        offsetY = 0
+    ) {
+        let x = 0,
+            y = 0,
+            rect;
 
-        while(element.parentElement == document.getElementById("roomGui")) {
-            rect = element.getBoundingClientRect()
-            x += rect.x
-            y += rect.y
+        while (element.parentElement == document.getElementById('roomGui')) {
+            rect = element.getBoundingClientRect();
+            x += rect.x;
+            y += rect.y;
         }
-        
+
         return {
             x: x + offsetX,
-            y: y + offsetY
-        }
+            y: y + offsetY,
+        };
     }
 
     public static getAbsolutePosition(event: any) {
         try {
-
             let x = null;
             let y = null;
 
@@ -93,10 +106,15 @@ export default class ScreenUtils {
 
                 return {
                     x: x,
-                    y: y
-                }
+                    y: y,
+                };
             } else {
-                if (event.type == 'touchstart' || event.type == 'touchmove' || event.type == 'touchend' || event.type == 'touchcancel') {
+                if (
+                    event.type == 'touchstart' ||
+                    event.type == 'touchmove' ||
+                    event.type == 'touchend' ||
+                    event.type == 'touchcancel'
+                ) {
                     x = event.originalEvent.pageX;
                     y = event.originalEvent.pageY;
                 } else {
@@ -105,23 +123,21 @@ export default class ScreenUtils {
                 }
             }
 
-
             return {
                 x: x,
-                y: y
-            }
-
+                y: y,
+            };
         } catch (exception) {
             return {
                 x: null,
-                y: null
-            }
+                y: null,
+            };
         }
     }
 
     public static getPositionByElement(event: any, element: HTMLDivElement) {
         try {
-            let rect = element.getBoundingClientRect();
+            const rect = element.getBoundingClientRect();
 
             let x = null;
             let y = null;
@@ -131,10 +147,15 @@ export default class ScreenUtils {
                 y = event.originalEvent.pageY - rect.top;
                 return {
                     x: x,
-                    y: y
-                }
+                    y: y,
+                };
             } else {
-                if (event.type == 'touchstart' || event.type == 'touchmove' || event.type == 'touchend' || event.type == 'touchcancel') {
+                if (
+                    event.type == 'touchstart' ||
+                    event.type == 'touchmove' ||
+                    event.type == 'touchend' ||
+                    event.type == 'touchcancel'
+                ) {
                     x = event.originalEvent.pageX - rect.left;
                     y = event.originalEvent.pageY - rect.top;
                 } else {
@@ -143,17 +164,15 @@ export default class ScreenUtils {
                 }
             }
 
-
             return {
                 x: x,
-                y: y
-            }
-
+                y: y,
+            };
         } catch (exception) {
             return {
                 x: null,
-                y: null
-            }
+                y: null,
+            };
         }
     }
 }

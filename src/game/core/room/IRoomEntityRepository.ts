@@ -1,3 +1,1 @@
-export default interface IRoomEntityRepository {
-
-}
+export default interface IRoomEntityRepository {}

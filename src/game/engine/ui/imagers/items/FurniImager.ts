@@ -1,39 +1,42 @@
-import FurniBase from './FurniBase'
-import { fetchJsonAsync } from '../../../../utils/DownloadManager'
-import { Furnidata, IFurnidata } from '../../../../core/ui/imagers/items/data/IFurnidata'
-import { Engine } from '../../../../Engine'
-import { Logger } from '../../../../utils/Logger'
-import { FurniDataType } from '../../../../core/ui/imagers/items/data/IFurniDataType'
-import { Furni } from './Furni'
-import { Sprite, Texture } from 'pixi.js'
-import { FurnidataItemType } from './enum/FurniDataItemType'
-import { FurniSpriteUtils } from './utils/FurniSpriteUtils'
-import { FurniPlaceholder } from './FurniPlaceholder'
-import { Repository } from '../../../../core/Repository'
+import FurniBase from './FurniBase';
+import {fetchJsonAsync} from '../../../../utils/DownloadManager';
+import {
+    Furnidata,
+    IFurnidata,
+} from '../../../../core/ui/imagers/items/data/IFurnidata';
+import {Engine} from '../../../../Engine';
+import {Logger} from '../../../../utils/Logger';
+import {FurniDataType} from '../../../../core/ui/imagers/items/data/IFurniDataType';
+import {Furni} from './Furni';
+import {Sprite, Texture} from 'pixi.js';
+import {FurnidataItemType} from './enum/FurniDataItemType';
+import {FurniSpriteUtils} from './utils/FurniSpriteUtils';
+import {FurniPlaceholder} from './FurniPlaceholder';
+import {Repository} from '../../../../core/Repository';
 
 export default class FurniImager {
-    public static FPS: number = 36
-    private _textureCaches: Repository<string, Texture> 
-    private ready: boolean
+    public static FPS = 36;
+    private _textureCaches: Repository<string, Texture>;
+    private ready: boolean;
     private bases: {
         flooritem: {
-            [id: string]: Promise<FurniBase>
-        },
+            [id: string]: Promise<FurniBase>;
+        };
         wallitem: {
-            [id: string]: Promise<FurniBase>
-        }
-    }
-    private furnidata: Furnidata
+            [id: string]: Promise<FurniBase>;
+        };
+    };
+    private furnidata: Furnidata;
 
     constructor() {
         this.ready = false;
         this.bases = {
             flooritem: {},
-            wallitem: {}
+            wallitem: {},
         };
         this.furnidata = {
             floorItems: {},
-            wallItems: {}
+            wallItems: {},
         };
 
         this._textureCaches = new Repository();
@@ -44,47 +47,51 @@ export default class FurniImager {
     }
 
     private async loadFurnidata(): Promise<void> {
-        const data: Furnidata = await fetchJsonAsync<Furnidata>(Engine.getInstance()?.config?.itemsResourcesUrl + 'furnidata.json')
+        const data: Furnidata = await fetchJsonAsync<Furnidata>(
+            Engine.getInstance()?.config?.itemsResourcesUrl + 'furnidata.json'
+        );
         if (data == null) {
             if (Engine.getInstance()?.config?.debug)
-                Logger.error('Cannot load furnidata')
+                Logger.error('Cannot load furnidata');
 
-            this.ready = false
-            return
+            this.ready = false;
+            return;
         }
 
-        this.furnidata = data
-        this.ready = true
+        this.furnidata = data;
+        this.ready = true;
     }
 
     public generateRandomItem() {
-        let randomIndex = Math.floor((Math.random() * Object.values(this.furnidata.floorItems).length))
+        const randomIndex = Math.floor(
+            Math.random() * Object.values(this.furnidata.floorItems).length
+        );
 
-        const item = this.furnidata.floorItems[randomIndex]
+        const item = this.furnidata.floorItems[randomIndex];
 
-        if (!item) return
+        if (!item) return;
 
-        return item.className
+        return item.className;
     }
 
     private findItemByName(itemName: string) {
-        for (let itemId in this.furnidata.floorItems) {
+        for (const itemId in this.furnidata.floorItems) {
             const item = this.furnidata.floorItems[itemId];
-            //console.log(item);  
+            //console.log(item);
             if (item.className == itemName) {
                 return {
                     item,
-                    type: FurniDataType.FLOOR_ITEMS
+                    type: FurniDataType.FLOOR_ITEMS,
                 };
             }
         }
 
-        for (let itemId in this.furnidata.wallItems) {
+        for (const itemId in this.furnidata.wallItems) {
             const item = this.furnidata.wallItems[itemId];
             if (item.className == itemName) {
                 return {
                     item,
-                    type: FurniDataType.WALL_ITEMS
+                    type: FurniDataType.WALL_ITEMS,
                 };
             }
         }
@@ -92,8 +99,11 @@ export default class FurniImager {
         return null;
     }
 
-    public loadFurniBase(type: FurnidataItemType, furniBaseName: string): Promise<FurniBase> {
-        let rawItem = this.findItemByName(furniBaseName);
+    public loadFurniBase(
+        type: FurnidataItemType,
+        furniBaseName: string
+    ): Promise<FurniBase> {
+        const rawItem = this.findItemByName(furniBaseName);
 
         if (rawItem == null) {
             return new Promise((_resolve, reject) => {
@@ -103,87 +113,111 @@ export default class FurniImager {
 
         const rawItemName = rawItem.item.className;
 
-        const {
-            itemName,
-            colorId
-        } = FurniSpriteUtils.splitItemNameAndColor(rawItemName);
+        const {itemName, colorId} =
+            FurniSpriteUtils.splitItemNameAndColor(rawItemName);
 
         if (this.bases[type][itemName] == null) {
             this.bases[type][itemName] = new Promise((resolve, _reject) => {
                 //Load furni json
-                this.fetchOffsetAsync(itemName).then((data) => {
-                    const furniBase = new FurniBase(data as IFurnidata, itemName)
-                    furniBase.init().then(() => {
-                        resolve(furniBase);
+                this.fetchOffsetAsync(itemName)
+                    .then(data => {
+                        const furniBase = new FurniBase(
+                            data as IFurnidata,
+                            itemName
+                        );
+                        furniBase.init().then(() => {
+                            resolve(furniBase);
+                        });
                     })
-                }).catch(() => {
-                    Logger.error('[Furni] Unable to find assets of item ' + itemName)
-                })
-            })
+                    .catch(() => {
+                        Logger.error(
+                            '[Furni] Unable to find assets of item ' + itemName
+                        );
+                    });
+            });
         }
 
-        return this.bases[type][itemName]
+        return this.bases[type][itemName];
     }
 
-    public loadFurniPlaceholder(type: FurnidataItemType, name: string): Promise<Furni>  {
+    public loadFurniPlaceholder(
+        type: FurnidataItemType,
+        name: string
+    ): Promise<Furni> {
         return new Promise((res, _rej) => {
             const furniSprite = new FurniPlaceholder(null);
             res(furniSprite);
-        })
+        });
     }
 
-    public loadFurniSprite(type: FurnidataItemType, name: string): Promise<Furni> {
+    public loadFurniSprite(
+        type: FurnidataItemType,
+        name: string
+    ): Promise<Furni> {
         return new Promise((res, _rej) => {
-            this.loadFurniBase(type, name).then((furnibase) => {
-                const furniSprite = new Furni(furnibase);
-                res(furniSprite);
-            }).catch((e)=> {
-                throw e;
-            })
-        })
+            this.loadFurniBase(type, name)
+                .then(furnibase => {
+                    const furniSprite = new Furni(furnibase);
+                    res(furniSprite);
+                })
+                .catch(e => {
+                    throw e;
+                });
+        });
     }
 
-    public loadFurniIcon(type: FurnidataItemType, name: string): Promise<Furni> {
-        const {
-            colorId
-        } = FurniSpriteUtils.splitItemNameAndColor(name);
+    public loadFurniIcon(
+        type: FurnidataItemType,
+        name: string
+    ): Promise<Furni> {
+        const {colorId} = FurniSpriteUtils.splitItemNameAndColor(name);
 
         return new Promise((res, _rej) => {
-            this.loadFurniBase(type, name).then((furnibase) => {
-                const furniSprite = new Furni(furnibase)
-                furniSprite.setIcon(true)
-                res(furniSprite)
-            }).catch(() => {
-                _rej('invalid furniBase name')
-            })
-        })
+            this.loadFurniBase(type, name)
+                .then(furnibase => {
+                    const furniSprite = new Furni(furnibase);
+                    furniSprite.setIcon(true);
+                    res(furniSprite);
+                })
+                .catch(() => {
+                    _rej('invalid furniBase name');
+                });
+        });
     }
 
     private fetchOffsetAsync(uniqueName: string) {
         return new Promise((resolve, reject) => {
-            fetchJsonAsync(Engine.getInstance().config.itemsResourcesUrl + uniqueName + '/' + uniqueName + '.json').then(data => {
-                resolve(data);
-            }).catch(err => reject(err));
+            fetchJsonAsync(
+                Engine.getInstance().config.itemsResourcesUrl +
+                    uniqueName +
+                    '/' +
+                    uniqueName +
+                    '.json'
+            )
+                .then(data => {
+                    resolve(data);
+                })
+                .catch(err => reject(err));
         });
     }
-    
+
     public addTexture(id: string, texture: Texture): void {
-        this._textureCaches.add(id, texture)
+        this._textureCaches.add(id, texture);
     }
 
     public hasTexture(id: string): boolean {
-        return this._textureCaches.has(id)
+        return this._textureCaches.has(id);
     }
 
     public getTexture(id: string): Texture {
-        return this._textureCaches.get(id)
+        return this._textureCaches.get(id);
     }
 
     public get isReady(): boolean {
-        return this.ready
+        return this.ready;
     }
 
     public getFurnidata(): Furnidata {
-        return this.furnidata
+        return this.furnidata;
     }
 }

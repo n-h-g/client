@@ -1,19 +1,33 @@
-import { Matrix, Container, DisplayObject, ICanvas } from 'pixi.js'
-import { Component, createApp } from 'vue'
-import { Engine } from '../Engine'
-import { UIComponent } from '../engine/ui/components/UIComponent';
-import { Logger } from './Logger'
+import {Matrix, Container, DisplayObject, ICanvas} from 'pixi.js';
+import {Component, createApp} from 'vue';
+import {Engine} from '../Engine';
+import {UIComponent} from '../engine/ui/components/UIComponent';
+import {Logger} from './Logger';
 
 export default class UiUtils {
     static guidGenerator() {
-        let S4 = function () {
+        const S4 = function () {
             return (((1 + Math.random()) * 0x10000) | 0).toString(16).substring(1);
         };
-        return (S4() + S4() + "-" + S4() + "-" + S4() + "-" + S4() + "-" + S4() + S4() + S4()) + Date.now().toString();
+        return (
+            S4() +
+            S4() +
+            '-' +
+            S4() +
+            '-' +
+            S4() +
+            '-' +
+            S4() +
+            '-' +
+            S4() +
+            S4() +
+            S4() +
+            Date.now().toString()
+        );
     }
 
     static htmlToElement(html: any) {
-        let template = document.createElement('template');
+        const template = document.createElement('template');
         html = html.trim(); // Never return a text node of whitespace as the result
         template.innerHTML = html;
         return template.content.firstChild;
@@ -23,74 +37,87 @@ export default class UiUtils {
         return object.worldTransform;
     }
 
-    static async generateImageFromObject(object: DisplayObject | Container): Promise<HTMLImageElement> {
-        return await Engine.getInstance().application?.renderer.extract.image(object);
+    static async generateImageFromObject(
+        object: DisplayObject | Container
+    ): Promise<HTMLImageElement> {
+        return await Engine.getInstance().application?.renderer.extract.image(
+            object
+        );
     }
 
-    static generateCanvasFromObject(object: DisplayObject | Container): ICanvas {
-        return Engine.getInstance().application?.renderer.extract.canvas(object)
+    static generateCanvasFromObject(
+        object: DisplayObject | Container
+    ): ICanvas {
+        return Engine.getInstance().application?.renderer.extract.canvas(
+            object
+        );
     }
 
-    static async generateBase64FromObject(object: DisplayObject | Container): Promise<string> {
-        return await Engine.getInstance().application?.renderer.extract.base64(object)
-    }
+    static async generateBase64FromObject(
+        object: DisplayObject | Container
+    ): Promise<string> {
+        return await Engine.getInstance().application?.renderer.extract.base64(
+            object
+        );
 
-    
 
     static getPosition(event: any, container: Container) {
-        let rect = container.getBounds();
+        const rect = container.getBounds();
 
-            let x = null;
-            let y = null;
+        let x = null;
+        let y = null;
 
-            if (event.type == 'touchstart' || event.type == 'touchmove' || event.type == 'touchend' || event.type == 'touchcancel') {
-                x = event.originalEvent.pageX - rect.left;
-                y = event.originalEvent.pageY - rect.top;
-            } else {
-                x = event.clientX - rect.left;
-                y = event.clientY - rect.top;
-            }
+        if (
+            event.type == 'touchstart' ||
+            event.type == 'touchmove' ||
+            event.type == 'touchend' ||
+            event.type == 'touchcancel'
+        ) {
+            x = event.originalEvent.pageX - rect.left;
+            y = event.originalEvent.pageY - rect.top;
+        } else {
+            x = event.clientX - rect.left;
+            y = event.clientY - rect.top;
+        }
 
-            return {
-                x: x,
-                y: y
-            }
+        return {
+            x: x,
+            y: y,
+        };
     }
 
     static mountComponent(component: Component, name: UIComponent) {
         try {
-            if (document.getElementById(name) != null)
-                return
+            if (document.getElementById(name) != null) return;
 
-            var ComponentApp = createApp(component)
-            const wrapper = document.createElement('div')
-            wrapper.id = name
-            ComponentApp.mount(wrapper)
-            document.getElementById('gameContainer').appendChild(wrapper)
+            let ComponentApp = createApp(component);
+            const wrapper = document.createElement('div');
+            wrapper.id = name;
+            ComponentApp.mount(wrapper);
+            document.getElementById('gameContainer').appendChild(wrapper);
 
-            return ComponentApp
-        } catch(e) {
+            return ComponentApp;
+        } catch (e) {
             if (Engine.getInstance().config.debug) {
-                Logger.debug(e)
+                Logger.debug(e);
             }
         }
     }
-    
+
     static dismountComponent(name: UIComponent) {
         try {
-            if (document.getElementById(name) == null)
-                return
+            if (document.getElementById(name) == null) return;
 
-            document.getElementById(name).remove()
-        } catch(e) {
+            document.getElementById(name).remove();
+        } catch (e) {
             if (Engine.getInstance().config.debug) {
-                Logger.debug(e)
+                Logger.debug(e);
             }
         }
     }
 
     /**
-     * 
+     *
      * @returns true if mobile
      */
     static mobileCheck() {

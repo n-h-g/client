@@ -1,5 +1,5 @@
-import { IRoomMapObject } from './IRoomMapObject'
+import {IRoomMapObject} from './IRoomMapObject';
 
 export interface IRoomMapPlane {
-    get mapObjects(): Array<IRoomMapObject>
+    get mapObjects(): Array<IRoomMapObject>;
 }

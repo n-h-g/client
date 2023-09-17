@@ -1,3 +1,3 @@
 export interface IComponentUI {
-    init(): void
+    init(): void;
 }

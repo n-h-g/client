@@ -1,3 +1,3 @@
-import { loadUI } from './ui/main'
+import {loadUI} from './ui/main';
 
-loadUI()
+loadUI();

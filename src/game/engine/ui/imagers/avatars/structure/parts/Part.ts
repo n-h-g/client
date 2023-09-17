@@ -1,7 +1,6 @@
-import { IPartSet } from "../../gamedata/IAvatarPartSetsData";
+import {IPartSet} from '../../gamedata/IAvatarPartSetsData';
 
 export default class Part {
-
     public setType: string;
     public flippedSetType: string;
     public removeSetType: string;
@@ -17,5 +16,4 @@ export default class Part {
     public getFlippedSetType(): string {
         return this.flippedSetType;
     }
-
 }

@@ -1,92 +1,121 @@
-import RoomLayout from '../RoomLayout'
-import Room from '../Room'
-import { IRoomLogic } from '../../../core/room/IRoomLogic'
-import { Engine } from '../../../Engine'
-import { Sprite, Texture } from 'pixi.js'
-import { Viewport } from 'pixi-viewport'
-import { RoomPriority } from '../visualization/RoomPriority'
-import RoomVisualization from '../visualization/RoomVisualization'
-import Point3d from '../../../utils/point/Point3d'
-import RenderingUtils from '../../../utils/RenderingUtils'
-import { EventManager } from '../../../core/events/EventManager'
-import { UIEvents } from '../../events/ui/UIEvents'
-import { RoomChatData } from '../../events/ui/data/room/RoomChatData'
-import Point from '../../../utils/point/Point'
+import RoomLayout from '../RoomLayout';
+import Room from '../Room';
+import {IRoomLogic} from '../../../core/room/IRoomLogic';
+import {Engine} from '../../../Engine';
+import {Sprite, Texture} from 'pixi.js';
+import {Viewport} from 'pixi-viewport';
+import {RoomPriority} from '../visualization/RoomPriority';
+import RoomVisualization from '../visualization/RoomVisualization';
+import Point3d from '../../../utils/point/Point3d';
+import RenderingUtils from '../../../utils/RenderingUtils';
+import {EventManager} from '../../../core/events/EventManager';
+import {UIEvents} from '../../events/ui/UIEvents';
+import {RoomChatData} from '../../events/ui/data/room/RoomChatData';
+import Point from '../../../utils/point/Point';
 
 export class RoomLogic implements IRoomLogic {
-    private room: RoomLayout
-    private canvasFloorHit: HTMLCanvasElement
-    private canvasWallHit: HTMLCanvasElement
+    private room: RoomLayout;
+    private canvasFloorHit: HTMLCanvasElement;
+    private canvasWallHit: HTMLCanvasElement;
 
-    private _lastCameraPosition: Point
+    private _lastCameraPosition: Point;
 
     constructor(room: RoomLayout) {
-        this.room = room
-        this.canvasFloorHit = this.room.createOrGetRoomCanvas('floorHit')
+        this.room = room;
+        this.canvasFloorHit = this.room.createOrGetRoomCanvas('floorHit');
 
         if (Engine.getInstance().config.debugRoomClick)
-            this.room.Visualization.Container.addChild(Sprite.from(Texture.from(RenderingUtils.convertCanvasToImage(this.canvasFloorHit))));
+            this.room.Visualization.Container.addChild(
+                Sprite.from(
+                    Texture.from(
+                        RenderingUtils.convertCanvasToImage(this.canvasFloorHit)
+                    )
+                )
+            );
 
-        this.canvasWallHit = this.room.createOrGetRoomCanvas('wallHit')
+        this.canvasWallHit = this.room.createOrGetRoomCanvas('wallHit');
     }
 
-    public dispose(): void {
-        
-    }
+    public dispose(): void {}
 
     public registerEvents(): void {
-        let roomVisualization = this.room.Visualization
+        const roomVisualization = this.room.Visualization
 
-        roomVisualization.getCanvasFloor().on('pointerover', this.onMouseOver.bind(this))
-        roomVisualization.Container.on('pointerdown', this.onMouseClick.bind(this))
-        this.room.Visualization.getCanvasFloor().on('pointerout', this.onMouseOut.bind(this))
-        roomVisualization.container.on('pointerout', this.onMouseOut.bind(this))
+        roomVisualization
+            .getCanvasFloor()
+            .on('pointerover', this.onMouseOver.bind(this));
+        roomVisualization.Container.on(
+            'pointerdown',
+            this.onMouseClick.bind(this)
+        );
+        this.room.Visualization.getCanvasFloor().on(
+            'pointerout',
+            this.onMouseOut.bind(this)
+        );
+        roomVisualization.container.on(
+            'pointerout',
+            this.onMouseOut.bind(this)
+        );
 
-       
-        Engine.getInstance().application.viewport.on('moved', this.onCameraMove.bind(this))
+        Engine.getInstance().application.viewport.on(
+            'moved',
+            this.onCameraMove.bind(this)
+        );
 
-        this.room.getFloorPlane().logic?.registerEvents()
-        this.room.getWallPlane().logic?.registerEvents()
+        this.room.getFloorPlane().logic?.registerEvents();
+        this.room.getWallPlane().logic?.registerEvents();
     }
 
     private onCameraMove(e: any) {
-        let screen: Point = e.screen
-        let viewport: Viewport = e.viewport
+        const screen: Point = e.screen
+        const viewport: Viewport = e.viewport
 
         EventManager.emit<RoomChatData>(UIEvents.ROOM_UPDATE_CHAT, {
             x: viewport.x,
-            y: viewport.y
-        })
+            y: viewport.y,
+        });
 
-        this._lastCameraPosition = Engine.getInstance().roomService.CurrentRoom.roomLayout.getOffset(viewport.x, viewport.y, 0);
+        this._lastCameraPosition =
+            Engine.getInstance().roomService.CurrentRoom.roomLayout.getOffset(
+                viewport.x,
+                viewport.y,
+                0
+            );
     }
 
     private onMouseClick(e: any) {
-        let room: Room = this.room.getRoom()
+        const room: Room = this.room.getRoom()
     }
 
     private onMouseOver(e: any) {
-        let room: Room = this.room.getRoom()
+        const room: Room = this.room.getRoom()
 
-        this.room.Visualization.getCanvasPointer().zIndex = RoomVisualization.calculateZIndex(new Point3d(this.room.getPointer().position.getX(), this.room.getPointer().position.getY(), this.room.getPointer().position.getZ()), RoomPriority.POINTER)
+        this.room.Visualization.getCanvasPointer().zIndex =
+            RoomVisualization.calculateZIndex(
+                new Point3d(
+                    this.room.getPointer().position.getX(),
+                    this.room.getPointer().position.getY(),
+                    this.room.getPointer().position.getZ()
+                ),
+                RoomPriority.POINTER
+            );
     }
 
     private onMouseOut() {
-        let room: Room = this.room.getRoom()
-        this.room.getPointer().logic.hidePointer()
+        const room: Room = this.room.getRoom()
+        this.room.getPointer().logic.hidePointer();
     }
 
-
     public tick(delta: number): void {
-        this.room.getWallPlane().logic?.tick(delta)
-        this.room.getFloorPlane().logic?.tick(delta)
+        this.room.getWallPlane().logic?.tick(delta);
+        this.room.getFloorPlane().logic?.tick(delta);
     }
 
     public getCanvasFloorHit(): HTMLCanvasElement {
-        return this.canvasFloorHit
+        return this.canvasFloorHit;
     }
 
     public getCanvasWallHit(): HTMLCanvasElement {
-        return this.canvasWallHit
+        return this.canvasWallHit;
     }
 }

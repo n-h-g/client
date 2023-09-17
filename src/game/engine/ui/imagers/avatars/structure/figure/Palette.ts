@@ -1,37 +1,35 @@
-import { IPaletteColor } from "../../gamedata/IFigureData";
-import PaletteColor from "./PaletteColor";
+import {IPaletteColor} from '../../gamedata/IFigureData';
+import PaletteColor from './PaletteColor';
 
 export class Palette {
-
     /**
      *  colorId | PaletteColor
      */
-    private colors: Map<string, PaletteColor>
+    private colors: Map<string, PaletteColor>;
 
     public constructor(data: any) {
         this.colors = new Map();
 
-        this.loadColors(data)
+        this.loadColors(data);
     }
 
     public getColor(colorId: string): PaletteColor | null {
-        const color = this.colors.get(colorId)
+        const color = this.colors.get(colorId);
 
-        if(!color) return null;
+        if (!color) return null;
 
         return color;
     }
 
     private loadColors(colors: any): void {
-
-        if(colors) {
+        if (colors) {
             Object.keys(colors).map((value: string, index: number) => {
-                const newColor = new PaletteColor(colors[value] as IPaletteColor)
+                const newColor = new PaletteColor(
+                    colors[value] as IPaletteColor
+                );
 
-                this.colors.set(value, newColor)
-            })
+                this.colors.set(value, newColor);
+            });
         }
-
     }
-
 }

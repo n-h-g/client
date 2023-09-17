@@ -1,18 +1,19 @@
-import { Engine } from "../../../Engine";
-import RoomVisualization from "../../room/visualization/RoomVisualization";
-import { Command } from "./Command";
+import {Engine} from '../../../Engine';
+import RoomVisualization from '../../room/visualization/RoomVisualization';
+import {Command} from './Command';
 
-export default class ZoomCommand extends Command{
+export default class ZoomCommand extends Command {
     public constructor() {
-        super("zoom")
+        super('zoom');
     }
 
     public handle(args: string[]): void {
         let scale = parseInt(args[0]);
-        let currentRoom = Engine.getInstance().roomService!.CurrentRoom
-        let RoomVisualization = (currentRoom!.roomLayout.Visualization as RoomVisualization)
+        const currentRoom = Engine.getInstance().roomService!.CurrentRoom;
+        const RoomVisualization = currentRoom!.roomLayout
+            .Visualization as RoomVisualization;
 
-        scale = scale == 0 ? 1 : scale
-        RoomVisualization.zoom(scale)
+        scale = scale == 0 ? 1 : scale;
+        RoomVisualization.zoom(scale);
     }
 }

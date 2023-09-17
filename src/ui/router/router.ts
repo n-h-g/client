@@ -1,5 +1,5 @@
-import { createRouter, createWebHistory } from 'vue-router'
-import Game from '../components/Game.vue'
+import {createRouter, createWebHistory} from 'vue-router';
+import Game from '../components/Game.vue';
 
 export const router = createRouter({
     history: createWebHistory(import.meta.env.BASE_URL),
@@ -7,12 +7,12 @@ export const router = createRouter({
         {
             path: '/',
             name: 'Game Client',
-            component: Game
+            component: Game,
         },
         {
             path: '/sso/:sso',
             name: 'Game Client with SSO',
-            component: Game
-        }
-    ]
+            component: Game,
+        },
+    ],
 });

@@ -1,3 +1,3 @@
 export interface IRotationComponent {
-    rot: number
+    rot: number;
 }

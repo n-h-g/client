@@ -1,6 +1,6 @@
-import { Gender } from '../../../../../engine/ui/imagers/avatars/gamedata/IFigureData'
+import {Gender} from '../../../../../engine/ui/imagers/avatars/gamedata/IFigureData';
 
 export interface IAspectComponent {
-    gender: Gender
-    look: string
+    gender: Gender;
+    look: string;
 }

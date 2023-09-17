@@ -1,5 +1,5 @@
-import { ILogic } from "../../../../../core/ui/imagers/items/ILogic";
+import {ILogic} from '../../../../../core/ui/imagers/items/ILogic';
 
-export class FurnitureVisualization {
-    
+export class FurnitureVisualization {}
+
 }

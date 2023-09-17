@@ -1,3 +1,3 @@
 export type DialogEventData = {
-    type: string
-}
+    type: string;
+};

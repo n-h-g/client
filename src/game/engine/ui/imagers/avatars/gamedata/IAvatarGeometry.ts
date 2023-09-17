@@ -44,9 +44,9 @@ export interface IAvatarSetAvatarSet {
 export interface IAvatarSetBodyPart {
     id: string;
     radius: number;
-    x: number,
-    y: number,
-    z: number,
+    x: number;
+    y: number;
+    z: number;
 }
 
 export interface IType {
