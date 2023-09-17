@@ -65,7 +65,7 @@ export class OfflineMode {
                           0
                       )
                     : randomTile.position;
-            this._engine.roomService.CurrentRoom.roomEntityRepository.add(
+            this._engine.roomService.currentRoom.roomEntityRepository.add(
                 this._entity.id,
                 this._entity
             );
@@ -96,7 +96,7 @@ export class OfflineMode {
                 base
             );
             item.visualization?.render();
-            this._engine.roomService.CurrentRoom.roomEntityRepository.add(
+            this._engine.roomService.currentRoom.roomEntityRepository.add(
                 item.id,
                 item
             );

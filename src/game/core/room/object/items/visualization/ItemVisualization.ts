@@ -35,7 +35,7 @@ export abstract class ItemVisualization
     nextFrame(): void {}
 
     draw(): void {
-        if (Engine.getInstance().roomService?.CurrentRoom) {
+        if (Engine.getInstance().roomService?.currentRoom) {
             const temp: Container = this.sprite.container;
 
             if (this.needsUpdate) this.sprite.reset();
@@ -46,7 +46,7 @@ export abstract class ItemVisualization
 
             this.container.eventMode = 'dynamic';
 
-            Engine.getInstance().roomService?.CurrentRoom?.roomLayout.visualization.container?.addChild(
+            Engine.getInstance().roomService?.currentRoom?.roomLayout.visualization.container?.addChild(
                 this.container
             );
             this.updatePosition();
@@ -136,8 +136,8 @@ export abstract class ItemVisualization
         this.sprite.container.eventMode = 'dynamic';
 
         this.container = this.sprite.container;
-        if (Engine.getInstance().roomService?.CurrentRoom) {
-            Engine.getInstance().roomService?.CurrentRoom?.roomLayout.visualization.container?.addChild(
+        if (Engine.getInstance().roomService?.currentRoom) {
+            Engine.getInstance().roomService?.currentRoom?.roomLayout.visualization.container?.addChild(
                 this.sprite.container
             );
             this.updatePosition();
@@ -147,7 +147,7 @@ export abstract class ItemVisualization
     }
 
     calculateOffsetX(): number {
-        const currentRoom = Engine.getInstance().roomService?.CurrentRoom;
+        const currentRoom = Engine.getInstance().roomService?.currentRoom;
         const tile: Tile = currentRoom.roomLayout
             .getFloorPlane()
             .getTilebyPosition(
@@ -167,7 +167,7 @@ export abstract class ItemVisualization
     }
 
     calculateOffsetY(): number {
-        const currentRoom = Engine.getInstance().roomService?.CurrentRoom;
+        const currentRoom = Engine.getInstance().roomService?.currentRoom;
         const tile: Tile = currentRoom.roomLayout
             .getFloorPlane()
             .getTilebyPosition(

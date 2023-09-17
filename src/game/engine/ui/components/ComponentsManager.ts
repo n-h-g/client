@@ -15,12 +15,13 @@ import {RoomInfoUI} from './room/RoomInfoUI';
 import {Repository} from '../../../core/Repository';
 
 export class ComponentsManager {
-    private _rootComponent: HTMLElement;
-    private _gameComponents: Repository<UIComponent, IComponentUI>;
+    readonly rootComponent: HTMLElement;
+	
+    private gameComponents: Repository<UIComponent, IComponentUI>;
 
     constructor() {
-        this._rootComponent = document.getElementById('gameContainer');
-        this._gameComponents = new Repository();
+        this.rootComponent = document.getElementById('gameContainer');
+        this.gameComponents = new Repository();
     }
 
     loadGameComponents(): void {
@@ -45,29 +46,25 @@ export class ComponentsManager {
     }
 
     initGameComponents(): void {
-        for (const component of this._gameComponents.getAll().values()) {
+        for (const component of this.gameComponents.getAll().values()) {
             component.init();
         }
-    }
-
-    get rootComponent(): HTMLElement {
-        return this._rootComponent;
     }
 
     private addComponent(
         componentKey: UIComponent,
         component: IComponentUI
     ): void {
-        if (this._gameComponents.has(componentKey)) return;
+        if (this.gameComponents.has(componentKey)) return;
 
-        this._gameComponents.add(componentKey, component);
+        this.gameComponents.add(componentKey, component);
     }
 
     getComponents(): Repository<UIComponent, IComponentUI> {
-        return this._gameComponents;
+        return this.gameComponents;
     }
 
     getComponent<T>(componentKey: UIComponent): T {
-        return this._gameComponents.get(componentKey) as T;
+        return this.gameComponents.get(componentKey) as T;
     }
 }

@@ -9,7 +9,7 @@ export class ZoomCommand extends Command {
 
     handle(args: string[]): void {
         let scale = parseInt(args[0]);
-        const currentRoom = Engine.getInstance().roomService!.CurrentRoom;
+        const currentRoom = Engine.getInstance().roomService!.currentRoom;
         const RoomVisualization = currentRoom!.roomLayout
             .visualization;
 

@@ -10,27 +10,27 @@ import {ChatMessageService} from './engine/game/chat/ChatService';
 import {Logger} from './utils/Logger';
 
 export class Engine {
-    private static _instance: Engine;
-    private _application: ApplicationEngine;
-    private _userInterfaceManager: UserInterfaceManager;
-    private _roomsService: RoomService;
-    private _networkingManager: NetworkingManager;
-    private _commandService: CommandService;
-    private _chatService: ChatMessageService;
-
-    private _config = generalConfig;
-
-    private _sso: string;
-    lastFrameTime: number;
+	lastFrameTime: number;
     timeElapsed: number;
 
+    private static instance: Engine;
+
+    private wrappedApplication: ApplicationEngine;
+    private wrappedUserInterfaceManager: UserInterfaceManager;
+    private wrappedRoomsService: RoomService;
+    private wrappedNetworkingManager: NetworkingManager;
+    private wrappedCommandService: CommandService;
+    private wrappedChatService: ChatMessageService;
+    private wrappedConfig = generalConfig;
+    private wrappedSSO: string;
+
     static getInstance(): Engine {
-        return this._instance;
+        return this.instance;
     }
 
     async init(): Promise<void> {
-        if (!Engine._instance) {
-            Engine._instance = this;
+        if (!Engine.instance) {
+            Engine.instance = this;
         }
 
         PIXI.BaseTexture.defaultOptions.scaleMode = PIXI.SCALE_MODES.NEAREST;
@@ -38,11 +38,11 @@ export class Engine {
         PIXI.settings.FAIL_IF_MAJOR_PERFORMANCE_CAVEAT = true;
 
         console.log(
-            '%cNHG Client v' + this._config.version,
+            '%cNHG Client v' + this.wrappedConfig.version,
             'font-size:2rem; background-color:#069; color:#fff; padding:10px 45px;'
         );
 
-        this._application = new ApplicationEngine(this, {
+        this.wrappedApplication = new ApplicationEngine(this, {
             backgroundColor: 0x00000,
             backgroundAlpha: 1,
             antialias: true,
@@ -55,16 +55,16 @@ export class Engine {
 
         document.body.appendChild(this.application.view);
 
-        this._roomsService = new RoomService();
-        this._commandService = new CommandService();
-        this._chatService = new ChatMessageService();
+        this.wrappedRoomsService = new RoomService();
+        this.wrappedCommandService = new CommandService();
+        this.wrappedChatService = new ChatMessageService();
 
         this.application.init();
 
-        this._userInterfaceManager = new UserInterfaceManager();
-        await this._userInterfaceManager.init();
+        this.wrappedUserInterfaceManager = new UserInterfaceManager();
+        await this.wrappedUserInterfaceManager.init();
 
-        if (this._config.offlineMode) {
+        if (this.wrappedConfig.offlineMode) {
             try {
                 new OfflineMode(this).init().catch(err => {
                     throw err;
@@ -73,45 +73,45 @@ export class Engine {
                 throw new e();
             }
         } else {
-            this._networkingManager = new NetworkingManager();
+            this.wrappedNetworkingManager = new NetworkingManager();
         }
 
-        if (this._config.debug) {
+        if (this.wrappedConfig.debug) {
             (window as any).nhg = this;
         }
     }
     get config(): typeof generalConfig {
-        return this._config;
+        return this.wrappedConfig;
     }
 
     set sso(sso: string) {
-        this._sso = sso;
+        this.wrappedSSO = sso;
     }
 
     get sso(): string {
-        return this._sso;
+        return this.wrappedSSO;
     }
 
     get application(): ApplicationEngine {
-        return this._application;
+        return this.wrappedApplication;
     }
 
     get commandService(): CommandService {
-        return this._commandService;
+        return this.wrappedCommandService;
     }
     get roomService(): RoomService {
-        return this._roomsService;
+        return this.wrappedRoomsService;
     }
 
     get userInterfaceManager(): UserInterfaceManager {
-        return this._userInterfaceManager;
+        return this.wrappedUserInterfaceManager;
     }
 
     get chatService(): ChatMessageService {
-        return this._chatService;
+        return this.wrappedChatService;
     }
 
     get networkingManager(): NetworkingManager {
-        return this._networkingManager;
+        return this.wrappedNetworkingManager;
     }
 }

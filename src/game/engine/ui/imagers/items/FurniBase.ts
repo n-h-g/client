@@ -1,7 +1,6 @@
 import {IFurnidata} from '../../../../core/ui/imagers/items/data/IFurnidata';
 import * as PIXI from 'pixi.js';
 import {IAsset} from '../../../../core/ui/imagers/items/IAsset';
-import {ILayer} from '../../../../core/ui/imagers/items/ILayer';
 import {fetchJsonAsync} from '../../../../utils/DownloadManager';
 import {Engine} from '../../../../Engine';
 import {FurniAsset} from './FurniAsset';
@@ -12,22 +11,23 @@ import {Layer} from './data/Layer';
 import {Repository} from '../../../../core/Repository';
 
 export class FurniBase {
-    private _data: IFurnidata;
-    private _spritesheetData: IFurnidata;
-    private spritesheet: PIXI.Texture;
-    itemName: string;
-    private _visualizationData: VisualizationData;
-    private _logicData: LogicData;
-    _assets: Repository<string, FurniAsset>;
 
-    constructor(data: IFurnidata, itemName: string) {
-        this._data = data;
-        this._spritesheetData = null;
-        this._visualizationData = null;
-        this._logicData = null;
+	itemName: string;
+    spritesheetData: IFurnidata;
+	assets: Repository<string, FurniAsset>;
+
+    private spritesheet: PIXI.Texture;
+    private visualizationData: VisualizationData;
+    private logicData: LogicData;
+
+
+    constructor(public readonly data: IFurnidata, itemName: string) {
+        this.spritesheetData = null;
+        this.visualizationData = null;
+        this.logicData = null;
         this.spritesheet = null;
         this.itemName = itemName;
-        this._assets = new Repository();
+        this.assets = new Repository();
     }
 
     async init(): Promise<Repository<string, FurniAsset>> {
@@ -40,12 +40,12 @@ export class FurniBase {
             '.json';
         const data: IFurnidata = await fetchJsonAsync<IFurnidata>(url);
         if (data != null) {
-            this._visualizationData = new VisualizationData(data.visualization);
-            this._logicData = new LogicData(data.logic);
+            this.visualizationData = new VisualizationData(data.visualization);
+            this.logicData = new LogicData(data.logic);
             this.loadAssets(data.assets);
         }
 
-        return this._assets;
+        return this.assets;
         /*return Promise.all([
             new Promise((res, rej) => {
                 let url = Engine.getInstance().config.proxyUrl + Engine.getInstance().config.itemsResourcesUrl + this.itemName + '/' + this.itemName + '.json'
@@ -64,7 +64,7 @@ export class FurniBase {
     loadAssets(assets: {[key: string]: IAsset}) {
         if (assets) {
             for (const asset of Object.keys(assets)) {
-                this._assets.add(
+                this.assets.add(
                     asset,
                     new FurniAsset(asset, assets[asset] as IAsset)
                 );
@@ -91,8 +91,8 @@ export class FurniBase {
     }
 
     getLogicDimension(dim: number) {
-        if (!this._logicData.getDimensions()) return 0;
-        return this._logicData.getDimensions()[dim];
+        if (!this.logicData.getDimensions()) return 0;
+        return this.logicData.getDimensions()[dim];
     }
 
     getUIDirection(): number {
@@ -124,19 +124,19 @@ export class FurniBase {
 
     hasDirection(direction: number): boolean {
         direction = (direction / 90) * 2;
-        return this._visualizationData.hasDirection(direction);
+        return this.visualizationData.hasDirection(direction);
     }
 
     hasAnimations(): boolean {
-        return this._visualizationData.hasAnimations();
+        return this.visualizationData.hasAnimations();
     }
 
     hasAnimation(animation: number): boolean {
-        return this._visualizationData.hasAnimation(animation);
+        return this.visualizationData.hasAnimation(animation);
     }
 
     hasAnimationForLayer(animation: number, layer: number): boolean {
-        return this._visualizationData.hasAnimationForLayer(animation, layer);
+        return this.visualizationData.hasAnimationForLayer(animation, layer);
     }
 
     getAnimations(): string[] {
@@ -144,25 +144,25 @@ export class FurniBase {
     }
 
     getFrameFromAsset(assetName: string): any {
-        let frameName = this._spritesheetData!.assets[assetName + '.png'];
+        let frameName = this.spritesheetData!.assets[assetName + '.png'];
 
         if (frameName == undefined) {
-            frameName = this._spritesheetData!.assets[this.itemName + '.png'];
+            frameName = this.spritesheetData!.assets[this.itemName + '.png'];
         }
 
         return frameName;
     }
 
     getAsset(assetName: string) {
-        return this._assets.get(assetName) ?? null;
+        return this.assets.get(assetName) ?? null;
     }
 
     getValidDirection(direction: number) {
-        return this._visualizationData.getValidDirection(direction);
+        return this.visualizationData.getValidDirection(direction);
     }
 
     getDirection(direction: number) {
-        return this._visualizationData.getDirection(direction);
+        return this.visualizationData.getDirection(direction);
     }
 
     getFrameFrom(
@@ -172,7 +172,7 @@ export class FurniBase {
         frameCount: number
     ): number {
         if (this.hasAnimationForLayer(animation, layer)) {
-            const animationLayer = this._visualizationData.getAnimationLayer(
+            const animationLayer = this.visualizationData.getAnimationLayer(
                 layer,
                 animation
             );
@@ -197,30 +197,30 @@ export class FurniBase {
     }
 
     getLayer(layer: number): Layer {
-        return this._visualizationData.getLayer(layer);
+        return this.visualizationData.getLayer(layer);
     }
 
     hasLayers(): boolean {
-        return this._visualizationData.hasLayers();
+        return this.visualizationData.hasLayers();
     }
 
     hasColorForLayer(color: number, layer: number): boolean {
         return (
-            this._visualizationData.hasColor(color) &&
+            this.visualizationData.hasColor(color) &&
             this.data.visualization.colors![color].layers[layer] != null
         );
     }
 
     getColorFrom(color: number, layer: number): number {
         if (this.hasColorForLayer(color, layer)) {
-            return this._visualizationData.getColor(color, layer).color;
+            return this.visualizationData.getColor(color, layer).color;
         }
 
         return 0xffffff;
     }
 
     getColors(): string[] {
-        return this._visualizationData.getColors();
+        return this.visualizationData.getColors();
     }
 
     assetNameFrom(
@@ -245,7 +245,7 @@ export class FurniBase {
     }
 
     private hasAsset(assetName: string) {
-        return this._assets.has(assetName);
+        return this.assets.has(assetName);
     }
 
     hasVisualDirections(): boolean {
@@ -296,16 +296,8 @@ export class FurniBase {
         return this.data.visualization.type;
     }
 
-    getSpriteSheetData() {
-        return this._spritesheetData;
-    }
-
-    get data() {
-        return this._data;
-    }
-
     getLayerCount() {
-        return this._visualizationData.layerCount;
+        return this.visualizationData.layerCount;
     }
 
     get angle(): number {

@@ -157,10 +157,10 @@ function openSettings() {
 }
 
 function getRoomName() {
-    return Engine.getInstance().roomService.CurrentRoom.getRoomInfo().roomName
+    return Engine.getInstance().roomService.currentRoom.roomInfo.roomName
 }
 function getAuthorName() {
-    return Engine.getInstance().roomService.CurrentRoom.getRoomInfo().authorName
+    return Engine.getInstance().roomService.currentRoom.roomInfo.authorName
 }
 </script>
 

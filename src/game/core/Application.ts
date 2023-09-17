@@ -9,12 +9,12 @@ import {
 import {Engine} from '../Engine';
 
 export class ApplicationEngine extends Application<HTMLCanvasElement> {
-    private _engine: Engine;
-    private _lastFrameTime: number;
-    private _timeElapsed = 0;
-    private _viewport: Viewport;
+    private engine: Engine;
+    private lastFrameTime: number;
+    private timeElapsed = 0;
+    private wrappedViewport: Viewport;
     private debugInfoContainer: Container;
-    private viewPortScreenCords: Point;
+    private wrappedScreenCoords: Point;
 
     constructor(engine: Engine, options?: Partial<IApplicationOptions>) {
         super(options);
@@ -28,13 +28,13 @@ export class ApplicationEngine extends Application<HTMLCanvasElement> {
 
         this.setUpViewport();
 
-        this._engine = engine;
+        this.engine = engine;
     }
 
     setUpViewport() {
-        if (this._viewport != null) this._viewport.destroy();
+        if (this.wrappedViewport != null) this.wrappedViewport.destroy();
 
-        this._viewport = new Viewport({
+        this.wrappedViewport = new Viewport({
             screenWidth: window.innerWidth,
             screenHeight: window.innerHeight,
             worldWidth: 1000,
@@ -42,18 +42,18 @@ export class ApplicationEngine extends Application<HTMLCanvasElement> {
             events: this.renderer.events,
         });
 
-        this._viewport.eventMode = 'dynamic';
+        this.wrappedViewport.eventMode = 'dynamic';
 
-        this.stage.addChild(this._viewport);
+        this.stage.addChild(this.wrappedViewport);
 
         this.stage.addChild(this.debugInfoContainer);
 
-        this.viewPortScreenCords = new Point(
+        this.wrappedScreenCoords = new Point(
             window.innerWidth,
             window.innerHeight
         );
 
-        this._viewport.drag({
+        this.wrappedViewport.drag({
             wheel: false,
         });
     }
@@ -80,20 +80,20 @@ export class ApplicationEngine extends Application<HTMLCanvasElement> {
 
     private setUpGameLoop(): void {
         const fpsInterval = 1000 / Engine.getInstance().config.fps;
-        this._lastFrameTime = Date.now();
+        this.lastFrameTime = Date.now();
 
         const gameLoop = () => {
             window.requestAnimationFrame(gameLoop);
 
             const currentTime = Date.now();
 
-            this._timeElapsed = currentTime - this._lastFrameTime;
+            this.timeElapsed = currentTime - this.lastFrameTime;
 
-            if (this._lastFrameTime > fpsInterval) {
-                this._engine.roomService.tick(this._timeElapsed);
-                this._lastFrameTime = currentTime;
+            if (this.lastFrameTime > fpsInterval) {
+                this.engine.roomService.tick(this.timeElapsed);
+                this.lastFrameTime = currentTime;
 
-                if (this._engine.config.debug) {
+                if (this.engine.config.debug) {
                     this.showDebugInfo();
                 }
             }
@@ -128,10 +128,10 @@ export class ApplicationEngine extends Application<HTMLCanvasElement> {
     }
 
     get viewport(): Viewport {
-        return this._viewport;
+        return this.wrappedViewport;
     }
 
-    get screenCords(): Point {
-        return this.viewPortScreenCords;
+    get screenCoords(): Point {
+        return this.wrappedScreenCoords;
     }
 }

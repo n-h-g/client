@@ -13,17 +13,17 @@ import {RenderingUtils} from '../../../../utils/RenderingUtils';
 import {RoomObjectSprite} from '../../../../core/room/object/RoomObjectSprite';
 
 export class Furni extends RoomObjectSprite {
-    private _furniBase: FurniBase;
-    private _direction = 0;
-    private _animation = 0;
-    private _textureCache: Texture;
-    private _isIcon: boolean;
-    private _frame = 0;
-    private _isPlaying = false;
-    private _events: FurniEvents;
-    private _isPlaceholder: boolean;
-    private _multiplier = 1;
-    private _lastAnimation = 1;
+    private wrappedFurniBase: FurniBase;
+    private direction = 0;
+    private animation = 0;
+    private textureCache: Texture;
+    private isIcon: boolean;
+    private frame = 0;
+    private isPlaying = false;
+    private events: FurniEvents;
+    private isPlaceholder: boolean;
+    private multiplier = 1;
+    private lastAnimation = 1;
 
     constructor(
         furniBase: FurniBase,
@@ -35,19 +35,19 @@ export class Furni extends RoomObjectSprite {
     ) {
         super();
 
-        this._furniBase = furniBase;
-        this._direction = direction;
-        this._animation = animation;
-        this._isIcon = isIcon;
-        this._frame = frame;
+        this.wrappedFurniBase = furniBase;
+        this.direction = direction;
+        this.animation = animation;
+        this.isIcon = isIcon;
+        this.frame = frame;
 
-        this._multiplier = 1;
+        this.multiplier = 1;
 
-        this._lastAnimation = 1;
+        this.lastAnimation = 1;
 
-        this._isPlaceholder = isPlaceholder;
+        this.isPlaceholder = isPlaceholder;
 
-        this._events = new FurniEvents();
+        this.events = new FurniEvents();
 
         this.container.eventMode = 'dynamic';
         this.container.visible = true;
@@ -55,58 +55,58 @@ export class Furni extends RoomObjectSprite {
     }
 
     async init(): Promise<void> {
-        if (this._isPlaceholder) return;
+        if (this.isPlaceholder) return;
 
         if (
             Engine.getInstance()?.userInterfaceManager?.furniImager?.hasTexture(
-                this._furniBase.itemName
+                this.wrappedFurniBase.itemName
             )
         )
-            this._textureCache =
+            this.textureCache =
                 Engine.getInstance()?.userInterfaceManager?.furniImager?.getTexture(
-                    this._furniBase.itemName
+                    this.wrappedFurniBase.itemName
                 );
         else {
             const texture: Texture =
-                await this._furniBase.downloadSpritesheet();
-            this._textureCache = texture;
+                await this.wrappedFurniBase.downloadSpritesheet();
+            this.textureCache = texture;
             Engine.getInstance()?.userInterfaceManager?.furniImager?.addTexture(
-                this._furniBase.itemName,
+                this.wrappedFurniBase.itemName,
                 texture
             );
         }
     }
 
     update(needsUpdate = false) {
-        if (this._isPlaceholder) {
+        if (this.isPlaceholder) {
             this.loadPlaceHolder();
             return;
         }
 
-        this._isPlaying = true;
+        this.isPlaying = true;
 
-        if (this._animation == this._lastAnimation) needsUpdate = false;
+        if (this.animation == this.lastAnimation) needsUpdate = false;
 
-        this.updateSprites(needsUpdate, this._animation);
+        this.updateSprites(needsUpdate, this.animation);
 
         if (
-            this._furniBase.visualizationType !==
+            this.wrappedFurniBase.visualizationType !==
             RoomVisualizationType.FURNITURE_ANIMATED
         )
-            this._isPlaying = false;
+            this.isPlaying = false;
 
-        this._events.onSpriteCreated();
+        this.events.onSpriteCreated();
     }
 
     private loadPlaceHolder() {
         this.downloadPlaceHolderTexture().then(async (texture: Texture) => {
-            this._textureCache = texture;
+            this.textureCache = texture;
             Engine.getInstance().userInterfaceManager.furniImager.addTexture(
-                this._furniBase ? this._furniBase.itemName : null,
+                this.wrappedFurniBase ? this.wrappedFurniBase.itemName : null,
                 texture
             );
 
-            const placeholder = Sprite.from(this._textureCache);
+            const placeholder = Sprite.from(this.textureCache);
 
             placeholder.height = 68 - 10e-3;
             placeholder.width = 68 - 10e-3;
@@ -120,31 +120,31 @@ export class Furni extends RoomObjectSprite {
             this.container.removeChild();
         }
 
-        for (let layer = 0; layer < this._furniBase.getLayerCount(); layer++) {
+        for (let layer = 0; layer < this.wrappedFurniBase.getLayerCount(); layer++) {
             this.updateSprite(layer);
         }
 
-        this._lastAnimation = animation;
+        this.lastAnimation = animation;
     }
 
     private updateSprite(layer: number) {
-        let offsetDirection = 360 - (this._direction + 135);
+        let offsetDirection = 360 - (this.direction + 135);
         offsetDirection = ((offsetDirection % 360) + 360) % 360;
 
-        const direction = this._furniBase.getValidDirection(offsetDirection);
+        const direction = this.wrappedFurniBase.getValidDirection(offsetDirection);
 
-        const frame = this._isIcon
+        const frame = this.isIcon
             ? 0
-            : this._furniBase.getFrameFrom(
+            : this.wrappedFurniBase.getFrameFrom(
                   direction,
-                  this._animation,
+                  this.animation,
                   layer,
-                  this._frame
+                  this.frame
               );
 
-        const assetName = this._furniBase.assetNameFrom(
-            this._isIcon ? 1 : FurniData.DEFAULT_SIZE,
-            this._isIcon ? 0 : layer,
+        const assetName = this.wrappedFurniBase.assetNameFrom(
+            this.isIcon ? 1 : FurniData.DEFAULT_SIZE,
+            this.isIcon ? 0 : layer,
             direction,
             frame
         );
@@ -154,32 +154,32 @@ export class Furni extends RoomObjectSprite {
             return;
         }
 
-        let asset: FurniAsset = this._furniBase.getAsset(assetName);
+        let asset: FurniAsset = this.wrappedFurniBase.getAsset(assetName);
         if (!asset) {
             Logger.debug('No assets found');
             return;
         }
 
-        if (!asset.sprite) asset = this._furniBase.getAsset(asset.source);
+        if (!asset.sprite) asset = this.wrappedFurniBase.getAsset(asset.source);
 
         let sprite = this.getSprite(asset);
         if (asset.isFlipped()) {
             sprite.scale.x = -1;
         }
 
-        const offsets: IOffsets = asset._offsets;
+        const offsets: IOffsets = asset.offsets;
 
         if (!sprite) return;
 
         sprite.pivot.x = offsets.left;
         sprite.pivot.y = offsets.top;
 
-        if (!this._furniBase.hasLayers()) return;
+        if (!this.wrappedFurniBase.hasLayers()) return;
 
         sprite = this.updateSpriteFrom(
             sprite,
-            this._direction,
-            this._furniBase.getLayer(layer)
+            this.direction,
+            this.wrappedFurniBase.getLayer(layer)
         );
 
         this.container.addChild(sprite);
@@ -201,7 +201,7 @@ export class Furni extends RoomObjectSprite {
                 );
         else {
             texture = RenderingUtils.cropTexture(
-                this._textureCache,
+                this.textureCache,
                 asset.sprite.height,
                 asset.sprite.width,
                 asset.sprite.left,
@@ -232,22 +232,22 @@ export class Furni extends RoomObjectSprite {
             }
             if (layer.z) {
                 let relativeDepth =
-                    this._furniBase.getDirection(direction) != null
-                        ? this._furniBase.getDirection(direction).getOffsetZ()
+                    this.wrappedFurniBase.getDirection(direction) != null
+                        ? this.wrappedFurniBase.getDirection(direction).getOffsetZ()
                         : layer.z;
                 relativeDepth = relativeDepth - layer.id * 0.001;
             } else {
                 sprite.zIndex =
-                    1 * this._furniBase.getDirection(direction).getOffsetZ();
+                    1 * this.wrappedFurniBase.getDirection(direction).getOffsetZ();
             }
             if (layer.alpha) {
-                sprite.alpha = (layer.alpha / 255) * this._multiplier;
+                sprite.alpha = (layer.alpha / 255) * this.multiplier;
             }
             if (layer.ignoreMouse) {
                 sprite.cursor = 'default';
             }
         } else {
-            sprite.alpha = (FurniData.DEFAULT_ALPHA / 255) * this._multiplier;
+            sprite.alpha = (FurniData.DEFAULT_ALPHA / 255) * this.multiplier;
         }
         return sprite;
     }
@@ -271,24 +271,24 @@ export class Furni extends RoomObjectSprite {
     }
 
     getNextDirection(direction: number) {
-        const directions = this._furniBase.getAvailableDirections();
+        const directions = this.wrappedFurniBase.getAvailableDirections();
         const pos = directions.indexOf(direction);
         return directions[(pos + 1) % directions.length];
     }
 
     setIcon(icon: boolean) {
-        this._isIcon = icon;
+        this.isIcon = icon;
     }
 
     get furniBase() {
-        return this._furniBase;
+        return this.wrappedFurniBase;
     }
 
     setPlaceHolder(placeholder: boolean) {
-        this._isPlaceholder = placeholder;
+        this.isPlaceholder = placeholder;
     }
 
     setDirection(direction) {
-        this._direction = direction;
+        this.direction = direction;
     }
 }

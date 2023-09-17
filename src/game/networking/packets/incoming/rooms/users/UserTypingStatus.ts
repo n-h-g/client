@@ -9,7 +9,7 @@ export class UserTypingStatus extends MessageHandler {
         const message = this.message as UserTypingData;
 
         const entity =
-            Engine.getInstance().roomService.CurrentRoom.roomEntityRepository.get(
+            Engine.getInstance().roomService.currentRoom.roomEntityRepository.get(
                 message.id
             );
 

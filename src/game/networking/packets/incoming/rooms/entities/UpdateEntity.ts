@@ -10,9 +10,9 @@ export class UpdateEntity extends MessageHandler {
     handle(): void {
         const entityData: EntityData = this.message;
 
-        if (Engine.getInstance().roomService?.CurrentRoom) {
+        if (Engine.getInstance().roomService?.currentRoom) {
             const entity =
-                Engine.getInstance().roomService?.CurrentRoom?.roomEntityRepository.get(
+                Engine.getInstance().roomService?.currentRoom?.roomEntityRepository.get(
                     entityData.id
                 );
 

@@ -6,41 +6,29 @@ import {
 import {SpriteData} from './data/SpriteData';
 
 export class FurniAsset {
-    _assetName: string;
+	readonly name: string;
+	readonly source?: string;
+    readonly sprite?: ISprite;
 
-    _offsets: IOffsets;
+    offsets: IOffsets;
 
-    private _flipH = 0;
+    private flipH = 0;
 
-    private _source?: string;
-
-    private _sprite?: ISprite;
 
     constructor(assetName: string, data: IAsset) {
-        this._assetName = assetName;
+        this.name = assetName;
 
-        this._flipH = data.flipH || 0;
+        this.flipH = data.flipH || 0;
 
-        this._source = data.source || null;
+        this.source = data.source || null;
 
-        this._offsets = data.offsets;
+        this.offsets = data.offsets;
 
-        this._sprite = new SpriteData(data.sprite);
+        this.sprite = new SpriteData(data.sprite);
     }
 
-    get name() {
-        return this._assetName;
-    }
-
-    get source() {
-        return this._source;
-    }
-
-    get sprite() {
-        return this._sprite;
-    }
 
     isFlipped(): boolean {
-        return this._flipH == 1;
+        return this.flipH == 1;
     }
 }

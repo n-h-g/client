@@ -100,7 +100,7 @@ export abstract class EntityVisualization extends RoomObjectVisualization {
 
         this.entity.logic.events.emit(EntityEvents.POSITION_CHANGED);
 
-        Engine.getInstance().roomService.CurrentRoom.roomLayout.visualization.container.sortChildren();
+        Engine.getInstance().roomService.currentRoom.roomLayout.visualization.container.sortChildren();
     }
 
     dispose(): void {

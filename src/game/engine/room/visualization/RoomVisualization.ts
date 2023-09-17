@@ -37,8 +37,8 @@ export class RoomVisualization implements Disposable {
         this.container.addChild(this.canvasFloor);
         this.container.addChild(this.canvasPointer);
 
-        this.container.x = Engine.getInstance().application.screenCords.x / 2;
-        this.container.y = Engine.getInstance().application.screenCords.y / 2;
+        this.container.x = Engine.getInstance().application.screenCoords.x / 2;
+        this.container.y = Engine.getInstance().application.screenCoords.y / 2;
 
         this.canvasDoorTile.eventMode = 'dynamic';
         this.canvasFloor.eventMode = 'dynamic';

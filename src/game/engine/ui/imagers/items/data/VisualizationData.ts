@@ -1,6 +1,5 @@
 import {IAnimation} from '../../../../../core/ui/imagers/items/IAnimation';
 import {IColor} from '../../../../../core/ui/imagers/items/IColor';
-import {IDirections} from '../../../../../core/ui/imagers/items/IDirections';
 import {ILayer} from '../../../../../core/ui/imagers/items/ILayer';
 import {
     IDirection,
@@ -71,7 +70,7 @@ export class VisualizationData {
         let currentAngle = -1;
         let validDirection = -1;
 
-        for (const key of this.getDirections().keys()) {
+        for (const key of this._directions.keys()) {
             let angle = (key * this._angle - direction + 360) % 360;
 
             if (angle > 180) angle = 360 - angle;
@@ -108,13 +107,11 @@ export class VisualizationData {
         return this.hasColors() && this._colors![color] != null;
     }
 
-    getColor(colorId, layerId): ColorData {
-        const color = this._colors[colorId];
-
-        return color;
+    getColor(colorId: number, layerId): ColorData {
+        return this._colors[colorId];
     }
 
-    getDirection(number): DirectionData {
+    getDirection(number: number): DirectionData {
         const direction = this._directions.get(number);
 
         if (!direction) return null;
@@ -172,7 +169,7 @@ export class VisualizationData {
         return Object.keys(this._colors);
     }
 
-    getDirections(): Map<number, DirectionData> {
+    get directions(): Map<number, DirectionData> {
         return this._directions;
     }
     get layerCount(): number {

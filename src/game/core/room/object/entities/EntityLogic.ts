@@ -42,7 +42,7 @@ export abstract class EntityLogic extends RoomObjectLogic {
 
     onHover(): void {
         const tile = Engine.getInstance()
-            .roomService.CurrentRoom.roomLayout.getFloorPlane()
+            .roomService.currentRoom.roomLayout.getFloorPlane()
             .getTilebyPosition(
                 new Point(
                     this.entity.position.x,
@@ -63,7 +63,7 @@ export abstract class EntityLogic extends RoomObjectLogic {
 
     onClick(): void {
         const tile = Engine.getInstance()
-            .roomService.CurrentRoom.roomLayout.getFloorPlane()
+            .roomService.currentRoom.roomLayout.getFloorPlane()
             .getTilebyPosition(
                 new Point(
                     this.entity.position.x,

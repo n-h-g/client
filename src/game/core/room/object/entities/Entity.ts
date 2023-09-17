@@ -14,7 +14,7 @@ export abstract class Entity extends RoomObjectController<
         super(id);
 
         const doorPosition =
-            Engine.getInstance()?.roomService?.CurrentRoom?.roomLayout?.getDoorPosition();
+            Engine.getInstance()?.roomService?.currentRoom?.roomLayout?.getDoorPosition();
         this.position = new Point3d(
             doorPosition.x,
             doorPosition.y,

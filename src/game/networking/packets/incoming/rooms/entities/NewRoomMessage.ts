@@ -11,7 +11,7 @@ export class NewRoomMessage extends MessageHandler {
         if (!data.authorId) return;
 
         const entity =
-            Engine.getInstance().roomService.CurrentRoom.roomEntityRepository.get(
+            Engine.getInstance().roomService.currentRoom.roomEntityRepository.get(
                 data.authorId
             );
 

@@ -6,10 +6,10 @@ export class RemoveEntity extends MessageHandler {
     handle(): void {
         const data: string = this.message.data;
 
-        if (!Engine.getInstance().roomService.CurrentRoom) return;
+        if (!Engine.getInstance().roomService.currentRoom) return;
 
         const entity: Entity =
-            Engine.getInstance().roomService.CurrentRoom.roomEntityRepository.get(
+            Engine.getInstance().roomService.currentRoom.roomEntityRepository.get(
                 data
             );
 
@@ -19,7 +19,7 @@ export class RemoveEntity extends MessageHandler {
 
         entity.dispose();
 
-        Engine.getInstance().roomService.CurrentRoom.roomEntityRepository.delete(
+        Engine.getInstance().roomService.currentRoom.roomEntityRepository.delete(
             data
         );
     }

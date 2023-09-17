@@ -16,8 +16,8 @@ import {AvatarData} from '../../../../ui/imagers/avatars/enum/AvatarData';
 import {UserEntityVisualization} from '../visualization/UserEntityVisualization';
 
 export class UserEntityLogic extends HumanLogic {
-    private _typing = false;
-    private _showLabel = false;
+    private typing = false;
+    private showLabel = false;
 
     private static SHOW_LABELS = false;
 
@@ -44,8 +44,8 @@ export class UserEntityLogic extends HumanLogic {
     }
 
     onToggleTyping(typing): void {
-        this._typing = typing;
-        this._showLabel = false;
+        this.typing = typing;
+        this.showLabel = false;
     }
 
     onTalk(length?: number): void {
@@ -76,18 +76,18 @@ export class UserEntityLogic extends HumanLogic {
 
         if (!UserEntityLogic.SHOW_LABELS) return;
 
-        this._showLabel = !this._showLabel;
+        this.showLabel = !this.showLabel;
         this.toggleUI();
     }
 
     onPositionChanged() {}
 
     onLoad(): void {
-        this._showLabel = false;
+        this.showLabel = false;
     }
 
     onClick() {
-        const roomId = Engine.getInstance().roomService?.CurrentRoom?.id;
+        const roomId = Engine.getInstance().roomService?.currentRoom?.id;
         const x = this.entity.position.x;
         const y = this.entity.position.y;
 
@@ -134,14 +134,14 @@ export class UserEntityLogic extends HumanLogic {
             UIEvents.AVATAR_CONTAINER_UPDATED,
             {
                 label: this.entity.name,
-                showLabel: this._showLabel,
+                showLabel: this.showLabel,
                 bounds: {
                     x: position.x,
                     y: position.y,
                     w: dimension.y,
                     h: dimension.x,
                 },
-                typing: this._typing,
+                typing: this.typing,
             }
         );
     }

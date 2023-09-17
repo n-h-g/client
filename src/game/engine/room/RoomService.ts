@@ -15,7 +15,7 @@ export class RoomService
     extends Service<null, null>
     implements Disposable
 {
-    private _currentRoom: Room;
+    private wrappedCurrentRoom: Room;
 
     constructor() {
         super();
@@ -29,20 +29,20 @@ export class RoomService
         authorName: string
     ): Room {
         Engine.getInstance()?.application.setUpViewport();
-        this._currentRoom = new Room(
+        this.wrappedCurrentRoom = new Room(
             roomName,
             roomModel,
             doorPosition,
             roomId,
             authorName
         );
-        this._currentRoom.roomLayout.visualization.render();
-        this._currentRoom.roomLayout.logic.registerEvents();
+        this.wrappedCurrentRoom.roomLayout.visualization.render();
+        this.wrappedCurrentRoom.roomLayout.logic.registerEvents();
         Engine.getInstance()?.application?.viewport.addChild(
-            this._currentRoom.roomLayout.visualization.container
+            this.wrappedCurrentRoom.roomLayout.visualization.container
         );
         this.toggleUI();
-        return this._currentRoom;
+        return this.wrappedCurrentRoom;
     }
 
     /**
@@ -86,30 +86,30 @@ export class RoomService
             enabled: true,
         });
         EventManager.emit<EnterRoomUIEventData>(UIEvents.ENTER_ROOM_INFO, {
-            name: this.CurrentRoom.roomInfo.roomName,
-            description: this.CurrentRoom.roomInfo.description,
-            owner: this.CurrentRoom.roomInfo.authorName ?? '',
+            name: this.currentRoom.roomInfo.roomName,
+            description: this.currentRoom.roomInfo.description,
+            owner: this.currentRoom.roomInfo.authorName ?? '',
             haveRights: true,
         });
     }
 
     dispose(): void {
-        if (!this._currentRoom) {
+        if (!this.wrappedCurrentRoom) {
             return;
         }
 
         this.toggleUI();
 
-        this._currentRoom.roomLayout.visualization.dispose();
-        this._currentRoom = null;
+        this.wrappedCurrentRoom.roomLayout.visualization.dispose();
+        this.wrappedCurrentRoom = null;
     }
 
     tick(delta: number): void {
-        this._currentRoom?.roomLayout.logic.tick(delta);
-        this._currentRoom?.roomEntityRepository.tick(delta);
+        this.wrappedCurrentRoom?.roomLayout.logic.tick(delta);
+        this.wrappedCurrentRoom?.roomEntityRepository.tick(delta);
     }
 
-    get CurrentRoom(): Room {
-        return this._currentRoom;
+    get currentRoom(): Room {
+        return this.wrappedCurrentRoom;
     }
 }

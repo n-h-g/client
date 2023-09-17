@@ -10,7 +10,7 @@ export class LoadRoomEntities extends MessageHandler {
             const data: EntityData = entityData;
 
             if (
-                Engine.getInstance()?.roomService?.CurrentRoom?.roomEntityRepository?.get(
+                Engine.getInstance()?.roomService?.currentRoom?.roomEntityRepository?.get(
                     data.id
                 ) !== null
             )
@@ -27,7 +27,7 @@ export class LoadRoomEntities extends MessageHandler {
                 .setUser(data.user)
                 .build()
                 .then((entity: Entity) => {
-                    Engine.getInstance().roomService?.CurrentRoom?.roomEntityRepository.add(
+                    Engine.getInstance().roomService?.currentRoom?.roomEntityRepository.add(
                         entity.id,
                         entity
                     );

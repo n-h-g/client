@@ -13,7 +13,7 @@ export class UpdateRoomData extends MessageHandler {
         }
 
         if (
-            Engine.getInstance()?.roomService?.CurrentRoom?.id !=
+            Engine.getInstance()?.roomService?.currentRoom?.id !=
             room.id
         )
             Engine.getInstance()?.roomService.dispose();

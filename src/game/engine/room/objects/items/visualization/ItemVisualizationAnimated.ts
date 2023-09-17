@@ -2,9 +2,6 @@ import {ItemVisualization} from '../../../../../core/room/object/items/visualiza
 import {Item} from '../Item';
 
 export class ItemVisualizationAnimated extends ItemVisualization {
-    private animation = 0;
-    private _lastAnimation = 0;
-    private _currentFrame = 0;
 
     constructor(item: Item) {
         super(item);

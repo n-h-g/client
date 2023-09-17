@@ -1,23 +1,23 @@
 import {Container, Resource, Texture} from 'pixi.js';
 
 export class RoomObjectSprite {
-    private _id: number;
-    private _width: number;
-    private _height: number;
-    private _offsetX: number;
-    private _offsetY: number;
-    private _texture: Texture<Resource>;
-    private _visible: boolean;
-    private _clickable: boolean;
-    private _alpha = 255;
-    private _container: Container;
+    private id: number;
+    private width: number;
+    private height: number;
+    private offsetX: number;
+    private offsetY: number;
+    private texture: Texture<Resource>;
+    private visible: boolean;
+    private clickable: boolean;
+    private alpha = 255;
+    private wrappedContainer: Container;
 
     constructor() {
-        this._width = 0;
-        this._height = 0;
-        this._offsetX = 0;
-        this._offsetY = 0;
-        this._container = new Container();
+        this.width = 0;
+        this.height = 0;
+        this.offsetX = 0;
+        this.offsetY = 0;
+        this.wrappedContainer = new Container();
     }
 
     reset(): void {}
@@ -25,26 +25,26 @@ export class RoomObjectSprite {
     update(needsUpdate = false): void {}
 
     dispose(): void {
-        this._texture = null;
-        this._alpha = 255;
-        this._height = 0;
-        this._width = 0;
+        this.texture = null;
+        this.alpha = 255;
+        this.height = 0;
+        this.width = 0;
     }
 
     get container(): Container {
-        return this._container;
+        return this.wrappedContainer;
     }
 
     set container(container: Container) {
-        if (this._container === container) return;
+        if (this.wrappedContainer === container) return;
 
-        this._texture = Texture.EMPTY;
+        this.texture = Texture.EMPTY;
 
         if (container) {
-            this._width = container.width;
-            this._height = container.height;
+            this.width = container.width;
+            this.height = container.height;
         }
 
-        this._container = container;
+        this.wrappedContainer = container;
     }
 }

@@ -16,7 +16,7 @@ export class RoomLogic implements Disposable {
     private room: RoomLayout;
     private canvasFloorHit: HTMLCanvasElement;
     private canvasWallHit: HTMLCanvasElement;
-    private _lastCameraPosition: Point;
+	private lastCameraPosition: Point;
 
     constructor(room: RoomLayout) {
         this.room = room;
@@ -86,8 +86,8 @@ export class RoomLogic implements Disposable {
             y: viewport.y,
         });
 
-        this._lastCameraPosition =
-            Engine.getInstance().roomService.CurrentRoom.roomLayout.getOffset(
+        this.lastCameraPosition =
+            Engine.getInstance().roomService.currentRoom.roomLayout.getOffset(
                 viewport.x,
                 viewport.y,
                 0
