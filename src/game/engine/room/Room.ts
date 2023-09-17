@@ -2,14 +2,14 @@ import {Point} from '../../utils/point/Point';
 import {RoomLayout} from './RoomLayout';
 import {RoomInfo} from './RoomInfo';
 import {RoomEntityRepository} from './RoomEntityRepository';
-import {IDisposable} from '../../core/room/IDisposable';
+import {Disposable} from '../../core/room/Disposable';
 
-export class Room implements IDisposable {
-    private _roomLayout: RoomLayout;
-    private roomInfo: RoomInfo;
-    private roomName: string;
-    private roomId: number;
-    private _roomEntityRepository: RoomEntityRepository;
+export class Room implements Disposable {
+    readonly id: number;
+    readonly name: string;
+    readonly roomInfo: RoomInfo;
+    readonly roomLayout: RoomLayout;
+    readonly roomEntityRepository: RoomEntityRepository;
 
     constructor(
         roomName: string,
@@ -18,40 +18,15 @@ export class Room implements IDisposable {
         roomId: number,
         authorName: string
     ) {
-        this.roomName = roomName;
-        this.roomId = roomId;
-        this._roomLayout = new RoomLayout(this, roomModel, doorPosition);
+        this.id = roomId;
+        this.name = roomName;
+        this.roomEntityRepository = new RoomEntityRepository();
         this.roomInfo = new RoomInfo(roomName, roomModel, authorName);
-
-        this._roomEntityRepository = new RoomEntityRepository();
+        this.roomLayout = new RoomLayout(this, roomModel, doorPosition);
     }
 
     dispose(): void {
-        this.roomLayout.Visualization.dispose();
-        this.roomLayout.Logic.dispose();
-    }
-
-    get roomLayout(): RoomLayout {
-        return this._roomLayout;
-    }
-
-    getRoomInfo(): RoomInfo {
-        return this.roomInfo;
-    }
-
-    getRoomId(): number {
-        return this.roomId;
-    }
-
-    get roomEntityRepository(): RoomEntityRepository {
-        return this._roomEntityRepository;
-    }
-
-    get name(): string {
-        return this.roomName;
-    }
-
-    get id(): number {
-        return this.roomId;
+        this.roomLayout.visualization.dispose();
+        this.roomLayout.logic.dispose();
     }
 }

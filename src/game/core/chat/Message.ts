@@ -1,6 +1,4 @@
-import {IMessage} from '../IMessage';
-
-export abstract class Message implements IMessage {
+export abstract class Message {
     id: number;
     senderId: number;
     destinationId: number;

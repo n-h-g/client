@@ -17,7 +17,6 @@ export class ItemVisualizationAnimated extends ItemVisualization {
     nextFrame(): void {}
 
     setAnimation(animation: number) {
-        const item = this.entity as Item;
         this.entity.visualization.draw();
     }
 }

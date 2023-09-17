@@ -11,7 +11,6 @@ export class ItemLogicMultiState extends ItemLogic {
 
     registerEvents() {
         super.registerEvents();
-        //this.entity.visualization.container.on("dblclick", (event) => this.changeState())
     }
 
     changeState() {
@@ -24,10 +23,6 @@ export class ItemLogicMultiState extends ItemLogic {
         } else {
             state++;
         }
-
-        //(item.visualization.container as FurniSprite).setAnimation(state);
-
-        //this.entity.visualization.needsUpdate = true
 
         this.state = state;
     }
@@ -45,8 +40,6 @@ export class ItemLogicMultiState extends ItemLogic {
                 (1000 * (100 / FurniImager.FPS)) / FurniImager.FPS
             ) {
                 this.frameTracker = 0;
-                //(this.entity.visualization as ItemVisualizationAnimated).frame = (this.entity.visualization as ItemVisualizationAnimated).frame + 1;
-                //(this.entity.visualization as ItemVisualizationAnimated).draw()
             }
         }
     }

@@ -8,7 +8,7 @@ export abstract class Entity extends RoomObjectController<
     EntityVisualization,
     EntityLogic
 > {
-    protected _name: string;
+    name: string;
 
     constructor(id: string, name: string) {
         super(id);
@@ -20,18 +20,10 @@ export abstract class Entity extends RoomObjectController<
             doorPosition.y,
             0
         );
-        this._name = name;
+        this.name = name;
     }
 
     dispose(): void {
         super.dispose();
-    }
-
-    get name(): string {
-        return this._name;
-    }
-
-    set name(name: string) {
-        this._name = name;
     }
 }

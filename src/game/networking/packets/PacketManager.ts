@@ -70,7 +70,7 @@ export class PacketManager {
                     packetBody
                 );
             }
-            messageHandler.setMessage(packetBody);
+            messageHandler.message = packetBody;
             messageHandler.handle();
         } else if (Engine.getInstance().config.debug) {
             Logger.warning('Unknown packet ' + packetHeader, packetBody);

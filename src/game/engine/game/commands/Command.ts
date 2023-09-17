@@ -1,8 +1,6 @@
-import {ICommand} from '../../../core/game/commands/ICommand';
-
-export abstract class Command implements ICommand {
-    definition: string;
-    aliases: string[] = [];
+export abstract class Command {
+    readonly definition: string;
+    readonly aliases: string[] = [];
 
     constructor(definition: string, aliases: string[] = []) {
         this.definition = definition;

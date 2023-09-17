@@ -4,23 +4,22 @@ import {Point} from '../../../utils/point/Point';
 import {MapData} from '../objects/map/MapData';
 import {UiUtils} from '../../../utils/UiUtils';
 import {Tile} from '../objects/map/Tile';
-import {IRoomVisualization} from '../../../core/room/IRoomVisualization';
 import {RoomObjectController} from '../../../core/room/object/RoomObjectController';
 import {RoomLogic} from '../logic/RoomLogic';
 import {Point3d} from '../../../utils/point/Point3d';
 import {RoomPriority} from './RoomPriority';
+import { Disposable } from '../../../core/room/Disposable';
 import {Engine} from '../../../Engine';
 
-export class RoomVisualization implements IRoomVisualization {
+export class RoomVisualization implements Disposable {
+    container: Container;
+    needsUpdate = false;
     private roomLayout: RoomLayout;
     private canvasFloor: Container;
     private canvasWall: Container;
     private canvasDoorTile: Container;
     private canvasDoorWall: Container;
     private canvasPointer: Container;
-    container: Container;
-
-    needsUpdate = false;
 
     constructor(room: RoomLayout) {
         this.roomLayout = room;

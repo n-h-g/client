@@ -17,7 +17,7 @@ export class RoomImagerBuilder {
     setRoom(room: Room) {
         this._room = new Room(
             room.name,
-            room.getRoomInfo().roomModel,
+            room.roomInfo.roomModel,
             room.roomLayout.getDoorPosition(),
             room.id,
             ''

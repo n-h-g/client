@@ -1,12 +1,12 @@
 import {Engine} from '../../../../../Engine';
-import {IRoomMessageData} from '../../../../../core/communication/incoming/rooms/entities/IRoomMessageData';
-import {MessageType} from '../../../../../core/game/chat/MessageType';
+import {RoomMessageData} from '../../../../../core/communication/incoming/rooms/entities/RoomMessageData';
+import {MessageType} from '../../../../../core/chat/MessageType';
 import {RoomChatMessage} from '../../../../../engine/game/chat/RoomChatMessage';
 import {MessageHandler} from '../../../../handler/MessageHandler';
 
 export class NewRoomMessage extends MessageHandler {
     handle(): void {
-        const data = this.message as IRoomMessageData;
+        const data: RoomMessageData = this.message;
 
         if (!data.authorId) return;
 

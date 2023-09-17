@@ -6,11 +6,11 @@ import {Container, Graphics, Point} from 'pixi.js';
 import {Tile} from '../Tile';
 
 export class VisualizationPointer extends RoomObjectVisualization {
+    private pointerWidth = 3;
     private pointerContext: Container;
     private pointerColor: ColorRGB = new ColorRGB(255, 255, 255);
     private pointerPosition = 0;
     private pointerAlpha = 1;
-    private pointerWidth = 3;
     private pointer: Pointer;
 
     constructor(pointer: Pointer) {
@@ -76,9 +76,5 @@ export class VisualizationPointer extends RoomObjectVisualization {
         container.addChild(ctx);
 
         return container;
-    }
-
-    getPointerWidth(): number {
-        return this.pointerWidth;
     }
 }

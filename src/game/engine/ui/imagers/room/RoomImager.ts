@@ -37,18 +37,18 @@ export class RoomImager {
 
         const generatedRoom = this._roomImagerBuilder.setRoom(room).build();
 
-        generatedRoom.roomLayout.Visualization.render();
+        generatedRoom.roomLayout.visualization.render();
 
         const container = new Container();
 
         container.addChild(
-            generatedRoom.roomLayout.Visualization.getCanvasFloor()
+            generatedRoom.roomLayout.visualization.getCanvasFloor()
         );
         container.addChild(
-            generatedRoom.roomLayout.Visualization.getCanvasWall()
+            generatedRoom.roomLayout.visualization.getCanvasWall()
         );
         container.addChild(
-            generatedRoom.roomLayout.Visualization.getCanvasDoorWall()
+            generatedRoom.roomLayout.visualization.getCanvasDoorWall()
         );
         //container.addChild(generatedRoom.roomLayout.Visualization.getCanvasDoorTile())
 

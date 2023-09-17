@@ -9,7 +9,7 @@ export class LogicWall extends RoomObjectLogic {
 
         this.wall = wall;
 
-        const canvas = this.wall.plane.room.Logic.getCanvasWallHit();
+        const canvas = this.wall.plane.room.logic.getCanvasWallHit();
     }
 
     dispose(): void {
@@ -17,10 +17,10 @@ export class LogicWall extends RoomObjectLogic {
     }
 
     registerEvents(): void {
-        this.wall.visualization.WallContext?.on('pointerdown', () =>
+        this.wall.visualization.wallContext?.on('pointerdown', () =>
             this.onClick()
         );
-        this.wall.visualization.WallContext?.on('pointerover', () =>
+        this.wall.visualization.wallContext?.on('pointerover', () =>
             this.onHover()
         );
     }

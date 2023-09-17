@@ -1,4 +1,4 @@
-import {IEntityData} from '../../../../../core/communication/incoming/rooms/entities/IEntityData';
+import {EntityData} from '../../../../../core/communication/incoming/rooms/entities/EntityData';
 import {HumanVisualization} from '../../../../../core/room/object/human/visualization/HumanVisualization';
 import {Engine} from '../../../../../Engine';
 import {ActionId} from '../../../../../engine/ui/imagers/avatars/enum/actions/ActionId';
@@ -8,7 +8,7 @@ import {MessageHandler} from '../../../../handler/MessageHandler';
 
 export class UpdateEntity extends MessageHandler {
     handle(): void {
-        const entityData: IEntityData = this.message;
+        const entityData: EntityData = this.message;
 
         if (Engine.getInstance().roomService?.CurrentRoom) {
             const entity =
@@ -25,7 +25,7 @@ export class UpdateEntity extends MessageHandler {
                     );
                 } else {
                     if (entityData.bh_rot) {
-                        entity.visualization.Rot = entityData.bh_rot.body_rot;
+                        entity.visualization.direction = entityData.bh_rot.body_rot;
                     }
                 }
 

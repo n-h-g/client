@@ -12,7 +12,6 @@ import {LogicPointer} from './LogicPointer';
 
 export class LogicTile extends RoomObjectLogic {
     private tile: Tile;
-
     private hitContext: CanvasRenderingContext2D | null;
 
     constructor(tile: Tile) {
@@ -20,7 +19,7 @@ export class LogicTile extends RoomObjectLogic {
 
         this.tile = tile;
 
-        const canvas = this.tile.plane.room.Logic.getCanvasFloorHit();
+        const canvas = this.tile.plane.room.logic.getCanvasFloorHit();
         this.hitContext = canvas.getContext('2d');
 
         this.checkTileAndDrawHitBox();
@@ -77,7 +76,7 @@ export class LogicTile extends RoomObjectLogic {
             this.tile.position.y ==
                 this.tile.plane.room.getDoorPosition().y;
 
-        this.tile.plane.room.Visualization.getCanvasPointer().zIndex =
+        this.tile.plane.room.visualization.getCanvasPointer().zIndex =
             RoomVisualization.calculateZIndex(
                 this.tile.position,
                 isDoor ? RoomPriority.DOOR_FLOOR_SELECT : RoomPriority.POINTER
@@ -104,6 +103,8 @@ export class LogicTile extends RoomObjectLogic {
             }
         }
     }
+
+	tick(delta: number): void {}
 
     private drawTileHitBox(
         hitCtx: CanvasRenderingContext2D
@@ -135,6 +136,4 @@ export class LogicTile extends RoomObjectLogic {
 
         return hitCtx;
     }
-
-    tick(delta: number): void {}
 }

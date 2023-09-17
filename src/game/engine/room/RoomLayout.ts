@@ -9,8 +9,8 @@ import {Pointer} from './objects/map/Pointer';
 import {MapData} from './objects/map/MapData';
 
 export class RoomLayout {
-    private visualization: RoomVisualization;
-    private logic: RoomLogic;
+    private wrappedVisualization: RoomVisualization;
+    private wrappedLogic: RoomLogic;
     private room: Room;
     private modelMatrix: number[][] = [];
     private colorsHash: ColorRGB[] = [];
@@ -32,8 +32,8 @@ export class RoomLayout {
 
         this.parseModel(model);
 
-        this.visualization = new RoomVisualization(this);
-        this.logic = new RoomLogic(this);
+        this.wrappedVisualization = new RoomVisualization(this);
+        this.wrappedLogic = new RoomLogic(this);
 
         this.floorPlane = new FloorPlane(this);
         this.wallPlane = new WallPlane(this);
@@ -217,16 +217,16 @@ export class RoomLayout {
         return this.zoom;
     }
 
-    get HasFullHeightTick(): boolean {
+    get hasFullHeightTick(): boolean {
         return this.fullHeightTick;
     }
 
-    get Visualization(): RoomVisualization {
-        return this.visualization;
+    get visualization(): RoomVisualization {
+        return this.wrappedVisualization;
     }
 
-    get Logic(): RoomLogic {
-        return this.logic;
+    get logic(): RoomLogic {
+        return this.wrappedLogic;
     }
 
     getModelMatrix(): number[][] {

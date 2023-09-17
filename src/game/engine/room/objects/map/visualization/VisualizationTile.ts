@@ -28,13 +28,17 @@ export class VisualizationTile extends RoomObjectVisualization {
 
         this.tile = tile;
 
-        const roomV = tile.plane.room.Visualization as RoomVisualization;
+        const roomV = tile.plane.room.visualization as RoomVisualization;
         this.floorContext = roomV.getCanvasFloor();
         this.doorContext = roomV.getCanvasDoorTile();
     }
 
     getZIndex(): number {
         return RoomPriority.FLOOR;
+    }
+
+    render(): void {
+        this.checkTypeAndDraw();
     }
 
     private static calculateOffsetX(position: Point3d, type: TileType): number {
@@ -64,10 +68,6 @@ export class VisualizationTile extends RoomObjectVisualization {
                     ? 1
                     : 0)
         );
-    }
-
-    render(): void {
-        this.checkTypeAndDraw();
     }
 
     private checkTypeAndDraw(): void {
@@ -104,7 +104,7 @@ export class VisualizationTile extends RoomObjectVisualization {
         const ctx = new Graphics();
         ctx.eventMode = 'dynamic';
 
-        const fullHeightTick = this.tile.plane.room.HasFullHeightTick
+        const fullHeightTick = this.tile.plane.room.hasFullHeightTick
             ? MapData.thickSpace *
               MapData.stepHeight *
               (this.tile.position.z + (isDoor ? 1 : 0))
@@ -203,7 +203,7 @@ export class VisualizationTile extends RoomObjectVisualization {
 
         ctx.eventMode = 'dynamic';
 
-        const fullHeightTick = this.tile.plane.room.HasFullHeightTick
+        const fullHeightTick = this.tile.plane.room.hasFullHeightTick
             ? MapData.thickSpace *
               MapData.stepHeight *
               this.tile.position.z
@@ -285,7 +285,7 @@ export class VisualizationTile extends RoomObjectVisualization {
             const offsetX = (MapData.tileWidth / 2 / 8) * 2 * i;
             const offsetY =
                 thickness + (thickness + (MapData.tileHeight / 2 / 8) * 2) * i;
-            const fullHeightTickStair = this.tile.plane.room.HasFullHeightTick
+            const fullHeightTickStair = this.tile.plane.room.hasFullHeightTick
                 ? MapData.thickSpace * (MapData.stairSteps - i)
                 : MapData.thickSpace;
 
@@ -344,10 +344,10 @@ export class VisualizationTile extends RoomObjectVisualization {
         return container;
     }
 
-    drawFrontCorner(container: Container) {
+    private drawFrontCorner(container: Container) {
         const ctx = new Graphics();
 
-        const fullHeightTick = this.tile.plane.room.HasFullHeightTick
+        const fullHeightTick = this.tile.plane.room.hasFullHeightTick
             ? MapData.thickSpace *
               MapData.stepHeight *
               this.tile.position.z
@@ -401,7 +401,7 @@ export class VisualizationTile extends RoomObjectVisualization {
             const offsetX = -((MapData.tileWidth / 2 / 8) * 2 * i);
             const offsetY =
                 thickness + (thickness + (MapData.tileHeight / 2 / 8) * 2) * i;
-            const fullHeightTickStair = this.tile.plane.room.HasFullHeightTick
+            const fullHeightTickStair = this.tile.plane.room.hasFullHeightTick
                 ? MapData.thickSpace * (MapData.stairSteps - i)
                 : MapData.thickSpace;
 

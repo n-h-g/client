@@ -1,12 +1,12 @@
 import {Point3d} from '../../../utils/point/Point3d';
-import {IDisposable} from '../IDisposable';
-import {Positionable} from './IPositionable';
+import {Disposable} from '../Disposable';
+import {Positionable} from './Positionable';
 
 export abstract class RoomObjectController<
-        IRoomObjectVisualization extends IDisposable,
-        IRoomObjectLogic extends IDisposable,
+        IRoomObjectVisualization extends Disposable,
+        IRoomObjectLogic extends Disposable,
     >
-    implements Positionable, IDisposable
+    implements Positionable, Disposable
 {
     private readonly _id: string;
     protected _objectPosition: Point3d;

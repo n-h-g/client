@@ -11,7 +11,7 @@ import {Point} from '../../../../../utils/point/Point';
 import {Point3d} from '../../../../../utils/point/Point3d';
 import {UiUtils} from '../../../../../utils/UiUtils';
 import {EntityVisualization} from '../../entities/EntityVisualization';
-import {MoveableVisualization} from '../../IMoveable';
+import {MoveableVisualization} from '../../Moveable';
 import {FurnidataItemType} from '../../../../../engine/ui/imagers/items/enum/FurniDataItemType';
 
 import anime from 'animejs';
@@ -20,11 +20,10 @@ export abstract class ItemVisualization
     extends EntityVisualization
     implements MoveableVisualization
 {
+	imagePreview: string;
     protected position: Point3d;
     protected iconImage: string;
-    imagePreview: string;
     protected isIcon = false;
-
     private static USE_ROTATION_ANIMATION = false;
 
     constructor(item: Item) {
@@ -47,7 +46,7 @@ export abstract class ItemVisualization
 
             this.container.eventMode = 'dynamic';
 
-            Engine.getInstance().roomService?.CurrentRoom?.roomLayout.Visualization.container?.addChild(
+            Engine.getInstance().roomService?.CurrentRoom?.roomLayout.visualization.container?.addChild(
                 this.container
             );
             this.updatePosition();
@@ -58,16 +57,6 @@ export abstract class ItemVisualization
         this.entity.visualization.container = this.container;
         this.needsUpdate = false;
         this.isIcon = false;
-    }
-
-    private async generateImagePreview() {
-        return this.entity
-            ? await UiUtils.generateBase64FromObject(this.container)
-            : null;
-    }
-
-    private generateIcon(): string {
-        return '';
     }
 
     rotate(): void {
@@ -136,9 +125,9 @@ export abstract class ItemVisualization
             this.sprite = sprite;
         }
 
-        if (!this._entity) return;
+        if (!this.entity) return;
 
-        const spriteZIndex = (this._entity as Item).base.getLogicDimension(2);
+        const spriteZIndex = (this.entity as Item).base.getLogicDimension(2);
 
         if (!this.sprite.container) return;
 
@@ -148,7 +137,7 @@ export abstract class ItemVisualization
 
         this.container = this.sprite.container;
         if (Engine.getInstance().roomService?.CurrentRoom) {
-            Engine.getInstance().roomService?.CurrentRoom?.roomLayout.Visualization.container?.addChild(
+            Engine.getInstance().roomService?.CurrentRoom?.roomLayout.visualization.container?.addChild(
                 this.sprite.container
             );
             this.updatePosition();
@@ -207,7 +196,7 @@ export abstract class ItemVisualization
 
     getZIndex(zIndex = 1): number {
         const compareY =
-            Math.trunc((this._entity as Item).base.getLogicDimension(2) / 100) /
+            Math.trunc((this.entity as Item).base.getLogicDimension(2) / 100) /
             10;
         return RoomVisualization.calculateZIndex(
             new Point3d(
@@ -217,5 +206,9 @@ export abstract class ItemVisualization
             ),
             RoomPriority.ROOM_ITEM
         );
+    }
+
+    private generateIcon(): string {
+        return '';
     }
 }

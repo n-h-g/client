@@ -22,8 +22,6 @@ export abstract class HumanLogic extends EntityLogic {
         super.onClick();
     }
 
-    protected abstract figureChanged(): void;
-
     tick(delta: number): void {
         const humanVisualization = this.entity
             .visualization as HumanVisualization;
@@ -41,4 +39,6 @@ export abstract class HumanLogic extends EntityLogic {
             }
         }
     }
+
+	protected abstract figureChanged(): void;
 }

@@ -1,8 +1,8 @@
 export class RoomInfo {
     roomName: string;
-    description: string | null;
-    maxUsers: number | null;
-    canWalkThrough: boolean | null;
+    description: string;
+    maxUsers: number;
+    canWalkThrough: boolean;
     roomModel: string;
     authorName: string;
 

@@ -4,11 +4,11 @@ import {ItemEvents} from '../../../../../engine/events/room/objects/entities/Ite
 import {Item} from '../../../../../engine/room/objects/items/Item';
 import {FurniData} from '../../../../../engine/ui/imagers/items/FurniData';
 import {OutgoingPacket} from '../../../../../networking/packets/outgoing/OutgoingPacket';
-import {MoveableLogic} from '../../IMoveable';
+import {MoveableLogic} from '../../Moveable';
 import {EntityLogic} from '../../entities/EntityLogic';
 
 export abstract class ItemLogic extends EntityLogic implements MoveableLogic {
-    _roll = false;
+    roll = false;
 
     constructor(item: Item) {
         super(item);
@@ -60,7 +60,7 @@ export abstract class ItemLogic extends EntityLogic implements MoveableLogic {
     }
 
     toggleMovement(value: boolean): void {
-        this._roll = value;
+        this.roll = value;
         this.entity.visualization.needsUpdate = value;
         this.entity.visualization.sprite.container.alpha =
             (value ? FurniData.LOADING_ALPHA : FurniData.DEFAULT_ALPHA) / 255;
@@ -71,7 +71,7 @@ export abstract class ItemLogic extends EntityLogic implements MoveableLogic {
     }
 
     tick(delta: number) {
-        if (this._roll) {
+        if (this.roll) {
             this.onMove(delta);
         }
 
@@ -99,10 +99,6 @@ export abstract class ItemLogic extends EntityLogic implements MoveableLogic {
             }
         );
 
-        this._roll = false;
-    }
-
-    get roll(): boolean {
-        return this._roll;
+        this.roll = false;
     }
 }

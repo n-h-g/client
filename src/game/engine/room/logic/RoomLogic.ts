@@ -1,6 +1,4 @@
 import {RoomLayout} from '../RoomLayout';
-import {Room} from '../Room';
-import {IRoomLogic} from '../../../core/room/IRoomLogic';
 import {Engine} from '../../../Engine';
 import {Sprite, Texture} from 'pixi.js';
 import {Viewport} from 'pixi-viewport';
@@ -12,12 +10,12 @@ import {EventManager} from '../../../core/events/EventManager';
 import {UIEvents} from '../../events/ui/UIEvents';
 import {RoomChatData} from '../../events/ui/data/room/RoomChatData';
 import {Point} from '../../../utils/point/Point';
+import { Disposable } from '../../../core/room/Disposable';
 
-export class RoomLogic implements IRoomLogic {
+export class RoomLogic implements Disposable {
     private room: RoomLayout;
     private canvasFloorHit: HTMLCanvasElement;
     private canvasWallHit: HTMLCanvasElement;
-
     private _lastCameraPosition: Point;
 
     constructor(room: RoomLayout) {
@@ -25,7 +23,7 @@ export class RoomLogic implements IRoomLogic {
         this.canvasFloorHit = this.room.createOrGetRoomCanvas('floorHit');
 
         if (Engine.getInstance().config.debugRoomClick)
-            this.room.Visualization.Container.addChild(
+            this.room.visualization.Container.addChild(
                 Sprite.from(
                     Texture.from(
                         RenderingUtils.convertCanvasToImage(this.canvasFloorHit)
@@ -36,10 +34,10 @@ export class RoomLogic implements IRoomLogic {
         this.canvasWallHit = this.room.createOrGetRoomCanvas('wallHit');
     }
 
-    dispose(): void {}
+	dispose(): void {}
 
     registerEvents(): void {
-        const roomVisualization = this.room.Visualization
+        const roomVisualization = this.room.visualization
 
         roomVisualization
             .getCanvasFloor()
@@ -48,7 +46,7 @@ export class RoomLogic implements IRoomLogic {
             'pointerdown',
             this.onMouseClick.bind(this)
         );
-        this.room.Visualization.getCanvasFloor().on(
+        roomVisualization.getCanvasFloor().on(
             'pointerout',
             this.onMouseOut.bind(this)
         );
@@ -64,6 +62,19 @@ export class RoomLogic implements IRoomLogic {
 
         this.room.getFloorPlane().logic?.registerEvents();
         this.room.getWallPlane().logic?.registerEvents();
+    }
+
+    tick(delta: number): void {
+        this.room.getWallPlane().logic?.tick(delta);
+        this.room.getFloorPlane().logic?.tick(delta);
+    }
+
+    getCanvasFloorHit(): HTMLCanvasElement {
+        return this.canvasFloorHit;
+    }
+
+    getCanvasWallHit(): HTMLCanvasElement {
+        return this.canvasWallHit;
     }
 
     private onCameraMove(e: any) {
@@ -84,13 +95,11 @@ export class RoomLogic implements IRoomLogic {
     }
 
     private onMouseClick(e: any) {
-        const room: Room = this.room.getRoom()
-    }
+
+	}
 
     private onMouseOver(e: any) {
-        const room: Room = this.room.getRoom()
-
-        this.room.Visualization.getCanvasPointer().zIndex =
+        this.room.visualization.getCanvasPointer().zIndex =
             RoomVisualization.calculateZIndex(
                 new Point3d(
                     this.room.getPointer().position.x,
@@ -102,20 +111,6 @@ export class RoomLogic implements IRoomLogic {
     }
 
     private onMouseOut() {
-        const room: Room = this.room.getRoom()
         this.room.getPointer().logic.hidePointer();
-    }
-
-    tick(delta: number): void {
-        this.room.getWallPlane().logic?.tick(delta);
-        this.room.getFloorPlane().logic?.tick(delta);
-    }
-
-    getCanvasFloorHit(): HTMLCanvasElement {
-        return this.canvasFloorHit;
-    }
-
-    getCanvasWallHit(): HTMLCanvasElement {
-        return this.canvasWallHit;
     }
 }

@@ -1,23 +1,24 @@
 import {EventManager} from '../../../core/events/EventManager';
-import {IDisposable} from '../../../core/room/IDisposable';
+import {Disposable} from '../../../core/room/Disposable';
 import {Engine} from '../../../Engine';
 import {OutgoingPacket} from '../../../networking/packets/outgoing/OutgoingPacket';
 import {RoomChatData} from '../../events/ui/data/room/RoomChatData';
 import {UIEvents} from '../../events/ui/UIEvents';
 import {RoomChatMessage} from './RoomChatMessage';
-import {ChatMessageRepository} from './ChatMessageRepository';
+import { Repository } from '../../../core/Repository';
+import { Message } from '../../../core/chat/Message';
+import { Service } from '../../../core/Service';
 
-export class ChatMessageService implements IDisposable {
-    repository: ChatMessageRepository;
-
+export class ChatMessageService extends Service<string, Message> implements Disposable {
     private _messageCounter = 0;
 
     constructor() {
-        this.repository = new ChatMessageRepository();
+		super();
+        this.repository = new Repository();
     }
 
     addMessage(chatMessage: RoomChatMessage): void {
-        this.repository?.add(chatMessage.id.toString(), chatMessage);
+        this.repository.add(chatMessage.id.toString(), chatMessage);
 
         EventManager.emit<RoomChatData>(UIEvents.ROOM_NEW_MESSAGE, {
             text: chatMessage.text,
@@ -37,9 +38,7 @@ export class ChatMessageService implements IDisposable {
         return this.repository.delete(id);
     }
 
-    dispose(): void {
-        throw new Error('Method not implemented');
-    }
+    dispose(): void {}
 
     checkCommand(message: string): boolean {
         if (message.startsWith(':')) {

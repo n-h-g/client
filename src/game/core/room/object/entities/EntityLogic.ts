@@ -12,12 +12,12 @@ import {RoomObjectLogic} from '../RoomObjectLogic';
 import {Entity} from './Entity';
 
 export abstract class EntityLogic extends RoomObjectLogic {
-    protected _entity: Entity;
+    protected entity: Entity;
     protected frameTracker = 0;
 
     constructor(entity: Entity) {
         super();
-        this._entity = entity;
+        this.entity = entity;
     }
 
     registerEvents(): void {
@@ -102,8 +102,4 @@ export abstract class EntityLogic extends RoomObjectLogic {
     abstract onPositionChanged(): void;
 
     abstract onLoad(): void;
-
-    get entity(): Entity {
-        return this._entity;
-    }
 }

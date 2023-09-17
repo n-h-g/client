@@ -1,31 +1,22 @@
-import {Container, DisplayObject, Resource, Texture} from 'pixi.js';
-import {IDisposable} from '../IDisposable';
-import {IRoomObjectSprite} from './IRoomObjectSprite';
+import {Container, Resource, Texture} from 'pixi.js';
 
-export class RoomObjectSprite implements IRoomObjectSprite {
+export class RoomObjectSprite {
     private _id: number;
-
     private _width: number;
     private _height: number;
     private _offsetX: number;
     private _offsetY: number;
-
     private _texture: Texture<Resource>;
-
     private _visible: boolean;
-
     private _clickable: boolean;
-
     private _alpha = 255;
-
-    protected _container: Container;
+    private _container: Container;
 
     constructor() {
         this._width = 0;
         this._height = 0;
         this._offsetX = 0;
         this._offsetY = 0;
-
         this._container = new Container();
     }
 

@@ -28,9 +28,7 @@ export class Pointer extends RoomObjectController<
     }
 
     getCanvas(): Container {
-        return (
-            this.room.Visualization as RoomVisualization
-        ).getCanvasPointer();
+        return this.room.visualization.getCanvasPointer();
     }
 
     getRoomLayout(): RoomLayout {

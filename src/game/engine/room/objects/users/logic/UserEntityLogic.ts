@@ -51,7 +51,7 @@ export class UserEntityLogic extends HumanLogic {
     onTalk(length?: number): void {
         setTimeout(
             () => {
-                const EntityVisualization = this._entity
+                const EntityVisualization = this.entity
                     .visualization as UserEntityVisualization;
                 EntityVisualization.addAction(ActionId.TALK);
                 EntityVisualization.needsUpdate = false;
@@ -79,6 +79,31 @@ export class UserEntityLogic extends HumanLogic {
         this._showLabel = !this._showLabel;
         this.toggleUI();
     }
+
+    onPositionChanged() {}
+
+    onLoad(): void {
+        this._showLabel = false;
+    }
+
+    onClick() {
+        const roomId = Engine.getInstance().roomService?.CurrentRoom?.id;
+        const x = this.entity.position.x;
+        const y = this.entity.position.y;
+
+        Engine.getInstance().networkingManager?.packetManager.applyOut(
+            OutgoingPacket.UserLookAtPoint,
+            {
+                roomId: roomId,
+                x: x,
+                y: y,
+            }
+        );
+
+        super.onClick();
+    }
+
+    figureChanged() {}
 
     private toggleUI() {
         if (Engine.getInstance().config.offlineMode) return;
@@ -120,29 +145,4 @@ export class UserEntityLogic extends HumanLogic {
             }
         );
     }
-
-    onPositionChanged() {}
-
-    onLoad(): void {
-        this._showLabel = false;
-    }
-
-    onClick() {
-        const roomId = Engine.getInstance().roomService?.CurrentRoom?.id;
-        const x = this.entity.position.x;
-        const y = this.entity.position.y;
-
-        Engine.getInstance().networkingManager?.packetManager.applyOut(
-            OutgoingPacket.UserLookAtPoint,
-            {
-                roomId: roomId,
-                x: x,
-                y: y,
-            }
-        );
-
-        super.onClick();
-    }
-
-    figureChanged() {}
 }

@@ -4,30 +4,29 @@ import {WallItem} from '../../../../engine/room/objects/items/WallItem';
 import {UserEntity} from '../../../../engine/room/objects/users/UserEntity';
 import {FurnidataItemType} from '../../../../engine/ui/imagers/items/enum/FurniDataItemType';
 import {Point3d} from '../../../../utils/point/Point3d';
-import {IAspectComponent} from './components/IAspectComponent';
-import {IHeadBodyRotationComponent} from './components/IHeadBodyRotation';
-import {IPositionComponent} from './components/IPositionComponent';
-import {IUserComponent} from './components/IUserComponent';
+import {AspectComponent} from './components/AspectComponent';
+import {HeadBodyRotationComponent} from './components/HeadBodyRotation';
+import {PositionComponent} from './components/PositionComponent';
+import {UserComponent} from './components/UserComponent';
 import {Entity} from './Entity';
 import {EntityType} from './EntityType';
 
 export class EntityBuilder {
-    _entity: Entity;
     private _id: string;
     private _name: string;
     private _type: EntityType;
-    private _position: IPositionComponent;
+    private _position: PositionComponent;
     private _bodyRotation?: number;
     private _headRotation?: number;
-    private _user?: IUserComponent;
-    private _figure?: IAspectComponent;
+    private _user?: UserComponent;
+    private _figure?: AspectComponent;
 
     setId(id: string) {
         this._id = id;
         return this;
     }
 
-    setFigure(figure: IAspectComponent) {
+    setFigure(figure: AspectComponent) {
         this._figure = figure;
         return this;
     }
@@ -37,18 +36,17 @@ export class EntityBuilder {
         return this;
     }
 
-    setUser(user: IUserComponent) {
+    setUser(user: UserComponent) {
         this._user = user;
-        this._entity = new UserEntity();
         return this;
     }
 
-    setPosition(position: IPositionComponent) {
+    setPosition(position: PositionComponent) {
         this._position = position;
         return this;
     }
 
-    setHeadBodyRotation(headBodyRotation: IHeadBodyRotationComponent) {
+    setHeadBodyRotation(headBodyRotation: HeadBodyRotationComponent) {
         if (headBodyRotation) {
             this._bodyRotation = headBodyRotation.body_rot;
             this._headRotation = headBodyRotation.head_rot;
@@ -60,6 +58,11 @@ export class EntityBuilder {
     setName(name: string) {
         this._name = name;
         return this;
+    }
+
+    async build() {
+        const entity = await this.getEntityInstance();
+        return entity;
     }
 
     private async getEntityInstance() {
@@ -78,7 +81,7 @@ export class EntityBuilder {
                 );
                 entity.position = position;
             } else {
-                // return new BotVisualization()
+                
             }
         } else if (this._type == EntityType.ITEM) {
             const base =
@@ -93,11 +96,6 @@ export class EntityBuilder {
             }
         }
 
-        return entity;
-    }
-
-    async build() {
-        const entity = await this.getEntityInstance();
         return entity;
     }
 }

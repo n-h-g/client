@@ -7,9 +7,8 @@ import {TilingSprite, ObservablePoint, Texture, Point, Graphics} from 'pixi.js';
 import {RoomObjectController} from '../../../../../core/room/object/RoomObjectController';
 import {RoomPlane} from '../RoomPlane';
 import {TileType} from '../TileTypeEnum';
-import {IRoomMapObject} from '../../../../../core/room/object/map/IRoomMapObject';
-
 import ImagePatterBase from '../../../../../../assets/images/room/content/floor_texture_64_2_floor_basic.png';
+import { RoomMapObject } from '../../../../../core/room/object/map/RoomMapObject';
 
 export class VisualizationPlane extends RoomObjectVisualization {
     private plane: RoomPlane;
@@ -29,9 +28,8 @@ export class VisualizationPlane extends RoomObjectVisualization {
     render(): void {
         this.getCanvasImageSource().then((img: HTMLImageElement) => {
             this.plane.mapObjects.forEach(obj => {
-                if (obj instanceof RoomObjectController) {
+                if (obj instanceof RoomObjectController)
                     obj.visualization?.render();
-                }
             });
 
             this.applyTexture(img);
@@ -39,7 +37,7 @@ export class VisualizationPlane extends RoomObjectVisualization {
     }
 
     private getCanvas() {
-        const roomV = this.plane.room.Visualization as RoomVisualization;
+        const roomV = this.plane.room.visualization;
 
         switch (this.plane.type) {
             case RoomPlaneType.Floor:
@@ -63,7 +61,7 @@ export class VisualizationPlane extends RoomObjectVisualization {
         });
     }
 
-    private async applyTexture(img) {
+    private async applyTexture(img: HTMLImageElement) {
         const ctx = new Graphics();
         const container = this.getCanvas();
 
@@ -164,7 +162,7 @@ export class VisualizationPlane extends RoomObjectVisualization {
 
             this.plane.room
                 .getFloorPlane()
-                .mapObjects.forEach((mapObject: IRoomMapObject) => {
+                .mapObjects.forEach((mapObject: RoomMapObject) => {
                     if (mapObject instanceof Tile) {
                         if ((mapObject as Tile).type == TileType.Hole) return;
 

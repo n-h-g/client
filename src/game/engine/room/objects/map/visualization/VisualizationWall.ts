@@ -10,9 +10,9 @@ import {Wall} from '../Wall';
 import {RoomPriority} from '../../../visualization/RoomPriority';
 
 export class VisualizationWall extends RoomObjectVisualization {
+	wallCtx: Graphics;
+    wallContext: Container;
     private wall: Wall;
-    private wallContext: Container;
-    private wallCtx: Graphics;
     private doorContext: Container;
     private color: ColorRGB = ColorRGB.getColorFromNumber(
         RoomVisualizationColorData.WALL_COLOR
@@ -27,7 +27,7 @@ export class VisualizationWall extends RoomObjectVisualization {
 
         this.wall = wall;
 
-        const roomV = wall.plane.room.Visualization;
+        const roomV = wall.plane.room.visualization;
         this.wallContext = roomV.getCanvasWall();
         this.doorContext = roomV.getCanvasDoorWall();
         this.wallCtx = null;
@@ -37,6 +37,10 @@ export class VisualizationWall extends RoomObjectVisualization {
 
     getZIndex(): number {
         return RoomPriority.WALL;
+    }
+
+    render(): void {
+        this.checkAndDraw();
     }
 
     //TODO SET WALL OFFSET
@@ -64,16 +68,12 @@ export class VisualizationWall extends RoomObjectVisualization {
         return 1 * position.x + 1 * position.y + 1 * position.z;
     }
 
-    render(): void {
-        this.checkAndDraw();
-    }
-
     private checkAndDraw() {
         if (this.wallContext == null || this.doorContext == null) {
             return;
         }
 
-        switch (this.wall.getType()) {
+        switch (this.wall.type) {
             default:
                 return;
 
@@ -115,7 +115,7 @@ export class VisualizationWall extends RoomObjectVisualization {
             NormalType.DARK
         ).toHex();
 
-        const fullHeightTick = this.wall.plane.room.HasFullHeightTick
+        const fullHeightTick = this.wall.plane.room.hasFullHeightTick
             ? MapData.thickSpace *
               MapData.stepHeight *
               this.wall.position.z
@@ -123,7 +123,7 @@ export class VisualizationWall extends RoomObjectVisualization {
 
         ctx.beginFill(wallTop); // top
 
-        if (this.wall.isCorner()) {
+        if (this.wall.corner) {
             ctx.moveTo(this.offsetX, this.offsetY + MapData.wallBlankTop);
 
             ctx.lineTo(
@@ -161,7 +161,7 @@ export class VisualizationWall extends RoomObjectVisualization {
         if (drawDepth) {
             ctx.beginFill(isLeft ? wallRight : wallLeft); // depth right
             //console.log(this.wall.plane.room.getMapSizeX())
-            const last: boolean = this.wall.isLast();
+            const last: boolean = this.wall.last;
 
             if (!last) {
                 ctx.endFill();
@@ -294,7 +294,7 @@ export class VisualizationWall extends RoomObjectVisualization {
         ctx.beginFill(wallTop); // top
         ctx.moveTo(this.offsetX, this.offsetY + MapData.wallBlankTop);
 
-        if (this.wall.isCorner()) {
+        if (this.wall.corner) {
             ctx.lineTo(
                 this.offsetX +
                     (isLeft ? 0 : MapData.wallDepth - MapData.wallDepth),
@@ -331,13 +331,5 @@ export class VisualizationWall extends RoomObjectVisualization {
         return container;
         //todo draw wall ?
         //    this.drawWall(ctx, isLeft, false)
-    }
-
-    get WallContext(): Container {
-        return this.wallContext;
-    }
-
-    getWallCtx(): Graphics | null {
-        return this.wallCtx;
     }
 }

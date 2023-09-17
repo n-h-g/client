@@ -8,13 +8,12 @@ import {UIComponent} from '../ui/components/UIComponent';
 import {IComponentShowableUI} from '../../core/ui/IComponentShowableUI';
 import {UIEvents} from '../events/ui/UIEvents';
 import {Service} from '../../core/Service';
-import {IDisposable} from '../../core/room/IDisposable';
+import {Disposable} from '../../core/room/Disposable';
 import {EnterRoomUIEventData} from '../events/ui/data/room/EnterRoomUIEventData';
-import {OutgoingPacket} from '../../networking/packets/outgoing/OutgoingPacket';
 
 export class RoomService
     extends Service<null, null>
-    implements IDisposable
+    implements Disposable
 {
     private _currentRoom: Room;
 
@@ -37,10 +36,10 @@ export class RoomService
             roomId,
             authorName
         );
-        this._currentRoom.roomLayout.Visualization.render();
-        this._currentRoom.roomLayout.Logic.registerEvents();
+        this._currentRoom.roomLayout.visualization.render();
+        this._currentRoom.roomLayout.logic.registerEvents();
         Engine.getInstance()?.application?.viewport.addChild(
-            this._currentRoom.roomLayout.Visualization.container
+            this._currentRoom.roomLayout.visualization.container
         );
         this.toggleUI();
         return this._currentRoom;
@@ -87,9 +86,9 @@ export class RoomService
             enabled: true,
         });
         EventManager.emit<EnterRoomUIEventData>(UIEvents.ENTER_ROOM_INFO, {
-            name: this.CurrentRoom.getRoomInfo().roomName,
-            description: this.CurrentRoom.getRoomInfo().description,
-            owner: this.CurrentRoom.getRoomInfo().authorName ?? '',
+            name: this.CurrentRoom.roomInfo.roomName,
+            description: this.CurrentRoom.roomInfo.description,
+            owner: this.CurrentRoom.roomInfo.authorName ?? '',
             haveRights: true,
         });
     }
@@ -101,12 +100,12 @@ export class RoomService
 
         this.toggleUI();
 
-        this._currentRoom.roomLayout.Visualization.dispose();
+        this._currentRoom.roomLayout.visualization.dispose();
         this._currentRoom = null;
     }
 
     tick(delta: number): void {
-        this._currentRoom?.roomLayout.Logic.tick(delta);
+        this._currentRoom?.roomLayout.logic.tick(delta);
         this._currentRoom?.roomEntityRepository.tick(delta);
     }
 

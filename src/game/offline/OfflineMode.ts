@@ -56,7 +56,7 @@ export class OfflineMode {
                 'prova',
                 'hd-615-18.ch-822-79.lg-710-81.sh-905-108.ha-1002-96.wa-2001-'
             );
-            this._entity.visualization.Rot = Direction.WEST;
+            this._entity.visualization.direction = Direction.WEST;
             this._entity.position =
                 OfflineMode.NUMBER_OF_USERS == 1
                     ? new Point3d(
@@ -117,7 +117,7 @@ export class OfflineMode {
 
         this._entity.visualization.setNextPosition(point);
 
-        this._entity.visualization.Rot = Rotation.calculateDirection(
+        this._entity.visualization.direction = Rotation.calculateDirection(
             new Point(
                 this._entity.position.x,
                 this._entity.position.y

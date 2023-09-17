@@ -11,7 +11,7 @@ export class ZoomCommand extends Command {
         let scale = parseInt(args[0]);
         const currentRoom = Engine.getInstance().roomService!.CurrentRoom;
         const RoomVisualization = currentRoom!.roomLayout
-            .Visualization as RoomVisualization;
+            .visualization;
 
         scale = scale == 0 ? 1 : scale;
         RoomVisualization.zoom(scale);

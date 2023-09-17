@@ -7,22 +7,21 @@ import {EntityEvents} from '../../../../engine/events/room/objects/entities/Enti
 import {Engine} from '../../../../Engine';
 
 export abstract class EntityVisualization extends RoomObjectVisualization {
-    _entity: Entity;
-
-    protected rotation: Direction = Direction.SOUTH;
-    private _nextPosition: Point3d;
+    entity: Entity;
     frame = 0;
+	direction: Direction = Direction.SOUTH;
+    protected nextPosition: Point3d;
 
     constructor(entity: Entity) {
         super(0, 0, 0);
-        this._entity = entity;
-        this._nextPosition = new Point3d(0, 0, 0);
+        this.entity = entity;
+        this.nextPosition = new Point3d(0, 0, 0);
     }
 
     setNextPosition(point: Point3d) {
-        this._nextPosition.x = point.x;
-        this._nextPosition.y = point.y;
-        this._nextPosition.z = point.z;
+        this.nextPosition.x = point.x;
+        this.nextPosition.y = point.y;
+        this.nextPosition.z = point.z;
         this.entity.logic.events.emit(EntityEvents.POSITION_CHANGED);
         this.updatePosition();
     }
@@ -30,80 +29,64 @@ export abstract class EntityVisualization extends RoomObjectVisualization {
     move(delta: number): void {
         delta = delta / 1000;
 
-        if (this._entity.position.x < this._nextPosition.x) {
-            this._entity.position.x =
-                this._entity.position.x +
+        if (this.entity.position.x < this.nextPosition.x) {
+            this.entity.position.x =
+                this.entity.position.x +
                     delta * AvatarData.AVATAR_WALK_SPEED;
-            if (this._entity.position.x > this._nextPosition.x) {
-                //this.isWalking = false
-                this._entity.position.x = this._nextPosition.x;
+            if (this.entity.position.x > this.nextPosition.x) {
+                this.entity.position.x = this.nextPosition.x;
             }
-        } else if (this._entity.position.x > this._nextPosition.x) {
-            this._entity.position.x = 
-                this._entity.position.x -
+        } else if (this.entity.position.x > this.nextPosition.x) {
+            this.entity.position.x = 
+                this.entity.position.x -
                     delta * AvatarData.AVATAR_WALK_SPEED;
-            if (this._entity.position.x < this._nextPosition.x) {
-                //this.isWalking = false
-                this._entity.position.x = this._nextPosition.x;
+            if (this.entity.position.x < this.nextPosition.x) {
+                this.entity.position.x = this.nextPosition.x;
             }
         }
 
-        if (this._entity.position.y < this._nextPosition.y) {
-            this._entity.position.y = this._entity.position.y + delta * AvatarData.AVATAR_WALK_SPEED;
+        if (this.entity.position.y < this.nextPosition.y) {
+            this.entity.position.y = this.entity.position.y + delta * AvatarData.AVATAR_WALK_SPEED;
 
-            if (this._entity.position.y > this._nextPosition.y) {
-                //this.isWalking = false
-                this._entity.position.y = this._nextPosition.y;
+            if (this.entity.position.y > this.nextPosition.y) {
+                this.entity.position.y = this.nextPosition.y;
             }
-        } else if (this._entity.position.y > this._nextPosition.y) {
-            this._entity.position.y = this._entity.position.y - delta * AvatarData.AVATAR_WALK_SPEED;
+        } else if (this.entity.position.y > this.nextPosition.y) {
+            this.entity.position.y = this.entity.position.y - delta * AvatarData.AVATAR_WALK_SPEED;
 
-            if (this._entity.position.y < this._nextPosition.y) {
-                //this.isWalking = false
-                this._entity.position.y = this._nextPosition.y;
+            if (this.entity.position.y < this.nextPosition.y) {
+                this.entity.position.y = this.nextPosition.y;
             }
         }
 
-        if (this._nextPosition.z > this._entity.position.z) {
-            this._entity.position.z = 
-                this._entity.position.z +
+        if (this.nextPosition.z > this.entity.position.z) {
+            this.entity.position.z = 
+                this.entity.position.z +
                     (Math.abs(this.entity.position.z - this.nextPosition.z) > 1.5
                         ? 9.8
                         : AvatarData.AVATAR_WALK_SPEED) *
                         delta;
 
-            if (this._entity.position.z > this._nextPosition.z) {
-                this._entity.position.z = this._nextPosition.z;
+            if (this.entity.position.z > this.nextPosition.z) {
+                this.entity.position.z = this.nextPosition.z;
             }
-        } else if (this.nextPosition.z < this._entity.position.z) {
-            this._entity.position.z = 
-                this._entity.position.z -
+        } else if (this.nextPosition.z < this.entity.position.z) {
+            this.entity.position.z = 
+                this.entity.position.z -
                     (Math.abs(
-                        this._entity.position.z - this._nextPosition.z
+                        this.entity.position.z - this.nextPosition.z
                     ) > 1.5
                         ? 9.8
                         : AvatarData.AVATAR_WALK_SPEED) *
                         delta;
 
-            if (this._entity.position.z < this._nextPosition.z) {
-                this._entity.position.z = this._nextPosition.z;
+            if (this.entity.position.z < this.nextPosition.z) {
+                this.entity.position.z = this.nextPosition.z;
             }
         }
 
         this.updatePosition();
     }
-
-    abstract draw(): void;
-
-    abstract nextFrame(): void;
-
-    abstract calculateOffsetX(): number;
-
-    abstract calculateOffsetY(): number;
-
-    abstract updateRotation(rotation: number): void;
-
-    abstract getZIndex(): number;
 
     updatePosition() {
         if (!this.container) return;
@@ -117,30 +100,22 @@ export abstract class EntityVisualization extends RoomObjectVisualization {
 
         this.entity.logic.events.emit(EntityEvents.POSITION_CHANGED);
 
-        Engine.getInstance().roomService.CurrentRoom.roomLayout.Visualization.container.sortChildren();
+        Engine.getInstance().roomService.CurrentRoom.roomLayout.visualization.container.sortChildren();
     }
 
     dispose(): void {
         super.dispose();
     }
 
-    set direction(direction: Direction) {
-        this.rotation = direction;
-    }
+    abstract draw(): void;
 
-    get entity(): Entity {
-        return this._entity;
-    }
+    abstract nextFrame(): void;
 
-    set Rot(direction: Direction) {
-        this.rotation = direction;
-    }
+    abstract calculateOffsetX(): number;
 
-    get nextPosition(): Point3d {
-        return this._nextPosition;
-    }
+    abstract calculateOffsetY(): number;
 
-    set nextPosition(point: Point3d) {
-        this.nextPosition = point;
-    }
+    abstract updateRotation(rotation: number): void;
+
+    abstract getZIndex(): number;
 }

@@ -1,4 +1,4 @@
-import {IEntityData} from '../../../../../core/communication/incoming/rooms/entities/IEntityData';
+import {EntityData} from '../../../../../core/communication/incoming/rooms/entities/EntityData';
 import {Entity} from '../../../../../core/room/object/entities/Entity';
 import {EntityBuilder} from '../../../../../core/room/object/entities/EntityBuilder';
 import {Engine} from '../../../../../Engine';
@@ -7,7 +7,7 @@ import {MessageHandler} from '../../../../handler/MessageHandler';
 export class LoadRoomEntities extends MessageHandler {
     handle(): void {
         for (const entityData of this.message.data) {
-            const data: IEntityData = entityData;
+            const data: EntityData = entityData;
 
             if (
                 Engine.getInstance()?.roomService?.CurrentRoom?.roomEntityRepository?.get(

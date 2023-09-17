@@ -7,9 +7,9 @@ import {ColorRGB} from '../../../../utils/color/ColorRGB';
 import {FloorPlane} from './FloorPlane';
 
 export class Tile extends RoomObjectController<VisualizationTile, LogicTile> {
-    private _type: TileType;
-    private _color: ColorRGB;
-    private _plane: FloorPlane;
+    type: TileType;
+    color: ColorRGB;
+    plane: FloorPlane;
 
     constructor(
         plane: FloorPlane,
@@ -20,27 +20,11 @@ export class Tile extends RoomObjectController<VisualizationTile, LogicTile> {
     ) {
         super(id);
 
-        this._plane = plane;
-        this._type = type;
-        this._color = color;
+        this.plane = plane;
+        this.type = type;
+        this.color = color;
         this.position = position;
         this.visualization = new VisualizationTile(this);
         this.logic = new LogicTile(this);
-    }
-
-    get color(): ColorRGB {
-        return this._color;
-    }
-
-    get type(): TileType {
-        return this._type;
-    }
-
-    get plane(): FloorPlane {
-        return this._plane;
-    }
-
-    set type(type: TileType) {
-        this._type = type;
     }
 }

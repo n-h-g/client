@@ -1,4 +1,4 @@
-export interface IRoomMessageData {
+export interface RoomMessageData {
     authorId: string;
     text: string;
 }

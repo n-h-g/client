@@ -4,7 +4,6 @@ import {HumanVisualization} from '../../../../../core/room/object/human/visualiz
 export class UserEntityVisualization extends HumanVisualization {
     constructor(entity: UserEntity) {
         super(entity);
-        this._actions = new Set();
     }
 
     updateRotation() {

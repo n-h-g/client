@@ -16,7 +16,7 @@
   "lookResource": "https://sharasy.com:2096/gamedata/character/avatar.php",
   "itemsUrl": "https://sharasy.com:2096/gamedata/items",
   "proxyUrl": "",
-  "roomResourcesUrl":"http://localhost/assets/room",
+  "roomResourcesUrl": "http://localhost/assets/room",
   "avatarFigurePath": "http://localhost/assets/figures",
   "avatarGameDataPath": "http://localhost/assets/gamedata/json",
   "itemsResourcesUrl": "http://localhost/assets/furniture/",

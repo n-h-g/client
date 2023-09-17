@@ -1,11 +1,11 @@
 import EventEmitter from 'eventemitter3';
-import {IDisposable} from '../IDisposable';
+import {Disposable} from '../Disposable';
 
-export abstract class RoomObjectLogic implements IDisposable {
-    private _events: EventEmitter;
+export abstract class RoomObjectLogic implements Disposable {
+    events: EventEmitter;
 
     constructor() {
-        this._events = new EventEmitter();
+        this.events = new EventEmitter();
     }
 
     abstract dispose(): void;
@@ -17,8 +17,4 @@ export abstract class RoomObjectLogic implements IDisposable {
     abstract onClick(): void;
 
     abstract onHover?(): void;
-
-    get events(): EventEmitter {
-        return this._events;
-    }
 }
