@@ -1,6 +1,5 @@
 import {RoomObjectVisualization} from '../../../../../core/room/object/RoomObjectVisualization';
 import {RoomPlaneType} from '../RoomPlaneTypeEnum';
-import {RoomVisualization} from '../../../visualization/RoomVisualization';
 import {MapData} from '../MapData';
 import {Tile} from '../Tile';
 import {TilingSprite, ObservablePoint, Texture, Point, Graphics} from 'pixi.js';
@@ -10,7 +9,7 @@ import {TileType} from '../TileTypeEnum';
 import ImagePatterBase from '../../../../../../assets/images/room/content/floor_texture_64_2_floor_basic.png';
 import { RoomMapObject } from '../../../../../core/room/object/map/RoomMapObject';
 
-export class VisualizationPlane extends RoomObjectVisualization {
+export class PlaneVisualization extends RoomObjectVisualization {
     private plane: RoomPlane;
     private imgPattern: HTMLImageElement;
     private useTexture = false;

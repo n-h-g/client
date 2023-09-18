@@ -1,7 +1,7 @@
 import {Wall} from '../Wall';
 import {RoomObjectLogic} from '../../../../../core/room/object/RoomObjectLogic';
 
-export class LogicWall extends RoomObjectLogic {
+export class WallLogic extends RoomObjectLogic {
     private wall: Wall;
 
     constructor(wall: Wall) {

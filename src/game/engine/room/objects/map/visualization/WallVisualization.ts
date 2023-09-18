@@ -1,7 +1,7 @@
 import {RoomObjectVisualization} from '../../../../../core/room/object/RoomObjectVisualization';
 import {MapData} from '../MapData';
 import {WallType} from '../WallTypeEnum';
-import {Point3d} from '../../.././../../utils/point/Point3d';
+import {Point3d} from '../../../../../utils/point/Point3d';
 import {ColorRGB} from '../../../../../utils/color/ColorRGB';
 import {NormalType} from '../../../visualization/NormalTypeEnum';
 import {RoomVisualizationColorData} from '../../../visualization/RoomVisualizationColorData';
@@ -9,7 +9,7 @@ import {Container, Graphics} from 'pixi.js';
 import {Wall} from '../Wall';
 import {RoomPriority} from '../../../visualization/RoomPriority';
 
-export class VisualizationWall extends RoomObjectVisualization {
+export class WallVisualization extends RoomObjectVisualization {
 	wallCtx: Graphics;
     wallContext: Container;
     private wall: Wall;
@@ -20,9 +20,9 @@ export class VisualizationWall extends RoomObjectVisualization {
 
     constructor(wall: Wall) {
         super(
-            VisualizationWall.calculateOffsetX(wall.position),
-            VisualizationWall.calculateOffsetY(wall.position),
-            VisualizationWall.calculateZIndex(wall.position)
+            WallVisualization.calculateOffsetX(wall.position),
+            WallVisualization.calculateOffsetY(wall.position),
+            WallVisualization.calculateZIndex(wall.position)
         );
 
         this.wall = wall;

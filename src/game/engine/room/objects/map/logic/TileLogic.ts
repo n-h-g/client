@@ -1,6 +1,6 @@
 import {MapData} from '../MapData';
 import {TileType} from '../TileTypeEnum';
-import {Container, Texture} from 'pixi.js';
+import {Container} from 'pixi.js';
 import {Engine} from '../../../../../Engine';
 import {OutgoingPacket} from '../../../../../networking/packets/outgoing/OutgoingPacket';
 import {RoomObjectLogic} from '../../../../../core/room/object/RoomObjectLogic';
@@ -8,9 +8,9 @@ import {Tile} from '../Tile';
 import {OfflineMode} from '../../../../../offline/OfflineMode';
 import {RoomPriority} from '../../../visualization/RoomPriority';
 import {RoomVisualization} from '../../../visualization/RoomVisualization';
-import {LogicPointer} from './LogicPointer';
+import {PointerLogic} from './PointerLogic';
 
-export class LogicTile extends RoomObjectLogic {
+export class TileLogic extends RoomObjectLogic {
     private tile: Tile;
     private hitContext: CanvasRenderingContext2D | null;
 
@@ -82,7 +82,7 @@ export class LogicTile extends RoomObjectLogic {
                 isDoor ? RoomPriority.DOOR_FLOOR_SELECT : RoomPriority.POINTER
             );
         (
-            this.tile.plane.room.getPointer().logic as LogicPointer
+            this.tile.plane.room.getPointer().logic as PointerLogic
         ).togglePointer();
         this.tile.plane.room
             .getPointer()

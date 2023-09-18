@@ -3,14 +3,14 @@ import {RoomObjectVisualization} from '../../../../../core/room/object/RoomObjec
 import {MapData} from '../MapData';
 import {RoomVisualizationColorData} from '../../../visualization/RoomVisualizationColorData';
 import {TileType} from '../TileTypeEnum';
-import {Point3d} from '../../.././../../utils/point/Point3d';
+import {Point3d} from '../../../../../utils/point/Point3d';
 import {ColorRGB} from '../../../../../utils/color/ColorRGB';
 import {NormalType} from '../../../visualization/NormalTypeEnum';
 import {Container, Graphics, ObservablePoint} from 'pixi.js';
 import {Tile} from '../Tile';
 import {RoomPriority} from '../../../visualization/RoomPriority';
 
-export class VisualizationTile extends RoomObjectVisualization {
+export class TileVisualization extends RoomObjectVisualization {
     private tile: Tile;
     private floorContext: Container;
     private doorContext: Container;
@@ -21,9 +21,9 @@ export class VisualizationTile extends RoomObjectVisualization {
 
     constructor(tile: Tile) {
         super(
-            VisualizationTile.calculateOffsetX(tile.position, tile.type),
-            VisualizationTile.calculateOffsetY(tile.position, tile.type),
-            VisualizationTile.calculateZIndex(tile.position, tile.type)
+            TileVisualization.calculateOffsetX(tile.position, tile.type),
+            TileVisualization.calculateOffsetY(tile.position, tile.type),
+            TileVisualization.calculateZIndex(tile.position, tile.type)
         );
 
         this.tile = tile;

@@ -2,7 +2,7 @@ import {RoomObjectLogic} from '../../../../../core/room/object/RoomObjectLogic';
 import {ColorRGB} from '../../../../../utils/color/ColorRGB';
 import {Pointer} from '../Pointer';
 
-export class LogicPointer extends RoomObjectLogic {
+export class PointerLogic extends RoomObjectLogic {
     private pointer: Pointer;
     private visible = false;
     private currentColor: ColorRGB = new ColorRGB(0, 0, 0);

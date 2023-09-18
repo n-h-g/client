@@ -1,12 +1,12 @@
-import {LogicTile} from './logic/LogicTile';
-import {VisualizationTile} from './visualization/VisualizationTile';
+import {TileLogic} from './logic/TileLogic';
+import {TileVisualization} from './visualization/TileVisualization';
 import {RoomObjectController} from '../../../../core/room/object/RoomObjectController';
 import {TileType} from './TileTypeEnum';
 import {Point3d} from '../../../../utils/point/Point3d';
 import {ColorRGB} from '../../../../utils/color/ColorRGB';
 import {FloorPlane} from './FloorPlane';
 
-export class Tile extends RoomObjectController<VisualizationTile, LogicTile> {
+export class Tile extends RoomObjectController<TileVisualization, TileLogic> {
     type: TileType;
     color: ColorRGB;
     plane: FloorPlane;
@@ -24,7 +24,7 @@ export class Tile extends RoomObjectController<VisualizationTile, LogicTile> {
         this.type = type;
         this.color = color;
         this.position = position;
-        this.visualization = new VisualizationTile(this);
-        this.logic = new LogicTile(this);
+        this.visualization = new TileVisualization(this);
+        this.logic = new TileLogic(this);
     }
 }

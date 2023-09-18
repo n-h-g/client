@@ -1,5 +1,5 @@
-import {LogicWall} from './logic/LogicWall';
-import {VisualizationWall} from './visualization/VisualizationWall';
+import {WallLogic} from './logic/WallLogic';
+import {WallVisualization} from './visualization/WallVisualization';
 import {WallType} from './/WallTypeEnum';
 import {Point3d} from '../../../../utils/point/Point3d';
 import {ColorRGB} from '../../../../utils/color/ColorRGB';
@@ -8,7 +8,7 @@ import {WallPlane} from './WallPlane';
 import { RoomMapObject } from '../../../../core/room/object/map/RoomMapObject';
 
 export class Wall
-    extends RoomObjectController<VisualizationWall, LogicWall>
+    extends RoomObjectController<WallVisualization, WallLogic>
     implements RoomMapObject
 {
     plane: WallPlane;
@@ -34,7 +34,7 @@ export class Wall
         this.corner = isCorner;
         this.last = isLast;
         this.position = position;
-        this.visualization = new VisualizationWall(this);
-        this.logic = new LogicWall(this);
+        this.visualization = new WallVisualization(this);
+        this.logic = new WallLogic(this);
     }
 }

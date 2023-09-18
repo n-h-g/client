@@ -1,6 +1,6 @@
 import {Point3d} from '../../../../utils/point/Point3d';
-import {VisualizationPointer} from './visualization/VisualizationPointer';
-import {LogicPointer} from './logic/LogicPointer';
+import {PointerVisualization} from './visualization/PointerVisualization';
+import {PointerLogic} from './logic/PointerLogic';
 import {RoomVisualization} from '../../visualization/RoomVisualization';
 import {MapData} from './MapData';
 import {RoomLayout} from '../../RoomLayout';
@@ -8,8 +8,8 @@ import {Container} from 'pixi.js';
 import {RoomObjectController} from '../../../../core/room/object/RoomObjectController';
 
 export class Pointer extends RoomObjectController<
-    VisualizationPointer,
-    LogicPointer
+    PointerVisualization,
+    PointerLogic
 > {
     private room: RoomLayout;
 
@@ -23,8 +23,8 @@ export class Pointer extends RoomObjectController<
         this.getCanvas().height = MapData.tileHeight;
 
         this.position = new Point3d(0, 0, 0);
-        this.visualization = new VisualizationPointer(this);
-        this.logic = new LogicPointer(this);
+        this.visualization = new PointerVisualization(this);
+        this.logic = new PointerLogic(this);
     }
 
     getCanvas(): Container {

@@ -5,7 +5,7 @@ import {ColorRGB} from '../../../../../utils/color/ColorRGB';
 import {Container, Graphics, Point} from 'pixi.js';
 import {Tile} from '../Tile';
 
-export class VisualizationPointer extends RoomObjectVisualization {
+export class PointerVisualization extends RoomObjectVisualization {
     private pointerWidth = 3;
     private pointerContext: Container;
     private pointerColor: ColorRGB = new ColorRGB(255, 255, 255);
