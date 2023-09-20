@@ -13,7 +13,7 @@ import { UIEvents } from "../../../game/engine/events/ui/UIEvents";
 
 const typing = ref(false)
 const label = ref("")
-const showLabel = ref(false)
+const showLabel = ref(true)
 const bounds = ref({
     x: 0,
     y: 0, 
