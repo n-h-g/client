@@ -91,11 +91,11 @@ function saveRights() {
 }
 
 function saveRoomInfo(deleteRoom = false) {
-    if (Engine.getInstance().roomService.CurrentRoom == null)
+    if (Engine.getInstance().roomService.currentRoom == null)
         return;
 
     let message = {
-        id: Engine.getInstance().roomService.CurrentRoom.getRoomId(),
+        id: Engine.getInstance().roomService.currentRoom.id,
         name: this.roomName,
         desc: this.roomDesc,
         maxUsers: this.roomMaxUsers,
