@@ -13,6 +13,7 @@ import {LoadRoomEntities} from './incoming/rooms/entities/LoadRoomEntities';
 import {NewRoomMessage} from './incoming/rooms/entities/NewRoomMessage';
 import {RemoveEntity} from './incoming/rooms/entities/RemoveEntity';
 import {UpdateEntity} from './incoming/rooms/entities/UpdateEntity';
+import { ReceiveRoomId } from './incoming/rooms/ReceiveRoomId';
 import {UpdateRoomData} from './incoming/rooms/UpdateRoomData';
 import {UserTypingStatus} from './incoming/rooms/users/UserTypingStatus';
 import {UpdateUserInformation} from './incoming/users/UpdateUserInformation';
@@ -30,6 +31,7 @@ export class PacketManager {
         const incomingPacketsHeader: any = {
             1: new LoginResponse(),
             2: new PongResponse(),
+            18: new LoadInventoryItems(),
             101: new AllRoomsList(),
             102: new MyRoomsList(),
             200: new UpdateRoomData(),
@@ -39,11 +41,11 @@ export class PacketManager {
             205: new RemoveEntity(),
             206: new NewRoomMessage(),
             207: new UserTypingStatus(),
+			208: new ReceiveRoomId(),
             400: new UpdateUserInformation(),
             401: new LoadInventoryItems(),
             800: new CataloguePages(),
-            801: new CataloguePage(),
-            18: new LoadInventoryItems(),
+            801: new CataloguePage()
         };
 
         Object.keys(incomingPacketsHeader).forEach(index => {
