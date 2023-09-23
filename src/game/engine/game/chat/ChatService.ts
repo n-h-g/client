@@ -70,15 +70,17 @@ export class ChatMessageService extends Service<string, Message> implements Disp
         whisper = false,
         whisperId = -1
     ): void {
-		Engine.getInstance().networkingManager?.packetManager?.applyOut(
-			OutgoingPacket.UserSay,
-			{
-				text: message,
-				shout: shout,
-				whisper,
-				whisperId,
-			}
-		);
+		if (!this.checkCommand(message)) {
+			Engine.getInstance().networkingManager?.packetManager?.applyOut(
+				OutgoingPacket.UserSay,
+				{
+					text: message,
+					shout: shout,
+					whisper,
+					whisperId,
+				}
+			);
+		}
     }
 
     getLastMessageId(): number {
