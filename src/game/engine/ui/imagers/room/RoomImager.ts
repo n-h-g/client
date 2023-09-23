@@ -4,6 +4,7 @@ import {UiUtils} from '../../../../utils/UiUtils';
 import {Room} from '../../../room/Room';
 import {RoomImagerBuilder} from './RoomImagerBuilder';
 import {Engine} from '../../../../Engine';
+import { RoomChatData } from '../../../events/ui/data/room/RoomChatData';
 
 export class RoomImager {
     private wrappedRoomImagerBuilder: RoomImagerBuilder;
@@ -23,7 +24,7 @@ export class RoomImager {
     }
 
     static getRoomPlaceHolder() {
-        return Engine.getInstance().roomService.generateSquareRoomModel(10);
+        return Engine.getInstance().roomService.generateSquareRoomModel(8);
     }
 
     /**
@@ -31,50 +32,45 @@ export class RoomImager {
      * @param room The room you want to generate the preview.
      * @returns
      */
-    async generateRoomPreview(room: Room): Promise<string> {
+    public async generateRoomPreview(room: Room): Promise<string> {
         //TODO REFACTOR THIS
         if (!room) return;
 
         const generatedRoom = this.wrappedRoomImagerBuilder.setRoom(room).build();
 
-        generatedRoom.roomLayout.visualization.render();
+       	generatedRoom.roomLayout.visualization.render();
 
-        const container = new Container();
+        return new Promise((resolve, reject) => {
+            setTimeout(async () => {
+                let renderingImage =
+					await UiUtils.generateImageFromObject(generatedRoom.roomLayout.visualization.container);
 
-        container.addChild(
-            generatedRoom.roomLayout.visualization.getCanvasFloor()
-        );
-        container.addChild(
-            generatedRoom.roomLayout.visualization.getCanvasWall()
-        );
-        container.addChild(
-            generatedRoom.roomLayout.visualization.getCanvasDoorWall()
-        );
-        //container.addChild(generatedRoom.roomLayout.Visualization.getCanvasDoorTile())
+                let texture = Texture.from(renderingImage);
 
-        const renderingImage = await UiUtils.generateBase64FromObject(
-            container
-        );
-        const texture = Texture.from(renderingImage);
-        const cropped = RenderingUtils.cropTexture(
-            texture,
-            container.height - RoomImager.ROOM_PREVIEW_HEIGHT,
-            container.width - RoomImager.ROOM_PREVIEW_WIDTH,
-            RoomImager.ROOM_PREVIEW_OFFSET_LEFT,
-            RoomImager.ROOM_PREVIEW_OFFSET_TOP
-        );
-        const preview = Sprite.from(cropped);
-        preview.scale.y = 1;
-        preview.scale.x = 1;
-        preview.anchor.x =
-            generatedRoom.roomLayout.getDoorPosition().x + 50;
-        preview.anchor.y =
-            generatedRoom.roomLayout.getDoorPosition().y + 50;
+                const cropped = RenderingUtils.cropTexture(
+					texture,
+					generatedRoom.roomLayout.visualization.container.height - RoomImager.ROOM_PREVIEW_HEIGHT,
+					generatedRoom.roomLayout.visualization.container.width - RoomImager.ROOM_PREVIEW_WIDTH,
+					RoomImager.ROOM_PREVIEW_OFFSET_LEFT,
+					RoomImager.ROOM_PREVIEW_OFFSET_TOP
+				);
 
-        const image = await UiUtils.generateBase64FromObject(preview);
-        console.log(image);
-        generatedRoom.dispose();
-        return image;
+                let preview = Sprite.from(cropped);
+
+                preview.scale.y = 1;
+                preview.scale.x = 1;
+
+                preview.anchor.x = generatedRoom.roomLayout.getDoorPosition().x + 50;
+                preview.anchor.y = generatedRoom.roomLayout.getDoorPosition().y + 50;
+
+                setTimeout(async () => {
+                    let image = await UiUtils.generateBase64FromObject(preview);
+
+                    resolve(image);
+                    generatedRoom.dispose();
+                }, 200)
+            }, 200)
+        })
     }
 
     private async loadPattern(pattern) {}

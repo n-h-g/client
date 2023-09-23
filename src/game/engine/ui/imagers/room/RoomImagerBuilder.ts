@@ -28,15 +28,15 @@ export class RoomImagerBuilder {
     setObject(
         object: RoomObjectController<RoomObjectVisualization, RoomObjectLogic>
     ) {
-        this.objects.push(object);
+	    this.objects.push(object);
         return this;
     }
 
     build() {
-        for (const object of this.objects) {
+		for (const object of this.objects) {
             object.visualization.render();
         }
-
+		
         return this.wrappedRoom;
     }
 }
