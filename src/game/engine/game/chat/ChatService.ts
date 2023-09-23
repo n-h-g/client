@@ -58,7 +58,7 @@ export class ChatMessageService extends Service<string, Message> implements Disp
                     commandService.repository?.get(splittedMessage);
                 commandClass?.handle(args);
             }
-            return true;
+            return false;
         }
 
         return false;
@@ -70,17 +70,15 @@ export class ChatMessageService extends Service<string, Message> implements Disp
         whisper = false,
         whisperId = -1
     ): void {
-        if (!this.checkCommand(message)) {
-            Engine.getInstance().networkingManager?.packetManager?.applyOut(
-                OutgoingPacket.UserSay,
-                {
-                    text: message,
-                    shout: shout,
-                    whisper,
-                    whisperId,
-                }
-            );
-        }
+		Engine.getInstance().networkingManager?.packetManager?.applyOut(
+			OutgoingPacket.UserSay,
+			{
+				text: message,
+				shout: shout,
+				whisper,
+				whisperId,
+			}
+		);
     }
 
     getLastMessageId(): number {

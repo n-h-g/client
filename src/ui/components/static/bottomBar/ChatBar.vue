@@ -1,7 +1,8 @@
 <template>
-    <div class="chatBar" :class="{hidden: !enabled}">
-      <input type="text" class="chatInput" autofocus :placeholder="placeHolder" v-model="message" @keydown="onInput()" @keyup.enter="sendMessage">
-    </div>
+	<div class="chatBar" :class="{ hidden: !enabled }">
+		<input type="text" class="chatInput" autofocus :placeholder="placeHolder" v-model="message" @keydown="onInput()"
+			@keyup.enter="sendMessage">
+	</div>
 </template>
 
 <script setup lang="ts">
@@ -18,35 +19,35 @@ let message = ref("")
 let enabled = ref(false)
 
 EventManager.read(UIEvents.ROOM_UI, (payload: RoomUIEventData) => {
-    enabled.value = payload.enabled
+	enabled.value = payload.enabled
 })
 
 function sendMessage(e) {
-    let shout = false
+	let shout = false
 
-    if (e.shiftKey)
-        shout = true
+	if (e.shiftKey)
+		shout = true
 
-    if(!Engine.getInstance().chatService.checkCommand(message.value)) {
-        Engine.getInstance().networkingManager.packetManager.applyOut(OutgoingPacket.UserSay, {
-            text: message.value,
-            shout: shout
-        })
-    }
+	if (!Engine.getInstance().chatService.checkCommand(message.value)) {
+		Engine.getInstance().networkingManager.packetManager.applyOut(OutgoingPacket.UserSay, {
+			text: message.value,
+			shout: shout
+		})
+	}
 
-    typed.value = false
-    message.value = ""
+	typed.value = false
+	message.value = ""
 }
 
 function onInput() {
-    let typing = true
+	let typing = true
 
-    if (message.value === "")
-        typing = false
+	if (message.value === "")
+		typing = false
 
-    Engine.getInstance().networkingManager.packetManager.applyOut(OutgoingPacket.UserTypeStatus, {
-        roomId: Engine.getInstance().roomService.CurrentRoom.id,
-        typing: typing
-    })
+	Engine.getInstance().networkingManager.packetManager.applyOut(OutgoingPacket.UserTypeStatus, {
+		roomId: Engine.getInstance().roomService.currentRoom.id,
+		typing: typing
+	})
 }
 </script>
