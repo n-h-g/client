@@ -50,11 +50,11 @@ export abstract class EntityLogic extends RoomObjectLogic {
                 )
             );
 
-        const pointer = tile.plane.room.getPointer();
+        const pointer = tile?.plane?.room?.getPointer();
 
         if (
-            pointer.position.x < tile.position.x &&
-            pointer.position.y < tile.position.y
+            pointer?.position?.x < tile?.position?.x &&
+            pointer?.position?.y < tile?.position?.y
         )
             return;
 
