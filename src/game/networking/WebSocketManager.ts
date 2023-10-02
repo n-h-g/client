@@ -15,9 +15,8 @@ export class WebSocketManager {
     constructor(networkingManager: NetworkingManager) {
         this.networkingManager = networkingManager;
 
-        if (Engine.getInstance()?.config.debug) {
-            Logger.debug('Connection url: ' + this.webSocketUrl);
-        }
+        if (Engine.getInstance()?.config.debug)
+            Logger.debug('Connecting to server: ' + this.webSocketUrl);
 
         this.webSocket = new WebSocket(this.webSocketUrl);
         this.setUpWebSocketEvents();
@@ -35,10 +34,9 @@ export class WebSocketManager {
     }
 
     private setUpWebSocketEvents(): void {
-        this.webSocket.onopen = event => {
-            if (Engine.getInstance().config.debug) {
+        this.webSocket.onopen = () => {
+            if (Engine.getInstance().config.debug)
                 Logger.debug('Connected');
-            }
 
             Engine.getInstance().networkingManager.packetManager.applyOut(
                 OutgoingPacket.PingRequest
@@ -47,12 +45,11 @@ export class WebSocketManager {
             this.wrappedClosed = false;
         };
 
-        this.webSocket.onerror = event => {
+        this.webSocket.onerror = () => {
             this.wrappedClosed = true;
 
             if (Engine.getInstance().config.debug) {
-                Logger.debug('Connection error - event details: ');
-                Logger.info(event.toString());
+                Logger.debug('Connection error');
             }
 
             EventManager.emit<LoadingProgressEventData>(UIEvents.LOAD, {
@@ -61,7 +58,7 @@ export class WebSocketManager {
             });
         };
 
-        this.webSocket.onclose = event => {
+        this.webSocket.onclose = () => {
             this.wrappedClosed = true;
             this.reconnectCounter = 0;
 
@@ -77,7 +74,6 @@ export class WebSocketManager {
                         this.setUpWebSocketEvents();
                     }
                 }, 2001);
-                setTimeout(() => {}, 4000);
             }
         };
 
@@ -94,7 +90,6 @@ export class WebSocketManager {
     }
 
     disconnect() {
-        Logger.info('Disconnected');
         this.networkingManager.packetManager.applyOut(
             OutgoingPacket.DisconnectMessage
         );
@@ -106,8 +101,7 @@ export class WebSocketManager {
     }
 
     sendData(message: any): void {
-        if (!this.wrappedClosed) {
+        if (!this.wrappedClosed)
             this.webSocket.send(JSON.stringify(message));
-        }
     }
 }

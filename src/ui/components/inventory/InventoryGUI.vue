@@ -102,7 +102,6 @@ const showAddAllItemsToTradeButton = ref(false)
 
 EventManager.read(UIEvents.INVENTORY_ITEMS_ADDED, (data: InventoryItemsEventData) => {
     for (let item of data.items) {
-
         if (item.item_type == ItemType.FLOOR_ITEM)
             floorItems.value.push(item)
         else
@@ -134,24 +133,15 @@ function getImagePreview(item: Item) {
 }
 
 function changeTab(tab: string) {
-    switch (tab) {
-        case 'floor':
-            this.currentTab = tab
-            break;
-        case 'wall':
-            this.currentTab = tab
-            break;
-    }
-
+	currentTab.value = tab;
     showPlaceItemButton.value = false
 }
 
 function selectItem(item: Item) {
     selectedItem.value = item
 
-    if (Engine.getInstance()?.roomService?.CurrentRoom != undefined) {
+    if (Engine.getInstance()?.roomService?.currentRoom != undefined)
         showPlaceItemButton.value = true
-    }
 }
 
 function deselectItem() {

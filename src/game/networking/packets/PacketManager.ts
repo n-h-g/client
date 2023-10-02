@@ -31,7 +31,6 @@ export class PacketManager {
         const incomingPacketsHeader: any = {
             1: new LoginResponse(),
             2: new PongResponse(),
-            18: new LoadInventoryItems(),
             101: new AllRoomsList(),
             102: new MyRoomsList(),
             200: new UpdateRoomData(),
@@ -54,50 +53,38 @@ export class PacketManager {
         });
     }
 
-    applyIn(packetHeader: number, packetBody: any): any {
-        const messageHandler: MessageHandler | undefined =
-            this.incomingPackets.get(packetHeader);
+    applyIn(packetHeader: number, packetBody: any): void {
+        const messageHandler: MessageHandler = this.incomingPackets.get(packetHeader);
 
-        if (messageHandler instanceof MessageHandler) {
-            if (Engine.getInstance().config.debug) {
-                Logger.debug(
-                    '%c[INCOMING] %c[' +
-                        packetHeader +
-                        '] %c(' +
-                        messageHandler.constructor.name +
-                        ') ',
-                    'color: purple',
-                    'color: DeepPink',
-                    'color: #777',
-                    packetBody
-                );
-            }
-            messageHandler.message = packetBody;
-            messageHandler.handle();
-        } else if (Engine.getInstance().config.debug) {
-            Logger.warning('Unknown packet ' + packetHeader, packetBody);
-        }
+		if (messageHandler == null) {
+			if (Engine.getInstance().config.debug)
+				Logger.warning('Unknown packet ' + packetHeader, packetBody);
+			return;
+		}
+
+        if (Engine.getInstance().config.debug)
+			Logger.debug(`%c[INCOMING] %c[${packetHeader}] %c(${messageHandler.constructor.name})`,
+					     'color: green',
+						 'color: red',
+						 'color: blue',
+						 packetBody);
+
+		messageHandler.message = packetBody;
+		messageHandler.handle();
     }
 
     applyOut(packetHeader: OutgoingPacket, packetBody: any = {}): void {
         if (Engine.getInstance().networkingManager?.webSocketManager?.closed)
             return;
 
-        if (Engine.getInstance().config.debug) {
-            Logger.debug(
-                '%c[OUTGOING] %c[' +
-                    packetHeader +
-                    '] %c(' +
-                    OutgoingPacket[packetHeader] +
-                    ')',
-                'color: green',
-                'color: #1493ff',
-                'color: #777',
-                packetBody
-            );
-        }
+        if (Engine.getInstance().config.debug)
+			Logger.debug(`%c[OUTGOING] %c[${packetHeader}] %c(${OutgoingPacket[packetHeader]})`,
+					     'color: red',
+						 'color: green',
+						 'color: blue',
+						 packetBody);
 
-        Engine.getInstance().networkingManager?.webSocketManager.sendData({
+        Engine.getInstance().networkingManager?.webSocketManager?.sendData({
             header: packetHeader,
             body: packetBody,
         });
