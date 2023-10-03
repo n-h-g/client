@@ -6,10 +6,12 @@ import {MessageHandler} from '../../../../handler/MessageHandler';
 
 export class UserTypingStatus extends MessageHandler {
     handle(): void {
-        const message = this.message as UserTypingData;
+        const message: UserTypingData = this.message;
+
+		if (!message) return;
 
         const entity =
-            Engine.getInstance().roomService.currentRoom.roomEntityRepository.get(
+            Engine.getInstance()?.roomService?.currentRoom?.roomEntityRepository?.get(
                 message.id
             );
 
