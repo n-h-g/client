@@ -7,13 +7,13 @@ import {MessageHandler} from '../../../handler/MessageHandler';
 
 export class MyRoomsList extends MessageHandler {
     handle() {
-        const rooms = this.message.data as NavigatorRoom[];
+        const rooms: NavigatorRoom[] = this.message.data;
 
         EventManager.emit<NavigatorRoomsEventData>(
             UIEvents.NAVIGATOR_ROOMS_ADDED,
             {
                 tab: NavigatorRoomType.MY,
-                rooms: rooms,
+                rooms: rooms
             }
         );
     }

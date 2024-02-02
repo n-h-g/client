@@ -20,8 +20,8 @@
 				<span class="title">{{ room.name }}</span>
 				<div class="icons_container">
 					<div class="usersNowRoom" :class="{
-						navigatorRoomFull: room.users_count >= room.maxUsers,
-						greenIcon: room.users_count > 0 && room.users_count < room.maxUsers,
+						navigatorRoomFull: room.users_count >= room.max_users,
+						greenIcon: room.users_count > 0 && room.users_count < room.max_users,
 					}">
 						{{ room.users_count }}
 					</div>
@@ -50,8 +50,9 @@ import { NavigatorRoomsEventData } from "../../../game/engine/events/ui/data/nav
 import { IComponentShowableUI } from '../../../game/core/ui/IComponentShowableUI'
 import { UIComponent } from '../../../game/engine/ui/components/UIComponent'
 import { EventManager } from "../../../game/core/events/EventManager"
+import { NavigatorRoom } from '../../../game/core/communication/incoming/navigator/NavigatorRoom'
 
-const rooms = ref([])
+const rooms = ref<NavigatorRoom[]>([])
 const currentTab = ref("public");
 
 EventManager.read(UIEvents.NAVIGATOR_ROOMS_ADDED, (event: NavigatorRoomsEventData) => {
