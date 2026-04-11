@@ -35,7 +35,7 @@ export abstract class ItemLogic extends EntityLogic implements MoveableLogic {
 
     onPositionChanged(): void {}
 
-    placeItem() {
+    /*placeItem() {
         Engine.getInstance().networkingManager?.packetManager.applyOut(
             OutgoingPacket.RoomPickupItemEvent,
             {
@@ -53,7 +53,7 @@ export abstract class ItemLogic extends EntityLogic implements MoveableLogic {
         );
 
         this.toggleMovement(false);
-    }
+    }*/
 
     onClick(): void {
         super.onClick();
@@ -89,7 +89,7 @@ export abstract class ItemLogic extends EntityLogic implements MoveableLogic {
         this.toggleMovement(false);
 
         Engine.getInstance()?.networkingManager?.packetManager?.applyOut(
-            OutgoingPacket.RoomMoveItemEvent,
+            OutgoingPacket.RoomPlaceItemEvent,
             {
                 id: this.entity.id,
                 name: this.entity.name,

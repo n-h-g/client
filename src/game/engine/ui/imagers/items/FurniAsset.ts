@@ -29,6 +29,6 @@ export class FurniAsset {
 
 
     isFlipped(): boolean {
-        return this.flipH == 1;
+        return this.flipH === 1;
     }
 }

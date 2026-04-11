@@ -37,6 +37,11 @@ export class FurniSpriteUtils {
     };
 
     static layerFromNumber(layer: number): string {
-        return String.fromCharCode(layer + 97); // a
+        if (layer === -1) {
+            return "sd";
+        }
+        
+        // Per i layer da 0 in poi (0 = a, 1 = b, 2 = c, ecc.)
+        return String.fromCharCode(layer + 97);
     }
 }

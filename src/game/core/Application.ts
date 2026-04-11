@@ -7,6 +7,7 @@ import {
     IApplicationOptions,
 } from 'pixi.js';
 import {Engine} from '../Engine';
+import { Entity } from './room/object/entities/Entity';
 
 export class ApplicationEngine extends Application<HTMLCanvasElement> {
     private engine: Engine;
@@ -29,6 +30,13 @@ export class ApplicationEngine extends Application<HTMLCanvasElement> {
         this.setUpViewport();
 
         this.engine = engine;
+
+        
+        if (import.meta.hot) {
+            import.meta.hot.dispose(() => {
+                this.destroy(true, { children: true, texture: true, baseTexture: true });
+            });
+        }
     }
 
     setUpViewport() {
@@ -80,26 +88,37 @@ export class ApplicationEngine extends Application<HTMLCanvasElement> {
 
     private setUpGameLoop(): void {
         const fpsInterval = 1000 / Engine.getInstance().config.fps;
-        this.lastFrameTime = Date.now();
+        this.lastFrameTime = performance.now();
 
         const gameLoop = () => {
-            window.requestAnimationFrame(gameLoop);
+            requestAnimationFrame(gameLoop);
 
-            const currentTime = Date.now();
-
+            const currentTime = performance.now();
             this.timeElapsed = currentTime - this.lastFrameTime;
 
-            if (this.lastFrameTime > fpsInterval) {
+            if (this.timeElapsed > fpsInterval) {
                 this.engine.roomService.tick(this.timeElapsed);
                 this.lastFrameTime = currentTime;
-
-                if (this.engine.config.debug) {
-                    this.showDebugInfo();
-                }
             }
         };
 
         gameLoop();
+    }
+
+    public followUserEntity(entity: Entity) {
+        if (!entity || !entity.visualization?.container) return;
+
+        const target = entity.visualization.container;
+
+        // Reset immediato: teletrasporta la camera sul personaggio
+        this.wrappedViewport.moveCenter(target.x, target.y);
+
+        // Configura il follow in modo "pigro" (lazy)
+        this.wrappedViewport.follow(target, {
+            speed: 1,           // Velocità moderata
+            acceleration: 0.05, // Accelerazione fluida
+            radius: 200,        // ZONA MORTA: l'omino è libero di muoversi in un raggio di 200px
+        });
     }
 
     private setUpEvents(): void {

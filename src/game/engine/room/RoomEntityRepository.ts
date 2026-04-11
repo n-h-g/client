@@ -10,6 +10,23 @@ export class RoomEntityRepository extends Repository<string, Entity> {
         super();
     }
 
+    public getEntityAt(x: number, y: number): Entity | undefined {
+        for (const entity of this.getAll().values()) {
+            if (Math.floor(entity.position.x) === Math.floor(x) &&
+                Math.floor(entity.position.y) === Math.floor(y)) {
+                return entity;
+            }
+        }
+        return undefined;
+    }
+    
+    public getEntitiesAt(x: number, y: number): Entity[] {
+        return Array.from(this.getAll().values()).filter((entity: Entity) => {
+            return Math.floor(entity.position.x) === Math.floor(x) &&
+                Math.floor(entity.position.y) === Math.floor(y);
+        });
+    }
+
     isEntityRolling(): boolean {
         return this.rollingEntity != null ? true : false;
     }

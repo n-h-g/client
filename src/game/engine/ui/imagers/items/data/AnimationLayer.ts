@@ -9,16 +9,18 @@ export class AnimationLayer {
 
     constructor(data: IAnimationLayer) {
         this.sequences = new Map();
-
         this.loadSequences(data.sequences);
     }
-    loadSequences(sequences: {
-        [index: number]: IAnimationLayerFrameSequence;
-    }) {
-        for (const sequence of Object.keys(sequences)) {
+    loadSequences(sequences: { [key: string]: any }) {
+        if (!sequences) return;
+
+        for (const [key, data] of Object.entries(sequences)) {
+            
+            const sequenceId = parseInt(key);
+        
             this.sequences.set(
-                parseInt(sequence),
-                new AnimationFrameSequence(sequences[sequence])
+                sequenceId,
+                new AnimationFrameSequence(data)
             );
         }
     }
@@ -44,4 +46,11 @@ export class AnimationLayer {
 
         return sequence;
     }
+
+    getAllSequences(): AnimationFrameSequence[] {
+        return Array.from(this.sequences.keys())
+            .sort((a, b) => a - b)
+            .map(key => this.sequences.get(key)!);
+    }
+    
 }

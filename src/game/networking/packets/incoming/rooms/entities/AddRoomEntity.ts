@@ -17,6 +17,7 @@ export class AddRoomEntity extends MessageHandler {
 
         const builder = new EntityBuilder();
 
+        
         builder
             .setId(data.id)
             .setName(data.name.name)
@@ -32,6 +33,11 @@ export class AddRoomEntity extends MessageHandler {
                     entity
                 );
                 entity.visualization.render();
+
+                if(Engine.getInstance().roomService?.currentRoom?.roomEntityRepository.getAll().size == 1) {
+                    Engine.getInstance().application.followUserEntity(entity)
+                }
             });
+
     }
 }

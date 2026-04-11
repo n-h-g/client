@@ -5,10 +5,7 @@ export interface IAnimationLayer {
 }
 
 export interface IAnimationLayerFrameSequence {
-    frame?: number;
-    frames?: {
-        [index: string]: {
+    [index: string]: {
             id: number;
-        };
     };
 }

@@ -15,6 +15,7 @@ export enum UIComponent {
     DefaultPanelUI = 'defaultPanel',
     UserPanelUI = 'userPanel',
     AvatarContainerUI = 'avatarContainer',
+    ChangeLookUI = 'changeLookUI',
     InventoryUI = 'inventory',
     PrivateChatUI = 'private',
 }

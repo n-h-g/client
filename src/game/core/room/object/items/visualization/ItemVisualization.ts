@@ -15,15 +15,17 @@ import {MoveableVisualization} from '../../Moveable';
 import {FurnidataItemType} from '../../../../../engine/ui/imagers/items/enum/FurniDataItemType';
 
 import anime from 'animejs';
+import { Furni } from '../../../../../engine/ui/imagers/items/Furni';
 
 export abstract class ItemVisualization
     extends EntityVisualization
     implements MoveableVisualization
 {
-	imagePreview: string;
+	protected imagePreview: string;
     protected position: Point3d;
     protected iconImage: string;
     protected isIcon = false;
+
     private static USE_ROTATION_ANIMATION = false;
 
     constructor(item: Item) {
@@ -32,23 +34,34 @@ export abstract class ItemVisualization
         this.iconImage = this.generateIcon();
     }
 
-    nextFrame(): void {}
+    nextFrame(): void {
+        if (this.sprite && typeof (this.sprite as any).nextFrame === 'function') {
+            (this.sprite as Furni).nextFrame();
+        }
+    }
+
 
     draw(): void {
-        if (Engine.getInstance().roomService?.currentRoom) {
+        if (Engine.getInstance().roomService?.currentRoom && this.sprite) {
+        
+            if (this.needsUpdate) {
+                this.sprite.update(true);
+                this.needsUpdate = false;
+            } else {
+  
+                this.sprite.update(false);
+            }
+
             const temp: Container = this.sprite.container;
-
-            if (this.needsUpdate) this.sprite.reset();
-
-            this.sprite.update(true);
-
             this.container = temp;
-
             this.container.eventMode = 'dynamic';
+            this.container.interactive = true;
 
-            Engine.getInstance().roomService?.currentRoom?.roomLayout.visualization.container?.addChild(
-                this.container
-            );
+            const roomContainer = Engine.getInstance().roomService?.currentRoom?.roomLayout.visualization.container;
+            if (roomContainer && this.container.parent !== roomContainer) {
+                roomContainer.addChild(this.container);
+            }
+            
             this.updatePosition();
         }
     }
@@ -82,117 +95,91 @@ export abstract class ItemVisualization
     }
 
     updateRotation(rotation: number): void {
-        const direction = rotation;
+        if (rotation === this.direction) return;
 
-        if (direction == this.direction) {
-            return;
-        }
         this.direction = rotation;
 
-        this.rotate();
+        if (this.sprite) {
+            (this.sprite as Furni).setDirection(rotation);
+            this.sprite.update(true);
+        }
     }
-
     async render(): Promise<void> {
+
         if (this.container) this.container.removeChildren();
 
         try {
-            const sprite =
-                await Engine.getInstance().userInterfaceManager.furniImager.loadFurniSprite(
-                    FurnidataItemType.FloorItem,
-                    this.entity.name
-                );
+            const sprite = await Engine.getInstance().userInterfaceManager.furniImager.loadFurniSprite(
+                FurnidataItemType.FloorItem,
+                this.entity.name
+            );
 
             await sprite.init();
-
             const dir = sprite.furniBase.getValidDirection(this.direction);
-
             sprite.setDirection(dir);
-
             sprite.update(true);
-
             this.sprite = sprite;
         } catch (e) {
-            const sprite =
-                await Engine.getInstance().userInterfaceManager.furniImager.loadFurniPlaceholder(
-                    FurnidataItemType.FloorItem,
-                    this.entity.name
-                );
-
+            const sprite = await Engine.getInstance().userInterfaceManager.furniImager.loadFurniPlaceholder(
+                FurnidataItemType.FloorItem,
+                this.entity.name
+            );
             await sprite.init();
-
             sprite.update(true);
-
             this.sprite = sprite;
         }
 
         if (!this.entity) return;
 
-        const spriteZIndex = (this.entity as Item).base.getLogicDimension(2);
-
+        const spriteZIndex = (this.entity as Item).base.getLogicDimension(1);
         if (!this.sprite.container) return;
 
         this.sprite.container.zIndex = this.getZIndex(spriteZIndex);
-
         this.sprite.container.eventMode = 'dynamic';
-
         this.container = this.sprite.container;
+
         if (Engine.getInstance().roomService?.currentRoom) {
             Engine.getInstance().roomService?.currentRoom?.roomLayout.visualization.container?.addChild(
                 this.sprite.container
             );
             this.updatePosition();
         }
+
+        try {
+            const imageElement = await UiUtils.generateImageFromObject(this.container);
+            //console.log(imageElement)
+            this.imagePreview = imageElement.src;
+        } catch (error) {
+        }
+        // ---------------------------------------
+
         this.entity.logic?.registerEvents();
         this.entity.logic?.events.emit(ItemEvents.ITEM_LOADED);
     }
 
     calculateOffsetX(): number {
-        const currentRoom = Engine.getInstance().roomService?.currentRoom;
-        const tile: Tile = currentRoom.roomLayout
-            .getFloorPlane()
-            .getTilebyPosition(
-                new Point(
-                    Math.round(this.position.x),
-                    Math.round(this.position.y)
-                )
-            );
+        const x = this.position.x;
+        const y = this.position.y;
 
-        return (
-            ((tile!.position.y - tile!.position.x) *
-                MapData.tileWidth) /
-                2 +
-            MapData.tileWidth / 2 +
-            1
-        );
+        const tileBaseX = ((y - x) * MapData.tileWidth) / 2;
+
+        
+        return tileBaseX + (MapData.tileWidth / 2) - 3;
     }
 
     calculateOffsetY(): number {
-        const currentRoom = Engine.getInstance().roomService?.currentRoom;
-        const tile: Tile = currentRoom.roomLayout
-            .getFloorPlane()
-            .getTilebyPosition(
-                new Point(
-                    Math.round(this.position.x),
-                    Math.round(this.position.y)
-                )
-            );
+        const x = this.position.x;
+        const y = this.position.y;
+        const z = this.position.z;
 
-        const offsetFloor =
-            tile!.position.z > 0
-                ? -MapData.thickSpace *
-                  MapData.stepHeight *
-                  tile!.position.z
-                : -FurniData.FURNI_TOP_OFFSET;
+        const tileBaseY = ((y + x) * MapData.tileHeight) / 2;
 
-        return (
-            ((tile!.position.y + tile!.position.x) *
-                MapData.tileHeight) /
-                2 +
-            MapData.tileHeight / 2 +
-            offsetFloor +
-            2
-        );
-    }
+        const zOffset = z * MapData.thickSpace * MapData.stairSteps;
+
+        const offsetFloor = z > 0 ? -zOffset : -FurniData.FURNI_TOP_OFFSET;
+
+        return tileBaseY + (MapData.tileHeight / 2) + offsetFloor;
+    }   
 
     getZIndex(zIndex = 1): number {
         const compareY =
@@ -206,6 +193,10 @@ export abstract class ItemVisualization
             ),
             RoomPriority.ROOM_ITEM
         );
+    }
+
+    public getimagePreview(): string {
+        return this.imagePreview
     }
 
     private generateIcon(): string {

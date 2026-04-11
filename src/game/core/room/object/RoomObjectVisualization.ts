@@ -15,6 +15,7 @@ export abstract class RoomObjectVisualization {
         this.zIndex = zIndex;
         this.container = null;
         this.needsUpdate = false;
+        
         this.sprite = new RoomObjectSprite();
     }
 

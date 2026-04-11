@@ -43,13 +43,13 @@ export class Engine {
         );
 
         this.wrappedApplication = new ApplicationEngine(this, {
-            backgroundColor: 0x00000,
+            backgroundColor: 0x000000,
             backgroundAlpha: 1,
             antialias: true,
-            resolution: window.devicePixelRatio,
+            resolution: 1,
+            autoDensity: false,
             width: window.innerWidth,
             height: window.innerHeight,
-            powerPreference: 'high-performance',
             resizeTo: window,
         });
 

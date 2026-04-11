@@ -37,10 +37,11 @@ export class AvatarImager {
     private parts: any;
     private textures: Repository<string, PIXI.Texture>;
 
+    private spritePool: PIXI.Sprite[] = [];
+
     constructor(structure: AvatarStructure) {
         this.data = new AvatarImageData();
         this.textures = new Repository();
-
         this.structure = structure;
     }
 
@@ -67,7 +68,6 @@ export class AvatarImager {
 
     async loadAvatarAssets(avatar: Avatar) {
         for (const part of avatar.AvatarFigure.look) {
-            //console.log(part)
             const figurePart = avatar.AvatarFigure.getFigureDataPart(part.type);
             if (!figurePart) {
                 return;
@@ -96,13 +96,54 @@ export class AvatarImager {
         return assets;
     }
 
-    drawAvatar(avatar: Avatar) {
+    private clearAvatarContainers(avatar: Avatar) {
+        const subContainers = [
+            avatar.ShadowContainer,
+            avatar.BodyContainer, avatar.LegContainer, avatar.HeadContainer,
+            avatar.HairContainer, avatar.ShoesContainer, avatar.HatContainer,
+            avatar.HeadAccessoryContainer, avatar.ArmsContainer, avatar.TorsoContainer,
+            avatar.FaceContainer
+        ];
+
+        for (const container of subContainers) {
+            while (container.children.length > 0) {
+                const child = container.children[0] as PIXI.Sprite;
+                container.removeChild(child);
+                this.spritePool.push(child);
+            }
+        }
+
+        for (let i = avatar.Container.children.length - 1; i >= 0; i--) {
+            const child = avatar.Container.children[i];
+            if (!subContainers.includes(child as PIXI.Container)) {
+                avatar.Container.removeChild(child);
+                this.spritePool.push(child as PIXI.Sprite);
+            }
+        }
+    }
+
+    async drawAvatar(avatar: Avatar) {
+        this.clearAvatarContainers(avatar);
+
         this.structure.setGeometry(this.data.avatarGeometry?.geometry!);
         const actions = this.structure.Actions?.getActionsByIds(avatar.Actions);
 
         const figureComponents = avatar.AvatarFigure.getAllComponents();
-
         const hiddens = avatar.AvatarFigure.getAllHidden();
+
+        if(!avatar.isUI)
+        {
+            const shadowPart: IPart = {
+                type: 'sd',
+                id: 1,
+                index: 0,
+                colorable: false,
+                colorindex: 0
+            };
+
+            const shadowComponent = new AvatarFigureComponent(shadowPart, ""); 
+            figureComponents.push(shadowComponent);
+        }
 
         figureComponents.sort(
             (a: AvatarFigureComponent, b: AvatarFigureComponent) => {
@@ -128,37 +169,43 @@ export class AvatarImager {
             }
         );
 
+        const assetGroups = new Map<string, AvatarFigureComponent[]>();
+
         for (const component of figureComponents) {
-            //console.log(component)
-
             if (hiddens.includes(component.part.type)) continue;
-
-            const partSet = this.structure.PartSets?.getPart(
-                component.part.type
-            );
-
-            if (!partSet) continue;
+            
+            if(component.part.type != 'sd') 
+            {
+                const partSet = this.structure.PartSets?.getPart(component.part.type);
+                if (!partSet) continue;
+            }
 
             const action = this.getFigureComponentAction(component, actions!);
-            const assetName = this.Structure.Assets?.getUniqueName(
-                component.part.type,
-                component.part.id
-            );
+            const assetName = this.Structure.Assets?.getUniqueName(component.part.type, component.part.id);
 
             if (!action || !assetName) continue;
 
-            this.data.loadTexture(assetName).then(() => {
-                this.drawPart(component, action!, avatar, assetName!);
-            });
+            if (!assetGroups.has(assetName)) assetGroups.set(assetName, []);
+            assetGroups.get(assetName)!.push(component);
         }
 
+        await Promise.all(Array.from(assetGroups.keys()).map(asset => this.data.loadTexture(asset)));
+
+        for (const [assetName, components] of assetGroups) {
+            for (const component of components) {
+                //console.log(component)
+                const action = this.getFigureComponentAction(component, actions!);
+                await this.drawPart(component, action!, avatar, assetName);
+            }
+        }
+    
         avatar.assemble();
     }
+
     private getFigureComponentAction(
         figureComponent: AvatarFigureComponent,
         actions: Action[]
     ): Action | null | undefined {
-        //console.log(actions)
         const action = actions.find((action: Action) => {
             const activeParts = Object.values(
                 this.structure.PartSets?.getActivePartForAction(action)!
@@ -187,14 +234,15 @@ export class AvatarImager {
 
         avatar.TotalFrames = partFrames.length;
 
-        const direction = avatar.BodyDirection;
+        const direction = component.part.type == 'sd' ? 0 : avatar.BodyDirection;
 
         const frame = this.structure.Geometry?.isHeadPart(component.part.type)
             ? avatar.HeadFrame
             : avatar.BodyFrame;
 
         let partFrame: any =
-            frame % (partFrames ? Object.values(partFrames).length : 1);
+            frame % (partFrames && Object.values(partFrames).length > 0 ? Object.values(partFrames).length : 1);
+            
         const partAction: string =
             partFrames && partFrames[partFrame]
                 ? partFrames[partFrame].assetPartDefinition
@@ -208,40 +256,6 @@ export class AvatarImager {
             partFrames && partFrames[partFrame]
                 ? partFrames[partFrame].number
                 : 0;
-
-        /*
-
-        let animationPartState
-
-        let frameNumber = 0
-
-        let offsets
-
-        console.log(action.id)
-
-        if(action.id) {
-            let animation = this.structure.Animations.getAnimation(action.id)
-
-
-            if(animation) {
-
-                let part = animation.getAnimationPart(component.part.type)
-
-                let frames = part.getFrames()
-
-                let animationFrame = avatar.HeadFrame % frames.length
-
-                let frame = frames[animationFrame]
-
-                let frameNumber = frame.number
-
-                offsets = animation ?? animation.offsets.getFrameDirectionParts(frameNumber, direction.valueOf()).bodyParts[0]
-
-                animationPartState = frame.assetPartDefinition
-            }
-        }
-
-        console.log(animationPartState)*/
 
         const flippedType = this.structure.PartSets?.getFlippedSetType(
             component.part.type
@@ -261,12 +275,14 @@ export class AvatarImager {
         const spritesheet = this.data.SpriteSheets.get(
             assetName
         ) as Spritesheet;
-        if (!this.textures.has(spriteComponent.ResourceName))
+        
+        if (!this.textures.has(spriteComponent.ResourceName)) {
             this.loadTextureIntoCache(
                 spriteComponent.ResourceName,
                 spritesheet,
                 assetName
             );
+        }
 
         this.drawSpriteComponent(spriteComponent, assetName, avatar, offsets);
     }
@@ -282,7 +298,7 @@ export class AvatarImager {
 
         if (asset.link != undefined) asset = spritesheet[asset.link];
 
-        const downloadedTexture: PIXI.Texture = this.data.getTexture(assetName);
+        const downloadedTexture: PIXI.Texture = this.data.getTexture(assetName) as PIXI.Texture;
         if (!downloadedTexture) {
             if (Engine.getInstance().config.debug) {
                 Logger.debug(
@@ -294,10 +310,10 @@ export class AvatarImager {
 
         const texture: PIXI.Texture = RenderingUtils.cropTexture(
             downloadedTexture,
-            parseInt(asset.height),
-            parseInt(asset.width),
             parseInt(asset.left),
-            parseInt(asset.top)
+            parseInt(asset.top),
+            parseInt(asset.width),
+            parseInt(asset.height),
         );
         this.textures.add(resource, texture);
     }
@@ -306,7 +322,7 @@ export class AvatarImager {
         component: AvatarSpriteComponent,
         assetName: string,
         avatar: Avatar,
-        bodyPartOffset: BodyPart
+        bodyPartOffset: BodyPart | undefined
     ) {
         const spritesheet: Spritesheet = (await this.data.SpriteSheets.get(
             assetName
@@ -322,17 +338,32 @@ export class AvatarImager {
             if (asset.link != undefined) asset = spritesheet[asset.link];
 
             const texture = this.textures.get(component.ResourceName);
-            const sprite = new PIXI.Sprite(texture);
+            
+            let sprite = this.spritePool.pop();
+            if (!sprite) {
+                sprite = new PIXI.Sprite();
+            }
+            
+            // Apply new texture
+            sprite.texture = texture;
+
+            // Reset scale, pivot, and position before calculating new ones
+            sprite.scale.set(1, 1);
+            sprite.pivot.set(0, 0);
+            sprite.x = 0;
+            sprite.y = 0;
+            sprite.tint = 0xFFFFFF;
 
             sprite.width = parseInt(asset.width);
             sprite.height = parseInt(asset.height);
             sprite.eventMode = 'dynamic';
             sprite.cursor = 'pointer';
 
-            if (component.Color && component.isColorable)
+            if (component.Color && component.isColorable) {
                 sprite.tint = avatar.IsPlaceHolder
                     ? 0xffffff
                     : parseInt(component.Color, 16);
+            }
 
             const offsets = asset.offset.split(',');
             if (offsets) {
@@ -354,9 +385,14 @@ export class AvatarImager {
                 sprite.x =
                     this.structure.Geometry?.width! -
                     sprite.x +
-                    AvatarData.AVATAR_LEFT_OFFSET;
+                    (component.ResourceType == 'sd' ? AvatarData.SHADOW_OFFSET_X : AvatarData.AVATAR_LEFT_OFFSET);
             }
 
+            if (component.ResourceType == 'sd') {
+                sprite.alpha = 0.2;
+                sprite.tint = 0x000000;
+                avatar.ShadowContainer.addChild(sprite);
+            }
             if (component.ResourceType == 'sh')
                 avatar.ShoesContainer.addChild(sprite);
             else if (component.ResourceType == 'hd')

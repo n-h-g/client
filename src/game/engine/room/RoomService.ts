@@ -10,6 +10,9 @@ import {UIEvents} from '../events/ui/UIEvents';
 import {Service} from '../../core/Service';
 import {Disposable} from '../../core/room/Disposable';
 import {EnterRoomUIEventData} from '../events/ui/data/room/EnterRoomUIEventData';
+import { Point3d } from '../../utils/point/Point3d';
+import { FurnidataItemType } from '../ui/imagers/items/enum/FurniDataItemType';
+import { FloorItem } from './objects/items/FloorItem';
 
 export class RoomService
     extends Service<null, null>
@@ -43,6 +46,54 @@ export class RoomService
         );
         this.toggleUI();
         return this.wrappedCurrentRoom;
+    }
+
+    getHighestZAt(x: number, y: number): number {
+        const room = Engine.getInstance().roomService.currentRoom;
+        if (!room) return 0;
+
+        const tile = room.roomLayout.getFloorPlane().getTilebyPosition(new Point(Math.floor(x), Math.floor(y)));
+        let highestZ = tile ? tile.position.z : 0;
+
+        const entities = room.roomEntityRepository.getEntitiesAt(Math.floor(x), Math.floor(y));
+
+        for (const entity of entities) {
+            const entityHeight = entity.visualization.sprite.container.y
+            const entityZ = entity.position.z + entityHeight;
+
+            if (entityZ > highestZ) {
+                highestZ = entityZ;
+            }
+        }
+
+        return highestZ;
+    }
+
+    public async startItemPlacement(inventoryItem: any) {
+        const room = this.currentRoom;
+        if (!room) return;
+
+        const base = await Engine.getInstance().userInterfaceManager!.furniImager.loadFurniBase(
+            FurnidataItemType.FloorItem,
+            inventoryItem.name 
+        );
+
+        const ghost = new FloorItem(
+            inventoryItem.id, 
+            inventoryItem.name,
+            new Point3d(0, 0, 0), 
+            base
+        );
+
+        ghost.visualization?.render();
+        
+        if (ghost.visualization?.container) {
+            ghost.visualization.container.alpha = 0.5;
+            ghost.visualization.container.interactive = false; 
+        }
+
+        room.roomEntityRepository.add(ghost.id, ghost);
+        room.roomEntityRepository.setRollingEntity(ghost);
     }
 
     /**

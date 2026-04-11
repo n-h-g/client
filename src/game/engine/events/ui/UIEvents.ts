@@ -32,4 +32,5 @@ export class UIEvents extends Events {
         'catalog_items_updated'
     );
     static ENTER_ROOM_INFO: UIEvents = new UIEvents('enter_room_info');
+    static CHANGE_LOOK: UIEvents = new UIEvents('change_look')
 }

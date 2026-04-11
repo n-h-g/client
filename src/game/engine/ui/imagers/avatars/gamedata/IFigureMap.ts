@@ -1,3 +1,5 @@
 export interface FigureMap {
-    [key: string]: Array<any>;
+    [type: string]: {
+        [id: string]: string; // Maps the Part ID (as a string) to the Library Name string
+    };
 }

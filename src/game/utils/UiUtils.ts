@@ -28,10 +28,63 @@ export class UiUtils {
 
     static htmlToElement(html: any) {
         const template = document.createElement('template');
-        html = html.trim(); // Never return a text node of whitespace as the result
+        html = html.trim();
         template.innerHTML = html;
         return template.content.firstChild;
     }
+
+
+    static trimCanvas(canvas: HTMLCanvasElement): HTMLCanvasElement {
+        const ctx = canvas.getContext('2d', { willReadFrequently: true });
+        if (!ctx) return canvas;
+
+        const width = canvas.width;
+        const height = canvas.height;
+        const pixels = ctx.getImageData(0, 0, width, height);
+        const data = pixels.data;
+        
+        let top = null, left = null, right = null, bottom = null;
+
+        // Iterazione per trovare i confini dei pixel non trasparenti
+        for (let i = 0; i < data.length; i += 4) {
+            const alpha = data[i + 3];
+            if (alpha !== 0) {
+                const x = (i / 4) % width;
+                const y = Math.floor((i / 4) / width);
+
+                if (top === null) top = y;
+                if (left === null || x < left) left = x;
+                if (right === null || x > right) right = x;
+                if (bottom === null || y > bottom) bottom = y;
+            }
+        }
+
+        // PROTEZIONE: Se il canvas è vuoto o trasparente, ritorna un canvas 1x1 minimo
+        if (top === null || left === null) {
+            const emptyCanvas = document.createElement('canvas');
+            emptyCanvas.width = 1;
+            emptyCanvas.height = 1;
+            return emptyCanvas;
+        }
+
+        const trimWidth = (right - left) + 1;
+        const trimHeight = (bottom - top) + 1;
+
+        // Estrazione della porzione utile
+        const trimmedData = ctx.getImageData(left, top, trimWidth, trimHeight);
+
+        const copy = document.createElement('canvas');
+        copy.width = trimWidth;
+        copy.height = trimHeight;
+        const copyCtx = copy.getContext('2d');
+        
+        if (copyCtx) {
+            copyCtx.putImageData(trimmedData, 0, 0);
+        }
+
+        return copy;
+    }
+
 
     static getGlobalPosition(object: DisplayObject | Container): Matrix {
         return object.worldTransform;

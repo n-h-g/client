@@ -1,45 +1,92 @@
 <template>
 	<Dialog title="Catalogue" className="catalogue" :box="UIEventsType.CATALOGUE">
+
 		<div class="header">
 			<div class="iconContainer">
 				<img v-if="currentMenu && currentMenu.iconImage" :src="resourceUrl + currentMenu.iconImage + '.png'" />
 			</div>
+
 			<div class="menuTitleWrapper">
 				<span class="menuTitle">
 					{{ currentMenu.title }}
 				</span>
+
 				<span class="menuDescription">
 					{{ currentMenu.description }}
 				</span>
 			</div>
 		</div>
+
 		<div class="wrapper">
+
+			<!-- MENU -->
 			<div class="catalogueMenu">
 				<ul class="menuUlCatalog">
-					<TreeMenu @open-page="openPage" :catalog-menu="catalogMenu" :current-menu="currentMenu" />
+					<TreeMenu
+						@open-page="openPage"
+						:catalog-menu="catalogMenu"
+						:current-menu="currentMenu"
+					/>
 				</ul>
 			</div>
-			<div class="cataloguePageContainer" v-if="currentCataloguePage && currentCataloguePage.items">
-				<div class="cataloguePage" ref="cataloguePage">
+
+			<!-- PAGE -->
+			<div
+				class="cataloguePageContainer"
+				v-if="currentCataloguePage && currentCataloguePage.items"
+			>
+
+				<div class="cataloguePage">
+
 					<div class="default_grid">
-						<div id="placeHolder" v-if="selectedItem != null">
-							<img :src="preview" />
-						</div>
+
+						<!-- PREVIEW -->
+						
+
+						<!-- ITEMS -->
 						<div class="defaultGridLayoutItemContainer">
-							<div class="itemCell catalogItemCell" v-for="item in currentCataloguePage.items" :key="item.id">
+
+							<div
+								class="itemCell catalogItemCell"
+								v-for="item in currentCataloguePage.items"
+								:key="item.id"
+								@click="selectItem(item)"
+								:class="{ selected: selectedItem?.id === item.id }"
+							>
+
 								<span class="itemIcon">
-									<img :src="icons.get(item.name)" @click="selectItem(item)">
+									<img :src="icons.get(item.name)" />
 								</span>
+
 								<span class="price">
 									{{ item.credits }}
-									<img src='@/assets/images/catalogue/creditIcon.png' />
+									<img src="@/assets/images/catalogue/creditIcon.png" />
 								</span>
+
 							</div>
+
 						</div>
+
+						<!-- BUY BUTTON -->
+						<div class="buyButtonContainer">
+                        <div
+                            class="buyButton"
+                            v-if="selectedItem"
+                            @click="buyItem"
+                        >
+                            <span>Buy</span>
+                        </div>
+                        <div class="buyButton disabled" v-else>
+                            <span>Buy</span>
+                        </div>
+                    </div>
 					</div>
+
 				</div>
 			</div>
+
 		</div>
+
 	</Dialog>
 </template>
 
@@ -61,76 +108,141 @@ import { UiUtils } from "../../../game/utils/UiUtils"
 import Dialog from "../dialog/Dialog.vue"
 import TreeMenu from "./TreeMenu.vue"
 
-Engine.getInstance()?.networkingManager?.packetManager?.applyOut(OutgoingPacket.CatalogPagesListEvent)
+// =========================
+// INIT
+// =========================
+Engine.getInstance()
+	?.networkingManager
+	?.packetManager
+	?.applyOut(OutgoingPacket.CatalogPagesListEvent)
 
-const resourceUrl = Engine.getInstance()?.config?.catalogueResourcesUrl + "icons/"
-const catalogMenu = ref([])
-const selectedItem = ref()
-const currentCataloguePage = ref({ items: [] } as {
-	items: CataloguePageItem[]
+const resourceUrl =
+	Engine.getInstance()?.config?.catalogueResourcesUrl + "icons/"
+
+const catalogMenu = ref<any[]>([])
+const selectedItem = ref<CataloguePageItem | null>(null)
+
+const currentCataloguePage = ref<{ items: CataloguePageItem[] }>({
+	items: [],
 })
-const icons = reactive(new Map<string, string>())
+
+const icons = new Map<string, string>()
+
 const preview = ref("")
+
 const currentMenu = ref({
 	id: 1,
 	title: "titolo",
 	description: "",
-	iconImage: "1"
+	iconImage: "1",
 })
 
+// =========================
+// EVENTS
+// =========================
 EventManager.read(UIEvents.CATALOGUE_PAGES_UPDATED, (data: CataloguePagesData) => {
-	for (var page of data.pages) {
-		if (catalogMenu.value.indexOf(page) < 0)
+	for (const page of data.pages) {
+		if (!catalogMenu.value.includes(page)) {
 			catalogMenu.value.push(page)
+		}
 	}
 })
 
 EventManager.read(UIEvents.CATALOG_ITEMS_UPDATED, async (data: CataloguePageData) => {
-	for (var item of data.items) {
-		if (hasItem(item.id)) return;
-		await getIcon(item);
+	for (const item of data.items) {
+		if (hasItem(item.id)) continue
+
+		await getIcon(item)
 		currentCataloguePage.value.items.push(item)
 	}
 })
 
-async function generatePlaceHolder(): Promise<string> {
-	const room = new Room('', RoomImager.getRoomPlaceHolder(), new Point(0, 0), 0, '')
-	return await Engine.getInstance()?.userInterfaceManager?.roomImager?.generateRoomPreview(room)
-}
-
+// =========================
+// ICONS
+// =========================
 async function getIcon(catalogItem: CataloguePageItem): Promise<void> {
-	const sprite = await Engine.getInstance()?.userInterfaceManager?.furniImager?.loadFurniIcon(FurnidataItemType.FloorItem, catalogItem.name);
-	await sprite.init();
-	sprite.update(true);
-	icons.set(catalogItem.name, await UiUtils.generateBase64FromObject(sprite.container));
+	const sprite =
+		await Engine.getInstance()
+			?.userInterfaceManager
+			?.furniImager
+			?.loadFurniIcon(FurnidataItemType.FloorItem, catalogItem.name)
+
+	await sprite.init()
+	sprite.update(true)
+
+	icons.set(
+		catalogItem.name,
+		await UiUtils.generateBase64FromObject(sprite.container)
+	)
 }
 
+// =========================
+// FIX HAS ITEM
+// =========================
 function hasItem(id: number): boolean {
-	for (var item of currentCataloguePage.value.items) {
-		return item.id === id;
-	}
-
-	return false;
+	return currentCataloguePage.value.items.some(
+		(item) => item.id === id
+	)
 }
 
-function selectItem(item) {
-	selectedItem.value = item;
-	generatePlaceHolder().then((image: string) => {
-		preview.value = image
+// =========================
+// SELECT ITEM
+// =========================
+function selectItem(item: CataloguePageItem) {
+	selectedItem.value = item
+
+	generatePlaceHolder().then((img) => {
+		preview.value = img
 	})
 }
 
-function openPage(page) {
-	currentMenu.value.description = page.description;
-	currentMenu.value.title = page.title;
-	currentMenu.value.iconImage = "1"; // TODO: FROM SERVER
+// =========================
+// PREVIEW
+// =========================
+async function generatePlaceHolder(): Promise<string> {
+	const room = new Room(
+		"",
+		RoomImager.getRoomPlaceHolder(),
+		new Point(0, 0),
+		0,
+		""
+	)
+
+	return await Engine.getInstance()
+		?.userInterfaceManager
+		?.roomImager
+		?.generateRoomPreview(room)
+}
+
+// =========================
+// OPEN PAGE
+// =========================
+function openPage(page: any) {
+	currentMenu.value.description = page.description
+	currentMenu.value.title = page.title
+	currentMenu.value.iconImage = "1"
+}
+
+// =========================
+// BUY ITEM
+// =========================
+function buyItem() {
+	if (!selectedItem.value) return
+
+	Engine.getInstance()
+		?.networkingManager
+		?.packetManager
+		?.applyOut(OutgoingPacket.CatalogBuyItemEvent, {
+			id: selectedItem.value.id,
+			pageId: currentMenu.value.id,
+		})
 }
 </script>
-
 <style lang="scss">
 .catalogue {
 	position: absolute;
 	z-index: 2;
+    margin-top:100px;
 	height: 620px;
 	width: 568px;
 
@@ -395,5 +507,52 @@ function openPage(page) {
 	.card-header>.head-title>h1 {
 		margin-bottom: 10px;
 	}
+
+    
+}
+.buyButtonContainer {
+    display: flex;
+    justify-content: flex-end; // Allinea a destra
+    padding-top: 10px;
+    width: 100%;
+}
+
+.buyButton {
+    position: relative;
+    cursor: pointer;
+    background-color: #58d63e; // Verde Habbo
+    border: 1px solid #000;
+    border-radius: 4px;
+    padding: 6px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: inset -2px -2px 0px 0px rgba(0, 0, 0, 0.2), 
+                inset 2px 2px 0px 0px rgba(255, 255, 255, 0.4);
+    
+    span {
+        color: #fff;
+        font-weight: bold;
+        font-size: 14px;
+        text-shadow: 1px 1px 0px rgba(0, 0, 0, 0.5);
+        pointer-events: none;
+    }
+
+    &:hover {
+        background-color: #65e84a;
+    }
+
+    &:active {
+        box-shadow: inset 2px 2px 0px 0px rgba(0, 0, 0, 0.2);
+        transform: translateY(1px);
+    }
+
+    &.disabled {
+        background-color: #ccc;
+        cursor: not-allowed;
+        filter: grayscale(1);
+        opacity: 0.6;
+        box-shadow: none;
+    }
 }
 </style>

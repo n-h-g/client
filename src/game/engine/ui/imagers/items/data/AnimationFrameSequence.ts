@@ -1,37 +1,38 @@
-import {IAnimationLayerFrameSequence} from '../../../../../core/ui/imagers/items/IAnimationLayer';
-import {AnimationFrame} from './AnimationFrame';
+import { AnimationFrame } from "./AnimationFrame";
 
 export class AnimationFrameSequence {
     private frames: AnimationFrame[];
-
     private frameCount = 0;
 
-    constructor(framesData: IAnimationLayerFrameSequence) {
-        this.frameCount = framesData.frame;
-
+    constructor(framesData: any[]) {
+        this.frameCount = 0;
         this.frames = [];
-
         this.loadFrames(framesData);
     }
 
-    getFrame(frameId: number): AnimationFrame {
-        if (this.frames.length == 0) return null;
+    loadFrames(framesData: any[]): void {
+        if (!framesData || !Array.isArray(framesData)) return;
 
-        const frame = this.frames[frameId];
+        for (const data of framesData) {
+    
+            const realFrameId = data.frame !== undefined ? data.frame : 0;
 
-        return frame;
+            const repeats = data.repeats || 1;
+
+            this.frames.push(
+                new AnimationFrame(realFrameId, repeats)
+            );
+            
+            this.frameCount++;
+        }
+    }
+
+    getFrame(index: number): AnimationFrame {
+        if (this.frames.length === 0) return null;
+        return this.frames[index % this.frames.length];
     }
 
     getFrameCount() {
         return this.frameCount;
-    }
-    loadFrames(framesData: IAnimationLayerFrameSequence): void {
-        if (!framesData.frames) return;
-
-        for (const frame of Object.keys(framesData.frames)) {
-            this.frames.push(
-                new AnimationFrame(Object.keys(framesData).indexOf(frame), 1)
-            );
-        }
     }
 }

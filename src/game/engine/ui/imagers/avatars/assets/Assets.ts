@@ -18,19 +18,22 @@ export class Assets {
         this.figureMap = figureMap;
     }
 
-    getUniqueName(type: string, partId: number): string {
-        let uniqueName = this.figureMap[type][partId];
+    getUniqueName(type: string, partId: number | string): string {
+        const idKey = partId.toString();
 
-        if (uniqueName == null && type == 'hrb') {
-            uniqueName = this.figureMap['hr'][partId];
+        if (!this.figureMap[type]) {
+            return '';
         }
 
-        if (uniqueName == null) {
-            uniqueName = this.figureMap[type][1];
+        let uniqueName = this.figureMap[type][idKey];
+
+        if (!uniqueName && type === 'hrb') {
+            uniqueName = this.figureMap['hr']?.[idKey];
         }
 
-        if (uniqueName == null) {
-            uniqueName = this.figureMap[type][0];
+        if (!uniqueName) {
+            //console.warn(`[FigureMap] ID ${idKey} missing for type ${type}. Falling back.`);
+            uniqueName = this.figureMap[type]["1"] || this.figureMap[type]["0"];
         }
 
         return uniqueName ?? '';

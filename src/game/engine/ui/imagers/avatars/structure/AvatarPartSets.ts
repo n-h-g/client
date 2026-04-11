@@ -23,9 +23,10 @@ export class AvatarPartSets {
     }
 
     getFlippedSetType(setType: string): string {
-        const part = this.getPart(setType) as Part;
+        const part = this.parts.get(setType);
+        if (!part) return setType;
 
-        return part.flippedSetType ? part.flippedSetType : part.setType;
+        return part.flippedSetType && part.flippedSetType !== "" ? part.flippedSetType : setType;
     }
 
     getActiveParts(activePartId: string): string[] {

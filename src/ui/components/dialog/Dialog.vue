@@ -1,83 +1,97 @@
 <template>
-    <div id="dialog" ref="dialog" :class="props.className" draggable="true" @dragstart="dragStart" @drag="drag"
-        @dragend="dragEnd">
-        <div class="title-bar drag-handler">
-            {{ props.title }}
-            <div class="closeIcon" @click="hide"></div>
-        </div>
-        <div class="content">
-            <slot></slot>
-        </div>
+  <div
+    id="dialog"
+    ref="dialog"
+    :class="props.className"
+    :style="style"
+  >
+    <div class="title-bar drag-handler" @pointerdown="dragStart">
+      {{ props.title }}
+      <div class="closeIcon" @click="hide"></div>
     </div>
+
+    <div class="content">
+      <slot></slot>
+    </div>
+  </div>
 </template>
 
 <script setup lang="ts">
-import { onMounted, ref } from 'vue';
-import { EventManager } from '../../../game/core/events/EventManager';
-import { DialogEventData } from '../../../game/engine/events/ui/data/general/Dialog';
-import { UIEvents } from '../../../game/engine/events/ui/UIEvents';
-import { UIEventsType } from '../../../game/engine/events/ui/UIEventsType';
+import { onMounted, ref, computed } from "vue";
+import { EventManager } from "../../../game/core/events/EventManager";
+import { DialogEventData } from "../../../game/engine/events/ui/data/general/Dialog";
+import { UIEvents } from "../../../game/engine/events/ui/UIEvents";
+import { UIEventsType } from "../../../game/engine/events/ui/UIEventsType";
 
 const props = defineProps<{
-    title: String,
-    box: UIEventsType,
-    className: String
+  title: string;
+  box: UIEventsType;
+  className: string;
 }>();
 
 function hide() {
-    EventManager.emit<DialogEventData>(UIEvents.CLOSE, {
-        type: props.box
-    });
+  EventManager.emit<DialogEventData>(UIEvents.CLOSE, {
+    type: props.box,
+  });
 }
 
-const dialog = ref<HTMLDivElement>(null);
-const offset = ref({
-    x: 0,
-    y: 0
+const dialog = ref<HTMLDivElement | null>(null);
+
+const position = ref({
+  x: 0,
+  y: 0,
 });
-const initial = ref({
-    x: 0,
-    y: 0
-});
-const current = ref({
-    x: 0,
-    y: 0
-});
-const active = ref(false);
+
+const dragging = ref(false);
+const offset = ref({ x: 0, y: 0 });
+
+const style = computed(() => ({
+  transform: `translate(${position.value.x}px, ${position.value.y}px)`,
+}));
+
+function dragStart(ev: PointerEvent) {
+  dragging.value = true;
+
+  offset.value.x = ev.clientX - position.value.x;
+  offset.value.y = ev.clientY - position.value.y;
+
+  window.addEventListener("pointermove", drag);
+  window.addEventListener("pointerup", dragEnd);
+}
+
+function drag(ev: PointerEvent) {
+  if (!dragging.value) return;
+
+  position.value.x = ev.clientX - offset.value.x;
+  position.value.y = ev.clientY - offset.value.y;
+}
+
+function dragEnd() {
+  dragging.value = false;
+
+  window.removeEventListener("pointermove", drag);
+  window.removeEventListener("pointerup", dragEnd);
+
+  localStorage.setItem(
+    `position_${props.box}`,
+    JSON.stringify(position.value)
+  );
+}
 
 onMounted(() => {
-    var initialPosition: { x: number, y: number } = JSON.parse(localStorage.getItem(`position_${props.box}`));
-    if (initialPosition != null) {
-        initial.value.x = initialPosition.x;
-        initial.value.x = initialPosition.y;
-        dialog.value.style.transform = 'translate(' + initialPosition.x + 'px, ' + initialPosition.y + 'px)';
-    }
-})
+  const saved = localStorage.getItem(`position_${props.box}`);
 
-const dragStart = (ev: DragEvent) => {
-    if (initial.value.x != 0 && initial.value.y != 0) {
-        initial.value.x = ev.clientX - offset.value.x;
-        initial.value.y = ev.clientY - offset.value.y;
-    }
-    active.value = true;
-}
+  if (!saved) return;
 
-const drag = (ev: DragEvent) => {
-    if (active.value && ev.clientX != 0 && ev.clientY != 0) {
-        current.value.x = ev.clientX - initial.value.x;
-        current.value.y = ev.clientY - initial.value.y;
-        offset.value.x = current.value.x;
-        offset.value.y = current.value.y;
-        dialog.value.style.transform = 'translate(' + current.value.x + 'px, ' + current.value.y + 'px)';
-    }
-}
+  try {
+    const parsed = JSON.parse(saved);
 
-const dragEnd = () => {
-    initial.value.x = current.value.x;
-    initial.value.y = current.value.y;
-    active.value = false;
-    localStorage.setItem(`position_${props.box}`, JSON.stringify(initial.value));
-}
+    position.value.x = parsed.x ?? 0;
+    position.value.y = parsed.y ?? 0;
+  } catch (e) {
+    console.warn("Invalid saved dialog position");
+  }
+});
 </script>
 
 <style lang="scss">

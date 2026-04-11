@@ -25,48 +25,44 @@ export class AvatarSpriteComponent {
         flippedType: string | undefined,
         isSmall = false
     ) {
-        if (partType === 'hd' && isSmall)
-            this.partId = '1';
-        if (
-            partType === 'ey' &&
-            state === 'std' &&
-            partId === '1' &&
-            direction === 3
-        )
-            state = 'sml';
-        if (
-            partType === 'fa' &&
-            state === 'std' &&
-            partId === '2' &&
-            (direction === 2 || direction === 4)
-        )
-            this.resourceDirection = 1;
-        if (partType === 'he' && state === 'std' && partId === '1') {
-            if (direction === 2) {
-                this.resourceDirection = 0;
-            }
+        let resDir = direction;
 
+        //console.log(state)
+
+
+        if (state === 'lay') {
+            resDir = (direction > 3 && direction < 7) ? 4 : 2;
         }
-        if (partType === 'he' && state === 'std' && partId === '8')
-            this.resourceDirection =
-                direction % 2 === 0 ? 1 : this.resourceDirection;
-        if (
-            partType === 'he' &&
-            state === 'std' &&
-            (partId === '2131' || partId === '2132') &&
-            direction >= 2 &&
-            direction <= 6
-        )
-            this.resourceDirection = 1;
-        if (partType === 'ha' && state === 'std' && partId === '2518')
-            this.resourceDirection = direction % 2 === 0 ? 2 : 1;
-        if (partType === 'ha' && state === 'std' && partId === '2519')
-            this.resourceDirection = direction % 2 === 0 ? 2 : 3;
-        if (partType === 'ha' && state === 'std' && partId === '2588')
-            this.resourceDirection = 7;
-        if (partType === 'ha' && state === 'std' && partId === '2589')
-            this.resourceDirection = 3;
 
+
+        if (partType === 'hd' && isSmall) this.partId = '1';
+        
+        if (partType === 'ey' && state === 'std' && partId === '1' && direction === 3) {
+            this.state = 'sml';
+        }
+
+        if (partType === 'fa' && state === 'std' && partId === '2' && (direction === 2 || direction === 4)) {
+            resDir = 1;
+        }
+
+        if (partType === 'he' && state === 'std') {
+            if (partId === '1' && direction === 2) resDir = 0;
+            if (partId === '8' && direction % 2 === 0) resDir = 1;
+            if ((partId === '2131' || partId === '2132') && direction >= 2 && direction <= 6) resDir = 1;
+        }
+
+        if (partType === 'ha' && state === 'std') {
+            if (partId === '2518') resDir = direction % 2 === 0 ? 2 : 1;
+            if (partId === '2519') resDir = direction % 2 === 0 ? 2 : 3;
+            if (partId === '2588') resDir = 7;
+            if (partId === '2589') resDir = 3;
+        }
+
+            if (state === 'sit') {
+            if (direction === 1 || direction === 3) resDir = 2;
+            if (direction === 5) resDir = 4;
+            if (direction === 7) resDir = 6;
+        }
 
         this.state = state;
 
@@ -85,9 +81,11 @@ export class AvatarSpriteComponent {
 
         this.isFlipped = false;
 
-        if (this.resourceDirection > 3 && this.resourceDirection < 7) {
-            this.resourceDirection = this.calcFlip(this.resourceDirection);
+        if (resDir > 3 && resDir < 7) {
+            this.resourceDirection = this.calcFlip(resDir);
             this.isFlipped = true;
+        } else {
+            this.resourceDirection = resDir;
         }
 
         if (partType == 'ey') this.colorable = false;

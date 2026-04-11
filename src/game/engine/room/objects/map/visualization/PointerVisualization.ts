@@ -4,6 +4,9 @@ import {MapData} from '../MapData';
 import {ColorRGB} from '../../../../../utils/color/ColorRGB';
 import {Container, Graphics, Point} from 'pixi.js';
 import {Tile} from '../Tile';
+import { RoomPriority } from '../../../visualization/RoomPriority';
+import { RoomVisualization } from '../../../visualization/RoomVisualization';
+import { Point3d } from '../../../../../utils/point/Point3d';
 
 export class PointerVisualization extends RoomObjectVisualization {
     private pointerWidth = 3;
@@ -28,7 +31,7 @@ export class PointerVisualization extends RoomObjectVisualization {
     }
 
     getZIndex(): number {
-        return -1;
+        return RoomPriority.POINTER;
     }
 
     render(): void {
@@ -43,11 +46,22 @@ export class PointerVisualization extends RoomObjectVisualization {
 
         this.pointerContext.visible = true;
 
-        this.pointer.position.x = tile.position.z;
+        this.pointer.position.x = tile.position.x;
         this.pointer.position.y = tile.position.y;
+        this.pointer.position.z = tile.position.z;
+        
+        this.pointerContext.zIndex = RoomVisualization.calculateZIndex(
+                        new Point3d(
+                            this.pointer.position.x,
+                            this.pointer.position.y,
+                            this.pointer.position.z
+                        ),
+                        RoomPriority.POINTER
+                    );
 
         this.pointerContext.x = xpos;
         this.pointerContext.y = ypos;
+        this.pointerContext.parent.sortableChildren = true;
     }
 
     drawPointer(container: Container): Container {

@@ -1,66 +1,69 @@
 <template>
-    <Dialog title="Inventory" className="inventory" :box="UIEventsType.INVENTORY">
+    <Dialog title="Inventory" :className="'inventory' + (tradeMode ? ' tradeMode' : '')" :box="UIEventsType.INVENTORY">
         <div class="sub">
-            <div class="item" :class="{ active: currentTab == 'floor' }" @click.stop="changeTab('floor')">
-                Floor
-            </div>
-            <div class="item" :class="{ active: currentTab == 'wall' }" @click.stop="changeTab('wall')">
-                Wall
-            </div>
+            <div class="item" :class="{ active: currentTab == 'floor' }" @click.stop="changeTab('floor')">Floor</div>
+            <div class="item" :class="{ active: currentTab == 'wall' }" @click.stop="changeTab('wall')">Wall</div>
         </div>
-        <div class="inventoryContainer" v-on:click="deselectItem()">
+
+        <div class="inventoryContainer" @click="deselectItem()">
             <div class="inventoryContainerBg">
                 <div class="inventoryListAndButtonsContainer">
-                    <div class="listContainer itemsContainer" v-if="currentTab == 'floor'">
-                        <div class="itemInventory" :class="{ selected: selectedItem && selectedItem.id == item.Id }"
-                            v-for="item in floorItems" @click.stop="selectItem(item)" v-bind:key="item.Id">
-                            <img :src="getImageIcon(item)" />
-                            <span class="stackSize">{{ item.qty }}</span>
-                        </div>
+                    <div class="listContainer itemsContainer">
+                        <template v-if="currentTab == 'floor'">
+                            <div class="itemInventory" 
+                                :class="{ selected: selectedItem && selectedItem.Id === item.Id }"
+                                v-for="item in floorItems" 
+                                :key="item.Id"
+                                @click.stop="selectItem(item)">
+                                <img :src="getImageIcon(item)" />
+                                <span class="stackSize">{{ item.qty }}</span>
+                            </div>
+                        </template>
+                        <template v-else>
+                            <div class="itemInventory" 
+                                 :class="{ selected: selectedItem && selectedItem.Id == item.Id }"
+                                 v-for="item in wallItems" :key="item.Id"
+                                 @click.stop="selectItem(item)">
+                                <img :alt="item.Name" :src="getImageIcon(item)"/>
+                                <span class="stackSize">{{ item.qty }}</span>
+                            </div>
+                        </template>
                     </div>
-                    <div class="listContainer itemsContainer" v-if="currentTab == 'wall'">
-                        <div class="itemInventory" :class="{ selected: selectedItem && selectedItem.id == item.Id }"
-                            v-for="item in wallItems" @click.stop="selectItem(item)" v-bind:key="item.Id">
-                            <img :alt="item.Name" :src="getImageIcon(item)"/>
-                            <span class="stackSize">{{ item.qty }}</span>
-                        </div>
-                    </div>
+
                     <div class="buttonsContainer">
-                        <div class="itemPreivew">
-                            <img v-if="selectedItem" v-bind:src="getImagePreview(selectedItem)" />
+                        <div class="itemName" v-if="selectedItem">
+                            {{ selectedItem.name || selectedItem.Name }}
                         </div>
-                        <div class="ui-button small" :class="{ hidden: !showPlaceItemButton }" ref="PlaceItemButton"
-                            @click.stop="placeItem()">Place</div>
-                        <div class="ui-button small" :class="{ hidden: !showAddAllItemsToTradeButton }"
-                            ref="AddItemToTradeButton" @click.stop="addAllItemsToTrade">
-                            Trade</div>
-                        <div class="ui-button small" :class="{ hidden: !showAddAllItemsToTradeButton }"
-                            ref="AddAllItemsToTradeButton" @click.stop="addAllItemsToTrade()">
-                            Trade</div>
+                        <div class="itemPreview">
+                            <img v-if="selectedItem" :src="getImagePreview(selectedItem)" />
+                        </div>
+                        <div class="buttonList">
+                            <div class="ui-button small" v-if="showPlaceItemButton" @click.stop="placeItem()">Place</div>
+                            <div class="ui-button small" v-if="showAddAllItemsToTradeButton" @click.stop="addAllItemsToTrade()">Trade</div>
+                        </div>
                     </div>
                 </div>
-                <div class="tradeContainer" :class="{ hidden: !tradeMode }">
+
+                <div class="tradeContainer" v-if="tradeMode">
                     <div class="trade-container">
-                        <div>
-                            <span>Your offer</span>
-                            <ul id="mytradeitems" ref="mytradeitems" class="itemsContainer">
-                                <div class="itemInventory" v-for="item in myTradeItems" v-bind:key="item.id">
-                                    <img :src="item.icon" :alt="item.name" />
+                        <div class="trade-column">
+                            <span class="label">Your offer</span>
+                            <div class="itemsGrid smallGrid">
+                                <div class="itemInventory" v-for="item in myTradeItems" :key="item.id">
+                                    <img :src="item.icon" />
                                     <span class="stackSize">{{ item.qty }}</span>
                                 </div>
-                            </ul>
+                            </div>
                         </div>
-                        <div>
-                            <button id="acceptTradeButton" class="tradeButton"
-                                v-on:click.stop="acceptTrade()">Accept</button>
-                            <button id="declineTradeButton" class="tradeButton"
-                                v-on:click.stop="cancelTrade()">Decline</button>
+                        <div class="trade-actions">
+                            <button class="tradeButton" @click.stop="acceptTrade()">Accept</button>
+                            <button class="tradeButton" @click.stop="cancelTrade()">Decline</button>
                         </div>
-                        <div>
-                            <span id="targetTradeName">{{ trade.targetTradeName }}</span>
-                            <div id="targettradeitems" ref="targettradeitems" class="itemsContainer">
-                                <div class="itemInventory" v-for="item in targetTradeItems" v-bind:key="item.id">
-                                    <img :src="item.icon" :alt="item.name" />
+                        <div class="trade-column">
+                            <span class="label">{{ trade.targetTradeName }}</span>
+                            <div class="itemsGrid smallGrid">
+                                <div class="itemInventory" v-for="item in targetTradeItems" :key="item.id">
+                                    <img :src="item.icon" />
                                     <span class="stackSize">{{ item.qty }}</span>
                                 </div>
                             </div>
@@ -73,7 +76,7 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, ref } from "vue"
+import { onMounted, ref, toRaw } from "vue"
 import { ItemVisualization } from "../../../game/core/room/object/items/visualization/ItemVisualization"
 import { Engine } from "../../../game/Engine"
 import {Item} from "../../../game/engine/room/objects/items/Item"
@@ -114,22 +117,32 @@ function addAllItemsToTrade() {
 }
 
 function placeItem() {
-    hide()
-    Engine.getInstance()?.networkingManager?.packetManager?.applyOut(OutgoingPacket.RoomPlaceItemEvent, {
-        id: this.selectedItem.id,
-        name: this.selectedItem.name,
-        x: 2,
-        y: 0,
-        z: 0
-    })
+    if (!selectedItem.value) return;
+
+    const engine = Engine.getInstance();
+
+    engine.roomService.startItemPlacement(selectedItem.value)
+    
+    hide();
 }
 
 function getImageIcon(item: Item) {
     return Engine.getInstance().config.itemsResourcesUrl + "/icons/" + item.name + "_icon.png"
 }
 
-function getImagePreview(item: Item) {
-    return item.visualization ? (item.visualization as ItemVisualization).imagePreview : "/src/assets/images/items/default_placeholder.png"
+function getImagePreview(item: Item): string {
+    if (!item) return "/src/assets/images/items/default_placeholder.png";
+
+    const rawItem = toRaw(item);
+    const visualization = rawItem.visualization as any;
+
+    if (!visualization) return "/src/assets/images/items/default_placeholder.png";
+
+    const preview = (typeof visualization.imagePreview === 'function') 
+        ? visualization.imagePreview() 
+        : visualization.imagePreview;
+
+    return preview || "/src/assets/images/items/default_placeholder.png";
 }
 
 function changeTab(tab: string) {
@@ -145,7 +158,8 @@ function selectItem(item: Item) {
 }
 
 function deselectItem() {
-
+    selectedItem.value = null;
+    showPlaceItemButton.value = false;
 }
 
 function acceptTrade() {
@@ -168,230 +182,174 @@ onMounted(() => {
 <style lang="scss">
 .inventory {
     position: fixed;
-    height: 340px;
+    height: 380px; // Aumentato leggermente per respirare
     width: 490px;
 
     .inventoryContainer {
-        position: relative;
-        margin-top: 0px;
-        width: calc(100% - 10px);
-        height: calc(100% - 10px);
+        height: calc(100% - 45px); // Sottrai l'altezza delle tab
+        width: 100%;
+        display: flex;
+        flex-direction: column;
 
         .inventoryContainerBg {
-            padding-left: 4px;
-            padding-right: 4px;
-            padding-bottom: 4px;
             display: flex;
             flex-direction: column;
-
-            .inventoryTabs {
-                padding-top: 5px;
-                padding-left: 16px;
-                padding-right: 16px;
-
-                display: flex;
-                width: 100%;
-
-                justify-items: center;
-                align-items: center;
-                justify-content: left;
-
-                .tab {
-                    text-align: center;
-                    border-radius: 4px;
-                    border-bottom: 0;
-                    padding: 3px;
-                    color: #272727;
-                    background-color: #ebebeb;
-                    position: relative;
-                    cursor: pointer;
-                    user-select: none;
-
-                    &.active {
-                        background-color: #fff;
-                        color: #272727;
-
-                        &::after {
-                            content: ' ';
-                            position: absolute;
-                            bottom: -1px;
-                            width: 100%;
-                            height: 2px;
-                            background-color: #eceae0;
-                            left: 0;
-                        }
-                    }
-                }
-            }
-
-            .inventoryListAndButtonsContainer {
-
-                display: flex;
-                flex-direction: row;
-                width: 100%;
-                height: 100%;
-
-                overflow-y: auto;
-                background-color: #ebebeb;
-
-                .listContainer {
-                    width: 65%;
-                    overflow-y: scroll;
-                    padding: 4px 16px 4px 4px;
-                }
-
-                .buttonsContainer {
-                    width: 35%;
-                    padding: 4px;
-                    display: flex;
-                    margin-right: 10px;
-                    flex-direction: column;
-                    justify-content: flex-start;
-
-                    .itemInfoPanelButton {
-                        margin: 3px;
-                        background-color: #fff;
-                        color: #000;
-                        padding-left: 3px;
-                        padding-right: 3px;
-                        border-radius: 12px;
-                        font-weight: 600;
-                        border: 1px solid #000;
-                        font-size: 13px;
-                        text-align: center;
-                        cursor: pointer;
-
-                        &:hover {
-                            background-color: #878787;
-                        }
-                    }
-                }
-            }
-
-            .tradeContainer {
-                margin-top: 2px;
-                margin-left: 5px;
-                margin-right: 5px;
-
-                display: flex;
-                flex-direction: row;
-                width: calc(100% - 5px * 2);
-                height: calc(50% - 37px);
-
-                border-radius: 12px;
-                border: 1px solid #000;
-                padding: 4px;
-
-                overflow-y: auto;
-
-                .trade-container {
-                    display: table;
-                    width: 100%;
-                    table-layout: fixed;
-
-                    div {
-                        list-style-type: none;
-                        display: table-cell;
-                        text-align: center;
-                        vertical-align: middle;
-                        padding: 2px;
-                        border-right: 1px solid #333;
-
-                        &:last-child {
-                            border-right: none;
-                        }
-                    }
-
-                    .tradeButton {
-                        margin: 3px;
-                        background-color: #fff;
-                        color: #000;
-                        padding-left: 3px;
-                        padding-right: 3px;
-                        border-radius: 12px;
-                        font-weight: 600;
-                        border: 1px solid #000;
-                        font-size: 13px;
-                        text-align: center;
-                        cursor: pointer;
-
-                        &:hover {
-                            background-color: #878787;
-                        }
-                    }
-                }
-            }
+            height: 100%;
+            padding: 5px;
+            overflow: hidden; // Impedisce scorrimenti esterni indesiderati
         }
     }
 
-    &.tradeMode {
-        height: 500px;
-
-        .inventoryListAndButtonsContainer {
-            height: 50% !important;
-        }
-    }
-
-    .itemsContainer {
+    .inventoryListAndButtonsContainer {
         display: flex;
         flex-direction: row;
-        flex-wrap: wrap;
-        align-items: center;
-        justify-content: flex-start;
-        flex-flow: row wrap;
-        align-content: flex-start;
+        flex: 1;           // Occupa tutto lo spazio verticale disponibile
+        min-height: 0;     // IMPORTANTE: permette al figlio di scorrere
+        background-color: #ebebeb;
+        border: 1px solid #333;
+        border-radius: 4px;
 
-        .itemInventory {
-            border: 1px solid #000;
-            background-color: #cbcbcb;
-            margin: 2px;
-            width: 38px;
-            height: 38px;
-            text-align: center;
-            position: relative;
-            border-radius: 6px;
-            cursor: pointer;
+        .listContainer {
+            flex: 1;       // Prende lo spazio rimasto dalla sidebar
+            overflow-y: auto; // ATTIVA LO SCROLL
+            padding: 8px;
             display: flex;
-            justify-content: center;
-            align-content: center;
+            flex-wrap: wrap;
+            align-content: flex-start;
+            gap: 2px;
+            
+            // Scrollbar stile retrò
+            &::-webkit-scrollbar { width: 14px; }
+            &::-webkit-scrollbar-thumb {
+                background: #ccc;
+                border: 2px solid #ebebeb;
+                border-radius: 10px;
+            }
+        }
 
-            .stackSize {
-                position: absolute;
-                top: 1px;
-                right: 0;
-                background-color: #fff;
-                border: 1px solid #2f6982;
-                color: #2f6982;
-                font-size: 9px;
-                font-family: Volter;
-                height: 15px;
-                line-height: 15px;
-                padding: 0;
-                padding-left: 2px;
-                padding-right: 2px;
+        .buttonsContainer {
+            width: 160px;
+            display: flex;
+            flex-direction: column;
+            padding: 10px;
+            background: #f4f4f4;
+            border-left: 1px solid #ccc;
+
+            .itemPreview {
+                height: 120px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                margin-bottom: 10px;
+                background: white;
+                border-radius: 4px;
+                border: 1px solid #ccc;
+                img { max-width: 100%; max-height: 100%; object-fit: contain; }
             }
 
-            &.selected,
-            &:hover {
-                box-shadow: inset 0 0 0 2px #fff;
+            .buttonList {
+                display: flex;
+                flex-direction: column;
+                gap: 5px;
             }
 
-            img {
-                object-fit: none;
+            .itemName {
+                font-size: 13px;
+                font-weight: bold;
+                text-align: center;
+                color: #333;
+                margin-bottom: 8px;
+                word-wrap: break-word; // Gestisce nomi molto lunghi
+                padding: 0 5px;
+                min-height: 1.2em; // Mantiene lo spazio anche se vuoto
+            }
+
+            .itemPreview {
+                height: 120px;
+                // ... resto dello stile invariato
             }
         }
     }
 
-    .itemPreivew {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        height: 180px;
-        margin-bottom: 5px;
+    // Modalità Scambio
+    &.tradeMode {
+        height: 520px;
+        
+        .inventoryListAndButtonsContainer {
+            flex: 0 0 240px; // Altezza fissa per la lista quando c'è il trade
+        }
 
-        img {
-            height: 100%;
-            object-fit: scale-down;
+        .tradeContainer {
+            margin-top: 8px;
+            flex: 1;
+            background: #d9d9d9;
+            border: 1px solid #000;
+            padding: 5px;
+            border-radius: 4px;
+            display: flex;
+
+            .trade-container {
+                display: flex;
+                width: 100%;
+                gap: 5px;
+
+                .trade-column {
+                    flex: 1;
+                    display: flex;
+                    flex-direction: column;
+                    .label { font-size: 11px; font-weight: bold; margin-bottom: 3px; }
+                }
+
+                .itemsGrid {
+                    flex: 1;
+                    background: #eee;
+                    border: 1px solid #999;
+                    overflow-y: auto;
+                    display: flex;
+                    flex-wrap: wrap;
+                    gap: 2px;
+                    padding: 4px;
+                }
+
+                .trade-actions {
+                    display: flex;
+                    flex-direction: column;
+                    justify-content: center;
+                    gap: 5px;
+                }
+            }
+        }
+    }
+
+    // Stile quadratini inventario
+    .itemInventory {
+        width: 40px;
+        height: 40px;
+        background: #cbcbcb;
+        border: 1px solid #333;
+        border-radius: 4px;
+        position: relative;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        &:hover {
+            background: #fff;
+            box-shadow: inset 0 0 0 2px #333;
+        }
+
+        img { max-width: 32px; max-height: 32px; }
+
+        .stackSize {
+            position: absolute;
+            bottom: 2px;
+            right: 2px;
+            background: #fff;
+            border: 1px solid #333;
+            font-size: 9px;
+            padding: 0 2px;
+            pointer-events: none;
         }
     }
 }

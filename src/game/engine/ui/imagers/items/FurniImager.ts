@@ -15,7 +15,7 @@ import {FurniPlaceholder} from './FurniPlaceholder';
 import {Repository} from '../../../../core/Repository';
 
 export class FurniImager {
-    static FPS = 36;
+    static FPS = 24;
     private textureCaches: Repository<string, Texture>;
     private ready: boolean;
     private bases: {
@@ -62,16 +62,16 @@ export class FurniImager {
         this.ready = true;
     }
 
-    generateRandomItem() {
-        const randomIndex = Math.floor(
-            Math.random() * Object.values(this.furnidata.floorItems).length
-        );
+    generateRandomItem(): string | null {
+        const items = Object.values(this.furnidata.floorItems);
 
-        const item = this.furnidata.floorItems[randomIndex];
+        if (items.length === 0) return null;
 
-        if (!item) return;
+        const randomIndex = Math.floor(Math.random() * items.length);
 
-        return item.className;
+        const item = items[randomIndex];
+
+        return item ? item.className : null;
     }
 
     private findItemByName(itemName: string) {
@@ -180,7 +180,7 @@ export class FurniImager {
                     res(furniSprite);
                 })
                 .catch(() => {
-                    _rej('invalid furniBase name');
+                    _rej('invalid furniBase name' + name);
                 });
         });
     }

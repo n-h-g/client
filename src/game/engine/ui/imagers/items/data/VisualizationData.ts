@@ -28,7 +28,8 @@ export class VisualizationData {
     constructor(data: IVisualization) {
         this.wrappedLayerCount = data.layerCount;
 
-        this.wrappedAngle = data.angle < 1 ? 1 : data.angle > 360 ? 360 : data.angle;
+        const defaultAngle = data.angle || 45;
+        this.wrappedAngle = defaultAngle < 1 ? 1 : defaultAngle > 360 ? 360 : defaultAngle;
 
         this.wrappedColors = new Map();
 
@@ -39,11 +40,14 @@ export class VisualizationData {
         this.loadLayers(data.layers);
         this.loadColors(data.colors);
         this.loadDirections(data.directions);
-        this.loadAnimations(data.animations)
+        this.loadAnimations(data.animations);
+
+        console.log(this.wrappedAnimations)
     }
 
     getAnimationLayer(layerId, animationId) {
         const animation = this.wrappedAnimations.get(animationId);
+
 
         if (!animation) return;
 
@@ -61,27 +65,32 @@ export class VisualizationData {
     }
 
     getValidDirection(direction: number) {
-        const existing = this.hasDirection(direction);
+        const existing = this.wrappedDirections.get(direction);
 
-        if (existing) return direction;
+        if(existing) return direction;
 
-        direction = ((direction % 360) + 360) % 360;
+
+        direction = direction * 90;
+
+        direction = (((direction % 360) + 360) % 360);
 
         let currentAngle = -1;
         let validDirection = -1;
 
-        for (const key of this.wrappedDirections.keys()) {
-            let angle = (key * this.wrappedAngle - direction + 360) % 360;
+        for(const key of this.wrappedDirections.keys())
+        {
+            let angle = ((((key * this.wrappedAngle) - direction) + 360) % 360);
 
-            if (angle > 180) angle = 360 - angle;
+            if(angle > 180) angle = (360 - angle);
 
-            if (angle < currentAngle || currentAngle < 0) {
+            if((angle < currentAngle) || (currentAngle < 0))
+            {
                 currentAngle = angle;
                 validDirection = key;
             }
         }
 
-        if (validDirection >= 0) return Math.trunc(validDirection);
+        if(validDirection >= 0) return Math.trunc(validDirection);
 
         return 0;
     }
@@ -91,12 +100,15 @@ export class VisualizationData {
     }
 
     hasAnimationForLayer(animation: number, layer: number): boolean {
-        const data = this.wrappedAnimations.get(animation)
+        if (!this.wrappedAnimations) return false;
 
-        if (!animation) return false;
-        const layerData = data.getLayer(layer)
+        const animData = this.wrappedAnimations.get(animation);
+        
+        if (!animData) return false;
 
-        return this.hasAnimation(animation) && layerData != null;
+        const layerData = animData.getLayer(layer);
+
+        return layerData !== null && layerData !== undefined;
     }
 
     hasColors(): boolean {
@@ -108,7 +120,7 @@ export class VisualizationData {
     }
 
     getColor(colorId: number, layerId): ColorData {
-        return this.wrappedColors[colorId];
+        return this.wrappedColors.get(colorId)
     }
 
     getDirection(number: number): DirectionData {
@@ -128,7 +140,6 @@ export class VisualizationData {
     }
 
     hasDirection(direction: number): boolean {
-        direction = (direction / 90) * 2;
         return this.wrappedDirections.has(direction);
     }
 
@@ -142,10 +153,11 @@ export class VisualizationData {
     }
 
     loadAnimations(animations: {[key: string]: IAnimation}) {
-        for (let animation of Object.keys(animations)) {
+        //console.log(Object.entries(animations)[0])
+        for (let animation of Object.entries(animations)) {
             this.wrappedAnimations.set(
-                parseInt(animation),
-                new AnimationData(parseInt(animation), animations[animation])
+                parseInt(animation[0]),
+                new AnimationData(parseInt(animation[0]), animation[1])
             );
         }
     };

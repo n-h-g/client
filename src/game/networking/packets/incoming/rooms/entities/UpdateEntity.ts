@@ -1,4 +1,5 @@
 import {EntityData} from '../../../../../core/communication/incoming/rooms/entities/EntityData';
+import { Human } from '../../../../../core/room/object/human/Human';
 import {HumanVisualization} from '../../../../../core/room/object/human/visualization/HumanVisualization';
 import {Engine} from '../../../../../Engine';
 import {ActionId} from '../../../../../engine/ui/imagers/avatars/enum/actions/ActionId';
@@ -17,6 +18,11 @@ export class UpdateEntity extends MessageHandler {
                 );
 
             if (!entity) return;
+
+            if (entityData.aspect) {
+                (entity as Human).figure = entityData.aspect.look; 
+                entity.visualization.render();
+            }
 
             if (entityData.position) {
                 if (entityData.rotation) {
@@ -57,7 +63,7 @@ export class UpdateEntity extends MessageHandler {
                     );
                 }
 
-                entity.visualization.needsUpdate = true;
+                entity.visualization.render();
             }
         } else {
             if (Engine.getInstance().config.debug) {

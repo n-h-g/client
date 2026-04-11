@@ -37,6 +37,11 @@
                     :class="{hidden: false}" @click.stop="useItem()" v-if="entity ? isAnimated(): true">
                     Use</div>
             </div>
+             <div class="previewBoxContainerButtons" v-if="mode == 'user'" >
+                <div class="previewButton" ref="changeLookButton" id="changeLookButton"
+                    :class="{hidden: false}" @click.stop="changeLook()">
+                    Look</div>
+            </div>
         </div>
     </div>
 </template>
@@ -53,6 +58,9 @@ import { UIEvents } from '../../../game/engine/events/ui/UIEvents'
 import { UIEventsType } from '../../../game/engine/events/ui/UIEventsType'
 import {Item} from '../../../game/engine/room/objects/items/Item'
 import { OutgoingPacket } from '../../../game/networking/packets/outgoing/OutgoingPacket'
+import { IComponentShowableUI } from '../../../game/core/ui/IComponentShowableUI'
+import { UIComponent } from '../../../game/engine/ui/components/UIComponent'
+import { ChangeLookEventData } from '../../../game/engine/events/ui/data/avatar/ChangeLookEventData'
 
 const mode = ref('')
 const entity = ref({
@@ -63,6 +71,7 @@ const entity = ref({
 })
 
 EventManager.read(UIEvents.PREVIEW_BOX_MODE, (evt: PreviewModeEventData) => {
+    //console.log(evt)
     mode.value = evt.mode
     entity.value.name = evt.name
     entity.value.image = evt.image
@@ -71,13 +80,14 @@ EventManager.read(UIEvents.PREVIEW_BOX_MODE, (evt: PreviewModeEventData) => {
 })
 
 function isAnimated() {
-    const item = Engine.getInstance()?.roomService?.CurrentRoom?.roomEntityRepository?.get(entity.value.id) as Item
+    const item = Engine.getInstance()?.roomService?.currentRoom?.roomEntityRepository?.get(entity.value.id) as Item
     return item.base.data.visualization.type == 'furniture_animated'
 }
 
 function moveItem() {
-    const item = Engine.getInstance()?.roomService?.CurrentRoom?.roomEntityRepository?.get(entity.value.id) as Item
-    Engine.getInstance()?.roomService?.CurrentRoom?.roomEntityRepository?.setRollingEntity(item)
+    const item = Engine.getInstance()?.roomService?.currentRoom?.roomEntityRepository?.get(entity.value.id) as Item
+    Engine.getInstance()?.roomService?.currentRoom?.roomEntityRepository?.setRollingEntity(item);
+    (item.logic as ItemLogic).toggleMovement(true)
 }
 
 function pickItem() {
@@ -94,6 +104,10 @@ function rotateItem() {
 
 function useItem() {
     
+}
+
+function changeLook() {
+    Engine.getInstance()?.userInterfaceManager?.componentsManager?.getComponent<IComponentShowableUI>(UIComponent.ChangeLookUI).toggle() 
 }
 
 function hide(): void {

@@ -13,6 +13,7 @@ import {RoomUI} from './room/RoomUI';
 import {AvatarContainerUI} from './avatar/AvatarContainerUI';
 import {RoomInfoUI} from './room/RoomInfoUI';
 import {Repository} from '../../../core/Repository';
+import { ChangeLookUI } from './guardrobe/ChangeLookUI';
 
 export class ComponentsManager {
     readonly rootComponent: HTMLElement;
@@ -38,6 +39,7 @@ export class ComponentsManager {
         this.addComponent(UIComponent.CreateRoomUI, new CreateRoomUI());
         this.addComponent(UIComponent.CatalogueUI, new CatalogueUI());
         this.addComponent(UIComponent.RoomUI, new RoomUI());
+        this.addComponent(UIComponent.ChangeLookUI, new ChangeLookUI)
         this.addComponent(
             UIComponent.AvatarContainerUI,
             new AvatarContainerUI()

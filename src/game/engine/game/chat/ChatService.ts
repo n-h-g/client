@@ -27,7 +27,7 @@ export class ChatMessageService extends Service<string, Message> implements Disp
             y: chatMessage.y,
             width: 0,
             height: 0,
-        });
+        } as RoomChatData);
 
         this.messageCounter++;
     }

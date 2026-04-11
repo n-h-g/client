@@ -3,15 +3,17 @@ import {ActionId} from './actions/ActionId';
 
 export class AvatarData {
     // dimensions
-    static AVATAR_LEFT_OFFSET = -25;
-    static AVATAR_TOP_OFFSET = 32;
+    static AVATAR_LEFT_OFFSET = -22;
+    static AVATAR_TOP_OFFSET = 106;
     static AVATAR_SIT_OFFSET = 18;
     static AVATAR_GENERIC_WIDTH = 125;
     static AVATAR_GENERIC_HEIGHT = 210;
 
     // offsets
-    static AVATAR_CONTAINER_OFFSET_LEFT = -4; // the x distance between avatar and container
-    static AVATAR_CONTAINER_OFFSET_TOP = -20; // the y distance between avatar and container
+    static AVATAR_CONTAINER_OFFSET_LEFT = -4;
+    static AVATAR_CONTAINER_OFFSET_TOP = -20;
+
+    static SHADOW_OFFSET_X = -8;
 
     // frame
     static AVATAR_FRAME_SPEED = 100;

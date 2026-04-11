@@ -8,6 +8,7 @@ import {IFigureData} from './gamedata/IFigureData';
 import {FigureMap} from './gamedata/IFigureMap';
 import {IAvatarImageData} from './gamedata/IAvatarImageData';
 import {Texture} from 'pixi.js';
+import { BaseTexture, SCALE_MODES } from 'pixi.js';
 
 export class AvatarImageData implements IAvatarImageData {
     AvatarDownloadManager: AvatarDownloadManager;
@@ -29,11 +30,15 @@ export class AvatarImageData implements IAvatarImageData {
 
     private textures: Map<string, Texture>;
 
+    private figureMapLookup: { [type: string]: { [id: string]: string } } = {};
+
     constructor() {
         this.AvatarDownloadManager = new AvatarDownloadManager();
         this.offsets = new Map();
         this.spritesheets = new Map();
         this.textures = new Map();
+
+        BaseTexture.defaultOptions.scaleMode = SCALE_MODES.NEAREST;
     }
 
     async loadGameData(): Promise<void> {

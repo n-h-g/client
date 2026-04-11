@@ -39,18 +39,19 @@ export enum OutgoingPacket {
     RoomRotateItemEvent = 24,
     RoomPlaceItemEvent = 25,
     RoomMoveItemEvent = 26,
+    RoomUseItemEvent = 27,
     MoveWallItemEvent = 33,
-    ToggleFloorItemEvent = 34,
+    ToggleFloorItemEvent = 17,
     ToggleWallItemEvent = 35,
 
     //#region catalogue
     CatalogPagesListEvent = 800,
     RequestCatalogPageEvent = 801,
-    StartNewTrade = 27,
+    StartNewTrade = 97,
     AddItemToTrade = 28,
     DeclineTrade = 30,
     AcceptTrade = 31,
-    CatalogBuyItemEvent = 32,
+    CatalogBuyItemEvent = 802,
 
     //#region rooms
     SaveRoomAdsEvent = 38,

@@ -74,16 +74,7 @@ export abstract class EntityLogic extends RoomObjectLogic {
         this.togglePreview();
     }
 
-    async togglePreview() {
-        if (Engine.getInstance().config.offlineMode) return;
-
-        const isHuman = this.entity instanceof Human;
-        const mode = isHuman ? 'user' : 'item';
-        Engine.getInstance()
-            .userInterfaceManager.componentsManager.getComponent<IComponentShowableUI>(
-                UIComponent.PreviewBoxUI
-            )
-            .toggle();
+    async loadPreviewData(mode) {
         EventManager.emit<PreviewModeEventData>(UIEvents.PREVIEW_BOX_MODE, {
             id: this.entity.id,
             mode: mode,
@@ -95,6 +86,20 @@ export abstract class EntityLogic extends RoomObjectLogic {
                 )
             ).src,
         });
+    }
+
+    async togglePreview() {
+        if (Engine.getInstance().config.offlineMode) return;
+
+        const isHuman = this.entity instanceof Human;
+        const mode = isHuman ? 'user' : 'item';
+        Engine.getInstance()
+            .userInterfaceManager.componentsManager.getComponent<IComponentShowableUI>(
+                UIComponent.PreviewBoxUI
+            )
+            .toggle();
+
+            await this.loadPreviewData(mode)
     }
 
     abstract onMove?(delta: number): void;

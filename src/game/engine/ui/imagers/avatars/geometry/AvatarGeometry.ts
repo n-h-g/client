@@ -51,6 +51,7 @@ export class AvatarGeometry extends Geometry {
         return part != null;
     }
 
+
     getBodyPartsOfType(type: string): Map<string, GeometryBodyPart> {
         if (!this.existsType(type)) return new Map();
 

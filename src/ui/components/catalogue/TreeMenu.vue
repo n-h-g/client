@@ -47,63 +47,72 @@ function filteredMenu() {
 }
 </script>
 
-<style lang="scss">
-.treeView {
-	list-style-type: none;
-	pointer-events: all !important;
+<style lang="scss" scoped>
+    .treeView {
 
-	.catalogLi {
-		cursor: pointer;
+        list-style-type: none;
 
-		.description {
-			border-top: 2px solid #d2d1cb;
-			border-bottom: 2px solid #d2d1cb;
-			display: flex;
-			flex-direction: row;
-			flex-wrap: wrap;
-			width: 100%;
-			justify-content: flex-start;
-			align-items: center;
-		}
+        .catalogLi {
+            cursor: pointer;
 
-		.description:hover {
-			background-color: darken(#d2d1cb, 10%);
-		}
 
-		&.active {
-			&>.description {
-				color: #fff;
-				background-color: #63c5e9;
-				font-style: italic;
-				border-top: 2px solid #82d1ed;
-				border-bottom: 2px solid #82d1ed;
+            .description {
+               // border-bottom: 1px solid #6e6e6e;
+                    border-top: 2px solid #d2d1cb;
+                    border-bottom: 2px solid #d2d1cb;
+                display: flex;
+                flex-direction: row;
+                flex-wrap: wrap;
+                width: 100%;
+                justify-content: flex-start;
+                align-items: center;
+            }
 
-				&>.catalogMenuLabel {
-					color: #fff;
-				}
-			}
-		}
+            .description:hover {
+                background-color: darken(#d2d1cb, 10%);
+            }
 
-		.catalogLiIcon {
-			width: 23px;
-			height: 20px;
-			display: flex;
-			flex-grow: 0;
-			justify-content: center;
-			align-items: center;
-		}
+            &.active {
+                &>.description {
+                    color: #fff;
+                    background-color: #63c5e9;
+                    font-style: italic;
+                    border-top: 2px solid #82d1ed;
+                    border-bottom: 2px solid #82d1ed;
 
-		.catalogMenuLabel {
-			flex-grow: 2;
-			margin: auto 0;
-			padding: 0 7px;
-			font-weight: 700;
-			color: #565656;
-		}
-	}
+                    &>.catalogMenuLabel {
+                        color: #fff;
+                    }
+                }
 
-	.menuUlCatalog {
-		margin-left: 10px;
-	}
-}
+
+            }
+
+            .catalogLiIcon {
+                width: 23px;
+                height: 20px;
+                display: flex;
+                flex-grow: 0;
+                justify-content: center;
+                align-items: center;
+            }
+
+            .catalogMenuLabel {
+                flex-grow: 2;
+                margin: auto 0;
+                padding: 0 7px;
+                font-weight: 700;
+                color: #565656;
+            }
+
+            /*  & > * {
+                display: inline-block;
+                vertical-align: middle;
+            }*/
+        }
+
+        .menuUlCatalog {
+            margin-left: 10px;
+        }
+    }
 </style>

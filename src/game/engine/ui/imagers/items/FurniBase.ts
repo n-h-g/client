@@ -11,18 +11,14 @@ import {Layer} from './data/Layer';
 import {Repository} from '../../../../core/Repository';
 
 export class FurniBase {
+    itemName: string;
+    assets: Repository<string, FurniAsset>;
 
-	itemName: string;
-    spritesheetData: IFurnidata;
-	assets: Repository<string, FurniAsset>;
+    private spritesheet: PIXI.Texture | null;
+    private visualizationData: VisualizationData | null;
+    private logicData: LogicData | null;
 
-    private spritesheet: PIXI.Texture;
-    private visualizationData: VisualizationData;
-    private logicData: LogicData;
-
-
-    constructor(public readonly data: IFurnidata, itemName: string) {
-        this.spritesheetData = null;
+    constructor(public data: IFurnidata, itemName: string) {
         this.visualizationData = null;
         this.logicData = null;
         this.spritesheet = null;
@@ -38,41 +34,34 @@ export class FurniBase {
             '/' +
             this.itemName +
             '.json';
-        const data: IFurnidata = await fetchJsonAsync<IFurnidata>(url);
-        if (data != null) {
-            this.visualizationData = new VisualizationData(data.visualization);
-            this.logicData = new LogicData(data.logic);
-            this.loadAssets(data.assets);
+            
+        const downloadedData: IFurnidata = await fetchJsonAsync<IFurnidata>(url);
+        
+        if (downloadedData != null) {
+
+            this.data = downloadedData;
+            this.visualizationData = new VisualizationData(downloadedData.visualization);
+            this.logicData = new LogicData(downloadedData.logic);
+            this.loadAssets(downloadedData.assets);
         }
 
         return this.assets;
-        /*return Promise.all([
-            new Promise((res, rej) => {
-                let url = Engine.getInstance().config.proxyUrl + Engine.getInstance().config.itemsResourcesUrl + this.itemName + '/' + this.itemName + '.json'
-                fetchJsonAsync(url).then(data => {
-                    this._visualizationData = new VisualizationData((data as IFurnidata).visualization)
-                    this._logicData = new LogicData((data as IFurnidata).logic)
-                    this.loadAssets((data as IFurnidata).assets)
-                    res(this._assets)
-                }).catch(err => {
-                    throw err;
-                })
-            })
-        ])*/
     }
 
     loadAssets(assets: {[key: string]: IAsset}) {
         if (assets) {
-            for (const asset of Object.keys(assets)) {
+            for (const assetName of Object.keys(assets)) {
                 this.assets.add(
-                    asset,
-                    new FurniAsset(asset, assets[asset] as IAsset)
+                    assetName,
+                    new FurniAsset(assetName, assets[assetName] as IAsset)
                 );
             }
         }
     }
 
-    async downloadSpritesheet(): Promise<PIXI.Texture> {
+    async downloadSpritesheet(): Promise<PIXI.Texture | null> {
+        if (this.spritesheet) return this.spritesheet;
+
         const configUrl =
             Engine.getInstance().config.proxyUrl +
             Engine.getInstance().config.itemsResourcesUrl +
@@ -81,88 +70,84 @@ export class FurniBase {
             this.itemName +
             '.png';
 
-        const texture = await PIXI.Assets.load<PIXI.Texture>(configUrl);
-
-        if (this.spritesheet != undefined) return null;
-
-        this.spritesheet = texture;
-
-        return texture;
+        try {
+            const texture = await PIXI.Assets.load<PIXI.Texture>({
+                src: configUrl,
+                data: {
+                    premultiplyAlpha: true
+                }
+            });
+            this.spritesheet = texture;
+            return texture;
+        } catch (error) {
+            console.error(`Failed to load spritesheet for ${this.itemName}:`, error);
+            return null;
+        }
     }
 
-    getLogicDimension(dim: number) {
-        if (!this.logicData.getDimensions()) return 0;
+    getLogicDimension(dim: number): number {
+        if (!this.logicData || !this.logicData.getDimensions()) return 0;
         return this.logicData.getDimensions()[dim];
     }
 
     getUIDirection(): number {
         const directions = this.getAvailableDirections();
-        let direction = directions[0];
+        if (!directions || directions.length === 0) return 0;
 
-        if (directions.includes(4)) {
-            direction = 4;
-            return direction;
-        }
-
-        if (directions.includes(2)) {
-            direction = 2;
-            return direction;
-        }
-        return direction;
+        if (directions.includes(4)) return 4;
+        if (directions.includes(2)) return 2;
+        
+        return directions[0];
     }
 
     getAvailableDirections(): number[] {
-        const directions: number[] = [];
-        const rawDirections = this.directions;
-
-        for (const direction in rawDirections) {
-            directions.push((parseInt(direction) % 90) * 2);
-        }
-
-        return directions;
+        return this.directions || [];
     }
 
     hasDirection(direction: number): boolean {
-        direction = (direction / 90) * 2;
-        return this.visualizationData.hasDirection(direction);
+        const normalizedDirection = (direction / 90) * 2;
+        return this.visualizationData?.hasDirection(normalizedDirection) ?? false;
     }
 
     hasAnimations(): boolean {
-        return this.visualizationData.hasAnimations();
+        return this.visualizationData?.hasAnimations() ?? false;
     }
 
     hasAnimation(animation: number): boolean {
-        return this.visualizationData.hasAnimation(animation);
+        return this.visualizationData?.hasAnimation(animation) ?? false;
     }
 
     hasAnimationForLayer(animation: number, layer: number): boolean {
-        return this.visualizationData.hasAnimationForLayer(animation, layer);
+        return this.visualizationData?.hasAnimationForLayer(animation, layer) ?? false;
     }
 
     getAnimations(): string[] {
-        return Object.keys(this.data.visualization.animations!);
+        if (!this.data?.visualization?.animations) return [];
+        return Object.keys(this.data.visualization.animations);
     }
 
     getFrameFromAsset(assetName: string): any {
-        let frameName = this.spritesheetData!.assets[assetName + '.png'];
+        if (!this.data || !this.data.assets) return null;
 
-        if (frameName == undefined) {
-            frameName = this.spritesheetData!.assets[this.itemName + '.png'];
+        let frameName = this.data.assets[assetName + '.png'];
+
+        if (frameName === undefined) {
+            frameName = this.data.assets[this.itemName + '.png'];
         }
 
         return frameName;
     }
 
-    getAsset(assetName: string) {
+    getAsset(assetName: string): FurniAsset | null {
         return this.assets.get(assetName) ?? null;
     }
 
-    getValidDirection(direction: number) {
-        return this.visualizationData.getValidDirection(direction);
+    getValidDirection(direction: number): number {
+        return this.visualizationData?.getValidDirection(direction) ?? 0;
     }
 
-    getDirection(direction: number) {
-        return this.visualizationData.getDirection(direction);
+    getDirection(direction: number): any {
+        return this.visualizationData?.getDirection(direction) ?? null;
     }
 
     getFrameFrom(
@@ -171,56 +156,75 @@ export class FurniBase {
         layer: number,
         frameCount: number
     ): number {
-        if (this.hasAnimationForLayer(animation, layer)) {
-            const animationLayer = this.visualizationData.getAnimationLayer(
-                layer,
-                animation
-            );
+        if (!this.hasAnimationForLayer(animation, layer)) {
+            return 0;
+        }
 
-            if (!animationLayer.hasSequences()) {
-                return 0;
+        const animationLayer = this.visualizationData?.getAnimationLayer(layer, animation);
+
+        if (!animationLayer || !animationLayer.hasSequences()) {
+            return 0;
+        }
+
+        const sequences = animationLayer.getAllSequences();
+        if (!sequences || sequences.length === 0) return 0;
+
+        let totalDuration = 0;
+        for (const seq of sequences) {
+            totalDuration += seq.getFrameCount();
+        }
+
+        if (totalDuration === 0) return 0;
+
+        const currentLoopFrame = frameCount % totalDuration;
+
+        if (sequences.length === 1) {
+            const sequence = sequences[0];
+            const frameData = sequence.getFrame(currentLoopFrame % sequence.getFrameCount());
+            return frameData ? frameData.id : 0;
+        } else {
+            let accumulatedFrames = 0;
+            for (const sequence of sequences) {
+                const seqLength = sequence.getFrameCount();
+                
+                if (currentLoopFrame < (seqLength + accumulatedFrames)) {
+                    const localIndex = currentLoopFrame - accumulatedFrames;
+                    const frameData = sequence.getFrame(localIndex);
+                    return frameData ? frameData.id : 0;
+                }
+                
+                accumulatedFrames += seqLength;
             }
-
-            const frameRepeat =
-                animationLayer.getFrame(direction, frameCount).repeats || 1;
-
-            const frameIndex = Math.floor(
-                ((frameCount % animationLayer.getSequence(0).getFrameCount()) *
-                    frameRepeat) /
-                    frameRepeat
-            );
-
-            return animationLayer.getSequence(0).getFrame(frameIndex).id;
         }
 
         return 0;
     }
 
-    getLayer(layer: number): Layer {
-        return this.visualizationData.getLayer(layer);
+    getLayer(layer: number): Layer | null {
+        return this.visualizationData?.getLayer(layer) ?? null;
     }
 
     hasLayers(): boolean {
-        return this.visualizationData.hasLayers();
+        return this.visualizationData?.hasLayers() ?? false;
     }
 
     hasColorForLayer(color: number, layer: number): boolean {
         return (
-            this.visualizationData.hasColor(color) &&
-            this.data.visualization.colors![color].layers[layer] != null
+            this.visualizationData?.hasColor(color) &&
+            this.data?.visualization?.colors?.[color]?.layers?.[layer] != null
         );
     }
 
     getColorFrom(color: number, layer: number): number {
         if (this.hasColorForLayer(color, layer)) {
-            return this.visualizationData.getColor(color, layer).color;
+            return this.visualizationData!.getColor(color, layer).color;
         }
 
         return 0xffffff;
     }
 
     getColors(): string[] {
-        return this.visualizationData.getColors();
+        return this.visualizationData?.getColors() ?? [];
     }
 
     assetNameFrom(
@@ -232,42 +236,35 @@ export class FurniBase {
         const layerChar = FurniSpriteUtils.layerFromNumber(layer);
 
         if (size == 1) {
-            return this.itemName + '_icon_' + layerChar;
+            return `${this.itemName}_icon_${layerChar}`;
         }
 
-        let assetName = this.itemName + '_' + size + '_' + layerChar;
+        let assetName = `${this.itemName}_${size}_${layerChar}`;
 
         if (frame != null) {
-            assetName += '_' + direction + '_' + frame;
+            assetName += `_${direction}_${frame}`;
         }
 
         return assetName;
     }
 
-    private hasAsset(assetName: string) {
+    private hasAsset(assetName: string): boolean {
         return this.assets.has(assetName);
     }
 
     hasVisualDirections(): boolean {
-        return this.data.visualization.directions != null;
+        return this.data?.visualization?.directions != null;
     }
 
     hasVisualDirection(direction: number): boolean {
         return (
             this.hasVisualDirections() &&
-            this.data.logic.directions![direction] != null
+            this.data?.logic?.directions?.[direction] != null
         );
     }
 
     hasVisualDirectionLayer(direction: number, layer: number): boolean {
-        if (
-            this.hasVisualDirection(direction) &&
-            this.data.logic.directions![direction]
-        ) {
-            return true;
-        }
-
-        return false;
+        return this.hasVisualDirection(direction) && !!this.data.logic.directions![direction];
     }
 
     isAssetFlipped(
@@ -281,32 +278,44 @@ export class FurniBase {
         if (this.hasAsset(assetName)) {
             const asset = this.data.assets[assetName];
             if (asset && asset.flipH != null) {
-                return asset.flipH == 1;
+                return asset.flipH === 1;
             }
         }
 
         return null;
     }
 
-    get LogicType() {
-        return this.data.logicType;
+    get LogicType(): string {
+        return this.data?.logicType ?? '';
     }
 
     get visualizationType(): string {
-        return this.data.visualization.type;
+        return this.data?.visualization?.type ?? '';
     }
 
-    getLayerCount() {
-        return this.visualizationData.layerCount;
+    getLayerCount(): number {
+        return this.visualizationData?.layerCount ?? 0;
     }
 
     get angle(): number {
-        return this.data.visualization.angle;
+        return this.data?.visualization?.angle ?? 0;
     }
 
     get directions(): number[] {
-        return this.data.logic.directions!.map(
-            direction => (direction / 90) * 2
+        if (!this.data?.logic?.directions) return [];
+        return this.data.logic.directions.map(
+            (direction: number) => (direction / 90) * 2
         );
+    }
+    destroy(): void {
+        if (this.spritesheet) {
+            this.spritesheet.destroy(true); // Free the texture from GPU memory
+            this.spritesheet = null;
+        }
+        
+        // Clear repositories and references
+        //this.assets?.();
+        this.visualizationData = null;
+        this.logicData = null;
     }
 }

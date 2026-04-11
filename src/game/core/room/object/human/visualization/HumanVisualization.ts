@@ -1,5 +1,8 @@
 import {Engine} from '../../../../../Engine';
 import {HumanEvents} from '../../../../../engine/events/room/objects/entities/HumanEvents';
+import { ChangeLookEventData } from '../../../../../engine/events/ui/data/avatar/ChangeLookEventData';
+import { UIEvents } from '../../../../../engine/events/ui/UIEvents';
+import { UIEventsType } from '../../../../../engine/events/ui/UIEventsType';
 import {MapData} from '../../../../../engine/room/objects/map/MapData';
 import {Tile} from '../../../../../engine/room/objects/map/Tile';
 import {RoomPriority} from '../../../../../engine/room/visualization/RoomPriority';
@@ -11,6 +14,7 @@ import {AvatarData} from '../../../../../engine/ui/imagers/avatars/enum/AvatarDa
 import {Point} from '../../../../../utils/point/Point';
 import {Point3d} from '../../../../../utils/point/Point3d';
 import {Rotation} from '../../../../../utils/Rotation';
+import { EventManager } from '../../../../events/EventManager';
 import {Direction} from '../../../../objects/Direction';
 import {EntityVisualization} from '../../entities/EntityVisualization';
 import {Human} from '../Human';
@@ -127,6 +131,11 @@ export abstract class HumanVisualization extends EntityVisualization {
             this.updatePosition();
         }
 
+        const avatarWidth = this.container.width > 0 ? this.container.width : 64;
+        const avatarHeight = this.container.height > 0 ? this.container.height : 110;
+
+        this.container.pivot.set(avatarWidth / 2, avatarHeight);
+
         this.entity.logic.events.emit(HumanEvents.HUMAN_RENDERING_COMPLETE);
 
         this.container.eventMode = 'dynamic';
@@ -135,6 +144,14 @@ export abstract class HumanVisualization extends EntityVisualization {
     }
 
     async render(): Promise<void> {
+
+        if (this.container) {
+            if (this.container.parent) {
+                this.container.parent.removeChild(this.container);
+            }
+            this.container.destroy({ children: true });
+        }
+
         const placeholder = new AvatarPlaceHolder(
             '',
             this.direction,
@@ -149,24 +166,15 @@ export abstract class HumanVisualization extends EntityVisualization {
         Engine.getInstance()
             ?.userInterfaceManager?.avatarImager.loadAvatar(placeholder)
             .then(() => {
-                Engine.getInstance()?.userInterfaceManager?.avatarImager.drawAvatar(
-                    placeholder
-                );
+                Engine.getInstance()?.userInterfaceManager?.avatarImager.drawAvatar(placeholder);
             });
 
-        placeholder.Container.cursor = 'pointer';
-        placeholder.Container.eventMode = 'dynamic';
-        placeholder.Container.interactiveChildren = true;
-
         this.container = this.avatar.Container;
-
         this.container.zIndex = this.getZIndex();
-
-        this.loadAvatar().then(() => {
-            this.container.destroy();
-            this.loaded = true;
-            this.draw();
-        });
+        this.container.cursor = 'pointer';
+        this.container.eventMode = 'dynamic';
+        this.container.interactiveChildren = true;
+         this.container.pivot.set(this.container.width / 2, this.container.height);
 
         if (Engine.getInstance().roomService?.currentRoom) {
             Engine.getInstance().roomService?.currentRoom?.roomLayout.visualization.container?.addChild(
@@ -175,7 +183,20 @@ export abstract class HumanVisualization extends EntityVisualization {
             this.updatePosition();
         }
 
+        this.loadAvatar().then(() => {
+        
+            if (this.container && this.container.parent) {
+                this.container.parent.removeChild(this.container);
+            }
+            this.container.destroy({ children: true });
+
+            this.loaded = true;
+            this.draw(); 
+        });
+
         this.entity.logic.events.emit(HumanEvents.HUMAN_RENDERING_COMPLETE);
+
+        //await this.entity.logic.loadPreviewData('user');
 
         this.entity.logic.registerEvents();
     }
@@ -205,36 +226,19 @@ export abstract class HumanVisualization extends EntityVisualization {
         );
     }
 
-    calculateOffsetY(): number {
-        const tile: Tile = Engine.getInstance()
-            .roomService.currentRoom.roomLayout.getFloorPlane()
-            .getTilebyPosition(
-                new Point(
-                    Math.round(this.entity.position.x),
-                    Math.round(this.entity.position.y)
-                )
-            );
-        const offsetFloor =
-            tile!.position.z > 0
-                ? -MapData.thickSpace *
-                  MapData.stepHeight *
-                  tile!.position.z
-                : -AvatarData.AVATAR_TOP_OFFSET;
-        return (this.container!.y =
-            ((this.entity.position.x + this.entity.position.y) *
-                MapData.tileHeight) /
-                2 +
-            MapData.tileHeight / 2 +
-            offsetFloor);
+    calculateOffsetX(): number {
+        const tileBaseX = (this.entity.position.y * MapData.tileHeight) - 
+                        (this.entity.position.x * MapData.tileWidth) / 2;
+
+        return tileBaseX + (MapData.tileWidth / 2);
     }
 
-    calculateOffsetX(): number {
-        return (
-            ((this.entity.position.y - this.entity.position.x) *
-                MapData.tileWidth) /
-                2 +
-            MapData.tileWidth / 2 -
-            MapData.tileWidth / 2
-        );
+    calculateOffsetY(): number {
+
+        const tileBaseY = (this.entity.position.y * MapData.tileHeight) / 2 + 
+                        (this.entity.position.x * MapData.tileWidth) / 4 -
+                        (this.entity.position.z * MapData.thickSpace * MapData.stairSteps);
+
+        return tileBaseY + (MapData.tileHeight / 2) + AvatarData.AVATAR_TOP_OFFSET + 2;
     }
 }

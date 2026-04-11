@@ -14,17 +14,16 @@ export class RenderingUtils {
 
     static cropTexture(
         texture: Texture,
-        height: number,
-        width: number,
-        left: number,
-        top: number
+        left: number,   // X
+        top: number,    // Y
+        width: number,  // W
+        height: number  // H
     ) {
         return new Texture(
             texture.baseTexture,
             new Rectangle(left, top, width, height)
         );
     }
-
     static getPointFromObject(object: {x; y; z}) {
         return new Point3d(object.x, object.y, object.z);
     }

@@ -1,6 +1,9 @@
 import {HumanEvents} from '../../../../../engine/events/room/objects/entities/HumanEvents';
+import { ChangeLookEventData } from '../../../../../engine/events/ui/data/avatar/ChangeLookEventData';
+import { UIEvents } from '../../../../../engine/events/ui/UIEvents';
 import {ActionId} from '../../../../../engine/ui/imagers/avatars/enum/actions/ActionId';
 import {AvatarData} from '../../../../../engine/ui/imagers/avatars/enum/AvatarData';
+import { EventManager } from '../../../../events/EventManager';
 import {EntityLogic} from '../../entities/EntityLogic';
 import {Human} from '../Human';
 import {HumanVisualization} from '../visualization/HumanVisualization';
@@ -16,6 +19,11 @@ export abstract class HumanLogic extends EntityLogic {
         this.events.on(HumanEvents.FIGURE_LOADING_COMPLETE, () =>
             this.onLoad()
         );
+
+
+        EventManager.emit<ChangeLookEventData>(UIEvents.CHANGE_LOOK, {
+            look: (this.entity as Human).figure
+        })
     }
 
     onClick(): void {

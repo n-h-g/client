@@ -1,13 +1,20 @@
 <template>
     <div id="roomGui" ref="roomGui"> 
         <div id="chatBubbleContainer" ref="chatBubbleContainer">
-            <div class="chatBubble" v-for="message in messages" :key="message.id" :id="message.id" :style="{top: message.y + 'px', left: message.x + 'px'}" v-bind:class="message.shout ? 'chatBubbleShout' : ''" @click=onClickChat(message)>
+            <div class="chatBubble" 
+                v-for="message in messages" 
+                :key="message.internalId" 
+                :id="message.internalId" 
+                :style="{top: message.y + 'px', left: message.x + 'px'}" 
+                :class="{'chatBubbleShout': message.data.shout}"
+                @click="onClickChat(message)">
+                
                 <div class="chatBubbleContainer">
-                <div class="playerHeadContainer">
-                    <img src="" />
+                    <div class="playerHeadContainer">
+                        <img src="" />
                     </div>
                     <p>
-                        <b>{{ message.author.name }}:</b> {{ message.text }}
+                        <b>{{ message.data.author.name }}:</b> {{ message.data.text }}
                     </p>
                  </div>
             </div>
@@ -27,142 +34,131 @@
         </div>
     </div>
 </template>
-
 <script setup lang="ts">
-import anime from 'animejs'
-import { ref } from 'vue'
+import { ref, onMounted, onUnmounted } from 'vue'
 import { EventManager } from '../../../game/core/events/EventManager'
 import { IComponentShowableUI } from '../../../game/core/ui/IComponentShowableUI'
 import { Engine } from '../../../game/Engine'
 import { RoomChatData } from '../../../game/engine/events/ui/data/room/RoomChatData'
 import { UIEvents } from '../../../game/engine/events/ui/UIEvents'
-import { ChatData } from '../../../game/engine/game/chat/ChatData'
 import { UIComponent } from '../../../game/engine/ui/components/UIComponent'
-import {AvatarData} from '../../../game/engine/ui/imagers/avatars/enum/AvatarData'
-import {UiUtils} from '../../../game/utils/UiUtils'
+import { AvatarData } from '../../../game/engine/ui/imagers/avatars/enum/AvatarData'
+import { UiUtils } from '../../../game/utils/UiUtils'
 import { Container } from 'pixi.js'
 
-const chatDelayTimer = 2000 // in ms
+interface UIChatBubble {
+    data: RoomChatData;
+    yOffset: number;
+    targetYOffset: number; // NUOVO: Dove la bolla deve arrivare
+    createdAt: number;
+    internalId: string;
+    x: number;
+    y: number;
+}
 
-const chatMessageDefaultHeight = 28
+const chatMessageDefaultHeight = 32;
+const chatLifespan = 8000;
+let chatMessageCounter = 0; 
 
-let messages = ref([] as RoomChatData[])
+let messages = ref<UIChatBubble[]>([])
+let animationFrameId: number;
 
-function pushChatMessageUp(additionalPaddingTop: number = 0) {
-    anime({
-        targets: ".chatBubble",
-        top: "-=" + additionalPaddingTop,
-        easing: 'easeInQuad',
-        duration: Engine.getInstance().config.fps / 60
+function onClickChat(message: any) {
+    if(!message.data.author) return;
+    message.data.author.logic.onClick()
+}
+
+// 1. GESTIONE ARRIVO NUOVO MESSAGGIO
+EventManager.read(UIEvents.ROOM_NEW_MESSAGE, (rawEvent: RoomChatData) => {
+    // Sposta il BERSAGLIO verso l'alto (non la posizione attuale)
+    messages.value.forEach(msg => {
+        msg.targetYOffset += chatMessageDefaultHeight;
     });
-}
 
-function onClickChat(message) {
-    if(!message.author) return;
-    message.author.logic.onClick()
-}
+    let startX = -1000;
+    let startY = -1000;
 
-function checkChatCollision(a, b, extraPadding: number = 0, padding: number = 0) {
-    return !((((a.x + padding) + a.width) < (b.x + padding)) || ((a.x + padding) > ((b.x + padding) + b.width)) || ((a.y + a.height) < (b.y + extraPadding)) || (a.y > ((b.y + extraPadding) + b.height)));
-}
-
-EventManager.read(UIEvents.ROOM_UPDATE_CHAT, (event: RoomChatData) => {
-    for(let i = 0; i < messages.value.length; i++) {
-        const elements: HTMLCollection = document.getElementsByClassName("chatBubble");
-
-        const chatMessage = messages.value[i]
-
-        if(!chatMessage) continue;
-
-        if(!((chatMessage.author.visualization.container as Container).visible)) return;
-
-        chatMessage.x = UiUtils.getGlobalPosition((chatMessage.author.visualization.container as Container)).tx + AvatarData.AVATAR_LEFT_OFFSET
-        chatMessage.y = UiUtils.getGlobalPosition((chatMessage.author.visualization.container as Container)).ty - (chatMessage.author.visualization.container.height * 2) + 28 * i
+    if (rawEvent.author?.visualization?.container) {
+        const container = rawEvent.author.visualization.container as Container;
+        const globalPos = UiUtils.getGlobalPosition(container);
+        startX = globalPos.tx + AvatarData.AVATAR_LEFT_OFFSET;
+        startY = globalPos.ty - container.height - 15;
     }
+
+    messages.value.push({
+        data: rawEvent,
+        yOffset: 0,
+        targetYOffset: 0, // Parte da zero e va verso zero
+        createdAt: Date.now(),
+        internalId: `chat_msg_${Date.now()}_${chatMessageCounter++}`,
+        x: startX,
+        y: startY
+    });
 })
 
-EventManager.read(UIEvents.ROOM_NEW_MESSAGE, (event: RoomChatData) => {
+// 2. LOOP DELLA UI (FISICA E RENDER)
+function updateChatPositions() {
+    const now = Date.now();
 
-    if(messages.value.length != 0) {
+    messages.value = messages.value.filter(msg => {
+        const isExpired = (now - msg.createdAt) > chatLifespan;
+        const hasAuthorContainer = msg.data.author && msg.data.author.visualization?.container;
+        return !isExpired && hasAuthorContainer;
+    });
 
-        //event.y += 28 * messages.value[messages.value.length - 1].y
-
-        pushChatMessageUp(chatMessageDefaultHeight)
-    } 
-
-    messages.value.push(event)
-
-    setTimeout(() => {
-        initializeChatInterval()
-    }, chatDelayTimer)
-})
-
-function initializeChatInterval() {
-
-    let additionalPaddingTop = 0
-
-    setInterval(() => {
-
-    for(let i = 1; i < messages.value.length; i++) {
-
-        let previousChat = messages.value[i - 1];
-
-        let currentChat = messages.value[i]
-
-        if(!currentChat) { currentChat = previousChat}
-
-        let skipAnimation: boolean = false
-
-        const elements: HTMLCollection = document.getElementsByClassName("chatBubble");
-
-        const previousElement = elements[i - 1] as HTMLElement
-        const currentElement = elements[i] as HTMLElement
-
-        additionalPaddingTop = currentChat != previousChat ? 28 : previousChat.height + 28
-
-        if(previousElement && currentElement) {
-            previousChat.height = parseInt(previousElement.style.height)
-            currentChat.height = parseInt(currentElement.style.height)
-
-            previousChat.width = parseInt(previousElement.style.width)
-            currentChat.width = parseInt(currentElement.style.width)
-
-            if(checkChatCollision(previousChat, currentChat)) {
-                skipAnimation = true
+    for (let i = 0; i < messages.value.length; i++) {
+        const chatMessage = messages.value[i];
+        
+        // --- INIZIO LOGICA ANIMAZIONE (LERP) ---
+        // Se l'offset attuale è minore del bersaglio, scivola verso l'alto
+        if (chatMessage.yOffset < chatMessage.targetYOffset) {
+            // Modifica lo 0.15 per rendere l'animazione più veloce o più lenta
+            chatMessage.yOffset += (chatMessage.targetYOffset - chatMessage.yOffset) * 0.15;
+            
+            // Arrotonda per evitare calcoli infiniti microscopici
+            if (Math.abs(chatMessage.targetYOffset - chatMessage.yOffset) < 0.5) {
+                chatMessage.yOffset = chatMessage.targetYOffset;
             }
         }
+        // --- FINE LOGICA ANIMAZIONE ---
 
-        if (!checkVisible(previousElement)) {
-            previousElement.remove()
-            delete messages[i]
-        }
+        if (!chatMessage.data.author?.visualization?.container) continue;
+        const container = chatMessage.data.author.visualization.container as Container;
+        if (!container.visible) continue;
+
+        const globalPos = UiUtils.getGlobalPosition(container);
+        
+        chatMessage.x = globalPos.tx + AvatarData.AVATAR_LEFT_OFFSET;
+        
+        const baseHeadY = globalPos.ty - container.height - 15;
+        // Applica l'offset calcolato dall'animazione
+        chatMessage.y = baseHeadY - chatMessage.yOffset; 
     }
 
-    pushChatMessageUp(additionalPaddingTop)
-    }, 5000)
-
+    animationFrameId = requestAnimationFrame(updateChatPositions);
 }
 
-function checkVisible(elm: HTMLElement | null) {
-    const rect = elm?.getBoundingClientRect();
-    const viewHeight = Math.max(document.documentElement.clientHeight, window.innerHeight);
+onMounted(() => {
+    animationFrameId = requestAnimationFrame(updateChatPositions);
+})
 
-    if(!rect) return;
-
-    return !(rect!.bottom < 0 || rect!.top - viewHeight >= 0);
-}
+onUnmounted(() => {
+    cancelAnimationFrame(animationFrameId);
+})
 
 function openSettings() {
     Engine.getInstance().userInterfaceManager.componentsManager.getComponent<IComponentShowableUI>(UIComponent.RoomInfoUI).toggle()
 }
 
 function getRoomName() {
-    return Engine.getInstance().roomService.currentRoom.roomInfo.roomName
+    return Engine.getInstance().roomService.currentRoom?.roomInfo.roomName || 'Unknown'
 }
+
 function getAuthorName() {
-    return Engine.getInstance().roomService.currentRoom.roomInfo.authorName
+    return Engine.getInstance().roomService.currentRoom?.roomInfo.authorName || 'Unknown'
 }
 </script>
+
 
 <style lang="scss">
 #roomGui {
@@ -224,9 +220,10 @@ function getAuthorName() {
             flex-direction: row;
             overflow: hidden;
             line-height: 2px;
-            transition: top 0.4s ease-out;
+            //transition: top 0.4s ease-out;
             pointer-events: all !important;
             cursor:pointer !important;
+            transform: translateX(-50%);
             //border-image-source: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADMAAAAYCAYAAABXysXfAAAACXBIWXMAAAsSAAALEgHS3X78AAAAsklEQVR42u3YwQ2AIAwFUNZwC48M5B6sxw4MUyGRRKDh1N9gheQnHjzwJK0pjohcn7xo9bD75hDcixLJK6SUSCLcXhvI83whUiAkvCqqwaAhKEwP6jEeFRUMUyOfwTA1hCv49weSLP5JQ9iY/2IKxATmgRASooLRgsAxmhDNkwkmMLWLaYC0upk30832T3Nj3DCYfRIzzDM5pwnMGwTKUTAxRpLOMDYztzLLg6YXGhaumm6fs9SOmEzL3AAAAABJRU5ErkJggg==);
 
             .chatBubbleContainer {

@@ -45,10 +45,12 @@ export class Avatar {
     private headAccessoryContainer: Container;
     private armsContainer: Container;
     private faceContainer: Container;
+    private shadowContainer: Container;
 
     private totalFrames = 0;
 
     private events: AvatarEvents | null = null;
+    private ui: boolean;
 
     constructor(
         figure: string = DEFAULT_FIGURE,
@@ -58,7 +60,8 @@ export class Avatar {
         bodyFrame = 0,
         headFrame = 0,
         isSmall = false,
-        placeholder = false
+        placeholder = false,
+        ui: boolean = false
     ) {
         this.avatarFigure = new AvatarFigure(figure);
 
@@ -68,6 +71,8 @@ export class Avatar {
 
         this.bodyDirection = bodyDirection;
         this.headDirection = headDirecton;
+
+        this.ui = ui;
 
         this.actions = actions;
 
@@ -91,6 +96,11 @@ export class Avatar {
         this.hatContainer = new Container();
         this.headAccessoryContainer = new Container();
         this.faceContainer = new Container();
+        this.shadowContainer = new Container();
+
+        this.container.cursor = 'pointer';
+        this.container.eventMode = 'dynamic';
+        this.container.interactiveChildren = false;
 
         /*this.events.on(AvatarEventsType.LOAD_COMPLETE, () => {
             this.assemble()
@@ -108,6 +118,7 @@ export class Avatar {
         this.container.addChild(this.armsContainer);
         this.container.addChild(this.torsoContainer);
         this.container.addChild(this.faceContainer);
+        this.container.addChild(this.shadowContainer);
 
         this.container.sortableChildren = true;
 
@@ -139,6 +150,10 @@ export class Avatar {
 
     addAction(action: ActionId) {
         this.actions.add(action);
+    }
+
+    get isUI() {
+        return this.ui;
     }
 
     get Look() {
@@ -229,6 +244,10 @@ export class Avatar {
     }
     get HairContainer(): Container {
         return this.legContainer;
+    }
+
+    get ShadowContainer(): Container {
+        return this.shadowContainer;
     }
 
     get HeadAccessoryContainer(): Container {

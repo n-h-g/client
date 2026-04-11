@@ -9,6 +9,7 @@ import {OfflineMode} from '../../../../../offline/OfflineMode';
 import {RoomPriority} from '../../../visualization/RoomPriority';
 import {RoomVisualization} from '../../../visualization/RoomVisualization';
 import {PointerLogic} from './PointerLogic';
+import { Furni } from '../../../../ui/imagers/items/Furni';
 
 export class TileLogic extends RoomObjectLogic {
     private tile: Tile;
@@ -50,10 +51,11 @@ export class TileLogic extends RoomObjectLogic {
             this.tile.plane.room
                 .getRoom()
                 .roomEntityRepository.isEntityRolling()
-        )
+        ) {
             this.tile.plane.room
                 .getRoom()
                 .roomEntityRepository.stopRollingEntity();
+        }
 
         Engine.getInstance().networkingManager.packetManager.applyOut(
             OutgoingPacket.UserMove,
@@ -91,9 +93,28 @@ export class TileLogic extends RoomObjectLogic {
                 tileContext!.y,
                 this.tile
             );
-        this.tile.plane.room
+
+        if (this.tile.plane.room
             .getRoom()
-            .roomEntityRepository.updateRollingEntity(this.tile.position);
+            .roomEntityRepository.isEntityRolling()) {
+        {
+
+            if (this.tile.plane.room
+            .getRoom()
+            .roomEntityRepository.isEntityRolling() && this.tile.plane.room
+            .getRoom()
+            .roomEntityRepository.rollingEntity.visualization) {
+                // L'oggetto torna NORMALE perché siamo su una tile
+                (this.tile.plane.room
+            .getRoom()
+            .roomEntityRepository.rollingEntity.visualization.sprite as Furni).setIcon(false);
+            }
+
+            this.tile.plane.room
+                .getRoom()
+                .roomEntityRepository.updateRollingEntity(this.tile.position);
+        }
+    }
     }
 
     checkTileAndDrawHitBox() {

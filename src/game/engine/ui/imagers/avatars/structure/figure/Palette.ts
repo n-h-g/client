@@ -5,7 +5,7 @@ export class Palette {
     /**
      *  colorId | PaletteColor
      */
-    private colors: Map<string, PaletteColor>;
+    public colors: Map<string, PaletteColor>;
 
     constructor(data: any) {
         this.colors = new Map();

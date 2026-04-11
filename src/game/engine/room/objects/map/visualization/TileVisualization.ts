@@ -9,6 +9,7 @@ import {NormalType} from '../../../visualization/NormalTypeEnum';
 import {Container, Graphics, ObservablePoint} from 'pixi.js';
 import {Tile} from '../Tile';
 import {RoomPriority} from '../../../visualization/RoomPriority';
+import { PlaneVisualization } from './PlaneVisualization';
 
 export class TileVisualization extends RoomObjectVisualization {
     private tile: Tile;
@@ -17,7 +18,7 @@ export class TileVisualization extends RoomObjectVisualization {
     private color: ColorRGB = ColorRGB.getColorFromNumber(
         RoomVisualizationColorData.TILE_COLOR
     );
-    private useStroke = true;
+    private useStroke = false;
 
     constructor(tile: Tile) {
         super(
@@ -31,6 +32,8 @@ export class TileVisualization extends RoomObjectVisualization {
         const roomV = tile.plane.room.visualization as RoomVisualization;
         this.floorContext = roomV.getCanvasFloor();
         this.doorContext = roomV.getCanvasDoorTile();
+
+        this.useStroke = !(tile.plane.visualization as PlaneVisualization).useTexture
     }
 
     getZIndex(): number {

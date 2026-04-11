@@ -11,7 +11,9 @@ export class ItemVisualizationAnimated extends ItemVisualization {
         await super.render();
     }
 
-    nextFrame(): void {}
+    nextFrame(): void {
+        super.nextFrame();
+    }
 
     setAnimation(animation: number) {
         this.entity.visualization.draw();

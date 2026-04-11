@@ -11,16 +11,27 @@ import {Point3d} from '../utils/point/Point3d';
 import {Rotation} from '../utils/Rotation';
 import {Tile} from '../engine/room/objects/map/Tile';
 
+// ... (mantenere gli import esistenti)
+
 export class OfflineMode {
     private engine: Engine;
     private entity: Entity;
     private static instance: OfflineMode;
-    private static ENTITY_ID = '473674-34dfbnasb-43423';
-    private static RANDOM_ITEMS = false;
-    private static ITEM = 'habbocake';
-    private static NUMBER_OF_ITEMS = 1;
-    private static NUMBER_OF_USERS = 1;
-    private static ROOM_SIZE = 20;
+    
+    // CONFIGURAZIONE FURNI
+    private static RANDOM_ITEMS = true; 
+    private static ITEMS = ['chair_norja'];
+    private static NUMBER_OF_ITEMS = 20; // Quanti furni generare
+    
+    // CONFIGURAZIONE UTENTI
+    private static NUMBER_OF_USERS = 1; // Quanti utenti generare (cambia N qui)
+    private static FIGURES = [
+        'ch-255-82.lg-275-67.ha-1012-1331.hd-190-13',
+        'hd-180-1.ch-255-66.lg-280-110.sh-305-62.ha-1012-110.hr-828-61', // Default 
+        'hr-100.hd-180-1.ch-210-66.lg-270-82.sh-290-91',                 // Boy
+        'hr-515-33.hd-600-1.ch-630-82.lg-695-73.sh-735-68',              // Girl
+        'hr-828-45.hd-180-2.ch-210-121.lg-270-82.sh-290-91.he-1601-62'   // Boy with accessory
+    ];
 
     constructor(engine: Engine) {
         this.engine = engine;
@@ -35,6 +46,7 @@ export class OfflineMode {
             OfflineMode.instance = this;
         }
 
+        // Layout della stanza
         const generatedModel =
             '000000000000000000000/000000000001111111111/000000000001111111111/000000000001111111111/000000000001111111111/000000000001111111111/000000000001111111111/011111111111111111111/011111111111111111111/011111111111111111111/111111111111111111111/011111111111111111111/011111111111111111111/011111111111111111111/011111111111111111111/011111111111111111111/011111111111111111111/011111111110000000000/011111111110000000000/011111111110000000000/011111111110000000000/011111111110000000000/011111111110000000000/000000000000000000000';
 
@@ -47,88 +59,98 @@ export class OfflineMode {
         );
 
         for (let i = 0; i < OfflineMode.NUMBER_OF_USERS; i++) {
-            const randomTile = room.roomLayout
-                .getFloorPlane()
-                .getRandomTile() as Tile;
+            const randomTile = room.roomLayout.getFloorPlane().getRandomTile() as Tile;
+            
+            // Scegli una figura a caso dall'array
+            const randomFigure = OfflineMode.FIGURES[Math.floor(Math.random() * OfflineMode.FIGURES.length)];
+            
+            const entity = new UserEntity(
+                'user_' + i,
+                'Utente_' + i,
+                randomFigure
+            );
+            
+            entity.visualization.direction = 6;
+            entity.position = new Point3d(randomTile.position.x, randomTile.position.y, 0);
+            this.engine.roomService.currentRoom.roomEntityRepository.add(entity.id, entity);
+            (entity.visualization as HumanVisualization).addAction(ActionId.SIT);
+            entity.visualization.render();
 
-            this.entity = new UserEntity(
-                'id',
-                'prova',
-                'hd-615-18.ch-822-79.lg-710-81.sh-905-108.ha-1002-96.wa-2001-'
-            );
-            this.entity.visualization.direction = Direction.WEST;
-            this.entity.position =
-                OfflineMode.NUMBER_OF_USERS == 1
-                    ? new Point3d(
-                          room.roomLayout.getDoorPosition().x,
-                          room.roomLayout.getDoorPosition().y,
-                          0
-                      )
-                    : randomTile.position;
-            this.engine.roomService.currentRoom.roomEntityRepository.add(
-                this.entity.id,
-                this.entity
-            );
-            this.entity.visualization.render();
+            // Salva il primo utente generato come l'entità principale controllata dal metodo walk()
+            if (i === 0) {
+                this.entity = entity;
+            }
         }
 
+        // --- GENERAZIONE SERIE DI FURNI ---
         for (let i = 0; i < OfflineMode.NUMBER_OF_ITEMS; i++) {
-            const randomTile = room.roomLayout
-                .getFloorPlane()
-                .getRandomTile() as Tile;
 
-            const randomItem =
-                this.engine.userInterfaceManager.furniImager.generateRandomItem();
+            const randomTile = room.roomLayout.getFloorPlane().getRandomTile() as Tile;
 
-            const base =
-                await this.engine.userInterfaceManager!.furniImager.loadFurniBase(
+            // 2. Seleziona lo sprite del mobile
+            let spriteName: string;
+            if (OfflineMode.RANDOM_ITEMS) {
+                // Sceglie un nome a caso dall'array ITEMS
+                spriteName = OfflineMode.ITEMS[Math.floor(Math.random() * OfflineMode.ITEMS.length)];
+            } else {
+                // Alterna tra gli elementi dell'array
+                spriteName = OfflineMode.ITEMS[i % OfflineMode.ITEMS.length];
+            }
+
+            try {
+                // 3. Carica la definizione (base) del furni
+                const base = await this.engine.userInterfaceManager!.furniImager.loadFurniBase(
                     FurnidataItemType.FloorItem,
-                    OfflineMode.RANDOM_ITEMS ? randomItem : OfflineMode.ITEM
+                    spriteName
                 );
-            const item = new FloorItem(
-                OfflineMode.ENTITY_ID,
-                OfflineMode.ITEM,
-                new Point3d(
-                    randomTile.position.x,
-                    randomTile.position.y,
-                    1
-                ),
-                base
-            );
-            item.visualization?.render();
-            this.engine.roomService.currentRoom.roomEntityRepository.add(
-                item.id,
-                item
-            );
+
+                // 4. Crea l'oggetto FloorItem con un ID univoco
+                const item = new FloorItem(
+                    `furni_offline_${i}_${Math.random()}`, // ID Univoco fondamentale
+                    spriteName,
+                    new Point3d(
+                        randomTile.position.x,
+                        randomTile.position.y,
+                        randomTile.position.z
+                    ),
+                    base
+                );
+
+
+                item.visualization.direction = 6;
+                item.visualization.needsUpdate = true
+                item.visualization?.render();
+                
+
+                this.engine.roomService.currentRoom.roomEntityRepository.add(
+                    item.id,
+                    item
+                );
+            } catch (e) {
+                console.error(`Errore nel caricamento del furni: ${spriteName}`, e);
+            }
         }
+        // ----------------------------------
     }
 
     walk(point: Point3d) {
-        if (point == this.entity.position) {
-            (this.entity.visualization as HumanVisualization).removeAction(
-                ActionId.WALK
-            );
-            (this.entity.visualization as HumanVisualization).addAction(
-                ActionId.STAND
-            );
+        if (!this.entity) return;
+
+        // Se la destinazione è uguale alla posizione attuale, ferma l'omino
+        if (point.x === this.entity.position.x && point.y === this.entity.position.y) {
+            (this.entity.visualization as HumanVisualization).removeAction(ActionId.WALK);
+            (this.entity.visualization as HumanVisualization).addAction(ActionId.STAND);
             this.entity.visualization.needsUpdate = false;
             return;
         }
 
         this.entity.visualization.setNextPosition(point);
-
         this.entity.visualization.direction = Rotation.calculateDirection(
-            new Point(
-                this.entity.position.x,
-                this.entity.position.y
-            ),
+            new Point(this.entity.position.x, this.entity.position.y),
             new Point(point.x, point.y)
         );
 
-        (this.entity.visualization as HumanVisualization).addAction(
-            ActionId.WALK
-        );
-
+        (this.entity.visualization as HumanVisualization).addAction(ActionId.WALK);
         this.entity.visualization.needsUpdate = true;
     }
 }
