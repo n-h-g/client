@@ -61,7 +61,7 @@ export class AvatarEffectManager {
     /** The effects ("fx") of the map by id: the dances have their own animations. */
     private getEffectMap(): Promise<Map<number, IEffectMapEntry>> {
         if (!this.effectMap) {
-            this.effectMap = (this.downloadManager.loadConfigFile('EffectMap') as Promise<IEffectMap>)
+            this.effectMap = (this.downloadManager.loadEffectMap() as Promise<IEffectMap>)
                 .then(map => {
                     const effects = new Map<number, IEffectMapEntry>();
 

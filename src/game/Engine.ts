@@ -1,6 +1,6 @@
 import {ApplicationEngine} from './core/Application';
 import {RoomService} from './engine/room/RoomService';
-import generalConfig from './configuration/general.json';
+import {config, GeneralConfig} from './configuration/Configuration';
 import {NetworkingManager} from './networking/NetworkingManager';
 import {UserInterfaceManager} from './engine/ui/UserInterfaceManager';
 import {CommandService} from './engine/game/commands/CommandService';
@@ -22,7 +22,7 @@ export class Engine {
     private wrappedNetworkingManager: NetworkingManager;
     private wrappedCommandService: CommandService;
     private wrappedChatService: ChatMessageService;
-    private wrappedConfig = generalConfig;
+    private wrappedConfig = config;
     private wrappedSSO: string;
 
     static getInstance(): Engine {
@@ -81,7 +81,7 @@ export class Engine {
             (window as any).nhg = this;
         }
     }
-    get config(): typeof generalConfig {
+    get config(): GeneralConfig {
         return this.wrappedConfig;
     }
 

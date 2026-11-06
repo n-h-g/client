@@ -43,6 +43,11 @@ export class AvatarDownloadManager {
             }
         });
     }
+    /** EffectMap.json: the library of each effect id. */
+    loadEffectMap(): Promise<any> {
+        return fetchJsonAsync(Engine.getInstance().config.avatarEffectMapUrl);
+    }
+
     /** An effect library (effects/<lib>/<lib>.json): its animation, assets and spritesheet frames. */
     loadEffectLibrary(lib: string): Promise<any> {
         return fetchJsonAsync(`${Engine.getInstance().config.avatarEffectPath}/${lib}/${lib}.json`);

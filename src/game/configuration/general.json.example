@@ -1,0 +1,29 @@
+{
+  "version": "2.0.0",
+  "server": {
+    "host": "127.0.0.1",
+    "port": 8083,
+    "channel": "nhg/game",
+    "ssl": false,
+    "reconnectOnFail": false,
+    "reconnectOnFailTryTimes": 3
+  },
+  "fps": 60,
+  "debug": true,
+  "debugRoomClick": true,
+  "offlineMode": false,
+  "language": "it",
+  "lookResource": "https://sharasy.com:2096/gamedata/character/avatar.php",
+  "itemsUrl": "https://sharasy.com:2096/gamedata/items",
+  "proxyUrl": "",
+  "roomResourcesUrl": "http://localhost/assets/room",
+  "avatarFigurePath": "http://localhost/assets/figures",
+  "avatarGameDataPath": "http://localhost/assets/gamedata/json",
+  "avatarEffectPath": "http://localhost/assets/effects",
+  "avatarEffectMapUrl": "http://localhost/assets/gamedata/json/EffectMap.json",
+  "itemsResourcesUrl": "http://localhost/nitro/furniture/",
+  "furnidataUrl": "http://localhost/nitro/gamedata/json/FurnitureData.json",
+  "itemsIconsUrl": "http://localhost/nitro/icons/",
+  "catalogueResourcesUrl": "https://sharasy.com:2096/gamedata/c_images/catalogue/",
+  "soundResourcesUrl": "https://sharasy.com:2096/gamedata/sounds/"
+}

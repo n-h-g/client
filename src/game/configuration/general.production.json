@@ -1,0 +1,17 @@
+{
+  "server": {
+    "host": "",
+    "port": 0,
+    "ssl": false
+  },
+  "debug": false,
+  "debugRoomClick": false,
+  "roomResourcesUrl": "/nhg-assets/room",
+  "avatarFigurePath": "/nhg-assets/figures",
+  "avatarGameDataPath": "/nhg-assets/gamedata/json",
+  "avatarEffectPath": "/nitro/effect",
+  "avatarEffectMapUrl": "/nitro/gamedata/json/EffectMap.json",
+  "itemsResourcesUrl": "/nitro/furniture/",
+  "furnidataUrl": "/nitro/gamedata/json/FurnitureData.json",
+  "itemsIconsUrl": "/nitro/icons/"
+}

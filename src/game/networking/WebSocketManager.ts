@@ -22,15 +22,19 @@ export class WebSocketManager {
         this.setUpWebSocketEvents();
     }
 
+    /**
+     * The game server of the configuration, or (empty host, as in production) the server of the page:
+     * the web server forwards the websocket channel to the game.
+     */
     private get webSocketUrl(): string {
-        let webSocketUrl = Engine.getInstance().config.server.ssl
-            ? 'wss://'
-            : 'ws://';
-        webSocketUrl += Engine.getInstance().config.server.host;
-        webSocketUrl += ':' + Engine.getInstance().config.server.port;
-        webSocketUrl += '/' + Engine.getInstance().config.server.channel;
+        const server = Engine.getInstance().config.server;
 
-        return webSocketUrl;
+        if (!server.host) {
+            const protocol = window.location.protocol === 'https:' ? 'wss://' : 'ws://';
+            return protocol + window.location.host + '/' + server.channel;
+        }
+
+        return (server.ssl ? 'wss://' : 'ws://') + server.host + ':' + server.port + '/' + server.channel;
     }
 
     private setUpWebSocketEvents(): void {
