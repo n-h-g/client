@@ -12,6 +12,7 @@ import {Logger} from './utils/Logger';
 export class Engine {
 	lastFrameTime: number;
     timeElapsed: number;
+    currentUserId: number | null = null;
 
     private static instance: Engine;
 

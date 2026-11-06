@@ -23,6 +23,7 @@ export class Room implements Disposable {
         this.roomEntityRepository = new RoomEntityRepository();
         this.roomInfo = new RoomInfo(roomName, roomModel, authorName);
         this.roomLayout = new RoomLayout(this, roomModel, doorPosition);
+        this.roomEntityRepository.floorPlane = this.roomLayout.getFloorPlane();
     }
 
     dispose(): void {

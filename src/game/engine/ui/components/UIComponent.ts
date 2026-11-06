@@ -18,4 +18,5 @@ export enum UIComponent {
     ChangeLookUI = 'changeLookUI',
     InventoryUI = 'inventory',
     PrivateChatUI = 'private',
+    FriendProfileUI = 'friendProfile',
 }

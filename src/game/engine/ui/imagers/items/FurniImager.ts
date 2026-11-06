@@ -47,19 +47,47 @@ export class FurniImager {
     }
 
     private async loadFurnidata(): Promise<void> {
-        const data: Furnidata = await fetchJsonAsync<Furnidata>(
-            Engine.getInstance()?.config?.itemsResourcesUrl + 'furnidata.json'
-        );
+        const config = Engine.getInstance()?.config;
+        const url = config?.furnidataUrl ?? config?.itemsResourcesUrl + 'furnidata.json';
+
+        const data = await fetchJsonAsync<any>(url);
         if (data == null) {
-            if (Engine.getInstance()?.config?.debug)
+            if (config?.debug)
                 Logger.error('Cannot load furnidata');
 
             this.ready = false;
             return;
         }
 
-        this.furnidata = data;
+        this.furnidata = {
+            floorItems: FurniImager.indexById(data.floorItems),
+            wallItems: FurniImager.indexById(data.wallItems),
+        };
         this.ready = true;
+    }
+
+    /**
+     * The Nitro FurnitureData.json has arrays of items (with dimensions, canSitOn...),
+     * the old furnidata.json objects indexed by id (with xdim, cansiton...): both become objects by id.
+     */
+    private static indexById(items: any): {[id: number]: any} {
+        if (!items) return {};
+        if (!Array.isArray(items)) return items;
+
+        const result: {[id: number]: any} = {};
+
+        for (const item of items) {
+            result[item.id] = {
+                ...item,
+                xdim: item.xdim ?? item.dimensions?.x,
+                ydim: item.ydim ?? item.dimensions?.y,
+                canstandon: item.canstandon ?? item.canStandOn,
+                cansiton: item.cansiton ?? item.canSitOn,
+                canlayon: item.canlayon ?? item.canLayOn,
+            };
+        }
+
+        return result;
     }
 
     generateRandomItem(): string | null {
@@ -78,7 +106,7 @@ export class FurniImager {
         for (const itemId in this.furnidata.floorItems) {
             const item = this.furnidata.floorItems[itemId];
             //console.log(item);
-            if (item.className == itemName) {
+            if (item.className.trim().toLowerCase() === itemName.trim().toLowerCase()) {
                 return {
                     item,
                     type: FurniDataType.FLOOR_ITEMS,
@@ -88,7 +116,7 @@ export class FurniImager {
 
         for (const itemId in this.furnidata.wallItems) {
             const item = this.furnidata.wallItems[itemId];
-            if (item.className == itemName) {
+            if (item.className.trim().toLowerCase() === itemName.trim().toLowerCase()) {
                 return {
                     item,
                     type: FurniDataType.WALL_ITEMS,
@@ -158,6 +186,7 @@ export class FurniImager {
             this.loadFurniBase(type, name)
                 .then(furnibase => {
                     const furniSprite = new Furni(furnibase);
+                    furniSprite.colorId = FurniSpriteUtils.splitItemNameAndColor(name).colorId;
                     res(furniSprite);
                 })
                 .catch(e => {
@@ -176,6 +205,7 @@ export class FurniImager {
             this.loadFurniBase(type, name)
                 .then(furnibase => {
                     const furniSprite = new Furni(furnibase);
+                    furniSprite.colorId = colorId;
                     furniSprite.setIcon(true);
                     res(furniSprite);
                 })

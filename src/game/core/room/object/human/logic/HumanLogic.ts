@@ -13,17 +13,12 @@ export abstract class HumanLogic extends EntityLogic {
         super(human);
     }
 
-    registerEvents(): void {
-        super.registerEvents();
+    protected registerLogicEvents(): void {
+        super.registerLogicEvents();
         this.events.on(HumanEvents.FIGURE_CHANGED, () => this.figureChanged());
         this.events.on(HumanEvents.FIGURE_LOADING_COMPLETE, () =>
             this.onLoad()
         );
-
-
-        EventManager.emit<ChangeLookEventData>(UIEvents.CHANGE_LOOK, {
-            look: (this.entity as Human).figure
-        })
     }
 
     onClick(): void {
@@ -36,10 +31,14 @@ export abstract class HumanLogic extends EntityLogic {
 
         if (humanVisualization.needsUpdate) {
             this.frameTracker += delta;
+            // the dances and the effects are animated as Nitro (a frame every 2 updates of 41 ms)
+            const frameSpeed = humanVisualization.actions.has(ActionId.DANCE) || humanVisualization.hasAnimatedEffect
+                ? AvatarData.AVATAR_DANCE_FRAME_SPEED
+                : AvatarData.AVATAR_FRAME_SPEED;
 
-            if (this.frameTracker >= AvatarData.AVATAR_FRAME_SPEED) {
+            if (this.frameTracker >= frameSpeed) {
                 humanVisualization.nextFrame();
-                this.frameTracker = 0;
+                this.frameTracker %= frameSpeed;
                 humanVisualization.draw();
             }
             if (humanVisualization.actions.has(ActionId.WALK)) {

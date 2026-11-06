@@ -25,12 +25,16 @@ export class UIEvents extends Events {
     static AVATAR_CONTAINER_UPDATED: UIEvents = new UIEvents(
         'avatar_container_updated'
     );
+    static AVATAR_CONTEXT_MENU: UIEvents = new UIEvents('avatar_context_menu');
     static CATALOGUE_PAGES_UPDATED: UIEvents = new UIEvents(
         'catalog_pages_updated'
     );
+    static CATALOG_ITEM_BOUGHT: UIEvents = new UIEvents('catalog_item_bought');
     static CATALOG_ITEMS_UPDATED: UIEvents = new UIEvents(
         'catalog_items_updated'
     );
     static ENTER_ROOM_INFO: UIEvents = new UIEvents('enter_room_info');
     static CHANGE_LOOK: UIEvents = new UIEvents('change_look')
+    /** A notification in the bubble alerts (top right), see BubbleAlertData. */
+    static BUBBLE_ALERT: UIEvents = new UIEvents('bubble_alert');
 }

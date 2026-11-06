@@ -19,12 +19,19 @@ export class UpdateRoomData extends MessageHandler {
             Engine.getInstance()?.roomService.dispose();
         else return;
 
-        Engine.getInstance()?.roomService?.setRoom(
+        const newRoom = Engine.getInstance()?.roomService?.setRoom(
             room.name,
             room.layout,
             new Point(room.door_x, room.door_y),
             room.id,
             room.owner_name
         );
+
+        // the room is drawn with the default look, then again with its wallpaper and floor
+        newRoom?.roomLayout.setDecorations({
+            wallpaper: room.wallpaper ?? null,
+            floor: room.floor ?? null,
+            landscape: room.landscape ?? null,
+        });
     }
 }

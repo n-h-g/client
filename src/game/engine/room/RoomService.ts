@@ -13,6 +13,9 @@ import {EnterRoomUIEventData} from '../events/ui/data/room/EnterRoomUIEventData'
 import { Point3d } from '../../utils/point/Point3d';
 import { FurnidataItemType } from '../ui/imagers/items/enum/FurniDataItemType';
 import { FloorItem } from './objects/items/FloorItem';
+import { WallItem } from './objects/items/WallItem';
+import { ItemType } from '../../core/room/object/items/ItemType';
+import { FurnitureWallData } from './objects/items/WallItemData';
 
 export class RoomService
     extends Service<null, null>
@@ -73,27 +76,59 @@ export class RoomService
         const room = this.currentRoom;
         if (!room) return;
 
+        const isWallItem = inventoryItem.item_type === ItemType.WALL_ITEM;
+        const furniType = isWallItem ? FurnidataItemType.WallItem : FurnidataItemType.FloorItem;
         const base = await Engine.getInstance().userInterfaceManager!.furniImager.loadFurniBase(
-            FurnidataItemType.FloorItem,
+            furniType,
             inventoryItem.name 
         );
 
-        const ghost = new FloorItem(
-            inventoryItem.id, 
-            inventoryItem.name,
-            new Point3d(0, 0, 0), 
-            base
-        );
+        // only one furni at a time: a placement/move already in progress is cancelled
+        room.roomEntityRepository.cancelRollingEntity();
 
-        ghost.visualization?.render();
-        
-        if (ghost.visualization?.container) {
-            ghost.visualization.container.alpha = 0.5;
-            ghost.visualization.container.interactive = false; 
-        }
+        const ghost = isWallItem
+            ? new WallItem(inventoryItem.id.toString(), inventoryItem.name, base, new FurnitureWallData({
+                localX: 0, localY: 0, width: 0, height: 0, y: 0, z: 0,
+                direction: 2, stuffData: '', secondsToExpiration: 0, isOldFormat: false,
+            }))
+            : new FloorItem(inventoryItem.id.toString(), inventoryItem.name, new Point3d(0, 0, 0), base);
+
+        ghost.isInventoryGhost = true;
+        if (ghost instanceof FloorItem) ghost.visualization.direction = FloorItem.DEFAULT_PLACEMENT_ROTATION;
 
         room.roomEntityRepository.add(ghost.id, ghost);
+
+        // the sprite must exist before the furni can follow the mouse
+        await ghost.visualization.render();
+
+        // the room changed or the placement was cancelled while loading
+        if (this.currentRoom !== room || room.roomEntityRepository.get(ghost.id) !== ghost) return;
+
+        // hidden until the mouse is on a tile (it would be drawn at 0,0)
+        if (ghost.visualization.container) ghost.visualization.container.visible = false;
+
         room.roomEntityRepository.setRollingEntity(ghost);
+
+        // the first tile hovered (even the one already under the mouse) moves the furni there
+        room.roomLayout.logic.resetHoveredTile();
+    }
+
+    /**
+     * Rotates the furni that is being placed from the inventory (R key).
+     */
+    rotatePlacingItem() {
+        const repository = this.currentRoom?.roomEntityRepository;
+        const ghost = repository?.rollingEntity as FloorItem | undefined;
+
+        if (!ghost || !ghost.isInventoryGhost) return;
+
+        // the next rotation of the furni; where it doesn't fit the furni keeps a rotation that fits
+        // (the footprint changes: the furni could go on top of different furni)
+        const position = ghost.position;
+        const tile = this.currentRoom.roomLayout.getFloorPlane()
+            .getTilebyPosition(new Point(Math.round(position.x), Math.round(position.y)));
+
+        if (tile) repository.rotateRollingEntity(tile.position);
     }
 
     /**

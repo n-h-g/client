@@ -8,8 +8,22 @@ import {ItemLogicMultiState} from './logic/ItemLogicMultiState';
 import {ItemVisualizationAnimated} from './visualization/ItemVisualizationAnimated';
 import {ItemVisualizationStatic} from './visualization/ItemVisualizationStatic';
 
+/** Inclusive rectangle of tiles covered by a floor item. */
+export type ItemFootprint = {
+    minX: number;
+    minY: number;
+    maxX: number;
+    maxY: number;
+};
+
 export abstract class Item extends Entity {
     base: FurniBase;
+
+    /**
+     * True for the preview created while placing an item from the inventory:
+     * its id is the inventory item id, not the id of a room entity.
+     */
+    isInventoryGhost = false;
 
     constructor(
         id: string,
@@ -25,6 +39,17 @@ export abstract class Item extends Entity {
             this.base.data.visualization.type
         );
         this.logic = this.getItemLogicFromType(this.base.data.logic.type);
+    }
+
+    abstract calculateOffsetX(): number;
+
+    abstract calculateOffsetY(): number;
+
+    /**
+     * Tiles covered by the item, or null if it doesn't stand on the floor (wall items).
+     */
+    getFootprint(): ItemFootprint | null {
+        return null;
     }
 
     private getItemVisualizationFromType(type: string): ItemVisualization {
@@ -43,6 +68,9 @@ export abstract class Item extends Entity {
             case 'furniture_basic':
                 return new ItemLogicBasic(this);
             case 'furniture_multistate':
+            case 'furniture_multiheight':
+            // the hole (state 0) is removed from the floor by RoomEntityRepository.refreshFloorHoles
+            case 'furniture_floor_hole':
                 return new ItemLogicMultiState(this);
         }
     }

@@ -9,6 +9,7 @@ import {LogicData} from './data/LogicData';
 import {FurniSpriteUtils} from './utils/FurniSpriteUtils';
 import {Layer} from './data/Layer';
 import {Repository} from '../../../../core/Repository';
+import {NitroFurniConverter} from './utils/NitroFurniConverter';
 
 export class FurniBase {
     itemName: string;
@@ -27,22 +28,30 @@ export class FurniBase {
     }
 
     async init(): Promise<Repository<string, FurniAsset>> {
-        const url =
-            Engine.getInstance()?.config?.proxyUrl +
-            Engine.getInstance()?.config?.itemsResourcesUrl +
-            this.itemName +
-            '/' +
-            this.itemName +
-            '.json';
-            
-        const downloadedData: IFurnidata = await fetchJsonAsync<IFurnidata>(url);
-        
-        if (downloadedData != null) {
+        // FurniImager already downloaded the json: download it only if missing
+        let downloadedData: unknown = this.data;
 
-            this.data = downloadedData;
-            this.visualizationData = new VisualizationData(downloadedData.visualization);
-            this.logicData = new LogicData(downloadedData.logic);
-            this.loadAssets(downloadedData.assets);
+        if (downloadedData == null) {
+            const url =
+                Engine.getInstance()?.config?.proxyUrl +
+                Engine.getInstance()?.config?.itemsResourcesUrl +
+                this.itemName +
+                '/' +
+                this.itemName +
+                '.json';
+
+            downloadedData = await fetchJsonAsync<unknown>(url);
+        }
+
+        if (downloadedData != null) {
+            const data: IFurnidata = NitroFurniConverter.isNitro(downloadedData)
+                ? NitroFurniConverter.convert(downloadedData)
+                : (downloadedData as IFurnidata);
+
+            this.data = data;
+            this.visualizationData = new VisualizationData(data.visualization);
+            this.logicData = new LogicData(data.logic);
+            this.loadAssets(data.assets);
         }
 
         return this.assets;
@@ -84,7 +93,6 @@ export class FurniBase {
             return null;
         }
     }
-
     getLogicDimension(dim: number): number {
         if (!this.logicData || !this.logicData.getDimensions()) return 0;
         return this.logicData.getDimensions()[dim];
@@ -150,58 +158,50 @@ export class FurniBase {
         return this.visualizationData?.getDirection(direction) ?? null;
     }
 
-    getFrameFrom(
-        direction: number,
-        animation: number,
-        layer: number,
-        frameCount: number
-    ): number {
-        if (!this.hasAnimationForLayer(animation, layer)) {
-            return 0;
-        }
-
+    getFrameFrom(direction: number, animation: number, layer: number, frameTick: number): number {
         const animationLayer = this.visualizationData?.getAnimationLayer(layer, animation);
+        if (!animationLayer || !animationLayer.hasSequences()) return 0;
 
-        if (!animationLayer || !animationLayer.hasSequences()) {
-            return 0;
+        const sequence = animationLayer.getSequence(0);
+        if (!sequence) return 0;
+
+        let totalTicks = 0;
+        for (let i = 0; i < sequence.getFrameCount(); i++) {
+            const frame = sequence.getFrame(i);
+            totalTicks += (frame.repeats || 1); 
         }
 
-        const sequences = animationLayer.getAllSequences();
-        if (!sequences || sequences.length === 0) return 0;
+        const currentTick = frameTick % totalTicks;
 
-        let totalDuration = 0;
-        for (const seq of sequences) {
-            totalDuration += seq.getFrameCount();
-        }
-
-        if (totalDuration === 0) return 0;
-
-        const currentLoopFrame = frameCount % totalDuration;
-
-        if (sequences.length === 1) {
-            const sequence = sequences[0];
-            const frameData = sequence.getFrame(currentLoopFrame % sequence.getFrameCount());
-            return frameData ? frameData.id : 0;
-        } else {
-            let accumulatedFrames = 0;
-            for (const sequence of sequences) {
-                const seqLength = sequence.getFrameCount();
-                
-                if (currentLoopFrame < (seqLength + accumulatedFrames)) {
-                    const localIndex = currentLoopFrame - accumulatedFrames;
-                    const frameData = sequence.getFrame(localIndex);
-                    return frameData ? frameData.id : 0;
-                }
-                
-                accumulatedFrames += seqLength;
+        let accumulatedTicks = 0;
+        for (let i = 0; i < sequence.getFrameCount(); i++) {
+            const frame = sequence.getFrame(i);
+            const duration = (frame.repeats || 1);
+            
+            if (currentTick < (accumulatedTicks + duration)) {
+                return frame.id;
             }
+            accumulatedTicks += duration;
         }
 
         return 0;
     }
-
     getLayer(layer: number): Layer | null {
         return this.visualizationData?.getLayer(layer) ?? null;
+    }
+
+    /**
+     * The z offset of a layer (the order of the layers and their depth in the room, as Nitro): the one of the
+     * direction if the direction changes it (e.g. a layer in front only when the furni is turned), else
+     * the one of the layer, else 0.
+     * @param direction a valid direction of the furni (see getValidDirection).
+     */
+    getLayerZ(direction: number, layer: number): number {
+        const directionZ = this.getDirection(direction)?.getLayerZ?.(layer);
+        if (directionZ !== undefined) return directionZ;
+
+        const z = this.getLayer(layer)?.z;
+        return z !== undefined && z !== null ? Number(z) : 0;
     }
 
     hasLayers(): boolean {
@@ -209,18 +209,18 @@ export class FurniBase {
     }
 
     hasColorForLayer(color: number, layer: number): boolean {
-        return (
-            this.visualizationData?.hasColor(color) &&
-            this.data?.visualization?.colors?.[color]?.layers?.[layer] != null
-        );
+        return this.data?.visualization?.colors?.[color]?.layers?.[layer]?.color != null;
     }
 
+    /**
+     * The tint of a layer for a color variant (e.g. chair_plasto*2 -> color 2), white if the layer has no color.
+     */
     getColorFrom(color: number, layer: number): number {
-        if (this.hasColorForLayer(color, layer)) {
-            return this.visualizationData!.getColor(color, layer).color;
-        }
+        if (!this.hasColorForLayer(color, layer)) return 0xffffff;
 
-        return 0xffffff;
+        const value = this.data.visualization.colors[color].layers[layer].color as number | string;
+
+        return typeof value === 'string' ? parseInt(value.replace('#', ''), 16) : value;
     }
 
     getColors(): string[] {
@@ -286,7 +286,7 @@ export class FurniBase {
     }
 
     get LogicType(): string {
-        return this.data?.logicType ?? '';
+        return this.data?.logic.type ?? '';
     }
 
     get visualizationType(): string {
@@ -309,12 +309,10 @@ export class FurniBase {
     }
     destroy(): void {
         if (this.spritesheet) {
-            this.spritesheet.destroy(true); // Free the texture from GPU memory
+            this.spritesheet.destroy(true);
             this.spritesheet = null;
         }
         
-        // Clear repositories and references
-        //this.assets?.();
         this.visualizationData = null;
         this.logicData = null;
     }

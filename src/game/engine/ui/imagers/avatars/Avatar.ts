@@ -6,6 +6,7 @@ import {ActionId} from './enum/actions/ActionId';
 import {AvatarData} from './enum/AvatarData';
 import {AvatarEventsType} from './enum/events/AvatarEventsType';
 import {AvatarEvents} from './events/AvatarEvents';
+import type {AvatarEffect} from './effects/AvatarEffect';
 
 const DEFAULT_FIGURE =
     'hd-180-1.ch-255-66.lg-280-110.sh-305-62.ha-1012-110.hr-828-61';
@@ -51,6 +52,11 @@ export class Avatar {
 
     private events: AvatarEvents | null = null;
     private ui: boolean;
+    private danceStyle: number;
+    private signValue: number;
+    /** The effect drawn with the avatar (loaded), null without effect. */
+    private effect: AvatarEffect | null = null;
+    private directionOffset = 0;
 
     constructor(
         figure: string = DEFAULT_FIGURE,
@@ -61,7 +67,9 @@ export class Avatar {
         headFrame = 0,
         isSmall = false,
         placeholder = false,
-        ui: boolean = false
+        ui: boolean = false,
+        danceStyle = 1,
+        signValue = 1
     ) {
         this.avatarFigure = new AvatarFigure(figure);
 
@@ -73,6 +81,8 @@ export class Avatar {
         this.headDirection = headDirecton;
 
         this.ui = ui;
+        this.danceStyle = danceStyle;
+        this.signValue = signValue;
 
         this.actions = actions;
 
@@ -132,6 +142,8 @@ export class Avatar {
         this.hatContainer.zIndex = 7;
         this.faceContainer.zIndex = 8;
         this.headAccessoryContainer.zIndex = 9;
+        // the shadow is on the floor, under all the parts
+        this.shadowContainer.zIndex = -1;
 
         this.container.sortChildren();
 
@@ -154,6 +166,48 @@ export class Avatar {
 
     get isUI() {
         return this.ui;
+    }
+
+    get DanceStyle() {
+        return this.danceStyle;
+    }
+
+    set DanceStyle(style: number) {
+        this.danceStyle = style;
+    }
+
+    get Effect(): AvatarEffect | null {
+        return this.effect;
+    }
+
+    set Effect(effect: AvatarEffect | null) {
+        this.effect = effect;
+    }
+
+    /**
+     * Turns the body and the head by the offset (an effect that turns the avatar, e.g. the hoverboard).
+     * As Nitro's AvatarImage.setDirection the direction goes around 0..7. Setting it again replaces the offset.
+     */
+    setDirectionOffset(offset: number) {
+        const delta = offset - this.directionOffset;
+        if (!delta) return;
+
+        this.directionOffset = offset;
+        this.bodyDirection = ((this.bodyDirection + delta) % 8 + 8) % 8;
+        this.headDirection = ((this.headDirection + delta) % 8 + 8) % 8;
+    }
+
+    /** The containers of the figure parts (not the shadow): what an effect colors. */
+    get PartContainers(): Container[] {
+        return [
+            this.bodyContainer, this.legContainer, this.headContainer, this.hairContainer,
+            this.shoesContainer, this.hatContainer, this.headAccessoryContainer,
+            this.armsContainer, this.torsoContainer, this.faceContainer,
+        ];
+    }
+
+    get SignValue() {
+        return this.signValue;
     }
 
     get Look() {
@@ -243,7 +297,8 @@ export class Avatar {
         return this.legContainer;
     }
     get HairContainer(): Container {
-        return this.legContainer;
+        // it returned the leg container: the hair was drawn with the legs (under the head)
+        return this.hairContainer;
     }
 
     get ShadowContainer(): Container {

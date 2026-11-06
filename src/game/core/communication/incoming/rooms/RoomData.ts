@@ -9,4 +9,8 @@ export interface RoomData {
     users_count: number;
     owner_id: number;
     owner_name: string;
+    /** Decorations applied with the wallpaper/floor/landscape items ("0.0" = default look). */
+    wallpaper?: string;
+    floor?: string;
+    landscape?: string;
 }

@@ -1,3 +1,4 @@
+import {TileType} from '../TileTypeEnum';
 import {RoomObjectVisualization} from '../../../../../core/room/object/RoomObjectVisualization';
 import {Pointer} from '../Pointer';
 import {MapData} from '../MapData';
@@ -25,7 +26,8 @@ export class PointerVisualization extends RoomObjectVisualization {
 
         this.pointer = pointer;
         this.pointerContext = pointer.getCanvas();
-        this.pointerContext.eventMode = 'dynamic';
+        // the pointer must not intercept the mouse events (the tile is picked by RoomLogic)
+        this.pointerContext.eventMode = 'none';
         this.pointerContext.visible = false;
         this.render();
     }
@@ -38,11 +40,12 @@ export class PointerVisualization extends RoomObjectVisualization {
         this.drawPointer(this.pointerContext);
     }
 
-    updatePosition(x: number, y: number, tile: Tile) {
-        const xpos =
-            (x - y) * (MapData.tileWidth / 2) + tile!.visualization!.offsetX;
-        const ypos =
-            (x + y) * (MapData.tileHeight / 2) + tile!.visualization!.offsetY;
+    updatePosition(tile: Tile) {
+        // A tile's display container can have its own transform. Stair graphics
+        // use one to draw the steps upward, but that transform is not a tile
+        // coordinate and must not affect the pointer position.
+        const xpos = tile.visualization!.offsetX;
+        const ypos = tile.visualization!.offsetY;
 
         this.pointerContext.visible = true;
 
@@ -50,14 +53,17 @@ export class PointerVisualization extends RoomObjectVisualization {
         this.pointer.position.y = tile.position.y;
         this.pointer.position.z = tile.position.z;
         
-        this.pointerContext.zIndex = RoomVisualization.calculateZIndex(
-                        new Point3d(
-                            this.pointer.position.x,
-                            this.pointer.position.y,
-                            this.pointer.position.z
-                        ),
-                        RoomPriority.POINTER
-                    );
+        // Between the floor and the furni (like Habbo): just below the lowest z-index
+        // a floor item or an avatar can have (tile 0,0 at height 0), so it's always over
+        // the floor and the walls and always under furni and avatars.
+        // the door tile is inside the wall: there the pointer goes under the walls (and under the avatar in the door)
+        const isDoor = tile.type === TileType.Door;
+        this.pointerContext.zIndex = isDoor
+            ? (tile.plane.room.visualization as RoomVisualization).getDoorZIndex() - 1
+            : RoomVisualization.calculateZIndex(
+                new Point3d(0, 0, 0),
+                RoomPriority.ROOM_ITEM
+            ) - 1;
 
         this.pointerContext.x = xpos;
         this.pointerContext.y = ypos;

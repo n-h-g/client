@@ -1,5 +1,6 @@
 <template>
     <BubbleAlertContainer />
+    <AvatarContextMenuGUI />
     <div id="staticContainer" v-if="hotelView" :class="{ hidden: !hotelView }">
         <HotelView />
     </div>
@@ -10,6 +11,7 @@ import { ref } from 'vue'
 import HotelView from './HotelView.vue'
 import { EventManager } from '../../../game/core/events/EventManager'
 import BubbleAlertContainer from './BubbleAlertContainer.vue'
+import AvatarContextMenuGUI from '../avatar/AvatarContextMenuGUI.vue'
 import { HotelViewData } from '../../../game/engine/events/ui/data/static/HotelView'
 import { UIEvents } from '../../../game/engine/events/ui/UIEvents'
 

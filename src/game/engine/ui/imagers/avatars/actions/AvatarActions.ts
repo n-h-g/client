@@ -25,10 +25,8 @@ export class Actions {
     getActionsByIds(actionIds: Set<ActionId>): Action[] {
         const actions: Action[] = [];
 
-        const avatarActions: IterableIterator<Action> = this.actions.values();
-
         actionIds.forEach(id => {
-            for (const action of avatarActions) {
+            for (const action of this.actions.values()) {
                 if (action.id == id) {
                     actions.push(action);
                 }

@@ -3,6 +3,7 @@ import {Logger} from '../../utils/Logger';
 import {MessageHandler} from '../handler/MessageHandler';
 import {CataloguePage} from './incoming/catalogue/CataloguePage';
 import {CataloguePages} from './incoming/catalogue/CataloguePages';
+import {BuyItem} from './incoming/catalogue/BuyItem';
 import {LoginResponse} from './incoming/handshake/LoginResponse';
 import {PongResponse} from './incoming/handshake/PongResponse';
 import {LoadInventoryItems} from './incoming/items/LoadInventoryItem';
@@ -14,10 +15,15 @@ import {NewRoomMessage} from './incoming/rooms/entities/NewRoomMessage';
 import {RemoveEntity} from './incoming/rooms/entities/RemoveEntity';
 import {UpdateEntity} from './incoming/rooms/entities/UpdateEntity';
 import { ReceiveRoomId } from './incoming/rooms/ReceiveRoomId';
+import {RoomPaint} from './incoming/rooms/RoomPaint';
 import {UpdateRoomData} from './incoming/rooms/UpdateRoomData';
 import {UserTypingStatus} from './incoming/rooms/users/UserTypingStatus';
 import {UpdateUserInformation} from './incoming/users/UpdateUserInformation';
 import {OutgoingPacket} from './outgoing/OutgoingPacket';
+import {FriendsList} from './incoming/friends/FriendsList';
+import {FriendRequestReceived} from './incoming/friends/FriendRequestReceived';
+import {FriendRequestResult} from './incoming/friends/FriendRequestResult';
+import {FriendMessage} from './incoming/friends/FriendMessage';
 
 export class PacketManager {
     private incomingPackets: Map<number, MessageHandler>;
@@ -41,10 +47,16 @@ export class PacketManager {
             206: new NewRoomMessage(),
             207: new UserTypingStatus(),
 			208: new ReceiveRoomId(),
+            209: new RoomPaint(),
             400: new UpdateUserInformation(),
             401: new LoadInventoryItems(),
             800: new CataloguePages(),
-            801: new CataloguePage()
+            801: new CataloguePage(),
+            802: new BuyItem(),
+            900: new FriendsList(),
+            901: new FriendRequestReceived(),
+            902: new FriendRequestResult(),
+            903: new FriendMessage(),
         };
 
         Object.keys(incomingPacketsHeader).forEach(index => {

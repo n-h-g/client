@@ -1,22 +1,21 @@
 <template>
     <div id="roomGui" ref="roomGui"> 
-        <div id="chatBubbleContainer" ref="chatBubbleContainer">
-            <div class="chatBubble" 
-                v-for="message in messages" 
-                :key="message.internalId" 
-                :id="message.internalId" 
-                :style="{top: message.y + 'px', left: message.x + 'px'}" 
-                :class="{'chatBubbleShout': message.data.shout}"
+        <!-- the chat strip at the top of the room, as Habbo/Nitro: the bubbles are born on its bottom line -->
+        <div id="chatBubbleContainer" ref="chatBubbleContainer" :style="{ height: chatHeight + 'px' }">
+            <div class="chatBubble"
+                v-for="message in messages"
+                :key="message.internalId"
+                :ref="element => setBubbleElement(message, element as HTMLElement | null)"
+                :style="{ top: message.top + 'px', left: message.left + 'px', visibility: message.ready ? 'visible' : 'hidden' }"
+                :class="{ chatBubbleShout: message.data.shout }"
                 @click="onClickChat(message)">
-                
-                <div class="chatBubbleContainer">
-                    <div class="playerHeadContainer">
-                        <img src="" />
-                    </div>
-                    <p>
-                        <b>{{ message.data.author.name }}:</b> {{ message.data.text }}
-                    </p>
-                 </div>
+                <div class="chatBubbleHead">
+                    <img v-if="message.head" :src="message.head" @load="onHeadLoad" />
+                </div>
+                <div class="chatBubbleContent">
+                    <b>{{ message.data.author?.name }}:</b> {{ message.data.text }}
+                </div>
+                <div class="chatBubblePointer"></div>
             </div>
         </div>
         <div class="roomObjectsContainer" ref="roomObjectsContainer">
@@ -35,115 +34,185 @@
     </div>
 </template>
 <script setup lang="ts">
-import { ref, onMounted, onUnmounted } from 'vue'
+import { ref, onMounted, onUnmounted, nextTick } from 'vue'
 import { EventManager } from '../../../game/core/events/EventManager'
 import { IComponentShowableUI } from '../../../game/core/ui/IComponentShowableUI'
 import { Engine } from '../../../game/Engine'
 import { RoomChatData } from '../../../game/engine/events/ui/data/room/RoomChatData'
 import { UIEvents } from '../../../game/engine/events/ui/UIEvents'
 import { UIComponent } from '../../../game/engine/ui/components/UIComponent'
-import { AvatarData } from '../../../game/engine/ui/imagers/avatars/enum/AvatarData'
-import { UiUtils } from '../../../game/utils/UiUtils'
+import { AvatarHeadImage } from '../../../game/engine/ui/imagers/avatars/AvatarHeadImage'
 import { Container } from 'pixi.js'
 
+/**
+ * The room chat as Nitro's ChatWidgetView (free flow mode): a bubble is born on the bottom line of the
+ * chat strip, centered on the avatar that talks, and then it stays there (it doesn't follow the avatar).
+ * Every few seconds all the bubbles go up; a new bubble pushes up the older ones it overlaps.
+ */
 interface UIChatBubble {
     data: RoomChatData;
-    yOffset: number;
-    targetYOffset: number; // NUOVO: Dove la bolla deve arrivare
-    createdAt: number;
     internalId: string;
-    x: number;
-    y: number;
+    /** Screen x of the avatar when it talked. */
+    locationX: number;
+    left: number;
+    top: number;
+    width: number;
+    height: number;
+    /** The bubble was just pushed up: it skips the next periodic movement. */
+    skipMovement: boolean;
+    /** Measured and placed: shown. */
+    ready: boolean;
+    head: string;
 }
 
-const chatMessageDefaultHeight = 32;
-const chatLifespan = 8000;
-let chatMessageCounter = 0; 
+/** Part of the window height used by the chat strip (Nitro's chat.viewer.height.percentage). */
+const CHAT_HEIGHT_PERCENTAGE = 0.4
+/** Nitro's normal scroll speed: the bubbles go up by MOVE_AMOUNT every SCROLL_SPEED ms. */
+const SCROLL_SPEED = 6000
+const MOVE_AMOUNT = 15
 
-let messages = ref<UIChatBubble[]>([])
-let animationFrameId: number;
+let chatMessageCounter = 0
 
-function onClickChat(message: any) {
-    if(!message.data.author) return;
+const messages = ref<UIChatBubble[]>([])
+const chatHeight = ref(Math.round(window.innerHeight * CHAT_HEIGHT_PERCENTAGE))
+const bubbleElements = new Map<string, HTMLElement>()
+let scrollInterval: number | undefined
+
+function onClickChat(message: UIChatBubble) {
+    if (!message.data.author) return;
     message.data.author.logic.onClick()
 }
 
-// 1. GESTIONE ARRIVO NUOVO MESSAGGIO
-EventManager.read(UIEvents.ROOM_NEW_MESSAGE, (rawEvent: RoomChatData) => {
-    // Sposta il BERSAGLIO verso l'alto (non la posizione attuale)
-    messages.value.forEach(msg => {
-        msg.targetYOffset += chatMessageDefaultHeight;
-    });
+function setBubbleElement(message: UIChatBubble, element: HTMLElement | null) {
+    if (element) bubbleElements.set(message.internalId, element)
+    else bubbleElements.delete(message.internalId)
+}
 
-    let startX = -1000;
-    let startY = -1000;
+/** The head is drawn at half size, as Nitro's chat (its large head scaled by 0.5). */
+function onHeadLoad(event: Event) {
+    const image = event.target as HTMLImageElement
+    image.style.width = Math.round(image.naturalWidth / 2) + 'px'
+}
 
-    if (rawEvent.author?.visualization?.container) {
-        const container = rawEvent.author.visualization.container as Container;
-        const globalPos = UiUtils.getGlobalPosition(container);
-        startX = globalPos.tx + AvatarData.AVATAR_LEFT_OFFSET;
-        startY = globalPos.ty - container.height - 15;
+/** Screen x of the avatar: its container is pivoted at the feet, in the middle of the avatar. */
+function avatarScreenX(data: RoomChatData): number | null {
+    const container = data.author?.visualization?.container as Container | undefined
+    if (!container) return null
+
+    return container.toGlobal(container.pivot).x
+}
+
+EventManager.read(UIEvents.ROOM_NEW_MESSAGE, async (data: RoomChatData) => {
+    const locationX = avatarScreenX(data)
+    if (locationX == null) return
+
+    const message: UIChatBubble = {
+        data,
+        internalId: `chat_msg_${Date.now()}_${chatMessageCounter++}`,
+        locationX,
+        left: 0,
+        top: 0,
+        width: 0,
+        height: 0,
+        skipMovement: false,
+        ready: false,
+        head: '',
     }
 
-    messages.value.push({
-        data: rawEvent,
-        yOffset: 0,
-        targetYOffset: 0, // Parte da zero e va verso zero
-        createdAt: Date.now(),
-        internalId: `chat_msg_${Date.now()}_${chatMessageCounter++}`,
-        x: startX,
-        y: startY
-    });
+    messages.value.push(message)
+    const bubble = messages.value[messages.value.length - 1]
+
+    const figure = (data.author as any)?.figure as string | undefined
+    if (figure) AvatarHeadImage.get(figure).then(head => bubble.head = head)
+
+    // measured once in the page (hidden), then placed
+    await nextTick()
+    const element = bubbleElements.get(bubble.internalId)
+    if (!element) return
+
+    bubble.width = element.offsetWidth
+    bubble.height = element.offsetHeight
+    bubble.left = Math.max(0, Math.min(window.innerWidth - bubble.width, bubble.locationX - bubble.width / 2))
+    bubble.top = chatHeight.value - bubble.height
+
+    makeRoom(bubble)
+    bubble.ready = true
 })
 
-// 2. LOOP DELLA UI (FISICA E RENDER)
-function updateChatPositions() {
-    const now = Date.now();
+/** Nitro's DoChatsOverlap: b is moved by additionalBTop. */
+function chatsOverlap(a: UIChatBubble, b: UIChatBubble, additionalBTop: number): boolean {
+    return !((a.left + a.width) < b.left
+        || a.left > (b.left + b.width)
+        || (a.top + a.height) < (b.top + additionalBTop)
+        || a.top > (b.top + additionalBTop + b.height))
+}
 
-    messages.value = messages.value.filter(msg => {
-        const isExpired = (now - msg.createdAt) > chatLifespan;
-        const hasAuthorContainer = msg.data.author && msg.data.author.visualization?.container;
-        return !isExpired && hasAuthorContainer;
-    });
+/** Pushes up the older bubbles that the bubble overlaps (and the ones they overlap in turn). */
+function checkOverlappingChats(chat: UIChatBubble, moved: number, pushed: UIChatBubble[]) {
+    const list = messages.value
 
-    for (let i = 0; i < messages.value.length; i++) {
-        const chatMessage = messages.value[i];
-        
-        // --- INIZIO LOGICA ANIMAZIONE (LERP) ---
-        // Se l'offset attuale è minore del bersaglio, scivola verso l'alto
-        if (chatMessage.yOffset < chatMessage.targetYOffset) {
-            // Modifica lo 0.15 per rendere l'animazione più veloce o più lenta
-            chatMessage.yOffset += (chatMessage.targetYOffset - chatMessage.yOffset) * 0.15;
-            
-            // Arrotonda per evitare calcoli infiniti microscopici
-            if (Math.abs(chatMessage.targetYOffset - chatMessage.yOffset) < 0.5) {
-                chatMessage.yOffset = chatMessage.targetYOffset;
-            }
+    for (let i = list.indexOf(chat) - 1; i >= 0; i--) {
+        const collides = list[i]
+
+        if (!collides.ready || collides === chat || pushed.includes(collides)
+            || ((collides.top + collides.height) - moved) > (chat.top + chat.height)) continue
+
+        if (chatsOverlap(chat, collides, -moved)) {
+            const amount = Math.abs((collides.top + collides.height) - chat.top)
+
+            pushed.push(collides)
+            collides.top -= amount
+            collides.skipMovement = true
+
+            checkOverlappingChats(collides, amount, pushed)
         }
-        // --- FINE LOGICA ANIMAZIONE ---
+    }
+}
 
-        if (!chatMessage.data.author?.visualization?.container) continue;
-        const container = chatMessage.data.author.visualization.container as Container;
-        if (!container.visible) continue;
+function makeRoom(chat: UIChatBubble) {
+    chat.skipMovement = true
+    checkOverlappingChats(chat, 0, [chat])
+    removeHiddenChats()
+}
 
-        const globalPos = UiUtils.getGlobalPosition(container);
-        
-        chatMessage.x = globalPos.tx + AvatarData.AVATAR_LEFT_OFFSET;
-        
-        const baseHeadY = globalPos.ty - container.height - 15;
-        // Applica l'offset calcolato dall'animazione
-        chatMessage.y = baseHeadY - chatMessage.yOffset; 
+/** The bubbles gone over the top of the screen. */
+function removeHiddenChats() {
+    const visible = messages.value.filter(chat => !chat.ready || chat.top > -chat.height * 2)
+    if (visible.length !== messages.value.length) messages.value = visible
+}
+
+function moveAllChatsUp(amount: number) {
+    for (const chat of messages.value) {
+        if (!chat.ready) continue
+
+        if (chat.skipMovement) {
+            chat.skipMovement = false
+            continue
+        }
+
+        chat.top -= amount
     }
 
-    animationFrameId = requestAnimationFrame(updateChatPositions);
+    removeHiddenChats()
+}
+
+// the bubbles keep their distance from the bottom of the strip
+function onResize() {
+    const newHeight = Math.round(window.innerHeight * CHAT_HEIGHT_PERCENTAGE)
+    const delta = chatHeight.value - newHeight
+
+    chatHeight.value = newHeight
+    for (const chat of messages.value) chat.top -= delta
 }
 
 onMounted(() => {
-    animationFrameId = requestAnimationFrame(updateChatPositions);
+    scrollInterval = window.setInterval(() => moveAllChatsUp(MOVE_AMOUNT), SCROLL_SPEED)
+    window.addEventListener('resize', onResize)
 })
 
 onUnmounted(() => {
-    cancelAnimationFrame(animationFrameId);
+    window.clearInterval(scrollInterval)
+    window.removeEventListener('resize', onResize)
 })
 
 function openSettings() {
@@ -206,55 +275,69 @@ function getAuthorName() {
         left: 0;
         top: 0;
         right: 0;
-        bottom: 0;
+        pointer-events: none;
 
         .chatBubble {
-            height: 28px;
             position: absolute;
-            border: 1px solid #000;
-            border-radius: 7px;
-            max-width: 80vw;
-          //  word-break: break-all; // todo check problem with many devices
-            background:linear-gradient(180deg, rgba(255,255,255,1) 0%, rgba(235,235,235,1) 50%, rgba(255,255,255,1) 100%);
             display: flex;
             flex-direction: row;
-            overflow: hidden;
-            line-height: 2px;
-            //transition: top 0.4s ease-out;
+            width: max-content;
+            max-width: 350px;
+            min-height: 26px;
+            box-sizing: border-box;
+            border: 1px solid #000;
+            border-radius: 7px;
+            background: linear-gradient(180deg, #fff 0%, #ebebeb 50%, #fff 100%);
+            font-size: 14px;
+            line-height: 1.15;
+            word-break: break-word;
+            user-select: none;
             pointer-events: all !important;
-            cursor:pointer !important;
-            transform: translateX(-50%);
-            //border-image-source: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADMAAAAYCAYAAABXysXfAAAACXBIWXMAAAsSAAALEgHS3X78AAAAsklEQVR42u3YwQ2AIAwFUNZwC48M5B6sxw4MUyGRRKDh1N9gheQnHjzwJK0pjohcn7xo9bD75hDcixLJK6SUSCLcXhvI83whUiAkvCqqwaAhKEwP6jEeFRUMUyOfwTA1hCv49weSLP5JQ9iY/2IKxATmgRASooLRgsAxmhDNkwkmMLWLaYC0upk30832T3Nj3DCYfRIzzDM5pwnMGwTKUTAxRpLOMDYztzLLg6YXGhaumm6fs9SOmEzL3AAAAABJRU5ErkJggg==);
+            cursor: pointer !important;
+            /* the bubbles slide up, as Nitro */
+            transition: top 0.2s ease;
 
-            .chatBubbleContainer {
-                height: 100%;
-                display: flex;
-                flex-direction: row;
-                
-                b {
-                    font-size: 14px;
+            .chatBubbleHead {
+                position: relative;
+                flex: none;
+                width: 27px;
+                border-radius: 6px 0 0 6px;
+                background-color: #c8c8c8;
+                border-right: 1px solid #8e8e8e;
+
+                img {
+                    position: absolute;
+                    left: 50%;
+                    bottom: 2px;
+                    transform: translateX(-50%);
                 }
-                p {
-                    font-size: 14px;
-                    flex: 2;
-                }
+            }
 
-                .playerHeadContainer 
-                {
-                    background-color: #bdbdbd;
-                    width: 23px;
-                    display: flex;
-                    justify-content: center;
-                    align-items: center;
-                    border-right: 2px solid #585858;
-                    padding: 3px 4px;
-                    margin-right: 3px;
+            .chatBubbleContent {
+                padding: 5px 6px 5px 4px;
+                color: #000;
+            }
 
-                    img {
-                        position: absolute;
-                        left: -2px;
-                        top: -6px;
-                    }
+            /* points to the avatar that talked */
+            .chatBubblePointer {
+                position: absolute;
+                left: 50%;
+                bottom: -6px;
+                transform: translateX(-50%);
+                width: 0;
+                height: 0;
+                border-left: 5px solid transparent;
+                border-right: 5px solid transparent;
+                border-top: 6px solid #000;
+
+                &::after {
+                    content: "";
+                    position: absolute;
+                    left: -4px;
+                    top: -7px;
+                    border-left: 4px solid transparent;
+                    border-right: 4px solid transparent;
+                    border-top: 5px solid #fff;
                 }
             }
         }

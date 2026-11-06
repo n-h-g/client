@@ -1,118 +1,139 @@
 <template>
-	<li class="treeView" v-if="catalogMenu">
-		<div v-for="menu in filteredMenu()" class="catalogLi" :class="{ active: currentMenu.id == menu.id }" :key="menu.id"
-			@click="openEvent(menu)">
-			<div class="description">
-				<span class="catalogLiIcon">
-					<img :src="resourceUrl +
-						menu.id +
-						'.png'
-						" />
+	<ul class="catalogTree">
+		<li v-for="page in pages" :key="page.id">
+			<div
+				class="catalogTreeRow"
+				:class="{ active: currentId === page.id, open: page.openSubMenu }"
+				:style="{ paddingLeft: 4 + depth * 12 + 'px' }"
+				@click.stop="openPage(page)"
+			>
+				<span class="catalogTreeIcon">
+					<img v-if="page.iconName" :src="getPageIconUrl(page)" loading="lazy" alt="" />
 				</span>
-				<span class="catalogMenuLabel">{{ menu.title }}</span>
+
+				<span class="catalogTreeLabel">{{ page.title }}</span>
+
+				<span v-if="hasSubPages(page)" class="catalogTreeArrow"></span>
 			</div>
-			<ul class="menuUlCatalog" :class="{ hidden: !menu.openSubMenu }">
-				<TreeMenu v-if="menu.subPages && menu.subPages.length > 0" :catalogMenu="menu.subPages"
-					:currentMenu="props.currentMenu" />
-			</ul>
-		</div>
-	</li>
+
+			<!-- the sub pages, shown when the page is open; their clicks are forwarded up to the catalogue -->
+			<TreeMenu
+				v-if="hasSubPages(page) && page.openSubMenu"
+				:pages="page.subPages"
+				:currentId="currentId"
+				:depth="depth + 1"
+				@openPage="(subPage) => emits('openPage', subPage)"
+			/>
+		</li>
+	</ul>
 </template>
 
 <script setup lang="ts">
 import { Engine } from "../../../game/Engine"
-import { OutgoingPacket } from "../../../game/networking/packets/outgoing/OutgoingPacket"
 
-const props = defineProps<{
-	catalogMenu: any
-	currentMenu: any
-}>()
+const props = withDefaults(
+	defineProps<{
+		pages: any[]
+		currentId: number
+		depth?: number
+	}>(),
+	{ depth: 0 }
+)
+
 const emits = defineEmits(["openPage"])
 
-const resourceUrl = Engine.getInstance().config.catalogueResourcesUrl + "icons/"
-
-function openEvent(menu) {
-	if (menu.subPages && menu.subPages.length > 0)
-		menu.openSubMenu = !menu.openSubMenu
-
-	Engine.getInstance().networkingManager.packetManager.applyOut(OutgoingPacket.RequestCatalogPageEvent, {
-		id: menu.id
-	})
-
-	emits("openPage", menu);
+function hasSubPages(page: any): boolean {
+	return page.subPages && page.subPages.length > 0
 }
 
-function filteredMenu() {
-	return props.catalogMenu.filter((menu) => menu.isEnabled !== -1);
+// the page icon is the icon of one of its furni (the catalogue icons are not in the Nitro assets)
+function getPageIconUrl(page: any): string {
+	return Engine.getInstance().config.itemsIconsUrl + page.iconName.replace("*", "_") + "_icon.png"
+}
+
+function openPage(page: any) {
+	// a folder opens/closes its sub pages; the page itself is opened anyway (it can have items)
+	if (hasSubPages(page)) page.openSubMenu = !page.openSubMenu
+
+	emits("openPage", page)
 }
 </script>
 
 <style lang="scss" scoped>
-    .treeView {
+.catalogTree {
+	list-style: none;
+	margin: 0;
+	padding: 0;
+}
 
-        list-style-type: none;
+.catalogTreeRow {
+	display: flex;
+	align-items: center;
+	height: 22px;
+	padding-right: 4px;
+	margin-bottom: 1px;
+	cursor: pointer;
+	background-color: #fff;
+	border-radius: 3px;
+	user-select: none;
 
-        .catalogLi {
-            cursor: pointer;
+	&:hover {
+		background-color: #e3f3fa;
+	}
 
+	&.active {
+		background-color: #63c5e9;
 
-            .description {
-               // border-bottom: 1px solid #6e6e6e;
-                    border-top: 2px solid #d2d1cb;
-                    border-bottom: 2px solid #d2d1cb;
-                display: flex;
-                flex-direction: row;
-                flex-wrap: wrap;
-                width: 100%;
-                justify-content: flex-start;
-                align-items: center;
-            }
+		.catalogTreeLabel {
+			color: #fff;
+		}
 
-            .description:hover {
-                background-color: darken(#d2d1cb, 10%);
-            }
+		.catalogTreeArrow {
+			border-left-color: #fff;
+		}
+	}
 
-            &.active {
-                &>.description {
-                    color: #fff;
-                    background-color: #63c5e9;
-                    font-style: italic;
-                    border-top: 2px solid #82d1ed;
-                    border-bottom: 2px solid #82d1ed;
+	&.open > .catalogTreeArrow {
+		transform: rotate(90deg);
+	}
+}
 
-                    &>.catalogMenuLabel {
-                        color: #fff;
-                    }
-                }
+.catalogTreeIcon {
+	flex: 0 0 20px;
+	width: 20px;
+	height: 20px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	overflow: hidden;
 
+	img {
+		max-width: 20px;
+		max-height: 20px;
+		image-rendering: pixelated;
+	}
+}
 
-            }
+.catalogTreeLabel {
+	flex: 1;
+	min-width: 0;
+	padding-left: 5px;
+	font-size: 12px;
+	font-weight: 700;
+	color: #4a4a4a;
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
 
-            .catalogLiIcon {
-                width: 23px;
-                height: 20px;
-                display: flex;
-                flex-grow: 0;
-                justify-content: center;
-                align-items: center;
-            }
-
-            .catalogMenuLabel {
-                flex-grow: 2;
-                margin: auto 0;
-                padding: 0 7px;
-                font-weight: 700;
-                color: #565656;
-            }
-
-            /*  & > * {
-                display: inline-block;
-                vertical-align: middle;
-            }*/
-        }
-
-        .menuUlCatalog {
-            margin-left: 10px;
-        }
-    }
+.catalogTreeArrow {
+	flex: 0 0 auto;
+	width: 0;
+	height: 0;
+	margin-left: 4px;
+	border-top: 4px solid transparent;
+	border-bottom: 4px solid transparent;
+	border-left: 5px solid #8a8a8a;
+	transition: transform 0.1s;
+}
 </style>

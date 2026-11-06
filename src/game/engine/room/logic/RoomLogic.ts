@@ -1,10 +1,16 @@
 import {RoomLayout} from '../RoomLayout';
 import {Engine} from '../../../Engine';
 import {Sprite, Texture} from 'pixi.js';
+import type {DisplayObject, FederatedPointerEvent} from 'pixi.js';
+import type {Tile} from '../objects/map/Tile';
+import type {Entity} from '../../../core/room/object/entities/Entity';
+import { WallItem } from '../objects/items/WallItem';
+import { WallType } from '../objects/map/WallTypeEnum';
+import { RoomPriority } from '../visualization/RoomPriority';
+import { RoomVisualization } from '../visualization/RoomVisualization';
+import { MapData } from '../objects/map/MapData';
+import { OutgoingPacket } from '../../../networking/packets/outgoing/OutgoingPacket';
 import {Viewport} from 'pixi-viewport';
-import {RoomPriority} from '../visualization/RoomPriority';
-import {RoomVisualization} from '../visualization/RoomVisualization';
-import {Point3d} from '../../../utils/point/Point3d';
 import {RenderingUtils} from '../../../utils/RenderingUtils';
 import {EventManager} from '../../../core/events/EventManager';
 import {UIEvents} from '../../events/ui/UIEvents';
@@ -17,6 +23,7 @@ export class RoomLogic implements Disposable {
     private canvasFloorHit: HTMLCanvasElement;
     private canvasWallHit: HTMLCanvasElement;
 	private lastCameraPosition: Point;
+    private hoveredTile: Tile | null = null;
 
     constructor(room: RoomLayout) {
         this.room = room;
@@ -34,26 +41,40 @@ export class RoomLogic implements Disposable {
         this.canvasWallHit = this.room.createOrGetRoomCanvas('wallHit');
     }
 
-	dispose(): void {}
+    private readonly keyDownListener = this.onKeyDown.bind(this);
+
+	dispose(): void {
+        window.removeEventListener('keydown', this.keyDownListener);
+    }
+
+    /**
+     * The next mouse move will hover the tile under the mouse again, even if it didn't change.
+     */
+    resetHoveredTile(): void {
+        this.hoveredTile = null;
+    }
 
     registerEvents(): void {
         const roomVisualization = this.room.visualization
 
-        roomVisualization
-            .getCanvasFloor()
-            .on('pointerover', this.onMouseOver.bind(this));
+        // The tile under the mouse is calculated from the floor geometry (see getTileAtGlobalPoint),
+        // not from the object hit by the mouse: furni sprites are hit on their whole rectangle
+        // (transparent parts included) and they used to hide the tiles behind them.
+        roomVisualization.Container.on(
+            'globalpointermove',
+            this.onPointerMove.bind(this)
+        );
         roomVisualization.Container.on(
             'pointerdown',
             this.onMouseClick.bind(this)
         );
-        roomVisualization.getCanvasFloor().on(
-            'pointerout',
+        roomVisualization.Container.on(
+            'pointerleave',
             this.onMouseOut.bind(this)
         );
-        roomVisualization.container.on(
-            'pointerout',
-            this.onMouseOut.bind(this)
-        );
+
+        window.removeEventListener('keydown', this.keyDownListener);
+        window.addEventListener('keydown', this.keyDownListener);
 
         Engine.getInstance().application.viewport.on(
             'moved',
@@ -94,23 +115,165 @@ export class RoomLogic implements Disposable {
             );
     }
 
-    private onMouseClick(e: any) {
+    private onPointerMove(e: FederatedPointerEvent) {
+        const rolling = Engine.getInstance().roomService?.currentRoom?.roomEntityRepository?.rollingEntity;
+        if (rolling instanceof WallItem) {
+            const visualization = this.room.visualization;
+            const wall = visualization.getWallAtGlobalPoint(e.global);
+            const container = rolling.visualization?.container;
 
-	}
+            if (container) {
+                container.visible = !!wall;
+                if (wall) {
+                    const local = this.room.visualization.container.toLocal(e.global);
+                    rolling.previewOffset = {x: local.x, y: local.y};
+                    const wallLocalX = Math.abs(local.x - wall.visualization.offsetX);
+                    const wallLocalY = wall.visualization.offsetY + MapData.wallHeight + 120 + wallLocalX / 2 + wall.position.z * MapData.thickSpace * MapData.stairSteps - local.y;
+                    rolling.setPlacement(wall, wallLocalX, wallLocalY);
+                    // Wall segments on opposite sides use the two canonical
+                    // Habbo wall directions (2 and 4).
+                    const wallDirection = wall.type === WallType.Left || wall.type === WallType.DoorLeft ? 2 : 4;
+                    if (rolling.visualization.direction !== wallDirection) {
+                        rolling.visualization.updateRotation(wallDirection);
+                    }
+                    rolling.visualization.updatePosition();
+                    container.zIndex = RoomVisualization.calculateZIndex(
+                        wall.position,
+                        RoomPriority.WALL_ITEM
+                    );
+                    // Keep the placement ghost translucent while it is attached
+                    // to the wall, like the Habbo placement preview.
+                    container.alpha = 0.55;
+                }
+            }
+            return;
+        }
 
-    private onMouseOver(e: any) {
-        this.room.visualization.getCanvasPointer().zIndex =
-            RoomVisualization.calculateZIndex(
-                new Point3d(
-                    this.room.getPointer().position.x,
-                    this.room.getPointer().position.y,
-                    this.room.getPointer().position.z
-                ),
-                RoomPriority.POINTER
+        const tile = this.room.visualization.getTileAtGlobalPoint(e.global);
+        const repository = Engine.getInstance().roomService?.currentRoom?.roomEntityRepository;
+
+        if (!tile) {
+            this.onMouseOut();
+
+            // out of the floor the furni that is being placed is shown as its icon (as in Habbo)
+            repository?.showRollingEntityAsIcon();
+        } else if (tile !== this.hoveredTile) {
+            this.hoveredTile = tile;
+
+            // moves the pointer (and the furni that is being moved, if any) on the tile:
+            // where the furni doesn't fit with any rotation it becomes its icon
+            tile.logic?.onHover();
+        }
+
+        // the icon follows the mouse, also inside the same tile
+        if (repository?.isRollingIcon()) {
+            const local = this.room.visualization.container.toLocal(e.global);
+            repository.moveRollingIcon(local.x, local.y);
+        }
+    }
+
+    private onMouseClick(e: FederatedPointerEvent) {
+        const repository = Engine.getInstance().roomService?.currentRoom?.roomEntityRepository;
+
+        // Wall furni are positioned against wall geometry. Never fall through to
+        // the floor tile click handler while one is being placed.
+        if (repository?.rollingEntity instanceof WallItem) {
+            const wallItem = repository.rollingEntity;
+            const wall = this.room.visualization.getWallAtGlobalPoint(e.global);
+            if (!wall) {
+                // A wall furni cannot be dropped on the floor: clicking anywhere
+                // outside a wall cancels the inventory placement.
+                repository.cancelRollingEntity();
+                return;
+            }
+
+            const local = this.room.visualization.container.toLocal(e.global);
+            const localX = Math.abs(local.x - wall.visualization.offsetX);
+            wallItem.setPlacement(
+                wall,
+                localX,
+                wall.visualization.offsetY + MapData.wallHeight + 120 + localX / 2 + wall.position.z * MapData.thickSpace * MapData.stairSteps - local.y
             );
+            const location = wallItem.getWallLocation();
+            if (location) {
+                Engine.getInstance().networkingManager.packetManager.applyOut(
+                    OutgoingPacket.RoomPlaceItemEvent,
+                    {id: Number(wallItem.id), wallPosition: location}
+                );
+                repository.delete(wallItem.id);
+                wallItem.visualization.container?.destroy({children: true});
+                repository.rollingEntity = null;
+            }
+            return;
+        }
+
+        // right click while moving a furni: cancel
+        if (e.button === 2 && repository?.isEntityRolling()) {
+            repository?.cancelRollingEntity();
+            return;
+        }
+
+        // clicking an avatar is handled by the avatar itself (look at / user preview)
+        if (this.isHumanTarget(e.target as DisplayObject)) return;
+
+        const tile = this.room.visualization.getTileAtGlobalPoint(e.global);
+
+        // out of the floor the furni being moved is its icon: it can't be dropped there
+        if (!tile && repository?.isRollingIcon()) {
+            repository.cancelRollingEntity();
+            return;
+        }
+
+        // walk to the tile under the mouse, even if a furni is drawn over it.
+        // Clicking a furni still opens its preview (ItemLogic.onClick).
+        tile?.logic?.onClick();
+    }
+
+    private isHumanTarget(target: DisplayObject | null): boolean {
+        if (!target) return false;
+
+        const entities =
+            Engine.getInstance().roomService?.currentRoom?.roomEntityRepository?.getAll();
+
+        if (!entities) return false;
+
+        const humanContainers = new Set<DisplayObject>();
+
+        entities.forEach((entity: Entity) => {
+            // humans are the only entities with a figure (no runtime import of Human: circular imports)
+            if ('figure' in entity && entity.visualization?.container) {
+                humanContainers.add(entity.visualization.container);
+            }
+        });
+
+        for (let node: DisplayObject | null = target; node; node = node.parent) {
+            if (humanContainers.has(node)) return true;
+        }
+
+        return false;
+    }
+
+    private onKeyDown(e: KeyboardEvent) {
+        const roomService = Engine.getInstance().roomService;
+
+        // keys only for the room this logic belongs to, and not while typing (chat...)
+        if (roomService?.currentRoom?.roomLayout !== this.room) return;
+
+        const target = e.target as HTMLElement | null;
+        if (target && (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.isContentEditable)) return;
+
+        const repository = roomService.currentRoom.roomEntityRepository;
+        if (!repository.isEntityRolling()) return;
+
+        if (e.key === 'Escape') {
+            repository.cancelRollingEntity();
+        } else if (e.key === 'r' || e.key === 'R') {
+            roomService.rotatePlacingItem();
+        }
     }
 
     private onMouseOut() {
+        this.hoveredTile = null;
         this.room.getPointer().logic.hidePointer();
     }
 }

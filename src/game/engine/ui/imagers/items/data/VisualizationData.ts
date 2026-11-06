@@ -42,7 +42,7 @@ export class VisualizationData {
         this.loadDirections(data.directions);
         this.loadAnimations(data.animations);
 
-        console.log(this.wrappedAnimations)
+        //console.log(this.wrappedAnimations)
     }
 
     getAnimationLayer(layerId, animationId) {

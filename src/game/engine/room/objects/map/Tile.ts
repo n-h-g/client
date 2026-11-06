@@ -10,6 +10,11 @@ export class Tile extends RoomObjectController<TileVisualization, TileLogic> {
     type: TileType;
     color: ColorRGB;
     plane: FloorPlane;
+    /**
+     * True while a floor hole furni (hole3, ...) stands on the tile: the tile is removed from the floor
+     * (not drawn, not hoverable) as long as the furni is there.
+     */
+    coveredByFloorHole = false;
 
     constructor(
         plane: FloorPlane,

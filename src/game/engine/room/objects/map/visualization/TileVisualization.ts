@@ -6,7 +6,7 @@ import {TileType} from '../TileTypeEnum';
 import {Point3d} from '../../../../../utils/point/Point3d';
 import {ColorRGB} from '../../../../../utils/color/ColorRGB';
 import {NormalType} from '../../../visualization/NormalTypeEnum';
-import {Container, Graphics, ObservablePoint} from 'pixi.js';
+import {Container, Graphics, Matrix, ObservablePoint} from 'pixi.js';
 import {Tile} from '../Tile';
 import {RoomPriority} from '../../../visualization/RoomPriority';
 import { PlaneVisualization } from './PlaneVisualization';
@@ -14,11 +14,17 @@ import { PlaneVisualization } from './PlaneVisualization';
 export class TileVisualization extends RoomObjectVisualization {
     private tile: Tile;
     private floorContext: Container;
+    /** Steps: drawn over the walls (they rise towards the wall behind them). */
+    private stairsContext: Container;
     private doorContext: Container;
-    private color: ColorRGB = ColorRGB.getColorFromNumber(
-        RoomVisualizationColorData.TILE_COLOR
-    );
     private useStroke = false;
+
+    /**
+     * Texture space -> room space of the floor pattern, as Nitro's floor planes: 32 pixels of the texture
+     * per tile on both the sides (u along y, v along x), with the corner of the pattern on the top corner of
+     * the tile 0,0. Every tile at any height starts on a corner of the pattern, so the floor is continuous.
+     */
+    private static readonly FLOOR_TEXTURE_MATRIX = new Matrix(1, 0.5, -1, 0.5, MapData.tileWidth / 2, 0);
 
     constructor(tile: Tile) {
         super(
@@ -32,6 +38,7 @@ export class TileVisualization extends RoomObjectVisualization {
         const roomV = tile.plane.room.visualization as RoomVisualization;
         this.floorContext = roomV.getCanvasFloor();
         this.doorContext = roomV.getCanvasDoorTile();
+        this.stairsContext = roomV.getCanvasStairs();
 
         this.useStroke = !(tile.plane.visualization as PlaneVisualization).useTexture
     }
@@ -41,7 +48,37 @@ export class TileVisualization extends RoomObjectVisualization {
     }
 
     render(): void {
+        // drawn again with a new floor: the old graphics are replaced
+        if (this.container && !this.container.destroyed) this.container.destroy();
+        this.container = null;
+
         this.checkTypeAndDraw();
+        // the furni can arrive before the floor is drawn
+        this.setHidden(this.tile.coveredByFloorHole);
+    }
+
+    /** The color of the floor applied to the room (the default one without a floor item). */
+    private get color(): ColorRGB {
+        return ColorRGB.getColorFromNumber(
+            this.tile.plane.room.floorDecoration?.color ?? RoomVisualizationColorData.TILE_COLOR
+        );
+    }
+
+    /** The top of the tile: the pattern of the floor applied to the room, tinted with its color. */
+    private beginTopFill(ctx: Graphics, color: string): void {
+        const texture = this.tile.plane.room.floorDecoration?.texture;
+
+        if (!texture) {
+            ctx.beginFill(color);
+            return;
+        }
+
+        ctx.beginTextureFill({texture, color, matrix: TileVisualization.FLOOR_TEXTURE_MATRIX});
+    }
+
+    /** A floor hole furni removes the tile from the floor: hidden (not destroyed), it comes back when the furni leaves. */
+    setHidden(hidden: boolean): void {
+        if (this.container) this.container.visible = !hidden;
     }
 
     private static calculateOffsetX(position: Point3d, type: TileType): number {
@@ -84,10 +121,10 @@ export class TileVisualization extends RoomObjectVisualization {
                 this.drawTile(this.floorContext);
                 break;
             case TileType.StairLeft:
-                this.drawStair(this.floorContext);
+                this.drawStair(this.stairsContext);
                 break;
             case TileType.StairRight:
-                this.drawStair(this.floorContext, true);
+                this.drawStair(this.stairsContext, true);
                 break;
             case TileType.StairCornerLeft:
                 //this.drawStairCorner(this.floorContext)
@@ -96,7 +133,7 @@ export class TileVisualization extends RoomObjectVisualization {
                 //this.drawStairCorner(this.floorContext, true)
                 break;
             case TileType.StairCornerFront:
-                this.drawFrontCorner(this.floorContext);
+                this.drawFrontCorner(this.stairsContext);
                 break;
             default:
                 return;
@@ -107,11 +144,16 @@ export class TileVisualization extends RoomObjectVisualization {
         const ctx = new Graphics();
         ctx.eventMode = 'dynamic';
 
+        // the sides of the tile go down to the neighbour tile on that side: a raised floor (e.g. an upper
+        // level of a house) is drawn as a solid block instead of a thin slab floating in the air
         const fullHeightTick = this.tile.plane.room.hasFullHeightTick
             ? MapData.thickSpace *
               MapData.stepHeight *
               (this.tile.position.z + (isDoor ? 1 : 0))
             : 0;
+        const leftTick = Math.max(fullHeightTick, this.getSideDrop(1, 0));
+        const rightTick = Math.max(fullHeightTick, this.getSideDrop(0, 1));
+
         const floorColor = RoomVisualizationColorData.getNormal(
             this.color,
             NormalType.LIGHT
@@ -137,14 +179,14 @@ export class TileVisualization extends RoomObjectVisualization {
             this.offsetX + MapData.tileWidth / 2,
             this.offsetY +
                 MapData.tileHeight +
-                fullHeightTick +
+                leftTick +
                 MapData.thickSpace
         );
         ctx.lineTo(
             this.offsetX,
             this.offsetY +
                 MapData.tileHeight / 2 +
-                fullHeightTick +
+                leftTick +
                 MapData.thickSpace
         );
 
@@ -163,19 +205,19 @@ export class TileVisualization extends RoomObjectVisualization {
             this.offsetX + MapData.tileWidth / 2,
             this.offsetY +
                 MapData.tileHeight +
-                fullHeightTick +
+                rightTick +
                 MapData.thickSpace
         );
         ctx.lineTo(
             this.offsetX + MapData.tileWidth,
             this.offsetY +
                 MapData.tileHeight / 2 +
-                fullHeightTick +
+                rightTick +
                 MapData.thickSpace
         );
         ctx.closePath();
         ctx.endFill();
-        ctx.beginFill(floorColor);
+        this.beginTopFill(ctx, floorColor);
         ctx.moveTo(
             this.offsetX + MapData.tileWidth / 2,
             this.offsetY //TopY
@@ -200,6 +242,32 @@ export class TileVisualization extends RoomObjectVisualization {
         container.addChild(ctx);
         return container;
     }
+
+    /**
+     * Height in pixels of the side of the tile towards the neighbour (x + dx, y + dy): the difference of height
+     * with it. Outside the room / on a hole the side goes down to the lowest floor of the room
+     * (so the rooms with a single level keep the thin border).
+     */
+    private getSideDrop(dx: number, dy: number): number {
+        const matrix = this.tile.plane.room.getModelMatrix();
+        const x = this.tile.position.x;
+        const y = this.tile.position.y;
+
+        let lowest = TileVisualization.lowestFloor.get(matrix);
+        if (lowest === undefined) {
+            lowest = Math.min(...matrix.flat().filter(height => height > 0));
+            if (!Number.isFinite(lowest)) lowest = 0;
+            TileVisualization.lowestFloor.set(matrix, lowest);
+        }
+
+        const neighbour = matrix[x + dx]?.[y + dy];
+        const neighbourHeight = neighbour && neighbour > 0 ? neighbour : lowest;
+        const difference = (matrix[x]?.[y] ?? 0) - neighbourHeight;
+
+        return difference > 0 ? difference * MapData.thickSpace * MapData.stepHeight : 0;
+    }
+
+    private static lowestFloor = new WeakMap<number[][], number>();
 
     private drawStair(container: Container, isRight = false): Container {
         const ctx = new Graphics();

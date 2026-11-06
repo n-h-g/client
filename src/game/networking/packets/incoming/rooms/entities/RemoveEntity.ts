@@ -22,5 +22,7 @@ export class RemoveEntity extends MessageHandler {
         Engine.getInstance().roomService.currentRoom.roomEntityRepository.delete(
             data
         );
+
+        Engine.getInstance().roomService.currentRoom.roomEntityRepository.onFloorItemsChanged();
     }
 }

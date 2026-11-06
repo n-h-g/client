@@ -13,6 +13,10 @@ export class AvatarActionId {
                 return 'sit';
             case ActionId.RESPECT:
                 return 'respect';
+            case ActionId.SIGN:
+                return 'sign';
+            case ActionId.BLOW:
+                return 'blow';
             case ActionId.WAVE:
                 return 'wave';
             case ActionId.IDLE:
@@ -30,7 +34,7 @@ export class AvatarActionId {
             case ActionId.WALK:
                 return 'wlk';
             case ActionId.LAUGH:
-                return 'lag';
+                return 'laugh';
             default:
             case ActionId.STAND:
                 return 'std';

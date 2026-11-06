@@ -1,5 +1,6 @@
 import {Engine} from '../../../../Engine';
 import {FloorItem} from '../../../../engine/room/objects/items/FloorItem';
+import type {ItemVisualization} from '../items/visualization/ItemVisualization';
 import {WallItem} from '../../../../engine/room/objects/items/WallItem';
 import {UserEntity} from '../../../../engine/room/objects/users/UserEntity';
 import {FurnidataItemType} from '../../../../engine/ui/imagers/items/enum/FurniDataItemType';
@@ -10,6 +11,8 @@ import {PositionComponent} from './components/PositionComponent';
 import {UserComponent} from './components/UserComponent';
 import {Entity} from './Entity';
 import {EntityType} from './EntityType';
+import { FurnitureWallData } from '../../../../engine/room/objects/items/WallItemData';
+import type {HumanVisualization} from '../human/visualization/HumanVisualization';
 
 export class EntityBuilder {
     private id: string;
@@ -18,8 +21,12 @@ export class EntityBuilder {
     private position: PositionComponent;
     private bodyRotation?: number;
     private headRotation?: number;
+    private rotation?: number;
+    private state = 0;
     private user?: UserComponent;
     private figure?: AspectComponent;
+    private wallPosition?: string;
+    private effectId = 0;
 
     setId(id: string): EntityBuilder {
         this.id = id;
@@ -55,8 +62,37 @@ export class EntityBuilder {
         return this;
     }
 
+    /**
+     * State of a furni (extraData): the animation it shows.
+     */
+    setState(interaction?: {extraData?: number | string}): EntityBuilder {
+        const state = Number(interaction?.extraData);
+        this.state = Number.isFinite(state) && state >= 0 ? state : 0;
+
+        return this;
+    }
+
+    setRotation(rotation?: {rot: number}): EntityBuilder {
+        if (rotation) {
+            this.rotation = rotation.rot;
+        }
+
+        return this;
+    }
+
+    /** The avatar effect of a human. */
+    setEffect(effect?: {id: number}): EntityBuilder {
+        this.effectId = effect?.id ?? 0;
+        return this;
+    }
+
     setName(name: string): EntityBuilder {
         this.name = name;
+        return this;
+    }
+
+    setWallPosition(wallPosition?: string): EntityBuilder {
+        this.wallPosition = wallPosition;
         return this;
     }
 
@@ -79,18 +115,35 @@ export class EntityBuilder {
                     this.name,
                     this.figure.look
                 );
+                entity.userId = this.user.id;
                 entity.position = position;
+                const visualization = entity.visualization as HumanVisualization;
+                if (this.bodyRotation != null) visualization.direction = this.bodyRotation;
+                if (this.headRotation != null) visualization.headRotation = this.headRotation;
+                visualization.setEffect(this.effectId);
             }
         } else if (this.type == EntityType.ITEM) {
+            const isWallItem = !!this.wallPosition || this.position == null;
             const base =
                 await Engine.getInstance().userInterfaceManager.furniImager.loadFurniBase(
-                    FurnidataItemType.FloorItem,
+                    isWallItem ? FurnidataItemType.WallItem : FurnidataItemType.FloorItem,
                     this.name
                 );
-            if (this.position != null) {
+            if (!isWallItem) {
                 entity = new FloorItem(this.id, this.name, position, base);
+
+                // the furni must be drawn with the rotation sent by the server,
+                // otherwise e.g. a chair is shown in a direction different from the one used to sit
+                if (this.rotation != null) {
+                    entity.visualization.direction = this.rotation;
+                }
+
+                (entity.visualization as ItemVisualization).state = this.state;
             } else {
-                entity = new WallItem(this.id, this.name);
+                const wallData = this.wallPosition
+                    ? FurnitureWallData.fromLocation(this.wallPosition)
+                    : new FurnitureWallData({localX: 0, localY: 0, width: 0, height: 0, y: 0, z: 0, direction: 2, stuffData: '', secondsToExpiration: 0, isOldFormat: false});
+                entity = new WallItem(this.id, this.name, base, wallData);
             }
         }
 

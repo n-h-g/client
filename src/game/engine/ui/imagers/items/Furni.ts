@@ -1,4 +1,4 @@
-import { BLEND_MODES, Sprite, Texture } from 'pixi.js';
+import { BLEND_MODES, Container, Sprite, Texture } from 'pixi.js';
 import { FurniBase } from './FurniBase';
 import { FurniData } from './FurniData';
 import { FurniAsset } from './FurniAsset';
@@ -11,6 +11,8 @@ import { RoomVisualizationType } from '../../../../core/room/object/RoomVisualiz
 import { Logger } from '../../../../utils/Logger';
 import { RenderingUtils } from '../../../../utils/RenderingUtils';
 import { RoomObjectSprite } from '../../../../core/room/object/RoomObjectSprite';
+import { AlphaHitTest } from './utils/AlphaHitTest';
+import { RoomDepth } from '../../../room/visualization/RoomDepth';
 
 export class Furni extends RoomObjectSprite {
 	private wrappedFurniBase: FurniBase;
@@ -26,6 +28,17 @@ export class Furni extends RoomObjectSprite {
 	private lastAnimation = 1;
 
 	private layerSprites: Map<number, Sprite> = new Map();
+
+	/**
+	 * The layers drawn in front of the avatars that are on the furni (e.g. the front of a bath with an avatar
+	 * sitting in it): a furni container has only one zIndex, these layers need one above the avatars.
+	 * ItemVisualization puts it in the room next to the furni container.
+	 */
+	readonly frontContainer = new Container();
+	private frontLayers = new Set<number>();
+
+	/** Color variant of the furni: the number after the * in the name (chair_plasto*2 -> 2), 0 = default. */
+	colorId = 0;
 
 	constructor(
 		furniBase: FurniBase,
@@ -54,6 +67,9 @@ export class Furni extends RoomObjectSprite {
 		this.container.eventMode = 'dynamic';
 		this.container.visible = true;
 		this.container.sortableChildren = true;
+		this.frontContainer.sortableChildren = true;
+
+		//console.log(this.furniBase.LogicType)
 	}
 
 	async init(): Promise<void> {
@@ -110,8 +126,8 @@ export class Furni extends RoomObjectSprite {
 
 			const placeholder = Sprite.from(this.textureCache);
 
-			placeholder.height = 68 - 10e-3;
-			placeholder.width = 68 - 10e-3;
+			placeholder.height = 64 - 10e-3;
+			placeholder.width = 64 - 10e-3;
 
 			this.container.addChild(placeholder);
 		});
@@ -120,6 +136,7 @@ export class Furni extends RoomObjectSprite {
 	private updateSprites(needsUpdate = false, animation = 0) {
         if (needsUpdate) {
             this.container.removeChildren();
+            this.frontContainer.removeChildren();
             this.layerSprites.clear();
         }
 
@@ -171,14 +188,17 @@ export class Furni extends RoomObjectSprite {
 		let sprite = this.layerSprites.get(layer);
 		if (!sprite) {
 			sprite = new Sprite(texture);
+			// clickable only on the visible pixels
+			AlphaHitTest.apply(sprite);
 			this.layerSprites.set(layer, sprite);
-			this.container.addChild(sprite);
+			(this.frontLayers.has(layer) ? this.frontContainer : this.container).addChild(sprite);
 		} else {
 			sprite.texture = texture;
 			sprite.visible = true;
 		}
 
-		const offsets = currentAsset.offsets;
+		// the offset is always the asset's own: a source only gives the bitmap
+		const offsets = originalAsset.offsets ?? currentAsset.offsets;
 
 		if (isFlipped) {
 			sprite.scale.x = -1;
@@ -194,7 +214,18 @@ export class Furni extends RoomObjectSprite {
 
 		const layerData = this.wrappedFurniBase.getLayer(layer);
 		this.updateSpriteFrom(sprite, direction, layerData, layer);
+
+		// color variants (e.g. chair_plasto*2) tint some layers
+		sprite.tint = layer >= 0 ? this.wrappedFurniBase.getColorFrom(this.colorId, layer) : 0xffffff;
 	}
+	private allLayersIgnoreMouse(): boolean {
+		const count = this.wrappedFurniBase.getLayerCount();
+		for (let i = 0; i < count; i++) {
+			if (!this.wrappedFurniBase.getLayer(i)?.ignoreMouse) return false;
+		}
+		return count > 0;
+	}
+
 	private getTexture(asset: FurniAsset): Texture {
         if (!asset.sprite) return null;
 
@@ -236,8 +267,11 @@ export class Furni extends RoomObjectSprite {
 				sprite.blendMode = FurniSpriteUtils.getBlendModeFromInk(layer.ink);
 			}
 
-			let finalZ = layer.z ? Number(layer.z) : directionZ;
-			sprite.zIndex = finalZ - (layer.id * 0.001);
+			// the z of the direction if it changes it (e.g. hcamme's tap), else the one of the layer.
+			// With the same z the layers are drawn in their order (b over a), as in Habbo:
+			// e.g. the lights of party_floor (b) were hidden under its floor (a)
+			const finalZ = this.wrappedFurniBase.getLayerZ(direction, layerIndex);
+			sprite.zIndex = finalZ + (layer.id * 0.001);
 
 			if (layer.alpha !== undefined) {
 				sprite.alpha = (layer.alpha / 255) * this.multiplier;
@@ -246,7 +280,9 @@ export class Furni extends RoomObjectSprite {
 			}
 
 
-			if (layer.ignoreMouse) {
+			// a furni whose layers all ignore the mouse (e.g. wl_sofa) would not be clickable at all:
+			// the flag is used only if some other layer can be clicked
+			if (layer.ignoreMouse && !this.allLayersIgnoreMouse()) {
 				sprite.eventMode = 'none';
 				sprite.cursor = 'default';
 			}
@@ -254,10 +290,12 @@ export class Furni extends RoomObjectSprite {
 			if (layerIndex === -1) {
 				sprite.alpha = (47 / 255) * this.multiplier;
 				sprite.zIndex = directionZ - 100;
+				// the shadow is not part of the furni for the mouse
+				sprite.eventMode = 'none';
 			} else {
 
 				sprite.alpha = (FurniData.DEFAULT_ALPHA / 255) * this.multiplier;
-				sprite.zIndex = directionZ - (layerIndex * 0.001);
+				sprite.zIndex = this.wrappedFurniBase.getLayerZ(direction, layerIndex) + (layerIndex * 0.001);
 			}
 
 		}
@@ -290,12 +328,39 @@ export class Furni extends RoomObjectSprite {
 	}
 
 	nextFrame() {
-        if (!this.isPlaying || this.isPlaceholder || this.isIcon) return;
-        
-        this.frame++;
+    if (!this.isPlaying || this.isPlaceholder || this.isIcon) return;
+		this.frame = (this.frame + 1);
+		this.updateSprites(false, this.animation); 
+	}
 
-        this.updateSprites(false, this.animation); 
-    }
+	/**
+	 * Depth of each drawn layer from the furni origin (see RoomDepth.ofLayer). The shadow is not included.
+	 */
+	getLayerDepths(): Map<number, number> {
+		const direction = this.wrappedFurniBase.getValidDirection(this.direction);
+		const depths = new Map<number, number>();
+
+		for (const layer of this.layerSprites.keys()) {
+			if (layer < 0) continue;
+
+			const z = this.wrappedFurniBase.getLayerZ(direction, layer);
+			depths.set(layer, RoomDepth.ofLayer(z, layer));
+		}
+
+		return depths;
+	}
+
+	/** Moves the given layers in the front container, the others back in the furni container. */
+	setFrontLayers(layers: Set<number>) {
+		if (layers.size === this.frontLayers.size && [...layers].every(layer => this.frontLayers.has(layer))) return;
+
+		this.frontLayers = new Set(layers);
+
+		for (const [layer, sprite] of this.layerSprites) {
+			const parent = this.frontLayers.has(layer) ? this.frontContainer : this.container;
+			if (sprite.parent !== parent) parent.addChild(sprite);
+		}
+	}
 
 	setIcon(icon: boolean) {
     if (this.isIcon === icon) return;

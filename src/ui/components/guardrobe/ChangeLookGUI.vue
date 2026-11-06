@@ -134,9 +134,15 @@ watch(look, () => {
 }, { immediate: false });
 
 EventManager.read(UIEvents.CHANGE_LOOK, (evt: ChangeLookEventData) => {
-    //console.log(evt)
     look.value = evt.look
+    if (evt.gender) gender.value = evt.gender.toUpperCase().startsWith('F') ? 'F' : 'M'
+
+    // the selected parts and colors of the open tab follow the loaded look
+    setUpLookComponents()
 })
+
+// the current look of the user: the server answers with UpdateUserInformation (-> CHANGE_LOOK)
+Engine.getInstance()?.networkingManager?.packetManager?.applyOut(OutgoingPacket.UserProfileInformation)
     
 
     let renderQueue: Array<() => Promise<void>> = [];

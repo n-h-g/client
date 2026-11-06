@@ -9,7 +9,7 @@ import {OfflineMode} from '../../../../../offline/OfflineMode';
 import {RoomPriority} from '../../../visualization/RoomPriority';
 import {RoomVisualization} from '../../../visualization/RoomVisualization';
 import {PointerLogic} from './PointerLogic';
-import { Furni } from '../../../../ui/imagers/items/Furni';
+import { Logger } from '../../../../../utils/Logger';
 
 export class TileLogic extends RoomObjectLogic {
     private tile: Tile;
@@ -27,14 +27,8 @@ export class TileLogic extends RoomObjectLogic {
     }
 
     registerEvents() {
-        setTimeout(() => {
-            this.tile.visualization?.container?.on('pointerdown', () =>
-                this.onClick()
-            );
-            this.tile.visualization?.container?.on('pointerover', () =>
-                this.onHover()
-            );
-        }, 200);
+        // Hover and click are dispatched by RoomLogic, which finds the tile under the mouse
+        // from the floor geometry (furni drawn over the tile don't block it).
     }
 
     dispose(): void {
@@ -42,11 +36,15 @@ export class TileLogic extends RoomObjectLogic {
     }
 
     onClick(): void {
+
+        if(Engine.getInstance().config.debugRoomClick) {
+            Logger.debug("x: " + this.tile.position.x + " y: " + this.tile.position.y)
+        }
+
         if (Engine.getInstance().config.offlineMode) {
             OfflineMode.getInstance().walk(this.tile.position);
             return;
         }
-
         if (
             this.tile.plane.room
                 .getRoom()
@@ -55,6 +53,9 @@ export class TileLogic extends RoomObjectLogic {
             this.tile.plane.room
                 .getRoom()
                 .roomEntityRepository.stopRollingEntity();
+
+            // this click places the furni that was being moved: the avatar doesn't walk
+            return;
         }
 
         Engine.getInstance().networkingManager.packetManager.applyOut(
@@ -71,6 +72,8 @@ export class TileLogic extends RoomObjectLogic {
     onHover() {
         const tileContext: Container | null | undefined =
             this.tile.visualization?.container;
+
+        if(!tileContext) return;
 
         const isDoor =
             this.tile.position.x ==
@@ -89,32 +92,13 @@ export class TileLogic extends RoomObjectLogic {
         this.tile.plane.room
             .getPointer()
             .visualization.updatePosition(
-                tileContext!.x,
-                tileContext!.y,
                 this.tile
             );
 
-        if (this.tile.plane.room
-            .getRoom()
-            .roomEntityRepository.isEntityRolling()) {
-        {
+        const repository = this.tile.plane.room.getRoom().roomEntityRepository;
 
-            if (this.tile.plane.room
-            .getRoom()
-            .roomEntityRepository.isEntityRolling() && this.tile.plane.room
-            .getRoom()
-            .roomEntityRepository.rollingEntity.visualization) {
-                // L'oggetto torna NORMALE perché siamo su una tile
-                (this.tile.plane.room
-            .getRoom()
-            .roomEntityRepository.rollingEntity.visualization.sprite as Furni).setIcon(false);
-            }
-
-            this.tile.plane.room
-                .getRoom()
-                .roomEntityRepository.updateRollingEntity(this.tile.position);
-        }
-    }
+        // the furni goes on the tile (turned if it doesn't fit), or becomes its icon if it can't go there
+        if (repository.isEntityRolling()) repository.updateRollingEntity(this.tile.position);
     }
 
     checkTileAndDrawHitBox() {

@@ -6,6 +6,7 @@ import {MapData} from '../../../../../engine/room/objects/map/MapData';
 import {Tile} from '../../../../../engine/room/objects/map/Tile';
 import {RoomPriority} from '../../../../../engine/room/visualization/RoomPriority';
 import {RoomVisualization} from '../../../../../engine/room/visualization/RoomVisualization';
+import {RoomDepth} from '../../../../../engine/room/visualization/RoomDepth';
 import {FurniData} from '../../../../../engine/ui/imagers/items/FurniData';
 import {Point} from '../../../../../utils/point/Point';
 import {Point3d} from '../../../../../utils/point/Point3d';
@@ -16,6 +17,7 @@ import {FurnidataItemType} from '../../../../../engine/ui/imagers/items/enum/Fur
 
 import anime from 'animejs';
 import { Furni } from '../../../../../engine/ui/imagers/items/Furni';
+import { WallItem } from '../../../../../engine/room/objects/items/WallItem';
 
 export abstract class ItemVisualization
     extends EntityVisualization
@@ -28,10 +30,57 @@ export abstract class ItemVisualization
 
     private static USE_ROTATION_ANIMATION = false;
 
+    /** State of the furni (extraData from the server): the animation shown, 0 = default (e.g. a lamp off). */
+    state = 0;
+
+    setState(state: number): void {
+        this.state = state;
+        if (this.sprite) (this.sprite as Furni).setAnimation(state);
+
+        // e.g. a floor hole furni opened/closed
+        Engine.getInstance().roomService?.currentRoom?.roomEntityRepository.onFloorItemsChanged();
+    }
+
     constructor(item: Item) {
         super(item);
         this.position = item.position;
         this.iconImage = this.generateIcon();
+    }
+
+    /** Where the icon is drawn (the mouse) while the furni being placed is shown as its icon. */
+    private placementIconPosition: {x: number; y: number} | null = null;
+
+    /** True while the furni being placed is shown as its icon: it can't go under the mouse. */
+    get isPlacementIcon(): boolean {
+        return !!(this.sprite as Furni | undefined)?.icon;
+    }
+
+    /**
+     * As in Habbo the furni that is being placed is drawn as its icon (opaque, following the mouse)
+     * where it can't go, and as the translucent furni where it fits.
+     */
+    setPlacementIcon(icon: boolean): void {
+        const furni = this.sprite as Furni | undefined;
+        if (!furni || typeof furni.setIcon !== 'function' || furni.icon === icon) return;
+
+        furni.setIcon(icon);
+
+        if (!icon) this.placementIconPosition = null;
+
+        if (furni.container) {
+            furni.container.alpha = (icon ? FurniData.DEFAULT_ALPHA : FurniData.LOADING_ALPHA) / 255;
+        }
+    }
+
+    /** The icon of the furni being placed follows the mouse (x, y in the room container). */
+    movePlacementIcon(x: number, y: number): void {
+        if (!this.isPlacementIcon) return;
+
+        this.placementIconPosition = {x, y};
+
+        if (this.container) this.container.visible = true;
+
+        this.updatePosition();
     }
 
     nextFrame(): void {
@@ -54,8 +103,6 @@ export abstract class ItemVisualization
 
             const temp: Container = this.sprite.container;
             this.container = temp;
-            this.container.eventMode = 'dynamic';
-            this.container.interactive = true;
 
             const roomContainer = Engine.getInstance().roomService?.currentRoom?.roomLayout.visualization.container;
             if (roomContainer && this.container.parent !== roomContainer) {
@@ -100,28 +147,134 @@ export abstract class ItemVisualization
         this.direction = rotation;
 
         if (this.sprite) {
-            (this.sprite as Furni).setDirection(rotation);
+            const furni = this.sprite as Furni;
+            // same conversion used in render(): the furni may not have all the 8 directions
+            furni.setDirection(furni.furniBase?.getValidDirection(rotation) ?? rotation);
             this.sprite.update(true);
         }
+
+        // the footprint changed
+        Engine.getInstance().roomService?.currentRoom?.roomEntityRepository.onFloorItemsChanged();
     }
+
+    updatePosition(): void {
+        super.updatePosition();
+
+        if (!this.container) return;
+
+        const repository = Engine.getInstance().roomService?.currentRoom?.roomEntityRepository;
+
+        // the furni that is being moved must not catch the click that places it
+        const isBeingMoved =
+            (this.entity as Item).isInventoryGhost || repository?.rollingEntity === this.entity;
+        this.container.eventMode = isBeingMoved ? 'none' : 'dynamic';
+
+        // the icon is on the mouse, over everything (the furni keeps its last valid position)
+        if (this.placementIconPosition && this.isPlacementIcon) {
+            this.container.x = this.placementIconPosition.x;
+            this.container.y = this.placementIconPosition.y;
+            this.container.zIndex = Number.MAX_SAFE_INTEGER;
+        }
+
+        this.syncFrontContainer();
+
+        repository?.onFloorItemsChanged();
+    }
+
+    /**
+     * The layers in front of the avatars that are on the furni go in the front container, drawn just above
+     * those avatars (as Nitro, that sorts every sprite by its depth): e.g. the front of hcamme over an avatar
+     * sitting in it, while its back stays behind. The depth of a layer is the furni origin plus its z offset.
+     *
+     * @param humans depth and zIndex of the avatars on the footprint of the furni.
+     */
+    updateFrontLayers(humans: {depth: number; zIndex: number}[]): void {
+        const furni = this.sprite as Furni | undefined;
+        if (!furni || typeof furni.getLayerDepths !== 'function') return;
+
+        const front = new Set<number>();
+        let frontZIndex = -Infinity;
+
+        if (humans.length > 0 && !this.isPlacementIcon) {
+            const origin = this.entity.position;
+            // the Z 0 of the items saved before the heights is the floor (see FloorItem.calculateOffsetY)
+            const originDepth = RoomDepth.of(origin.x, origin.y, Math.max(origin.z, 1));
+
+            for (const [layer, offset] of furni.getLayerDepths()) {
+                for (const human of humans) {
+                    if (originDepth + offset >= human.depth) continue;
+
+                    front.add(layer);
+                    frontZIndex = Math.max(frontZIndex, human.zIndex);
+                }
+            }
+        }
+
+        furni.setFrontLayers(front);
+
+        // just above the avatars it covers, below anything in front of them (the zIndex are integers)
+        if (front.size > 0) furni.frontContainer.zIndex = frontZIndex + 0.5;
+
+        this.syncFrontContainer();
+    }
+
+    /** The front container follows the furni container: same parent, position, visibility and alpha. */
+    private syncFrontContainer(): void {
+        const front = (this.sprite as Furni | undefined)?.frontContainer;
+        if (!front || front.destroyed || !this.container || this.container.destroyed) return;
+
+        const parent = this.container.parent;
+        if (parent && front.parent !== parent) parent.addChild(front);
+
+        front.x = this.container.x;
+        front.y = this.container.y;
+        front.visible = this.container.visible && front.children.length > 0;
+        front.alpha = this.container.alpha;
+
+        if (this.linkedFrontContainer !== front) {
+            this.linkedFrontContainer = front;
+
+            // the layers in front are still the furni for the mouse
+            const container = this.container;
+            front.eventMode = 'dynamic';
+            front.cursor = 'pointer';
+            front.on('pointerdown', event => container.emit('pointerdown', event));
+            front.on('pointerover', event => container.emit('pointerover', event));
+
+            container.once('destroyed', () => {
+                if (!front.destroyed) front.destroy({children: true});
+            });
+        }
+    }
+
+    private linkedFrontContainer: Container | null = null;
+
     async render(): Promise<void> {
 
         if (this.container) this.container.removeChildren();
 
+        // a new sprite is created: the layers in front of the old one leave the room
+        const oldFront = (this.sprite as Furni | undefined)?.frontContainer;
+        if (oldFront && !oldFront.destroyed) {
+            oldFront.parent?.removeChild(oldFront);
+            oldFront.removeChildren();
+        }
+
         try {
             const sprite = await Engine.getInstance().userInterfaceManager.furniImager.loadFurniSprite(
-                FurnidataItemType.FloorItem,
+                this.entity instanceof WallItem ? FurnidataItemType.WallItem : FurnidataItemType.FloorItem,
                 this.entity.name
             );
 
             await sprite.init();
             const dir = sprite.furniBase.getValidDirection(this.direction);
             sprite.setDirection(dir);
+            sprite.setAnimation(this.state);
             sprite.update(true);
             this.sprite = sprite;
         } catch (e) {
             const sprite = await Engine.getInstance().userInterfaceManager.furniImager.loadFurniPlaceholder(
-                FurnidataItemType.FloorItem,
+                this.entity instanceof WallItem ? FurnidataItemType.WallItem : FurnidataItemType.FloorItem,
                 this.entity.name
             );
             await sprite.init();
@@ -158,30 +311,22 @@ export abstract class ItemVisualization
     }
 
     calculateOffsetX(): number {
-        const x = this.position.x;
-        const y = this.position.y;
-
-        const tileBaseX = ((y - x) * MapData.tileWidth) / 2;
-
-        
-        return tileBaseX + (MapData.tileWidth / 2) - 3;
+        return (this.entity as Item).calculateOffsetX();
     }
 
     calculateOffsetY(): number {
-        const x = this.position.x;
-        const y = this.position.y;
-        const z = this.position.z;
-
-        const tileBaseY = ((y + x) * MapData.tileHeight) / 2;
-
-        const zOffset = z * MapData.thickSpace * MapData.stairSteps;
-
-        const offsetFloor = z > 0 ? -zOffset : -FurniData.FURNI_TOP_OFFSET;
-
-        return tileBaseY + (MapData.tileHeight / 2) + offsetFloor;
-    }   
+        return (this.entity as Item).calculateOffsetY();
+    } 
 
     getZIndex(zIndex = 1): number {
+        if (this.entity instanceof WallItem) {
+            const wallData = this.entity.wallData;
+            return RoomVisualization.calculateZIndex(
+                new Point3d(wallData.width, wallData.height, 0),
+                RoomPriority.WALL_ITEM
+            );
+        }
+
         const compareY =
             Math.trunc((this.entity as Item).base.getLogicDimension(2) / 100) /
             10;

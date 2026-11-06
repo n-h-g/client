@@ -1,5 +1,5 @@
 import {Matrix, Container, DisplayObject, ICanvas} from 'pixi.js';
-import {Component, createApp} from 'vue';
+import {App, Component, createApp} from 'vue';
 import {Engine} from '../Engine';
 import {UIComponent} from '../engine/ui/components/UIComponent';
 import {Logger} from './Logger';
@@ -139,6 +139,9 @@ export class UiUtils {
         };
     }
 
+    /** The Vue apps of the mounted components, to unmount them. */
+    private static mountedApps = new Map<UIComponent, App>();
+
     static mountComponent(component: Component, name: UIComponent) {
         try {
             if (document.getElementById(name) != null) return;
@@ -148,6 +151,8 @@ export class UiUtils {
             wrapper.id = name;
             ComponentApp.mount(wrapper);
             document.getElementById('gameContainer').appendChild(wrapper);
+
+            UiUtils.mountedApps.set(name, ComponentApp);
 
             return ComponentApp;
         } catch (e) {
@@ -160,6 +165,10 @@ export class UiUtils {
     static dismountComponent(name: UIComponent) {
         try {
             if (document.getElementById(name) == null) return;
+
+            // unmounted, not only removed from the page: its onUnmounted hooks run (e.g. listeners removed)
+            UiUtils.mountedApps.get(name)?.unmount();
+            UiUtils.mountedApps.delete(name);
 
             document.getElementById(name).remove();
         } catch (e) {

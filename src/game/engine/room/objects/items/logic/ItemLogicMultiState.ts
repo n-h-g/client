@@ -10,34 +10,28 @@ export class ItemLogicMultiState extends ItemLogic {
     private state = 0;
 
     private lastClickTime = 0;
-    private readonly DOUBLE_CLICK_THRESHOLD = 200;
+    // ms between the two clicks of a double click (200 was too short: a normal double click was missed)
+    private readonly DOUBLE_CLICK_THRESHOLD = 400;
 
     constructor(item: Item) {
         super(item);
     }
 
-    registerEvents() {
-        super.registerEvents();
-    }
-
     changeState() {
-        let state = this.state;
-
         const item = this.entity as Item;
-
-        if (this.state > item.base.getAnimations().length) {
-            state = 0;
-        } else {
-            state++;
-        }
+        const animations = item.base.getAnimations();
         
+        if (!animations || animations.length === 0) return;
 
-        (this.entity.visualization.sprite as Furni).setAnimation(state);
-
-        this.state = state;
+        // offline mode only: online the server sends the new state (UpdateEntity)
+        const visualization = this.entity.visualization as any;
+        visualization.setState((visualization.state + 1) % animations.length);
     }
     
     onClick() {
+        // single click: the preview, like the other furni; double click: next state
+        super.onClick();
+
         const now = Date.now();
         const diff = now - this.lastClickTime;
 
@@ -51,12 +45,17 @@ export class ItemLogicMultiState extends ItemLogic {
     }
 
     onDoubleClick() {
-        Engine.getInstance()?.networkingManager?.packetManager?.applyOut(
-            OutgoingPacket.RoomUseItemEvent,
-            {
-                id: this.entity.id,
-            }
-        );
+        if(!Engine.getInstance().config.offlineMode)
+        {
+            Engine.getInstance()?.networkingManager?.packetManager?.applyOut(
+                OutgoingPacket.RoomUseItemEvent,
+                {
+                    id: this.entity.id,
+                }
+            );
+        } else {
+            this.changeState();
+        }
     }
 
     tick(delta: number) {
@@ -71,7 +70,6 @@ export class ItemLogicMultiState extends ItemLogic {
 
         if (this.frameTracker >= frameDuration) {
             this.frameTracker = 0;
-            
             (this.entity.visualization as ItemVisualizationAnimated).nextFrame();
         }
     }

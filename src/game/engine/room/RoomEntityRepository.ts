@@ -2,9 +2,40 @@ import {Repository} from '../../core/Repository';
 import {Entity} from '../../core/room/object/entities/Entity';
 import {Point3d} from '../../utils/point/Point3d';
 import {EntityEvents} from '../events/room/objects/entities/EntityEvents';
+import {Point} from '../../utils/point/Point';
+import type {Item} from './objects/items/Item';
+import type {FloorItem} from './objects/items/FloorItem';
+import type {FloorPlane} from './objects/map/FloorPlane';
+import {TileType} from './objects/map/TileTypeEnum';
+import {RoomDepth} from './visualization/RoomDepth';
+import {ActionId} from '../ui/imagers/avatars/enum/actions/ActionId';
+
+/** What the repository needs of ItemVisualization to show a floor furni as its icon while it's placed. */
+type PlacementVisualization = {
+    readonly isPlacementIcon: boolean;
+    setPlacementIcon(icon: boolean): void;
+    movePlacementIcon(x: number, y: number): void;
+};
+
+/** What the repository needs of ItemVisualization to draw the layers of a floor furni over the avatars on it. */
+type FrontLayersVisualization = {
+    updateFrontLayers(humans: {depth: number; zIndex: number}[]): void;
+};
 
 export class RoomEntityRepository extends Repository<string, Entity> {
+    /** Logic of the furni that remove the floor under them (hole3, ...). */
+    static readonly FLOOR_HOLE_LOGIC = 'furniture_floor_hole';
+    /** State of a floor hole furni in which the hole is open (as in Habbo). */
+    private static readonly FLOOR_HOLE_OPEN_STATE = 0;
+
     rollingEntity: Entity;
+    /** Floor of the room, where the floor hole furni remove the tiles. */
+    floorPlane: FloorPlane | null = null;
+    private rollingStartPosition: Point3d | null = null;
+    /** Rotation of the furni when it started moving: it gets it back if the move is cancelled. */
+    private rollingStartDirection: number | null = null;
+    /** Rotation chosen by the user (R key) for the furni being placed: it's used wherever it fits. */
+    private rollingWantedDirection: number | null = null;
 
     constructor() {
         super();
@@ -34,23 +65,335 @@ export class RoomEntityRepository extends Repository<string, Entity> {
     stopRollingEntity() {
         if (this.rollingEntity == null) return;
 
-        this.rollingEntity.logic.events.emit(EntityEvents.STOP_ROLL);
+        // shown as its icon: it can't go there, as in Habbo the click doesn't place it
+        if (this.isRollingIcon()) {
+            this.cancelRollingEntity();
+            return;
+        }
 
+        const entity = this.rollingEntity;
         this.rollingEntity = null;
+
+        entity.logic.events.emit(EntityEvents.STOP_ROLL);
+
+        // a floor hole that was being moved opens again where it was dropped
+        this.onFloorItemsChanged();
     }
 
+    /**
+     * Stops moving the furni without placing it: a furni from the inventory is removed,
+     * a furni of the room goes back where it was (with its rotation).
+     */
+    cancelRollingEntity() {
+        if (this.rollingEntity == null) return;
+
+        const entity = this.rollingEntity;
+        this.rollingEntity = null;
+
+        RoomEntityRepository.placementVisualization(entity)?.setPlacementIcon(false);
+
+        const item = entity as unknown as Partial<Item>;
+        if (!item.isInventoryGhost && this.rollingStartDirection !== null) {
+            entity.visualization.updateRotation(this.rollingStartDirection);
+        }
+
+        entity.logic.events.emit(EntityEvents.CANCEL_ROLL, this.rollingStartPosition);
+    }
+
+    /**
+     * The rotation the user chose for the furni that is being placed (R key): the furni gets it again
+     * where it fits, elsewhere it's turned to a rotation that fits.
+     */
+    rotateRollingEntity(position: Point3d) {
+        const entity = this.rollingEntity;
+        const item = entity as unknown as Partial<FloorItem>;
+        if (!entity || typeof item.getFootprintAt !== 'function') return;
+
+        // the first rotation of the furni after the wanted one (from the last back to the first)
+        this.rollingWantedDirection = this.getPlacementDirections(entity, (this.rollingWantedDirection ?? 0) + 1)[0];
+
+        // shown as its icon away from its last tile: the new rotation is used on the next tile
+        if (this.isRollingIcon()) return;
+
+        this.updateRollingEntity(position);
+    }
+
+    /**
+     * Moves the furni that is being placed on the given tile, on top of the furni already there.
+     * A floor furni that doesn't fit with its rotation is turned (as in Habbo/Nitro); if no rotation
+     * fits it's shown as its icon.
+     */
     updateRollingEntity(position: Point3d) {
         if (this.rollingEntity == null) return;
 
-        this.rollingEntity.visualization.setNextPosition(position);
+        const entity = this.rollingEntity;
+        const visualization = entity.visualization;
+        const placement = RoomEntityRepository.placementVisualization(entity);
 
-        this.rollingEntity.logic.events.emit(EntityEvents.START_ROLL);
+        if (placement) {
+            const direction = this.findPlacementDirection(entity, position.x, position.y);
+
+            if (direction === null) {
+                placement.setPlacementIcon(true);
+                return;
+            }
+
+            placement.setPlacementIcon(false);
+
+            if (direction !== visualization.direction) visualization.updateRotation(direction);
+        }
+
+        // the furni jumps on the tile under the mouse (no sliding)
+        visualization.setNextPosition(new Point3d(position.x, position.y, position.z));
+        visualization.snapToNextPosition();
+
+        visualization.setNextPosition(
+            new Point3d(position.x, position.y, this.getStackHeightUnder(entity, position.z))
+        );
+        visualization.snapToNextPosition();
+
+        if (visualization.container) visualization.container.visible = true;
+
+        entity.logic.events.emit(EntityEvents.START_ROLL);
     }
 
     setRollingEntity(entity: Entity) {
         if (entity == null) return;
 
+        // a furni already being moved is put back first
+        if (this.rollingEntity && this.rollingEntity !== entity) this.cancelRollingEntity();
+
         this.rollingEntity = entity;
+        this.rollingStartPosition = new Point3d(entity.position.x, entity.position.y, entity.position.z);
+        this.rollingStartDirection = entity.visualization?.direction ?? null;
+        this.rollingWantedDirection = entity.visualization?.direction ?? 0;
+
+        // a floor hole that starts moving gives back its tiles (they must be valid places for it)
+        this.onFloorItemsChanged();
+    }
+
+    /** True while the floor furni that is being moved is shown as its icon (it can't go under the mouse). */
+    isRollingIcon(): boolean {
+        return !!this.rollingEntity && !!RoomEntityRepository.placementVisualization(this.rollingEntity)?.isPlacementIcon;
+    }
+
+    /**
+     * The mouse is not on the floor: the floor furni that is being moved is shown as its icon.
+     */
+    showRollingEntityAsIcon() {
+        if (!this.rollingEntity) return;
+
+        RoomEntityRepository.placementVisualization(this.rollingEntity)?.setPlacementIcon(true);
+    }
+
+    /**
+     * The icon of the furni that is being moved follows the mouse.
+     * @param x, y the mouse position in the room container.
+     */
+    moveRollingIcon(x: number, y: number) {
+        if (!this.isRollingIcon()) return;
+
+        RoomEntityRepository.placementVisualization(this.rollingEntity)?.movePlacementIcon(x, y);
+    }
+
+    /**
+     * The rotation the furni gets with its origin on x, y: the one chosen by the user if it fits there,
+     * else the first of its other rotations that fits; null if no rotation fits.
+     * The rotations facing the room (2 and 4, towards the viewer) come before the ones facing the walls:
+     * e.g. a sofa turned to 4 at the end of a row is turned to 2, not to 6 (its back to the room).
+     */
+    private findPlacementDirection(entity: Entity, x: number, y: number): number | null {
+        const item = entity as unknown as FloorItem;
+        const directions = this.getPlacementDirections(entity, this.rollingWantedDirection ?? 0);
+        const [wanted, ...others] = directions;
+
+        const facingRoom = others.filter(direction => RoomEntityRepository.FACING_ROOM.has(direction));
+        const facingWalls = others.filter(direction => !RoomEntityRepository.FACING_ROOM.has(direction));
+
+        for (const direction of [wanted, ...facingRoom, ...facingWalls]) {
+            if (this.canPlaceAt(item, x, y, direction)) return direction;
+        }
+
+        return null;
+    }
+
+    /** Rotations whose front faces the room (towards the viewer): south-east and south-west. */
+    private static readonly FACING_ROOM = new Set([2, 4]);
+
+    /**
+     * The rotations of the furni (e.g. 0 and 2 for a bed, 0 2 4 6 for a sofa), starting from the wanted one
+     * (or the first one after it, if the furni doesn't have it).
+     */
+    private getPlacementDirections(entity: Entity, wanted: number): number[] {
+        const available = (entity as unknown as Partial<Item>).base?.getAvailableDirections() ?? [];
+        if (available.length === 0) return [wanted];
+
+        const sorted = [...available].sort((a, b) => a - b);
+        let start = sorted.findIndex(direction => direction >= wanted);
+        if (start < 0) start = 0;
+
+        return [...sorted.slice(start), ...sorted.slice(0, start)];
+    }
+
+    /**
+     * Same check of the server (Room.canPlaceItemAt): all the tiles of the footprint inside the room,
+     * not holes and not the door. The tiles removed by a floor hole furni are holes too.
+     */
+    private canPlaceAt(item: FloorItem, x: number, y: number, direction: number): boolean {
+        if (!this.floorPlane) return true;
+
+        const footprint = item.getFootprintAt(x, y, direction);
+        const door = this.floorPlane.room.getDoorPosition();
+
+        for (let tileX = footprint.minX; tileX <= footprint.maxX; tileX++) {
+            for (let tileY = footprint.minY; tileY <= footprint.maxY; tileY++) {
+                const tile = this.floorPlane.getTilebyPosition(new Point(tileX, tileY));
+
+                if (!tile || tile.type === TileType.Hole || tile.type === TileType.Door) return false;
+                if (tile.coveredByFloorHole) return false;
+                if (door && door.x === tileX && door.y === tileY) return false;
+            }
+        }
+
+        return true;
+    }
+
+    /** The visualization of a floor furni, that can be shown as its icon while it's placed. */
+    private static placementVisualization(entity: Entity): PlacementVisualization | null {
+        const item = entity as unknown as Partial<FloorItem>;
+        if (typeof item.getFootprintAt !== 'function') return null;
+
+        const visualization = entity.visualization as unknown as Partial<PlacementVisualization>;
+        return typeof visualization?.setPlacementIcon === 'function'
+            ? (visualization as PlacementVisualization)
+            : null;
+    }
+
+    /**
+     * Preview of the Z the server will give to the furni (the server calculates the real one):
+     * the highest top among the tiles and the other floor items under its footprint.
+     */
+    private getStackHeightUnder(entity: Entity, tileZ: number): number {
+        const item = entity as unknown as Partial<Item>;
+        const footprint = typeof item.getFootprint === 'function' ? item.getFootprint() : null;
+        if (!footprint) return tileZ;
+
+        let height = tileZ;
+
+        this.getAll().forEach((other: Entity) => {
+            if (other === entity) return;
+
+            const otherItem = other as unknown as Partial<Item>;
+            if (typeof otherItem.getFootprint !== 'function' || otherItem.isInventoryGhost) return;
+
+            const otherFootprint = otherItem.getFootprint();
+            if (!otherFootprint) return;
+
+            const overlaps =
+                otherFootprint.minX <= footprint.maxX && otherFootprint.maxX >= footprint.minX &&
+                otherFootprint.minY <= footprint.maxY && otherFootprint.maxY >= footprint.minY;
+
+            if (!overlaps) return;
+
+            const top = Math.max(other.position.z, 1) + (otherItem.base?.getLogicDimension(2) ?? 0);
+            height = Math.max(height, top);
+        });
+
+        return height;
+    }
+
+    /**
+     * To call when a floor item is added, moved, rotated, removed or changes state:
+     * updates the floor holes and the zIndex of the humans.
+     */
+    onFloorItemsChanged() {
+        this.refreshFloorHoles();
+        this.refreshHumansDepth();
+        this.refreshFrontLayers();
+    }
+
+    /**
+     * The layers of the floor items in front of the avatars on them are drawn over those avatars
+     * (e.g. the front of a bath with an avatar sitting in it). To call when a floor item or an avatar
+     * changes position, and after the zIndex of the avatars is calculated.
+     */
+    refreshFrontLayers() {
+        const humans: {x: number; y: number; depth: number; zIndex: number}[] = [];
+
+        this.getAll().forEach((entity: Entity) => {
+            // structural check: Human can't be imported here without an import cycle
+            const container = entity.visualization?.container;
+            if (!('figure' in entity) || !container) return;
+
+            const actions = (entity.visualization as {actions?: Set<ActionId>}).actions;
+            const relativeDepth = actions?.has(ActionId.LAY) ? RoomDepth.AVATAR_LAYING : RoomDepth.AVATAR;
+            const {x, y, z} = entity.position;
+
+            humans.push({
+                x: Math.round(x),
+                y: Math.round(y),
+                depth: RoomDepth.of(x, y, z) + relativeDepth,
+                zIndex: container.zIndex,
+            });
+        });
+
+        this.getAll().forEach((entity: Entity) => {
+            const item = entity as unknown as Partial<Item>;
+            const visualization = entity.visualization as unknown as Partial<FrontLayersVisualization>;
+            if (typeof item.getFootprint !== 'function' || typeof visualization?.updateFrontLayers !== 'function') return;
+
+            // a furni that is being moved is drawn as one piece
+            const footprint = item.isInventoryGhost || entity === this.rollingEntity ? null : item.getFootprint();
+
+            visualization.updateFrontLayers(footprint
+                ? humans.filter(human =>
+                    human.x >= footprint.minX && human.x <= footprint.maxX &&
+                    human.y >= footprint.minY && human.y <= footprint.maxY)
+                : []);
+        });
+    }
+
+
+    /**
+     * Removes from the floor the tiles under the open floor hole furni (as Nitro's FurnitureFloorHoleLogic).
+     * A hole that is being placed or moved doesn't count yet: its tiles must stay hoverable to drop it.
+     */
+    private refreshFloorHoles() {
+        if (!this.floorPlane) return;
+
+        const covered = new Set<string>();
+
+        this.getAll().forEach((entity: Entity) => {
+            const item = entity as unknown as Partial<Item>;
+            if (item.base?.LogicType !== RoomEntityRepository.FLOOR_HOLE_LOGIC) return;
+            if (item.isInventoryGhost || entity === this.rollingEntity) return;
+
+            const state = (entity.visualization as {state?: number} | undefined)?.state ?? 0;
+            if (state !== RoomEntityRepository.FLOOR_HOLE_OPEN_STATE) return;
+
+            const footprint = item.getFootprint?.();
+            if (!footprint) return;
+
+            for (let x = footprint.minX; x <= footprint.maxX; x++) {
+                for (let y = footprint.minY; y <= footprint.maxY; y++) {
+                    covered.add(`${x},${y}`);
+                }
+            }
+        });
+
+        this.floorPlane.setFloorHoles(covered);
+    }
+
+    /**
+     * Recalculates the zIndex of the humans, that depends on the floor items around them.
+     */
+    private refreshHumansDepth() {
+        this.getAll().forEach((entity: Entity) => {
+            // structural check: Human can't be imported here without an import cycle
+            if (!('figure' in entity) || !entity.visualization?.container) return;
+
+            entity.visualization.container.zIndex = entity.visualization.getZIndex();
+        });
     }
 
     tick(delta: number) {

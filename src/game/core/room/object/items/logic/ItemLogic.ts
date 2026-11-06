@@ -6,6 +6,7 @@ import {FurniData} from '../../../../../engine/ui/imagers/items/FurniData';
 import {OutgoingPacket} from '../../../../../networking/packets/outgoing/OutgoingPacket';
 import {MoveableLogic} from '../../Moveable';
 import {EntityLogic} from '../../entities/EntityLogic';
+import {Point3d} from '../../../../../utils/point/Point3d';
 
 export abstract class ItemLogic extends EntityLogic implements MoveableLogic {
     roll = false;
@@ -14,8 +15,8 @@ export abstract class ItemLogic extends EntityLogic implements MoveableLogic {
         super(item);
     }
 
-    registerEvents(): void {
-        super.registerEvents();
+    protected registerLogicEvents(): void {
+        super.registerLogicEvents();
 
         this.events.on(ItemEvents.ITEM_LOADED, () => this.onLoad());
         this.events.on(EntityEvents.POSITION_CHANGED, () =>
@@ -25,6 +26,9 @@ export abstract class ItemLogic extends EntityLogic implements MoveableLogic {
             this.toggleMovement(true)
         );
         this.events.on(EntityEvents.STOP_ROLL, () => this.stopRolling());
+        this.events.on(EntityEvents.CANCEL_ROLL, (startPosition: Point3d | null) =>
+            this.cancelRolling(startPosition)
+        );
     }
 
     onLoad() {}
@@ -56,7 +60,9 @@ export abstract class ItemLogic extends EntityLogic implements MoveableLogic {
     }*/
 
     onClick(): void {
-        super.onClick();
+        // Only the preview: the movement goes to the tile under the mouse (RoomLogic.onMouseClick),
+        // not to the furni origin tile (which can be a blocked tile, e.g. a table).
+        this.togglePreview();
     }
 
     toggleMovement(value: boolean): void {
@@ -88,17 +94,57 @@ export abstract class ItemLogic extends EntityLogic implements MoveableLogic {
 
         this.toggleMovement(false);
 
+        // the furni could be still sliding towards the last hovered tile: use the tile itself
+        this.entity.visualization.snapToNextPosition();
+
+        const item = this.entity as Item;
+
+        // - from the inventory: PlaceItem with the inventory item id
+        // - already in the room: MoveItem with the room entity id (UUID)
+        // The server calculates the Z (stack height) in both cases.
         Engine.getInstance()?.networkingManager?.packetManager?.applyOut(
-            OutgoingPacket.RoomPlaceItemEvent,
+            item.isInventoryGhost
+                ? OutgoingPacket.RoomPlaceItemEvent
+                : OutgoingPacket.RoomMoveItemEvent,
             {
                 id: this.entity.id,
                 name: this.entity.name,
-                x: this.entity.position.x,
-                y: this.entity.position.y,
-                z: this.entity.position.z,
+                x: Math.round(this.entity.position.x),
+                y: Math.round(this.entity.position.y),
+                rot: this.entity.visualization.direction,
             }
         );
 
         this.roll = false;
+
+        // the server sends the real furni (AddRoomEntity) and the updated inventory
+        if (item.isInventoryGhost) this.removeGhost();
+    }
+
+    /**
+     * Moving cancelled (ESC / right click): the preview from the inventory is removed,
+     * a furni of the room goes back to its position.
+     */
+    cancelRolling(startPosition: Point3d | null) {
+        this.toggleMovement(false);
+        this.roll = false;
+
+        if ((this.entity as Item).isInventoryGhost) {
+            this.removeGhost();
+            return;
+        }
+
+        if (startPosition) {
+            this.entity.visualization.setNextPosition(startPosition);
+            this.entity.visualization.snapToNextPosition();
+        }
+    }
+
+    private removeGhost() {
+        const repository = Engine.getInstance().roomService?.currentRoom?.roomEntityRepository;
+
+        repository?.delete(this.entity.id);
+        this.entity.visualization.container?.destroy({children: true});
+        repository?.onFloorItemsChanged();
     }
 }

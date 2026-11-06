@@ -90,6 +90,19 @@ export abstract class EntityVisualization extends RoomObjectVisualization {
         this.updatePosition();
     }
 
+    /**
+     * Moves the entity directly to the next position, without interpolation.
+     * Used when the entity is not walking (e.g. its height changes because
+     * an item is placed under it, or it's a furni moved by the server).
+     */
+    snapToNextPosition(): void {
+        this.entity.position.x = this.nextPosition.x;
+        this.entity.position.y = this.nextPosition.y;
+        this.entity.position.z = this.nextPosition.z;
+
+        this.updatePosition();
+    }
+
     updatePosition() {
         if (!this.container) return;
 

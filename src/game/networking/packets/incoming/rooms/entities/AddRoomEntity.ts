@@ -21,11 +21,15 @@ export class AddRoomEntity extends MessageHandler {
         builder
             .setId(data.id)
             .setName(data.name.name)
+            .setWallPosition(data.wallPosition)
             .setType(data.type)
             .setFigure(data.aspect)
             .setPosition(data.position)
             .setHeadBodyRotation(data.bh_rot)
+            .setRotation(data.rotation)
+            .setState(data.interaction)
             .setUser(data.user)
+                .setEffect(data.effect)
             .build()
             .then((entity: Entity) => {
                 Engine.getInstance().roomService?.currentRoom?.roomEntityRepository.add(

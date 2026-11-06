@@ -14,6 +14,9 @@ import {AvatarContainerUI} from './avatar/AvatarContainerUI';
 import {RoomInfoUI} from './room/RoomInfoUI';
 import {Repository} from '../../../core/Repository';
 import { ChangeLookUI } from './guardrobe/ChangeLookUI';
+import {FriendsUI} from './friends/FriendsUI';
+import {MessengerUI} from './friends/MessengerUI';
+import {FriendProfileUI} from './friends/FriendProfileUI';
 
 export class ComponentsManager {
     readonly rootComponent: HTMLElement;
@@ -45,6 +48,9 @@ export class ComponentsManager {
             new AvatarContainerUI()
         );
         this.addComponent(UIComponent.RoomInfoUI, new RoomInfoUI());
+        this.addComponent(UIComponent.FriendsMenuUI, new FriendsUI());
+        this.addComponent(UIComponent.PrivateChatUI, new MessengerUI());
+        this.addComponent(UIComponent.FriendProfileUI, new FriendProfileUI());
     }
 
     initGameComponents(): void {

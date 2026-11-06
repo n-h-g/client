@@ -51,7 +51,7 @@ export class FloorPlane extends RoomPlane {
                 ];
 
             if (object instanceof Tile) {
-                if (object.type != TileType.Hole) {
+                if (object.type != TileType.Hole && !object.coveredByFloorHole) {
                     tile = true;
                     return object;
                 }
@@ -71,6 +71,22 @@ export class FloorPlane extends RoomPlane {
                 }
             }
         });
+    }
+
+    /**
+     * Removes from the floor the tiles under the floor hole furni and puts back the others.
+     * @param positions the covered tiles, as "x,y"
+     */
+    setFloorHoles(positions: Set<string>): void {
+        for (const tile of this.getTiles()) {
+            if (!(tile instanceof Tile)) continue;
+
+            const covered = positions.has(`${tile.position.x},${tile.position.y}`);
+            if (covered === tile.coveredByFloorHole) continue;
+
+            tile.coveredByFloorHole = covered;
+            tile.visualization?.setHidden(covered);
+        }
     }
 
     getTileByColor(color: ColorRGB): Tile {

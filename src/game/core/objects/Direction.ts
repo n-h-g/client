@@ -1,6 +1,6 @@
 export enum Direction {
-    NORTH_EAST = 0, // In alto a destra (asse X positivo)
-    EAST = 1,       // Destra
+    NORTH_EAST = 0,
+    EAST = 1,
     SOUTH_EAST = 2, // In basso a destra (asse Y positivo)
     SOUTH = 3,      // In basso
     SOUTH_WEST = 4, // In basso a sinistra (asse X negativo)

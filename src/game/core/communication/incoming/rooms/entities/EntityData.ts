@@ -19,4 +19,13 @@ export interface EntityData {
     bh_rot: HeadBodyRotationComponent;
     type: EntityType;
     action: ActionsComponent;
+    /** The avatar effect of a human (0: none). */
+    effect?: {
+        id: number;
+    };
+    /** State of a furni with states (extraData = animation shown). */
+    interaction?: {
+        extraData?: number | string;
+    };
+    wallPosition?: string;
 }

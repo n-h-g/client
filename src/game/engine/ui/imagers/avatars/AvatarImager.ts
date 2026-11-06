@@ -16,6 +16,11 @@ import {AssetData, Spritesheet} from './gamedata/IAvatarResource';
 import {IPart} from './gamedata/IFigureData';
 import {AvatarStructure} from './structure/AvatarStructure';
 import {Repository} from '../../../../core/Repository';
+import {getDanceBodyPart, getDanceFrameCount} from './animation/DanceAnimations';
+import {BodyPartLayers} from './animation/BodyPartLayers';
+import {ActionId} from './enum/actions/ActionId';
+import {AvatarEffectManager} from './effects/AvatarEffectManager';
+import {AvatarEffectRenderer} from './effects/AvatarEffectRenderer';
 
 export type FigureDataComponent = {
     index: number;
@@ -39,10 +44,24 @@ export class AvatarImager {
 
     private spritePool: PIXI.Sprite[] = [];
 
+    /** The avatar effects (:effect): loaded once, drawn with the avatars that have them. */
+    readonly effects: AvatarEffectManager;
+    private readonly effectRenderer: AvatarEffectRenderer;
+
     constructor(structure: AvatarStructure) {
         this.data = new AvatarImageData();
         this.textures = new Repository();
         this.structure = structure;
+
+        this.effects = new AvatarEffectManager(this.data.AvatarDownloadManager);
+        this.effectRenderer = new AvatarEffectRenderer(
+            // the axis of the mirrored figure parts (see drawSpriteComponent)
+            () => (this.structure.Geometry?.width ?? 0) + AvatarData.AVATAR_LEFT_OFFSET,
+            action => {
+                const actionId = BodyPartLayers.actionByName(action);
+                return (actionId && this.structure.Actions?.getActionById(actionId)?.assetPartDefiniton) || 'std';
+            }
+        );
     }
 
     loadStructure(): void {
@@ -78,6 +97,11 @@ export class AvatarImager {
             for (const asset of assets) {
                 await this.data.loadPart(asset);
             }
+        }
+
+        if (avatar.Actions.has(ActionId.SIGN)) {
+            const signAsset = this.structure.Assets?.getUniqueName('li', avatar.SignValue);
+            if (signAsset) await this.data.loadPart(signAsset);
         }
     }
 
@@ -125,11 +149,32 @@ export class AvatarImager {
     async drawAvatar(avatar: Avatar) {
         this.clearAvatarContainers(avatar);
 
+        // an effect can turn the avatar (e.g. sideways on the hoverboard)
+        const effect = avatar.Effect;
+        avatar.setDirectionOffset(effect?.animation.directionOffset ?? 0);
+
         this.structure.setGeometry(this.data.avatarGeometry?.geometry!);
+        if (avatar.Actions.has(ActionId.SIGN)) {
+            const signAsset = this.structure.Assets?.getUniqueName('li', avatar.SignValue);
+            if (signAsset && !this.data.SpriteSheets.has(signAsset)) {
+                await this.data.loadPart(signAsset);
+            }
+        }
         const actions = this.structure.Actions?.getActionsByIds(avatar.Actions);
 
         const figureComponents = avatar.AvatarFigure.getAllComponents();
-        const hiddens = avatar.AvatarFigure.getAllHidden();
+        // the parts hidden by the clothes and the ones removed by the effect (e.g. the shoes in a car)
+        const hiddens = [...avatar.AvatarFigure.getAllHidden(), ...(effect?.animation.removes ?? [])];
+
+        if (avatar.Actions.has(ActionId.SIGN)) {
+            figureComponents.push(new AvatarFigureComponent({
+                type: 'li',
+                id: avatar.SignValue,
+                index: 0,
+                colorable: false,
+                colorindex: 0,
+            }, ''));
+        }
 
         if(!avatar.isUI)
         {
@@ -174,7 +219,7 @@ export class AvatarImager {
         for (const component of figureComponents) {
             if (hiddens.includes(component.part.type)) continue;
             
-            if(component.part.type != 'sd') 
+            if(component.part.type != 'sd' && component.part.type != 'li') 
             {
                 const partSet = this.structure.PartSets?.getPart(component.part.type);
                 if (!partSet) continue;
@@ -198,7 +243,12 @@ export class AvatarImager {
                 await this.drawPart(component, action!, avatar, assetName);
             }
         }
-    
+
+        if (effect) {
+            this.effectRenderer.draw(avatar, effect);
+            avatar.TotalFrames = Math.max(avatar.Frames, effect.frameCount);
+        }
+
         avatar.assemble();
     }
 
@@ -227,30 +277,74 @@ export class AvatarImager {
         avatar: Avatar,
         assetName: string
     ) {
+        const dancePart = action.id === ActionId.DANCE
+            ? getDanceBodyPart(avatar.DanceStyle, avatar.BodyFrame, component.part.type)
+            : null;
+        // the dance moves the body parts, else the effect can (e.g. sitting in a car, arms on the wheel)
+        const layerPart = dancePart
+            ?? avatar.Effect?.animation.getBodyPartLayer(avatar.BodyFrame, component.part.type)
+            ?? null;
+        const layerAction = layerPart ? BodyPartLayers.actionOf(layerPart) : undefined;
+        // a layer without action keeps the action of the avatar
+        const selectedAction = layerPart?.action
+            ? (layerAction && this.structure.Actions?.getActionById(layerAction))
+                ?? this.structure.Actions?.getDefaultAction()
+                ?? action
+            : action;
+        const animation = layerPart?.action === 'Default'
+            ? undefined
+            : this.structure.Animations?.getAnimation(layerPart?.action ?? action.id);
         const partFrames: IAnimationFrame[] =
-            this.structure.Animations?.getAnimation(action.id)
+            animation
                 ?.getAnimationPart(component.part.type)
                 ?.getFrames() ?? [];
 
-        avatar.TotalFrames = partFrames.length;
+        avatar.TotalFrames = Math.max(
+            avatar.Frames,
+            partFrames.length,
+            dancePart ? getDanceFrameCount(avatar.DanceStyle) : 0,
+            action.id === ActionId.LAUGH ? 16 : 0
+        );
 
-        const direction = component.part.type == 'sd' ? 0 : avatar.BodyDirection;
+        const isHeadPart = this.structure.Geometry?.isHeadPart(component.part.type) ?? false;
+        const baseDirection = isHeadPart ? avatar.HeadDirection : avatar.BodyDirection;
+        // The local renderer has no joint pivot for turning a single atlas
+        // part; applying Dance4's head direction delta here makes the head
+        // jump to a different offset. Keep the head on its avatar direction.
+        const direction = component.part.type == 'sd'
+            ? 0
+            : (baseDirection + (isHeadPart ? 0 : (layerPart?.dd ?? 0)) + 8) % 8;
 
         const frame = this.structure.Geometry?.isHeadPart(component.part.type)
             ? avatar.HeadFrame
             : avatar.BodyFrame;
 
-        let partFrame: any =
+        let partFrame: any = layerPart?.frame ??
             frame % (partFrames && Object.values(partFrames).length > 0 ? Object.values(partFrames).length : 1);
             
-        const partAction: string =
+        const assetPartDefinition: string =
             partFrames && partFrames[partFrame]
                 ? partFrames[partFrame].assetPartDefinition
-                : action.assetPartDefiniton;
+                : selectedAction.assetPartDefiniton;
 
-        const offsets = this.structure.Animations?.getAnimation(
-            action.id
-        )?.getAnimationOffset(action.id, partFrame, direction);
+        const animationOffsets = animation?.getAnimationOffset(String(animation.id), partFrame, direction);
+        const laughHeadMotion = action.id === ActionId.LAUGH && isHeadPart
+            ? [0, 2, 4, 5, 3, 1, 0, 2, 5, 4, 2, 0, 1, 3, 2, 0][avatar.HeadFrame % 16]
+            : 0;
+        const laughHeadSway = action.id === ActionId.LAUGH && isHeadPart
+            ? [0, 1, 1, 0, -1, -1, 0, 1, 1, 0, -1, -1, 0, 1, 0, 0][avatar.HeadFrame % 16]
+            : 0;
+        const offsets = layerPart
+            ? {
+                dx: (animationOffsets?.dx ?? 0) + layerPart.dx,
+                dy: (animationOffsets?.dy ?? 0) + layerPart.dy,
+            }
+            : action.id === ActionId.LAUGH && isHeadPart
+                ? {
+                    dx: (animationOffsets?.dx ?? 0) + laughHeadSway,
+                    dy: (animationOffsets?.dy ?? 0) + laughHeadMotion,
+                }
+                : animationOffsets;
 
         partFrame =
             partFrames && partFrames[partFrame]
@@ -261,8 +355,8 @@ export class AvatarImager {
             component.part.type
         );
 
-        const spriteComponent = new AvatarSpriteComponent(
-            partAction,
+        let spriteComponent = new AvatarSpriteComponent(
+            assetPartDefinition,
             component.part.type,
             component.part.id.toString(),
             direction,
@@ -275,6 +369,25 @@ export class AvatarImager {
         const spritesheet = this.data.SpriteSheets.get(
             assetName
         ) as Spritesheet;
+
+        // Some clothes do not have every dance action/frame variant. Reuse
+        // the standing sprite for that frame so a missing wlk/wave asset does
+        // not make the shirt (or another figure part) disappear.
+        const isFacialGesture = action.id === ActionId.BLOW || action.id === ActionId.LAUGH;
+        if ((layerPart || isFacialGesture) && !spritesheet?.[spriteComponent.ResourceName]) {
+            spriteComponent = new AvatarSpriteComponent(
+                this.structure.Actions?.getDefaultAction()?.assetPartDefiniton ?? 'std',
+                component.part.type,
+                component.part.id.toString(),
+                baseDirection,
+                0,
+                component.color,
+                flippedType,
+                avatar.IsSmall
+            );
+        }
+
+        if (!spritesheet?.[spriteComponent.ResourceName]) return;
         
         if (!this.textures.has(spriteComponent.ResourceName)) {
             this.loadTextureIntoCache(
@@ -335,7 +448,10 @@ export class AvatarImager {
 
         let asset: AssetData = spritesheet[component.ResourceName];
         if (asset !== undefined) {
-            if (asset.link != undefined) asset = spritesheet[asset.link];
+            // a linked asset only reuses the bitmap of another one: the offset is its own
+            // (e.g. h_lay_sh_4_2_0 links h_sit_sh_4_2_0 but has a different offset)
+            const ownOffset = asset.offset;
+            if (asset.link != undefined) asset = { ...spritesheet[asset.link], offset: ownOffset ?? spritesheet[asset.link]?.offset };
 
             const texture = this.textures.get(component.ResourceName);
             
@@ -353,6 +469,11 @@ export class AvatarImager {
             sprite.x = 0;
             sprite.y = 0;
             sprite.tint = 0xFFFFFF;
+            // a pooled sprite may have been a shadow or an effect sprite
+            sprite.alpha = 1;
+            sprite.blendMode = PIXI.BLEND_MODES.NORMAL;
+            sprite.filters = null;
+            sprite.zIndex = 0;
 
             sprite.width = parseInt(asset.width);
             sprite.height = parseInt(asset.height);
@@ -388,12 +509,14 @@ export class AvatarImager {
                     (component.ResourceType == 'sd' ? AvatarData.SHADOW_OFFSET_X : AvatarData.AVATAR_LEFT_OFFSET);
             }
 
+            // one container per part: without the else the shadow fell in the last branch too and
+            // addChild moved it out of the ShadowContainer (it could not be hidden)
             if (component.ResourceType == 'sd') {
                 sprite.alpha = 0.2;
                 sprite.tint = 0x000000;
                 avatar.ShadowContainer.addChild(sprite);
             }
-            if (component.ResourceType == 'sh')
+            else if (component.ResourceType == 'sh')
                 avatar.ShoesContainer.addChild(sprite);
             else if (component.ResourceType == 'hd')
                 avatar.HeadContainer.addChild(sprite);
@@ -422,7 +545,8 @@ export class AvatarImager {
                 component.ResourceType == 'rh' ||
                 component.ResourceType == 'lh' ||
                 component.ResourceType == 'ls' ||
-                component.ResourceType == 'rs'
+                component.ResourceType == 'rs' ||
+                component.ResourceType == 'li'
             )
                 avatar.ArmsContainer.addChild(sprite);
             else if (component.ResourceType == 'ch')
@@ -430,10 +554,10 @@ export class AvatarImager {
             else avatar.Container.addChild(sprite);
         } else {
             if (Engine.getInstance().config.debug) {
-                Logger.debug(
+                /*Logger.debug(
                     'Cannot find resource ' +
                         this.getTextureId(component.ResourceName)
-                );
+                );*/
             }
         }
     }

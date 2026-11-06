@@ -38,6 +38,16 @@ export class PlaneVisualization extends RoomObjectVisualization {
         this.plane.logic.registerEvents();
     }
 
+    /**
+     * Draws again the tiles/walls of the plane (e.g. a new wallpaper or floor): each of them replaces
+     * its old graphics.
+     */
+    redraw(): void {
+        this.plane.mapObjects.forEach(obj => {
+            if (obj instanceof RoomObjectController) obj.visualization?.render();
+        });
+    }
+
     private getCanvas() {
         const roomV = this.plane.room.visualization;
 

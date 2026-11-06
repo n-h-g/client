@@ -7,6 +7,13 @@ import {ColorRGB} from '../../utils/color/ColorRGB';
 import {WallPlane} from './objects/map/WallPlane';
 import {Pointer} from './objects/map/Pointer';
 import {MapData} from './objects/map/MapData';
+import {PlaneDecoration, RoomDecorationLibrary} from './decoration/RoomDecorationLibrary';
+
+export type RoomDecorationIds = {
+    wallpaper: string | null;
+    floor: string | null;
+    landscape: string | null;
+};
 
 export class RoomLayout {
     private wrappedVisualization: RoomVisualization;
@@ -24,6 +31,11 @@ export class RoomLayout {
     private zoom = 1;
     private fullHeightTick = false;
     private pointer: Pointer;
+
+    /** Ids of the decorations applied with the wallpaper/floor/landscape items ("0.0" = default look). */
+    private decorationIds: RoomDecorationIds = {wallpaper: null, floor: null, landscape: null};
+    private wrappedFloorDecoration: PlaneDecoration | null = null;
+    private wrappedWallDecoration: PlaneDecoration | null = null;
 
     constructor(room: Room, model: string, doorPosition: Point) {
         this.room = room;
@@ -173,6 +185,53 @@ export class RoomLayout {
 
         this.colorsHash.push(color);
         return color;
+    }
+
+    /**
+     * Applies the wallpaper/floor/landscape of the room (on entering, or when the owner applies one from
+     * the inventory): the floor and the walls are drawn again with the new color and pattern.
+     * The landscape is kept but not drawn: it's only visible through the windows.
+     * @param ids the decorations that change, the missing ones stay as they are.
+     */
+    async setDecorations(ids: Partial<RoomDecorationIds>): Promise<void> {
+        this.decorationIds = {...this.decorationIds, ...ids};
+
+        const library = RoomDecorationLibrary.getInstance();
+        await library.load();
+
+        const floor = library.getFloor(this.decorationIds.floor);
+        const wall = library.getWall(this.decorationIds.wallpaper);
+
+        // the room was left while loading
+        if (!this.visualization.container || this.visualization.container.destroyed) return;
+
+        const floorChanged = !RoomLayout.samePlane(floor, this.wrappedFloorDecoration);
+        const wallChanged = !RoomLayout.samePlane(wall, this.wrappedWallDecoration);
+
+        this.wrappedFloorDecoration = floor;
+        this.wrappedWallDecoration = wall;
+
+        if (floorChanged) this.floorPlane.visualization?.redraw();
+        if (wallChanged) this.wallPlane.visualization?.redraw();
+    }
+
+    private static samePlane(a: PlaneDecoration | null, b: PlaneDecoration | null): boolean {
+        if (!a || !b) return a === b;
+        return a.color === b.color && a.texture === b.texture;
+    }
+
+    getDecorationIds(): RoomDecorationIds {
+        return {...this.decorationIds};
+    }
+
+    /** The floor applied with a floor item, null for the default look. */
+    get floorDecoration(): PlaneDecoration | null {
+        return this.wrappedFloorDecoration;
+    }
+
+    /** The wallpaper applied with a wallpaper item, null for the default look. */
+    get wallDecoration(): PlaneDecoration | null {
+        return this.wrappedWallDecoration;
     }
 
     getModelMaltrix(): number[][] {

@@ -11,34 +11,34 @@
                     <div class="listContainer itemsContainer">
                         <template v-if="currentTab == 'floor'">
                             <div class="itemInventory" 
-                                :class="{ selected: selectedItem && selectedItem.Id === item.Id }"
+                                :class="{ selected: selectedItem && selectedItem.id === item.id }"
                                 v-for="item in floorItems" 
-                                :key="item.Id"
+                                :key="item.id"
                                 @click.stop="selectItem(item)">
                                 <img :src="getImageIcon(item)" />
-                                <span class="stackSize">{{ item.qty }}</span>
+                                <span v-if="item.qty > 1" class="stackSize">{{ item.qty }}</span>
                             </div>
                         </template>
                         <template v-else>
                             <div class="itemInventory" 
-                                 :class="{ selected: selectedItem && selectedItem.Id == item.Id }"
-                                 v-for="item in wallItems" :key="item.Id"
+                                 :class="{ selected: selectedItem && selectedItem.id === item.id }"
+                                 v-for="item in wallItems" :key="item.id"
                                  @click.stop="selectItem(item)">
                                 <img :alt="item.Name" :src="getImageIcon(item)"/>
-                                <span class="stackSize">{{ item.qty }}</span>
+                                <span v-if="item.qty > 1" class="stackSize">{{ item.qty }}</span>
                             </div>
                         </template>
                     </div>
 
                     <div class="buttonsContainer">
                         <div class="itemName" v-if="selectedItem">
-                            {{ selectedItem.name || selectedItem.Name }}
+                            {{ getItemName(selectedItem) }}
                         </div>
                         <div class="itemPreview">
-                            <img v-if="selectedItem" :src="getImagePreview(selectedItem)" />
+                            <img v-if="selectedItem" :src="preview || getImageIcon(selectedItem)" />
                         </div>
                         <div class="buttonList">
-                            <div class="ui-button small" v-if="showPlaceItemButton" @click.stop="placeItem()">Place</div>
+                            <div class="ui-button small" v-if="showPlaceItemButton" @click.stop="placeItem()">{{ isDecoration(selectedItem) ? 'Apply' : 'Place' }}</div>
                             <div class="ui-button small" v-if="showAddAllItemsToTradeButton" @click.stop="addAllItemsToTrade()">Trade</div>
                         </div>
                     </div>
@@ -76,7 +76,7 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, ref, toRaw } from "vue"
+import { onMounted, ref } from "vue"
 import { ItemVisualization } from "../../../game/core/room/object/items/visualization/ItemVisualization"
 import { Engine } from "../../../game/Engine"
 import {Item} from "../../../game/engine/room/objects/items/Item"
@@ -88,7 +88,9 @@ import { IComponentShowableUI } from "../../../game/core/ui/IComponentShowableUI
 import { EventManager } from "../../../game/core/events/EventManager"
 import { UIEvents } from "../../../game/engine/events/ui/UIEvents"
 import { InventoryItemsEventData } from "../../../game/engine/events/ui/data/inventory/InventoryItems"
+import { FurniPreview } from "../../../game/engine/ui/imagers/items/utils/FurniPreview"
 import { ItemType } from "../../../game/core/room/object/items/ItemType"
+import { RoomDecorationLibrary } from "../../../game/engine/room/decoration/RoomDecorationLibrary"
 
 const tradeMode = ref(false)
 const myTradeItems = ref([])
@@ -103,12 +105,41 @@ const floorItems = ref([])
 const wallItems = ref([])
 const showAddAllItemsToTradeButton = ref(false)
 
+// the server always sends the whole inventory (on open, after placing and after picking up a furni)
 EventManager.read(UIEvents.INVENTORY_ITEMS_ADDED, (data: InventoryItemsEventData) => {
+    const floor = []
+    const wall = []
+
+    // the copies of the same furni are one slot with the amount (the slot uses the first copy's id)
+    const groups = new Map<string, any>()
+
     for (let item of data.items) {
+        const group = groups.get(slotKey(item))
+
+        if (group) {
+            group.qty++
+            group.ids.push(item.id)
+            continue
+        }
+
+        const slot = { ...item, qty: 1, ids: [item.id] }
+        groups.set(slotKey(item), slot)
+
         if (item.item_type == ItemType.FLOOR_ITEM)
-            floorItems.value.push(item)
+            floor.push(slot)
         else
-            wallItems.value.push(item)
+            wall.push(slot)
+    }
+
+    floorItems.value = floor
+    wallItems.value = wall
+
+    // after placing a copy the slot stays selected while there are copies left
+    if (selectedItem.value) {
+        const slot = groups.get(slotKey(selectedItem.value))
+
+        if (slot) selectedItem.value = slot
+        else deselectItem()
     }
 })
 
@@ -116,10 +147,36 @@ function addAllItemsToTrade() {
 
 }
 
+/**
+ * The copies of a furni are one slot; the wallpapers/floors/landscapes are one slot per decoration
+ * (wallpaper 101 and wallpaper 102 are different items).
+ */
+function slotKey(item: any): string {
+    return isDecoration(item) ? `${item.name}:${item.extra_data ?? ''}` : item.name
+}
+
+function isDecoration(item: any): boolean {
+    return !!item && RoomDecorationLibrary.isDecorationItem(item.name)
+}
+
+function getItemName(item: any): string {
+    const name = item.name || item.Name
+    return isDecoration(item) && item.extra_data ? `${name} ${item.extra_data}` : name
+}
+
 function placeItem() {
     if (!selectedItem.value) return;
 
     const engine = Engine.getInstance();
+
+    // a wallpaper/floor/landscape is not placed: it changes the room look (the server consumes it)
+    if (isDecoration(selectedItem.value)) {
+        engine.networkingManager.packetManager.applyOut(
+            OutgoingPacket.RoomApplyDecorationEvent,
+            { id: selectedItem.value.id }
+        )
+        return;
+    }
 
     engine.roomService.startItemPlacement(selectedItem.value)
     
@@ -127,31 +184,28 @@ function placeItem() {
 }
 
 function getImageIcon(item: Item) {
-    return Engine.getInstance().config.itemsResourcesUrl + "/icons/" + item.name + "_icon.png"
+    // Nitro icons: <name>_icon.png, with the color variant after an underscore (chair_plasto*2 -> chair_plasto_2_icon.png)
+    return Engine.getInstance().config.itemsIconsUrl + item.name.replace("*", "_") + "_icon.png"
 }
 
-function getImagePreview(item: Item): string {
-    if (!item) return "/src/assets/images/items/default_placeholder.png";
-
-    const rawItem = toRaw(item);
-    const visualization = rawItem.visualization as any;
-
-    if (!visualization) return "/src/assets/images/items/default_placeholder.png";
-
-    const preview = (typeof visualization.imagePreview === 'function') 
-        ? visualization.imagePreview() 
-        : visualization.imagePreview;
-
-    return preview || "/src/assets/images/items/default_placeholder.png";
-}
 
 function changeTab(tab: string) {
 	currentTab.value = tab;
     showPlaceItemButton.value = false
 }
 
-function selectItem(item: Item) {
+// the furni drawn in the preview panel (the icon is shown until it's ready)
+const preview = ref("")
+
+async function selectItem(item: any) {
     selectedItem.value = item
+    preview.value = ""
+
+    FurniPreview.render(item.name)
+        .then(image => {
+            if (image && selectedItem.value && slotKey(selectedItem.value) === slotKey(item)) preview.value = image
+        })
+        .catch(() => {})
 
     if (Engine.getInstance()?.roomService?.currentRoom != undefined)
         showPlaceItemButton.value = true
@@ -343,8 +397,10 @@ onMounted(() => {
 
         .stackSize {
             position: absolute;
-            bottom: 2px;
-            right: 2px;
+            top: 1px;
+            right: 1px;
+            border-radius: 3px;
+            font-weight: bold;
             background: #fff;
             border: 1px solid #333;
             font-size: 9px;

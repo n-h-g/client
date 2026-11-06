@@ -8,5 +8,8 @@ export enum UIEventsType {
     HOTELVIEW = 'hotelview',
     ROOM = 'room',
     ROOM_INFO = 'room_info',
-    CHANGE_LOOK = 'change_look'
+    CHANGE_LOOK = 'change_look',
+    FRIENDS = 'friends',
+    MESSENGER = 'messenger',
+    FRIEND_PROFILE = 'friend_profile'
 }

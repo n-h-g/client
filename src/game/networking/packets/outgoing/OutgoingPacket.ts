@@ -19,6 +19,7 @@ export enum OutgoingPacket {
     UserTypeStatus = 12,
     UserLookAtPoint = 13,
     UserProfileInformation = 15,
+    UserActionEvent = 50,
 
     //#region Inventory
     RequestInventoryItemsEvent = 14,
@@ -32,6 +33,7 @@ export enum OutgoingPacket {
     RequestFriendRequestsEvent = 21,
     FollowFriendEvent = 37,
     FriendPrivateMessageEvent = 39,
+    RemoveFriendEvent = 51,
 
     //#region Items
     RotateMoveItemEvent = 22,
@@ -40,6 +42,8 @@ export enum OutgoingPacket {
     RoomPlaceItemEvent = 25,
     RoomMoveItemEvent = 26,
     RoomUseItemEvent = 27,
+    /** A wallpaper/floor/landscape applied from the inventory (Nitro's FurniturePlacePaintComposer): {id}. */
+    RoomApplyDecorationEvent = 29,
     MoveWallItemEvent = 33,
     ToggleFloorItemEvent = 17,
     ToggleWallItemEvent = 35,

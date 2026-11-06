@@ -14,6 +14,8 @@ import {UIComponent} from '../../../../ui/components/UIComponent';
 import {ActionId} from '../../../../ui/imagers/avatars/enum/actions/ActionId';
 import {AvatarData} from '../../../../ui/imagers/avatars/enum/AvatarData';
 import {UserEntityVisualization} from '../visualization/UserEntityVisualization';
+import {AvatarContextMenuData} from '../../../../events/ui/data/avatar/AvatarContextMenuData';
+import {HumanVisualization} from '../../../../../core/room/object/human/visualization/HumanVisualization';
 
 export class UserEntityLogic extends HumanLogic {
     private typing = false;
@@ -24,9 +26,10 @@ export class UserEntityLogic extends HumanLogic {
     onDance(): void {}
 
     registerEvents() {
-        this.entity.visualization.container.on('pointerdown', () =>
-            this.onClick()
-        );
+        this.entity.visualization.container.on('pointerdown', (event: any) => {
+            event.stopPropagation();
+            this.onClick();
+        });
         this.events.on(UserEvents.USER_TOGGLE_TYPING, (typing: boolean) =>
             this.onToggleTyping(typing)
         );
@@ -87,6 +90,22 @@ export class UserEntityLogic extends HumanLogic {
     }
 
     onClick() {
+        const user = this.entity as import('../UserEntity').UserEntity;
+        if (user.userId != null && user.userId === Engine.getInstance().currentUserId) {
+            const bounds = this.entity.visualization.container.getBounds();
+            const visualization = this.entity.visualization as HumanVisualization;
+            EventManager.emit<AvatarContextMenuData>(UIEvents.AVATAR_CONTEXT_MENU, {
+                id: user.id,
+                name: user.name,
+                x: bounds.x + bounds.width / 2,
+                y: bounds.y,
+                sitting: visualization.actions.has(ActionId.SIT),
+                isSelf: true,
+                userId: user.userId,
+            });
+            return;
+        }
+
         const roomId = Engine.getInstance().roomService?.currentRoom?.id;
         const x = this.entity.position.x;
         const y = this.entity.position.y;
@@ -100,7 +119,16 @@ export class UserEntityLogic extends HumanLogic {
             }
         );
 
-        super.onClick();
+        const bounds = this.entity.visualization.container.getBounds();
+        EventManager.emit<AvatarContextMenuData>(UIEvents.AVATAR_CONTEXT_MENU, {
+            id: this.entity.id,
+            name: this.entity.name,
+            x: bounds.x + bounds.width / 2,
+            y: bounds.y,
+            sitting: false,
+            isSelf: false,
+            userId: user.userId,
+        });
     }
 
     figureChanged() {}

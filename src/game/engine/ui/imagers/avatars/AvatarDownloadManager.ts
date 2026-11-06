@@ -43,6 +43,16 @@ export class AvatarDownloadManager {
             }
         });
     }
+    /** An effect library (effects/<lib>/<lib>.json): its animation, assets and spritesheet frames. */
+    loadEffectLibrary(lib: string): Promise<any> {
+        return fetchJsonAsync(`${Engine.getInstance().config.avatarEffectPath}/${lib}/${lib}.json`);
+    }
+
+    /** The spritesheet of an effect library. */
+    async loadEffectTexture(lib: string, image: string = `${lib}.png`): Promise<any> {
+        return await PIXI.Assets.load(`${Engine.getInstance().config.avatarEffectPath}/${lib}/${image}`);
+    }
+
     loadOffsets(part: string) {
         return new Promise((resolve, reject) => {
             const request = new XMLHttpRequest();

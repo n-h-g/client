@@ -1,5 +1,7 @@
 import {RoomLayout} from '../RoomLayout';
 import {Container} from '@pixi/display';
+import type {IPointData} from 'pixi.js';
+import {TileType} from '../objects/map/TileTypeEnum';
 import {Point} from '../../../utils/point/Point';
 import {MapData} from '../objects/map/MapData';
 import {UiUtils} from '../../../utils/UiUtils';
@@ -10,6 +12,7 @@ import {Point3d} from '../../../utils/point/Point3d';
 import {RoomPriority} from './RoomPriority';
 import { Disposable } from '../../../core/room/Disposable';
 import {Engine} from '../../../Engine';
+import { Wall } from '../objects/map/Wall';
 
 export class RoomVisualization implements Disposable {
     container: Container;
@@ -20,6 +23,7 @@ export class RoomVisualization implements Disposable {
     private canvasDoorTile: Container;
     private canvasDoorWall: Container;
     private canvasPointer: Container;
+    private canvasStairs: Container;
 
     constructor(room: RoomLayout) {
         this.roomLayout = room;
@@ -30,12 +34,14 @@ export class RoomVisualization implements Disposable {
         this.canvasDoorWall = new Container();
         this.canvasPointer = new Container();
         this.canvasDoorTile = new Container();
+        this.canvasStairs = new Container();
 
         this.container.addChild(this.canvasDoorTile);
         this.container.addChild(this.canvasWall);
         this.container.addChild(this.canvasDoorWall);
         this.container.addChild(this.canvasFloor);
         this.container.addChild(this.canvasPointer);
+        this.container.addChild(this.canvasStairs);
 
         this.container.x = (Engine.getInstance().application.screenCoords.x - this.container.width) / 2;
         this.container.y = (Engine.getInstance().application.screenCoords.y / 2 - - this.container.height) / 2;
@@ -65,6 +71,8 @@ export class RoomVisualization implements Disposable {
             defaultPoint,
             RoomPriority.WALL
         );
+        // the steps rise towards the wall behind them: drawn with the floor, the wall covered their top
+        this.canvasStairs.zIndex = this.canvasWall.zIndex + 1;
 
         this.container.eventMode = 'dynamic';
 
@@ -109,6 +117,57 @@ export class RoomVisualization implements Disposable {
             );
     }
 
+    /**
+     * Finds the floor tile under the given global (screen) point using only the tiles geometry,
+     * so furni and avatars drawn over the floor don't hide the tile under the mouse.
+     * When more tiles overlap (different heights) the one in front (higher x + y) wins.
+     */
+    getTileAtGlobalPoint(global: IPointData): Tile | undefined {
+        const local = this.canvasFloor.toLocal(global);
+
+        const halfWidth = MapData.tileWidth / 2;
+        const halfHeight = MapData.tileHeight / 2;
+
+        let found: Tile | undefined;
+        let foundDepth = -Infinity;
+
+        for (const tile of this.roomLayout.getFloorPlane().getTiles()) {
+            // the floor plane contains only tiles; holes (height 0 or under a floor hole furni) are not walkable
+            if (tile?.type === undefined || tile.type == TileType.Hole || tile.coveredByFloorHole || !tile.visualization) continue;
+
+            // the tile is a rhombus whose bounding box starts at (offsetX, offsetY)
+            const centerX = tile.visualization.offsetX + halfWidth;
+            const centerY = tile.visualization.offsetY + halfHeight;
+
+            const distance =
+                Math.abs(local.x - centerX) / halfWidth +
+                Math.abs(local.y - centerY) / halfHeight;
+
+            if (distance > 1) continue;
+
+            const depth = tile.position.x + tile.position.y;
+
+            if (depth > foundDepth) {
+                found = tile;
+                foundDepth = depth;
+            }
+        }
+
+        return found;
+    }
+
+    getWallAtGlobalPoint(global: IPointData): Wall | undefined {
+        const walls = this.roomLayout.getWallPlane().getWalls();
+        // Wall graphics are drawn in room-local coordinates; containsPoint accounts
+        // for the room's viewport transform and avoids treating floor tiles as walls.
+        for (let i = walls.length - 1; i >= 0; i--) {
+            const wall = walls[i];
+            const graphics = wall.visualization.wallCtx;
+            if (graphics?.containsPoint(global as any)) return wall;
+        }
+        return undefined;
+    }
+
     globalToTileWithHeight(x: number, y: number, z: number): Point {
         const offsetX = this.container.x;
         const offsetY = this.container.y - z * MapData.tileHeight * 2;
@@ -146,6 +205,18 @@ export class RoomVisualization implements Disposable {
         if (!object) return;
 
         this.container.addChild(object.visualization.container);
+    }
+
+    /**
+     * z-index for what stands in the door (the avatar, the pointer): the door tile is inside the wall,
+     * so they go under all the walls (wall over the door included) but over the floor.
+     */
+    getDoorZIndex(): number {
+        return Math.min(this.canvasWall.zIndex, this.canvasDoorWall.zIndex) - 1;
+    }
+
+    getCanvasStairs(): Container {
+        return this.canvasStairs;
     }
 
     getCanvasFloor(): Container {

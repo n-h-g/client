@@ -10,6 +10,7 @@ import {IComponentShowableUI} from '../../../ui/IComponentShowableUI';
 import {Human} from '../human/Human';
 import {RoomObjectLogic} from '../RoomObjectLogic';
 import {Entity} from './Entity';
+import type {Container} from 'pixi.js';
 
 export abstract class EntityLogic extends RoomObjectLogic {
     protected entity: Entity;
@@ -20,15 +21,34 @@ export abstract class EntityLogic extends RoomObjectLogic {
         this.entity = entity;
     }
 
+    private listenedContainer: Container | null = null;
+    private logicEventsRegistered = false;
+
+    /**
+     * Called at every render of the entity: the mouse listeners are added once per container,
+     * the logic events once per entity (they used to pile up, and a click opened and closed the preview).
+     */
     registerEvents(): void {
+        const container = this.entity.visualization.container;
+
+        if (container && container !== this.listenedContainer) {
+            this.listenedContainer = container;
+            container.on('pointerdown', () => this.onClick());
+            container.on('pointerover', () => this.onHover());
+        }
+
+        if (this.logicEventsRegistered) return;
+        this.logicEventsRegistered = true;
+
+        this.registerLogicEvents();
+    }
+
+    /**
+     * Listeners of the logic events (this.events), registered only once.
+     */
+    protected registerLogicEvents(): void {
         this.events.on(EntityEvents.POSITION_CHANGED, () =>
             this.onPositionChanged()
-        );
-        this.entity.visualization.container.on('pointerdown', () =>
-            this.onClick()
-        );
-        this.entity.visualization.container.on('pointerover', () =>
-            this.onHover()
         );
     }
 
@@ -41,24 +61,8 @@ export abstract class EntityLogic extends RoomObjectLogic {
     }
 
     onHover(): void {
-        const tile = Engine.getInstance()
-            .roomService.currentRoom.roomLayout.getFloorPlane()
-            .getTilebyPosition(
-                new Point(
-                    this.entity.position.x,
-                    this.entity.position.y
-                )
-            );
-
-        const pointer = tile?.plane?.room?.getPointer();
-
-        if (
-            pointer?.position?.x < tile?.position?.x &&
-            pointer?.position?.y < tile?.position?.y
-        )
-            return;
-
-        tile?.logic?.onHover();
+        // The floor pointer is handled by RoomLogic (tile under the mouse),
+        // it must not jump to the entity origin tile when the mouse is over an entity.
     }
 
     onClick(): void {
@@ -93,11 +97,12 @@ export abstract class EntityLogic extends RoomObjectLogic {
 
         const isHuman = this.entity instanceof Human;
         const mode = isHuman ? 'user' : 'item';
+        // show, not toggle: clicking another entity while the preview is open must not close it
         Engine.getInstance()
             .userInterfaceManager.componentsManager.getComponent<IComponentShowableUI>(
                 UIComponent.PreviewBoxUI
             )
-            .toggle();
+            .show();
 
             await this.loadPreviewData(mode)
     }

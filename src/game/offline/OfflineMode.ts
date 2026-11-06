@@ -10,6 +10,8 @@ import {Point} from '../utils/point/Point';
 import {Point3d} from '../utils/point/Point3d';
 import {Rotation} from '../utils/Rotation';
 import {Tile} from '../engine/room/objects/map/Tile';
+import { WallItem } from '../engine/room/objects/items/WallItem';
+import { FurnitureWallData, IWallDataParser } from '../engine/room/objects/items/WallItemData';
 
 // ... (mantenere gli import esistenti)
 
@@ -20,8 +22,11 @@ export class OfflineMode {
     
     // CONFIGURAZIONE FURNI
     private static RANDOM_ITEMS = true; 
-    private static ITEMS = ['chair_norja'];
-    private static NUMBER_OF_ITEMS = 20; // Quanti furni generare
+    private static ITEMS = ['habbocake', 'snst_tree1'];
+    private static NUMBER_OF_ITEMS = 0; // Quanti furni generare
+
+    private static WALL_ITEMS = ['ny2013_wall'];
+    private static NUMBER_OF_WALL_ITEMS = 1;
     
     // CONFIGURAZIONE UTENTI
     private static NUMBER_OF_USERS = 1; // Quanti utenti generare (cambia N qui)
@@ -40,7 +45,6 @@ export class OfflineMode {
     static getInstance(): OfflineMode {
         return this.instance;
     }
-
     async init() {
         if (!OfflineMode.instance) {
             OfflineMode.instance = this;
@@ -87,13 +91,11 @@ export class OfflineMode {
 
             const randomTile = room.roomLayout.getFloorPlane().getRandomTile() as Tile;
 
-            // 2. Seleziona lo sprite del mobile
             let spriteName: string;
             if (OfflineMode.RANDOM_ITEMS) {
-                // Sceglie un nome a caso dall'array ITEMS
                 spriteName = OfflineMode.ITEMS[Math.floor(Math.random() * OfflineMode.ITEMS.length)];
             } else {
-                // Alterna tra gli elementi dell'array
+
                 spriteName = OfflineMode.ITEMS[i % OfflineMode.ITEMS.length];
             }
 
@@ -117,7 +119,7 @@ export class OfflineMode {
                 );
 
 
-                item.visualization.direction = 6;
+                item.visualization.direction = Direction.EAST;
                 item.visualization.needsUpdate = true
                 item.visualization?.render();
                 
@@ -128,6 +130,58 @@ export class OfflineMode {
                 );
             } catch (e) {
                 console.error(`Errore nel caricamento del furni: ${spriteName}`, e);
+            }
+        }
+
+        for (let i = 0; i < OfflineMode.NUMBER_OF_WALL_ITEMS; i++) {
+            const spriteName = OfflineMode.WALL_ITEMS[i % OfflineMode.WALL_ITEMS.length];
+
+            const side = 'r'
+            const wallX = 7;
+            const wallY = 5;
+            const localX = 0;
+            const localY = 0;
+            
+            const wallLocationString = `:w=${wallX},${wallY} l=${localX},${localY} ${side}`;
+
+            try {
+                const base = await this.engine.userInterfaceManager!.furniImager.loadFurniBase(
+                    FurnidataItemType.WallItem,
+                    spriteName
+                );
+
+                const mockWallData: IWallDataParser = {
+                    width: 0,
+                    height: 0,
+                    localX: localX,
+                    localY: localY,
+                    direction: 2,
+                    stuffData: "0",
+                    secondsToExpiration: -1,
+                    y: 0,
+                    z: 0,
+                    isOldFormat: false
+                };
+
+                const wallData = new FurnitureWallData(mockWallData);
+
+                const item = new WallItem(
+                    `wall_offline_${i}`,
+                    spriteName,
+                    base,
+                    wallData
+                );
+
+                item.visualization.direction = (side === 'r') ? 4 : 2;
+                item.visualization.needsUpdate = true;
+                await item.visualization.render();
+
+                this.engine.roomService.currentRoom.roomEntityRepository.add(
+                    item.id,
+                    item
+                );
+            } catch (e) {
+                console.error(`Errore caricamento WallItem: ${spriteName}`, e);
             }
         }
         // ----------------------------------
