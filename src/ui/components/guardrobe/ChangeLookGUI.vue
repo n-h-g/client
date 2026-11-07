@@ -1,5 +1,5 @@
 <template>
-    <Dialog title="ChangeLook" class-name="changelookUI" :box="UIEventsType.CHANGE_LOOK" :style="{ marginTop: '300px', marginLeft: '400px', width: '70vh' }">
+    <Dialog title="ChangeLook" class-name="changelookUI" :box="UIEventsType.CHANGE_LOOK">
         <div class="changeLookContainer">
             <div class="tabs">
                 <div class="tab" :class="{ active: currentTab == 'faceAndBody' }" @click="changeTab('faceAndBody')">
@@ -24,18 +24,17 @@
                         <img src="@/assets/images/look_editor/gender_female.png" />
                     </div>
                 </div>
-                <div class="firstChoose" v-if="currentTab != 'faceAndBody'">
-                    <div class="chooseTab" v-for="(tab, key) in currentMainTab.tabs" :key="key"
+                <div class="firstChoose" v-else>
+                    <div class="chooseTab" v-for="(tab, key) in currentMainTab?.tabs" :key="key"
                         :class="{active: secondTabId == key}" @click="changeSecondTab(key)">
                         <img :src="getSecondTabImage(tab.image)" />
                     </div>
                 </div>
-                <div class="parts"
-                    :class="currentTab != 'faceAndBody' ? currentMainTab.tabs[secondTabId].type : 'faceAndBody'">
+                <div class="parts" :class="currentTab != 'faceAndBody' ? currentSubTab?.type : 'faceAndBody'">
                     <div class="part" v-for="part in partSet" :key="part.key"
                         :class="{selected: part.selected, hc: part.isHc, loaded: part.loaded}"
-                        @click="handleChangePart(part, part.figure)">
-                        <img :src="part.img" /> 
+                        @click="handleChangePart(part)">
+                        <img :src="part.img" />
                     </div>
                 </div>
                 <div class="lookPreview">
@@ -43,8 +42,7 @@
                         <img v-if="lookImage != ''" :src='lookImage' />
                     </div>
                     <div class="buttonContainer">
-                        <button class="saveButton"
-                            @click="saveLook">Salva</button>
+                        <button class="saveButton" @click="saveLook">Salva</button>
                     </div>
                 </div>
                 <div class="palettesContainer">
@@ -68,19 +66,13 @@ import { OutgoingPacket } from "../../../game/networking/packets/outgoing/Outgoi
 import { IComponentShowableUI } from '../../../game/core/ui/IComponentShowableUI'
 import { UIComponent } from '../../../game/engine/ui/components/UIComponent'
 import Dialog from '../dialog/Dialog.vue'
-import { UiUtils } from '../../../game/utils/UiUtils'
 import avatarLoadingImage from '../../../assets/images/loading.png'
 import { UIEventsType } from "../../../game/engine/events/ui/UIEventsType";
 import { UIEvents } from '../../../game/engine/events/ui/UIEvents'
 import { AvatarFigure } from '../../../game/engine/ui/imagers/avatars/AvatarFigure'
-import { Avatar } from '../../../game/engine/ui/imagers/avatars/Avatar'
-import { AvatarImager } from '../../../game/engine/ui/imagers/avatars/AvatarImager'
-import { AvatarEventsType } from '../../../game/engine/ui/imagers/avatars/enum/events/AvatarEventsType'
+import { AvatarHeadImage } from '../../../game/engine/ui/imagers/avatars/AvatarHeadImage'
 import { ChangeLookEventData } from '../../../game/engine/events/ui/data/avatar/ChangeLookEventData'
-
 import { EventManager } from '../../../game/core/events/EventManager'
-import { ActionId } from "../../../game/engine/ui/imagers/avatars/enum/actions/ActionId"
-import { Container } from "pixi.js"
 
 const avatarTabs = [
     {
@@ -120,21 +112,26 @@ const avatarTabs = [
     }
 ]
 
+/** The thumbnails drawn at the same time: the downloads of the libraries go in parallel. */
+const THUMBNAIL_CONCURRENCY = 4
+
 const currentTab = ref<string>('faceAndBody')
 const secondTabId = ref<number>(0)
 const gender = ref<string>('M')
 const look = ref<string>('hd-180-1.ch-255-66.lg-280-110.sh-305-62.ha-1012-110.hr-828-61');
 const partSet = ref<any[]>([])
 const lookImage = ref<string>('')
-let palettes = ref<any[]>([])
-const handlerRef = ref<HTMLElement | null>(null)
+const palettes = ref<any[]>([])
 
-watch(look, () => {
-    generateLookPreview();
-}, { immediate: false });
+const currentMainTab = computed(() => avatarTabs.find(e => e.id === currentTab.value))
+const currentSubTab = computed(() => currentMainTab.value?.tabs[secondTabId.value])
+
+// the preview follows the look; the thumbnails depend only on the tab, the gender and the colors
+watch(look, () => generateLookPreview());
 
 EventManager.read(UIEvents.CHANGE_LOOK, (evt: ChangeLookEventData) => {
-    look.value = evt.look
+    // a look saved before (e.g. with the colors "NaN" or a part written twice) is repaired
+    look.value = normalizeLook(evt.look)
     if (evt.gender) gender.value = evt.gender.toUpperCase().startsWith('F') ? 'F' : 'M'
 
     // the selected parts and colors of the open tab follow the loaded look
@@ -143,41 +140,35 @@ EventManager.read(UIEvents.CHANGE_LOOK, (evt: ChangeLookEventData) => {
 
 // the current look of the user: the server answers with UpdateUserInformation (-> CHANGE_LOOK)
 Engine.getInstance()?.networkingManager?.packetManager?.applyOut(OutgoingPacket.UserProfileInformation)
-    
 
-    let renderQueue: Array<() => Promise<void>> = [];
-let isProcessingQueue = false;
+/*
+ * The thumbnails: drawn a few at a time, in the order of the grid. A new part set (another tab, gender or color)
+ * drops the ones still waiting; the images are cached by figure (AvatarHeadImage), so a tab opened again is instant.
+ */
+let thumbnailGeneration = 0
+let thumbnailQueue: Array<() => Promise<void>> = []
+let thumbnailsRunning = 0
 
-async function processQueue() {
-    if (isProcessingQueue || renderQueue.length === 0) return;
-    isProcessingQueue = true;
-    while (renderQueue.length > 0) {
-        const task = renderQueue.shift();
-        if (task) await task();
+function pumpThumbnails() {
+    while (thumbnailsRunning < THUMBNAIL_CONCURRENCY && thumbnailQueue.length > 0) {
+        const task = thumbnailQueue.shift()!
+        thumbnailsRunning++
+        task().catch(() => {}).finally(() => {
+            thumbnailsRunning--
+            pumpThumbnails()
+        })
     }
-    isProcessingQueue = false;
 }
 
-const currentMainTab = computed(() => {
-    return avatarTabs.find(e => e.id === currentTab.value)
-})
+function avatarImage(figure: string, headOnly: boolean): Promise<string> {
+    return headOnly ? AvatarHeadImage.get(figure) : AvatarHeadImage.full(figure)
+}
 
 function hide() {
     Engine.getInstance()?.userInterfaceManager?.componentsManager.getComponent<IComponentShowableUI>(UIComponent.ChangeLookUI)?.hide()
 }
 
-function show() {
-    Engine.getInstance()?.userInterfaceManager?.componentsManager.getComponent<IComponentShowableUI>(UIComponent.ChangeLookUI)?.show()
-}
-
-function setDefaultTabs() {
-    currentTab.value = 'faceAndBody'
-    secondTabId.value = 0
-    generateLookPreview()
-}
-
 function getSecondTabImage(image: string) {
-    // Uso compatibile con Vite/Webpack moderno
     return new URL(`../../../assets/images/look_editor/${image}.png`, import.meta.url).href
 }
 
@@ -203,252 +194,226 @@ function setUpLookComponents() {
     generatePalettes()
 }
 
+/** The part of the look of the open tab (e.g. the hair), if the look has one. */
 function calculateCurrentPart() {
-    const avatarMainTab = avatarTabs.find(e => e.id === currentTab.value)
-    if (!avatarMainTab) return undefined
+    const avatarTab = currentSubTab.value
+    if (!avatarTab) return undefined
 
-    const avatarTab = avatarMainTab.tabs[secondTabId.value]
-    const figure = new AvatarFigure(look.value);
-    const parts = figure.parts;
-    
-    return parts.find((value: any) => value.type === avatarTab.type)
+    return new AvatarFigure(look.value).parts.find((value: any) => value.type === avatarTab.type)
 }
 
 function calculateCurrentColor(colorId: number) {
-    const avatarMainTab = avatarTabs.find(e => e.id === currentTab.value)
-    if (!avatarMainTab) return 0
-
-    const avatarTab = avatarMainTab.tabs[secondTabId.value]
-    const figure = new AvatarFigure(look.value)
-    const parts = figure.parts
-    const value = parts.find((value: any) => value.type === avatarTab.type)
-    
-    if (value !== undefined) {
-        return value.colors[colorId] || 0
-    } else {
-        return 0
-    }
+    return calculateCurrentPart()?.colors[colorId] || 0
 }
 
-async function generateAvatarDataUrl(figure: string, headOnly: boolean = false): Promise<string> {
-    const engine = Engine.getInstance();
-    const imager = engine?.userInterfaceManager?.avatarImager;
-
-    if (!imager || !engine) return "";
-
-    const actions = new Set<ActionId>();
-    actions.add("std" as any); 
-
-    const avatar = new Avatar(figure, 2, 2, actions, 0, 0, false, false, true);
-        
-    await imager.loadAvatar(avatar);
-    imager.drawAvatar(avatar); 
-
-    return new Promise((resolve) => {
-        avatar.Events?.on(AvatarEventsType.LOAD_COMPLETE, () => {
-            const renderer = (engine as any).application?.renderer;
-                
-            if (!renderer) {
-                resolve("");
-                return;
-            }
-
-            let targetContainer;
-
-            if (headOnly) {
-                const headContainer = new Container();
-                // Add head and face for the small icons
-                if (avatar.HeadContainer) headContainer.addChild(avatar.HeadContainer);
-                if (avatar.FaceContainer) headContainer.addChild(avatar.FaceContainer);
-                targetContainer = headContainer;
-            } else {
-                // Ensure the Face is attached to the main container for the full preview
-                if (avatar.Container && avatar.FaceContainer) {
-                    avatar.Container.addChild(avatar.FaceContainer);
-                }
-                targetContainer = avatar.Container;
-            }
-            
-            if (!targetContainer) {
-                resolve("");
-                return;
-            }
-
-            const canvas = renderer.extract.canvas(targetContainer);
-            resolve(UiUtils.trimCanvas(canvas).toDataURL());
-        });
-    });
-}
+/** The preview of the whole look; an older one finishing late does not replace a newer one. */
+let previewGeneration = 0
 
 function generateLookPreview() {
-    setUpLookComponents();
+    const generation = ++previewGeneration
+    const figure = look.value
 
-
-    generateAvatarDataUrl(look.value, false).then(dataUrl => {
-        //console.log(dataUrl)
-        lookImage.value = dataUrl;
-    });
-}
-
-function generatePartImage(figure: string, type: string, partSetKey: number | string) {
-    const isHeadOnly = type === 'faceAndBody';
-
-    renderQueue.push(async () => {
-        const dataUrl = await generateAvatarDataUrl(figure, isHeadOnly);
-        const element = partSet.value.find(e => e.key == partSetKey);
-        if (element) {
-            element.img = dataUrl;
-            element.loaded = true;
-        }
-    });
-
-    processQueue();
-    return avatarLoadingImage;
+    avatarImage(figure, false).then(dataUrl => {
+        if (generation === previewGeneration) lookImage.value = dataUrl
+    })
 }
 
 function generatePartSet() {
-    partSet.value = [];
-    
-    const avatarMainTab = avatarTabs.find(e => e.id === currentTab.value);
-    if (!avatarMainTab) return;
+    const generation = ++thumbnailGeneration
+    thumbnailQueue = []
 
-    const avatarTab = avatarMainTab.tabs[secondTabId.value];
-    const avatarImager = Engine.getInstance()?.userInterfaceManager.avatarImager;
-    
-    const figureData = avatarImager?.Structure?.AvatarFigureData;
-    const setType = figureData?.getSetByType(avatarTab.type);
-    const currentPartSets = setType?.partSets;
-
-    const currentPart = calculateCurrentPart();
-
-    let currentColor = calculateCurrentColor(0).toString();
-    if (currentPart != null && currentPart.colors.length > 1) {
-        currentColor += "-" + calculateCurrentColor(1);
+    const avatarMainTab = currentMainTab.value
+    const avatarTab = currentSubTab.value
+    if (!avatarMainTab || !avatarTab) {
+        partSet.value = []
+        return
     }
 
+    const figureData = Engine.getInstance()?.userInterfaceManager?.avatarImager?.Structure?.AvatarFigureData
+    const currentPartSets = figureData?.getSetByType(avatarTab.type)?.partSets
+    const currentPart = calculateCurrentPart()
+
+    let currentColor = calculateCurrentColor(0).toString()
+    if (currentPart != null && currentPart.colors.length > 1) {
+        currentColor += "-" + calculateCurrentColor(1)
+    }
+
+    const parts: any[] = []
+
     if (!avatarTab.required) {
-        partSet.value.push({ 
+        parts.push({
             type: avatarTab.type,
             key: -1,
             img: new URL("../../../assets/images/look_editor/removeSelection.png", import.meta.url).href,
             isHc: false,
-            selected: false,
-            loaded: true 
-        });
+            selected: currentPart == null,
+            loaded: true
+        })
     }
 
-    if (currentPartSets) {
-        currentPartSets.forEach((part: any, partId: string) => {
-            const figure = avatarTab.type + "-" + partId + "-" + currentColor;
-            
-            if ((part.gender === gender.value || part.gender === 'U') && part.selectable) {
-                partSet.value.push({ // CORRETTO: .value.push
-                    type: avatarTab.type,
-                    key: partId,
-                    img: generatePartImage(figure, avatarMainTab.id, partId),
-                    isHc: part.club && part.club > 0,
-                    loaded: false,
-                    figure: figure,
-                    selected: currentPart != null && currentPart.id === partId.toString(),
-                });
-            }
-        });
+    currentPartSets?.forEach((part: any, partId: string) => {
+        if ((part.gender !== gender.value && part.gender !== 'U') || !part.selectable) return
+
+        parts.push({
+            type: avatarTab.type,
+            key: partId,
+            img: avatarLoadingImage,
+            isHc: part.club && part.club > 0,
+            loaded: false,
+            figure: avatarTab.type + "-" + partId + "-" + currentColor,
+            selected: currentPart != null && currentPart.id === partId.toString(),
+        })
+    })
+
+    partSet.value = parts
+
+    // the reactive items (partSet.value), so the images set later are shown
+    const headOnly = avatarMainTab.id === 'faceAndBody'
+    for (const part of partSet.value) {
+        if (part.loaded) continue
+
+        thumbnailQueue.push(async () => {
+            if (generation !== thumbnailGeneration) return
+
+            const dataUrl = await avatarImage(part.figure, headOnly)
+            if (generation !== thumbnailGeneration) return
+
+            if (dataUrl) part.img = dataUrl
+            part.loaded = true
+        })
     }
+
+    pumpThumbnails()
 }
 
-function handleChangePart(part: any, figure: string) {
-    partSet.value.forEach(e => e.selected = false);
-    
-    const avatarFigure = new AvatarFigure(look.value);
-    
+function handleChangePart(part: any) {
+    const avatarFigure = new AvatarFigure(look.value)
+
     if (part.key == -1) {
-
-        const filteredParts = avatarFigure.look.filter((p: any) => p.type !== part.type);
-        look.value = generateFigureString(filteredParts);
+        look.value = generateFigureString(avatarFigure.look.filter((p: any) => p.type !== part.type))
     } else {
+        // with the color of its thumbnail: a part without colors was saved as "ha-3766-NaN"
+        const newPart = new AvatarFigure(part.figure).look[0]
 
-        const newPartFigure = new AvatarFigure(part.type + "-" + part.key);
-        const newPart = newPartFigure.look[0];
-        
-        const currentPart = avatarFigure.look.find((p: any) => p.type === part.type);
-        if (currentPart) newPart.colors = currentPart.colors;
+        const currentPart = avatarFigure.look.find((p: any) => p.type === part.type)
+        if (currentPart) newPart.colors = currentPart.colors
 
-        const otherParts = avatarFigure.look.filter((p: any) => p.type !== part.type);
-        look.value = generateFigureString([...otherParts, newPart]);
+        const otherParts = avatarFigure.look.filter((p: any) => p.type !== part.type)
+        look.value = generateFigureString([...otherParts, newPart])
     }
-    
-    part.selected = true;
-    generateLookPreview();
-}
 
+    partSet.value.forEach(e => e.selected = false)
+    part.selected = true
+
+    // the thumbnails stay (same tab and colors); the palettes follow the colors of the new part
+    generatePalettes()
+}
 
 function generatePalette(paletteId: number) {
-    const avatarMainTab = avatarTabs.find(e => e.id === currentTab.value);
-    if (!avatarMainTab) return [];
+    const avatarTab = currentSubTab.value
+    if (!avatarTab) return []
 
-    const avatarTab = avatarMainTab.tabs[secondTabId.value];
-    const figureData = Engine.getInstance()?.userInterfaceManager?.avatarImager?.Structure?.AvatarFigureData;
-    
-    const setType = figureData?.getSetByType(avatarTab.type);
-    if (!setType) return [];
+    const figureData = Engine.getInstance()?.userInterfaceManager?.avatarImager?.Structure?.AvatarFigureData
 
-    const palette = figureData?.getPalette(setType.paletteid.toString());
-    if (!palette) return [];
+    const setType = figureData?.getSetByType(avatarTab.type)
+    if (!setType) return []
 
-    const colors: any[] = [];
-    const currentColor = calculateCurrentColor(paletteId);
+    const palette = figureData?.getPalette(setType.paletteid.toString())
+    if (!palette) return []
+
+    const colors: any[] = []
+    const currentColor = calculateCurrentColor(paletteId)
 
     palette.colors.forEach((colorData: any, colorIdStr: string) => {
-        const colorId = parseInt(colorIdStr);
+        if (!colorData.selectable) return
+
+        const colorId = parseInt(colorIdStr)
         colors.push({
             isHc: colorData.club > 0,
             selected: colorId === parseInt(currentColor),
             paletteId: paletteId,
             colorId: colorId,
             backgroundColor: colorData.color
-        });
-    });
+        })
+    })
 
-    return colors;
+    return colors
 }
 
 function generatePalettes() {
-    const currentPart = calculateCurrentPart();
-    palettes.value = [];
-    
-    let colorCount = currentPart ? Math.max(1, currentPart.colors.length) : 1;
-    
+    const currentPart = calculateCurrentPart()
+    const colorCount = currentPart ? Math.max(1, currentPart.colors.length) : 1
+
+    const result: any[] = []
     for (let i = 0; i < colorCount; i++) {
-        palettes.value.push({
-            key: i,
-            colors: generatePalette(i)
-        });
+        result.push({ key: i, colors: generatePalette(i) })
     }
+    palettes.value = result
 }
 
 function generateFigureString(parts: any[]): string {
-    return parts.map(part => {
-        let str = `${part.type}-${part.id}`;
+    return normalizeLook(parts.map(part => {
+        let str = `${part.type}-${part.id}`
         if (part.colors && part.colors.length > 0) {
-            str += `-${part.colors.join('-')}`;
+            str += `-${part.colors.join('-')}`
         }
-        return str;
-    }).join('.');
+        return str
+    }).join('.'))
+}
+
+/**
+ * A look with one part per type (the last one written stays, e.g. a color changed) and only numeric colors:
+ * a colorable part without a valid color gets the first selectable color of its palette.
+ */
+function normalizeLook(figure: string): string {
+    const parts = new Map<string, string>()
+
+    for (const raw of (figure ?? '').split('.')) {
+        const [type, id, ...colors] = raw.split('-')
+        if (!type || !id || isNaN(Number(id))) continue
+
+        const validColors = colors.filter(color => color !== '' && !isNaN(Number(color)))
+        if (validColors.length === 0) {
+            const color = defaultColor(type, id)
+            if (color) validColors.push(color)
+        }
+
+        // the order of the look follows the last write of each type
+        parts.delete(type)
+        parts.set(type, [type, id, ...validColors].join('-'))
+    }
+
+    return [...parts.values()].join('.')
+}
+
+/** The first selectable color of the palette of a set, if the set is colorable. */
+function defaultColor(type: string, setId: string): string | null {
+    const figureData = Engine.getInstance()?.userInterfaceManager?.avatarImager?.Structure?.AvatarFigureData
+    const setType = figureData?.getSetByType(type)
+    const partSet = setType?.partSets?.get(setId)
+    if (!setType || !partSet?.colorable) return null
+
+    const palette = figureData?.getPalette(setType.paletteid.toString())
+    for (const [colorId, color] of palette?.colors ?? []) {
+        if ((color as any).selectable) return String(colorId)
+    }
+    return null
 }
 
 function handleChangeColor(color: any, palette: any) {
     const currentPart = calculateCurrentPart()
-    if (currentPart != null) {
-        currentPart.colors[palette.key] = color.colorId.toString()
-        look.value = generateFigureString(
-            new AvatarFigure(look.value + "." + generateFigureString([currentPart])).look
-        )
-        palette.colors.forEach((e: any) => {
-            e.selected = false
-        })
-        generateLookPreview()
-        color.selected = true
-    }
+    if (currentPart == null) return
+
+    currentPart.colors[palette.key] = color.colorId.toString()
+    look.value = generateFigureString(
+        new AvatarFigure(look.value + "." + generateFigureString([currentPart])).look
+    )
+
+    palette.colors.forEach((e: any) => e.selected = false)
+    color.selected = true
+
+    // the thumbnails are drawn with the color of the part
+    generatePartSet()
 }
 
 function saveLook() {
@@ -460,29 +425,42 @@ function saveLook() {
 }
 
 onMounted(() => {
-    setDefaultTabs()
+    currentTab.value = 'faceAndBody'
+    secondTabId.value = 0
+    setUpLookComponents()
+    generateLookPreview()
 })
 </script>
 
 <style lang="scss" scoped>
 
-.changeLookContainer {
-    width: 630px; /* Adattato per contenere le flexbox interne senza rompere l'UI */
-    height: 345px;
+/* the root of the Dialog: in the middle of the screen, never larger than it (the bottom bar is 54px) */
+.changelookUI {
+    position: fixed;
+    top: max(8px, calc(50vh - 250px));
+    left: max(8px, calc(50vw - 380px));
+    width: min(760px, calc(100vw - 16px));
+    height: min(440px, calc(100vh - 70px));
     display: flex;
     flex-direction: column;
-    background-color: transparent; /* Il background globale ora lo darà il Dialog */
+    box-sizing: border-box;
+}
+
+.changeLookContainer {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    background-color: transparent;
+    font-family: "Ubuntu", sans-serif;
 
     .tabs {
-        padding-top: 5px;
-        padding-left: 16px;
-        padding-right: 16px;
+        flex: 0 0 auto;
+        padding: 5px 16px 0;
         border-bottom: 1px solid #000;
         display: flex;
-        width: 100%;
-        justify-items: center;
-        align-items: center;
-        justify-content: left;
+        flex-wrap: wrap;
+        align-items: flex-end;
+        gap: 2px;
 
         .tab {
             text-align: center;
@@ -490,12 +468,13 @@ onMounted(() => {
             border-top-right-radius: 4px;
             border: 1px solid #000;
             border-bottom: 0;
-            padding: 3px;
+            padding: 3px 6px;
             color: #000;
             background-color: #c3c2b8;
             position: relative;
             cursor: pointer;
             user-select: none;
+            white-space: nowrap;
 
             &.active {
                 border-left: 2px solid #000;
@@ -516,40 +495,40 @@ onMounted(() => {
         }
     }
 
+    /* the subtabs, the parts, the preview and the colors: side by side, stacked on a small screen */
     .tabContainer {
-        width: 100%;
-        height: calc(100% - 33px);
-        display: flex;
-        flex-direction: row;
+        flex: 1 1 auto;
+        min-height: 0;
+        display: grid;
+        grid-template-columns: 70px minmax(0, 1fr) 150px auto;
+        grid-template-rows: minmax(0, 1fr);
+        grid-template-areas: "side parts preview colors";
+        gap: 10px;
+        padding: 5px 0;
 
         .firstChoose {
-            width: 75px;
+            grid-area: side;
             display: flex;
             flex-direction: column;
-            justify-content: center;
+            justify-content: flex-start;
             align-items: center;
-            padding: 5px;
+            gap: 6px;
+            overflow-y: auto;
 
             .chooseTab {
+                flex: 0 0 auto;
                 background-color: #cbd1d8;
                 padding: 4px;
                 width: 50px;
                 height: 50px;
                 display: flex;
                 justify-content: center;
-                align-content: center;
-                position: relative;
+                align-items: center;
                 cursor: pointer;
                 user-select: none;
-                margin: 5px;
                 border-radius: 5px;
                 box-shadow: inset 2px 2px 0 2px rgba(0, 0, 0, .25);
-
-                span {
-                    display: flex;
-                    justify-content: center;
-                    align-items: center;
-                }
+                box-sizing: border-box;
 
                 img {
                     object-fit: none;
@@ -563,46 +542,34 @@ onMounted(() => {
         }
 
         .parts {
-            width: 275px;
-            display: flex;
-            flex-direction: row;
-            flex-wrap: wrap;
+            grid-area: parts;
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(50px, 1fr));
+            grid-auto-rows: 50px;
+            align-content: start;
+            gap: 4px;
             overflow-y: auto;
             overflow-x: hidden;
-            margin: 5px 10px;
             border-radius: 5px;
-            height: calc(100% - 10px);
+            min-height: 0;
 
             .part {
-                height: 50px;
-                width: 50px;
                 background-color: #b3b5bc;
                 display: flex;
                 justify-content: center;
-                align-content: center;
-                margin: 2px;
+                align-items: center;
                 border-radius: 5px;
                 box-shadow: inset 2px 2px 0 2px rgba(0, 0, 0, .25);
                 cursor: pointer;
                 user-select: none;
-                position: relative;
-                display: flex;
-                justify-content: center;
-                align-items: center;
                 overflow: hidden;
 
                 img {
                     max-width: 90%;
                     max-height: 90%;
-                    object-fit: contain; 
+                    object-fit: contain;
+                    image-rendering: pixelated;
                     pointer-events: none;
-                }
-
-                &.loaded {
-                    img {
-                        position: static; 
-                        transform: none;
-                    }
                 }
 
                 &.selected {
@@ -613,18 +580,20 @@ onMounted(() => {
         }
 
         .lookPreview {
-            width: 150px;
-            height: calc(100% - 10px);
+            grid-area: preview;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            padding: 10px;
             background-color: #c2ced4;
             border-radius: 5px;
-            margin: 5px 10px;
+            min-height: 0;
+            box-sizing: border-box;
 
             .lookBackground {
+                flex: 1 1 auto;
+                min-height: 120px;
                 border-radius: 5px;
-                height: calc(70% - 20px);
-                margin: 10px;
-                width: calc(100% - 20px);
-                background: rgb(202, 209, 219);
                 background: radial-gradient(circle, rgba(202, 209, 219, 1) 0%, rgba(102, 113, 129, 1) 60%);
                 overflow: hidden;
                 display: flex;
@@ -635,6 +604,9 @@ onMounted(() => {
 
                 img {
                     z-index: 2;
+                    max-width: 100%;
+                    max-height: 100%;
+                    image-rendering: pixelated;
                 }
 
                 &::after {
@@ -650,16 +622,12 @@ onMounted(() => {
             }
 
             .buttonContainer {
-                height: 30%;
-                display: flex;
-                justify-content: center;
-                align-items: flex-end;
+                flex: 0 0 auto;
 
                 .saveButton {
                     border-radius: 5px;
-                    width: calc(100% - 20px);
-                    margin-bottom: 15px;
-                    height: 50px;
+                    width: 100%;
+                    height: 46px;
                     background-color: #009d2f;
                     color: #fff;
                     padding: 0 10px;
@@ -667,7 +635,7 @@ onMounted(() => {
                     border: 0;
                     outline: none;
                     font-family: "Ubuntu", sans-serif;
-                    font-size: 1.4rem;
+                    font-size: 1.3rem;
                     text-shadow: 1px 1px 0 rgba(0, 0, 0, .5);
                     box-shadow: 0 4px 0 0px rgba(0, 0, 0, 0.15), inset 0 4px 0 0px rgba(255, 255, 255, 0.15), inset 0 -4px 0 0px rgba(0, 0, 0, 0.15);
 
@@ -679,24 +647,23 @@ onMounted(() => {
         }
 
         .palettesContainer {
+            grid-area: colors;
             display: flex;
+            gap: 10px;
+            min-height: 0;
 
             .palette {
-                width: 150px;
-                margin: 5px 10px;
-                border-radius: 5px;
-                height: calc(100% - 10px);
-                display: flex;
-                flex-direction: row;
-                flex-wrap: wrap;
+                display: grid;
+                grid-template-columns: repeat(3, 36px);
+                grid-auto-rows: 36px;
+                align-content: start;
+                gap: 4px;
                 overflow-x: hidden;
                 overflow-y: auto;
+                border-radius: 5px;
 
                 .color {
-                    width: 40px;
-                    height: 40px;
                     border-radius: 5px;
-                    margin: 2px;
                     position: relative;
                     box-shadow: inset 2px 2px 0 2px rgba(0, 0, 0, .25);
                     cursor: pointer;
@@ -707,12 +674,9 @@ onMounted(() => {
 
                         &::after {
                             content: ' ';
-                            width: 30px;
-                            height: 30px;
-                            border: 2px solid #fff;
                             position: absolute;
-                            top: 3px;
-                            left: 3px;
+                            inset: 3px;
+                            border: 2px solid #fff;
                             border-radius: 5px;
                             box-shadow: inset 0 -4px 0 0px rgba(0, 0, 0, .25);
                         }
@@ -721,14 +685,77 @@ onMounted(() => {
                             content: ' ';
                             position: absolute;
                             top: 7px;
-                            left: 9px;
-                            width: 22px;
+                            left: 8px;
+                            right: 8px;
                             height: 4px;
                             border-radius: 33px;
                             background-color: rgba(255, 255, 255, .5);
                         }
                     }
                 }
+            }
+        }
+    }
+}
+
+/* tablet: the colors go under the parts, in rows that scroll sideways */
+@media (max-width: 760px) {
+    .changelookUI {
+        height: min(560px, calc(100vh - 70px));
+    }
+
+    .changeLookContainer .tabContainer {
+        grid-template-columns: 64px minmax(0, 1fr) 130px;
+        grid-template-rows: minmax(0, 1fr) auto;
+        grid-template-areas:
+            "side parts preview"
+            "colors colors colors";
+
+        .palettesContainer {
+            flex-direction: column;
+            gap: 6px;
+
+            .palette {
+                grid-template-columns: none;
+                grid-auto-flow: column;
+                grid-auto-columns: 32px;
+                grid-auto-rows: 32px;
+                overflow-x: auto;
+                overflow-y: hidden;
+                padding-bottom: 4px;
+            }
+        }
+    }
+}
+
+/* phone: everything in one column, the dialog scrolls */
+@media (max-width: 480px) {
+    .changelookUI {
+        top: 8px;
+        height: calc(100vh - 70px);
+    }
+
+    .changeLookContainer {
+        overflow-y: auto;
+
+        .tabs {
+            padding: 5px 4px 0;
+        }
+
+        .tabContainer {
+            min-height: auto;
+            grid-template-columns: 1fr;
+            grid-template-rows: auto 240px auto 220px;
+            grid-template-areas:
+                "side"
+                "parts"
+                "colors"
+                "preview";
+
+            .firstChoose {
+                flex-direction: row;
+                justify-content: center;
+                overflow-x: auto;
             }
         }
     }

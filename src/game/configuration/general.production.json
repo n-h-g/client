@@ -13,5 +13,7 @@
   "avatarEffectMapUrl": "/nitro/gamedata/json/EffectMap.json",
   "itemsResourcesUrl": "/nitro/furniture/",
   "furnidataUrl": "/nitro/gamedata/json/FurnitureData.json",
-  "itemsIconsUrl": "/nitro/icons/"
+  "itemsIconsUrl": "/nitro/icons/",
+  "avatarNitroFigurePath": "/nitro/figure",
+  "avatarNitroFigureMapUrl": "/nitro/gamedata/json/FigureMap.json"
 }

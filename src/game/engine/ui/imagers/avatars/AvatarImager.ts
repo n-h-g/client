@@ -88,15 +88,12 @@ export class AvatarImager {
     async loadAvatarAssets(avatar: Avatar) {
         for (const part of avatar.AvatarFigure.look) {
             const figurePart = avatar.AvatarFigure.getFigureDataPart(part.type);
-            if (!figurePart) {
-                return;
-            }
+            // a part unknown to the figure data: the others are loaded anyway
+            if (!figurePart) continue;
 
             const assets: Set<string> = this.getAssets(figurePart.parts);
 
-            for (const asset of assets) {
-                await this.data.loadPart(asset);
-            }
+            await Promise.all(Array.from(assets, asset => this.data.loadPart(asset)));
         }
 
         if (avatar.Actions.has(ActionId.SIGN)) {
@@ -165,6 +162,7 @@ export class AvatarImager {
         const figureComponents = avatar.AvatarFigure.getAllComponents();
         // the parts hidden by the clothes and the ones removed by the effect (e.g. the shoes in a car)
         const hiddens = [...avatar.AvatarFigure.getAllHidden(), ...(effect?.animation.removes ?? [])];
+        hiddens.push(...this.getHairHiddenTypes(figureComponents, hiddens));
 
         if (avatar.Actions.has(ActionId.SIGN)) {
             figureComponents.push(new AvatarFigureComponent({
@@ -250,6 +248,27 @@ export class AvatarImager {
         }
 
         avatar.assemble();
+    }
+
+    /**
+     * The two layers of a hair (as Habbo): "hrb" is the whole hair, "hr" the hair cut for a hat. HabboAvatarPartSets
+     * says hrb removes hr: the whole hair is drawn, unless something hides it (the hiddenLayers of a hat, e.g. a beanie
+     * hides hrb) and then the cut one is drawn under the hat. A hair without hrb sprites keeps hr.
+     */
+    private getHairHiddenTypes(components: AvatarFigureComponent[], hiddens: string[]): string[] {
+        if (hiddens.includes('hrb')) return [];
+
+        const hasWholeHair = components.some(component => {
+            if (component.part.type !== 'hrb') return false;
+
+            const assetName = this.structure.Assets?.getUniqueName('hrb', component.part.id);
+            const spritesheet = assetName ? this.data.SpriteSheets.get(assetName) : null;
+            const prefix = `h_std_hrb_${component.part.id}_`;
+
+            return !!spritesheet && Object.keys(spritesheet).some(key => key.startsWith(prefix));
+        });
+
+        return hasWholeHair ? ['hr'] : [];
     }
 
     private getFigureComponentAction(
@@ -530,14 +549,14 @@ export class AvatarImager {
             else if (component.ResourceType == 'lg')
                 avatar.LegContainer.addChild(sprite);
             else if (
-                component.ResourceType == 'hrb' ||
                 component.ResourceType == 'ha' ||
                 component.ResourceType == 'hbr'
             )
                 avatar.HatContainer.addChild(sprite);
             else if (component.ResourceType == 'he')
                 avatar.HeadAccessoryContainer.addChild(sprite);
-            else if (component.ResourceType == 'hr')
+            // the hair below the hat (hrb) goes with the hair, under the hat: in the hat container it covered it
+            else if (component.ResourceType == 'hr' || component.ResourceType == 'hrb')
                 avatar.HairContainer.addChild(sprite);
             else if (component.ResourceType == 'bd')
                 avatar.BodyContainer.addChild(sprite);

@@ -8,8 +8,8 @@ export class PaletteColor {
 
     constructor(paletteData: IPaletteColor) {
         this.index = paletteData.index;
-        this.club = paletteData.club;
-        this.selectable = paletteData.selectable;
+        this.club = Number(paletteData.club) || 0;
+        this.selectable = (paletteData.selectable as unknown) === true || Number(paletteData.selectable) === 1;
         this.color = paletteData.color;
     }
 }

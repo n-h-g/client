@@ -7,8 +7,9 @@ export class UpdateRoomData extends MessageHandler {
     handle(): void {
         const room: RoomData = this.message;
 
+        // no room (e.g. the user walked to the door): the hotel view
         if (room.id == -1) {
-            Engine.getInstance()?.roomService?.dispose();
+            Engine.getInstance()?.roomService?.leaveRoom();
             return;
         }
 

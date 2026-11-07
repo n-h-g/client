@@ -38,7 +38,7 @@ export class AvatarFigure {
         const hiddens: string[] = [];
 
         for (let part of this.figureDataParts.values()) {
-            hiddens.concat(part.hidden);
+            hiddens.push(...(part.hidden ?? []));
         }
 
         return hiddens;
@@ -107,17 +107,16 @@ export class AvatarFigure {
             for (let part of set?.parts) {
                 const colorId =
                     figurePart.colors[part.colorindex] ?? figurePart.colors[0];
+                // a part that is not colorable is drawn too, with its own colors
                 const palette = part.colorable
                     ? this.avatarStructure?.AvatarFigureData?.getPalette(
                           setType.paletteid.toString()
                       )
                     : null;
 
-                if (!palette) continue;
-
-                const paletteColor: PaletteColor | null = palette?.getColor(
-                    colorId.toString()
-                ) as PaletteColor;
+                const paletteColor = palette && colorId != null && !isNaN(colorId)
+                    ? (palette.getColor(colorId.toString()) as PaletteColor | null)
+                    : null;
 
                 const color = paletteColor?.color ?? ''
 

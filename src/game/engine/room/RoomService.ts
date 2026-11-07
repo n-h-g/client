@@ -16,6 +16,7 @@ import { FloorItem } from './objects/items/FloorItem';
 import { WallItem } from './objects/items/WallItem';
 import { ItemType } from '../../core/room/object/items/ItemType';
 import { FurnitureWallData } from './objects/items/WallItemData';
+import { InventoryItemsEventData } from '../events/ui/data/inventory/InventoryItems';
 
 export class RoomService
     extends Service<null, null>
@@ -23,8 +24,42 @@ export class RoomService
 {
     private wrappedCurrentRoom: Room;
 
+    /**
+     * The furni just placed from the inventory: when the server sends the updated inventory, the next copy of it
+     * (e.g. 10 country_fnc3) is placed right away, with the same rotation. Cancelling a placement stops it.
+     */
+    private nextPlacement: {name: string; itemType: string; direction: number | null} | null = null;
+
     constructor() {
         super();
+
+        // the server sends the whole inventory after every placement
+        EventManager.read(UIEvents.INVENTORY_ITEMS_ADDED, (data: InventoryItemsEventData) =>
+            this.continuePlacement(data)
+        );
+    }
+
+    /** A furni of the inventory was placed (sent to the server): its next copy follows. */
+    onInventoryItemPlaced(name: string, itemType: string, direction: number | null) {
+        this.nextPlacement = {name, itemType, direction};
+    }
+
+    /** The placement was cancelled (ESC, right click, out of the room): no next copy. */
+    stopPlacementChain() {
+        this.nextPlacement = null;
+    }
+
+    private continuePlacement(data: InventoryItemsEventData) {
+        const next = this.nextPlacement;
+        this.nextPlacement = null;
+
+        if (!next || !this.currentRoom) return;
+
+        // another furni is being moved/placed in the meanwhile: it stays
+        if (this.currentRoom.roomEntityRepository.isEntityRolling()) return;
+
+        const copy = data?.items?.find(item => item.name === next.name && item.item_type === next.itemType);
+        if (copy) this.startItemPlacement(copy, next.direction);
     }
 
     setRoom(
@@ -72,7 +107,7 @@ export class RoomService
         return highestZ;
     }
 
-    public async startItemPlacement(inventoryItem: any) {
+    public async startItemPlacement(inventoryItem: any, direction: number | null = null) {
         const room = this.currentRoom;
         if (!room) return;
 
@@ -94,7 +129,8 @@ export class RoomService
             : new FloorItem(inventoryItem.id.toString(), inventoryItem.name, new Point3d(0, 0, 0), base);
 
         ghost.isInventoryGhost = true;
-        if (ghost instanceof FloorItem) ghost.visualization.direction = FloorItem.DEFAULT_PLACEMENT_ROTATION;
+        // the next copy of a furni keeps the rotation chosen for the previous one
+        if (ghost instanceof FloorItem) ghost.visualization.direction = direction ?? FloorItem.DEFAULT_PLACEMENT_ROTATION;
 
         room.roomEntityRepository.add(ghost.id, ghost);
 
@@ -156,6 +192,7 @@ export class RoomService
         return model;
     }
 
+    /** Entering a room: the room UI (bottom bar, chat...) instead of the hotel view. */
     toggleUI() {
         if (Engine.getInstance().config.offlineMode) return;
 
@@ -163,7 +200,7 @@ export class RoomService
             .userInterfaceManager.componentsManager.getComponent<IComponentShowableUI>(
                 UIComponent.RoomUI
             )
-            .toggle();
+            .show();
 
         EventManager.emit<HotelViewData>(UIEvents.HOTEL_VIEW, {
             mode: false,
@@ -179,15 +216,39 @@ export class RoomService
         });
     }
 
+    /**
+     * The room is closed (another room is entered: the next one shows its UI right after). The room UI is hidden:
+     * before it was toggled, and leaving without entering another room left it shown.
+     */
     dispose(): void {
         if (!this.wrappedCurrentRoom) {
             return;
         }
 
-        this.toggleUI();
+        this.wrappedCurrentRoom.roomEntityRepository.cancelRollingEntity();
+        this.nextPlacement = null;
+
+        if (!Engine.getInstance().config.offlineMode) {
+            Engine.getInstance()
+                .userInterfaceManager.componentsManager.getComponent<IComponentShowableUI>(UIComponent.RoomUI)
+                ?.hide();
+
+            EventManager.emit<RoomUIEventData>(UIEvents.ROOM_UI, {
+                enabled: false,
+            });
+        }
 
         this.wrappedCurrentRoom.roomLayout.visualization.dispose();
         this.wrappedCurrentRoom = null;
+    }
+
+    /** Out of the room (e.g. walked to the door): back to the hotel view, as after the login. */
+    leaveRoom(): void {
+        this.dispose();
+
+        EventManager.emit<HotelViewData>(UIEvents.HOTEL_VIEW, {
+            mode: true,
+        });
     }
 
     tick(delta: number): void {

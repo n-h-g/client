@@ -22,26 +22,73 @@ export class AvatarDownloadManager {
     }
 
     async loadTexture(assetName: string): Promise<any> {
-        const url = `${
-            Engine.getInstance().config.avatarFigurePath
-        }/${assetName}/${assetName}.png`;
+        const nitroLibrary = AvatarDownloadManager.nitroLibrary(assetName);
+        const url = nitroLibrary
+            ? `${Engine.getInstance().config.avatarNitroFigurePath}/${nitroLibrary}/${nitroLibrary}.png`
+            : `${Engine.getInstance().config.avatarFigurePath}/${assetName}/${assetName}.png`;
         return await PIXI.Assets.load(url);
     }
 
-    loadSpriteSheet(part: string): Promise<any> {
-        return new Promise((resolve, reject) => {
-            try {
-                resolve(
-                    fetchJsonAsync(
-                        `${
-                            Engine.getInstance().config.avatarFigurePath
-                        }/${part}/${part}.json`
-                    )
-                );
-            } catch (e) {
-                console.log(e);
+    /**
+     * <library>/<library>.json: the spritesheet and the offsets of a figure library. Rejects when missing.
+     * A Nitro library (see NITRO_PREFIX) is converted to the format of the NHG libraries.
+     */
+    async loadSpriteSheet(part: string): Promise<any> {
+        const nitroLibrary = AvatarDownloadManager.nitroLibrary(part);
+        if (!nitroLibrary) {
+            return fetchJsonAsync(`${Engine.getInstance().config.avatarFigurePath}/${part}/${part}.json`);
+        }
+
+        const json = await fetchJsonAsync<any>(
+            `${Engine.getInstance().config.avatarNitroFigurePath}/${nitroLibrary}/${nitroLibrary}.json`
+        );
+        return AvatarDownloadManager.fromNitro(json);
+    }
+
+    /** The libraries of the Nitro figures (the ones the NHG figures do not have) are named "nitro:<library>". */
+    static readonly NITRO_PREFIX = 'nitro:';
+
+    /** The FigureMap of the Nitro figures: {libraries: [{id, parts: [{id, type}]}]}. */
+    loadNitroFigureMap(): Promise<any> {
+        return fetchJsonAsync(Engine.getInstance().config.avatarNitroFigureMapUrl);
+    }
+
+    private static nitroLibrary(name: string): string | null {
+        return name.startsWith(AvatarDownloadManager.NITRO_PREFIX)
+            ? name.substring(AvatarDownloadManager.NITRO_PREFIX.length)
+            : null;
+    }
+
+    /**
+     * A Nitro library ({name, assets: {asset: {x, y, source?}}, spritesheet: {frames: {"<name>_<asset>.png": {frame}}}})
+     * as an NHG one ({asset: {offset: "x,y", left, top, width, height} or {offset, link}}).
+     */
+    private static fromNitro(json: any): any {
+        const frames = json?.spritesheet?.frames ?? {};
+        const prefix = `${json?.name}_`;
+        const spritesheet: any = {};
+
+        for (const [name, asset] of Object.entries<any>(json?.assets ?? {})) {
+            const offset = `${asset.x ?? 0},${asset.y ?? 0}`;
+
+            if (asset.source) {
+                spritesheet[name] = {offset, link: asset.source};
+                continue;
             }
-        });
+
+            const frame = frames[`${prefix}${name}.png`]?.frame;
+            if (!frame) continue;
+
+            spritesheet[name] = {
+                offset,
+                left: String(frame.x),
+                top: String(frame.y),
+                width: String(frame.w),
+                height: String(frame.h),
+            };
+        }
+
+        return spritesheet;
     }
     /** EffectMap.json: the library of each effect id. */
     loadEffectMap(): Promise<any> {

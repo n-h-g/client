@@ -13,19 +13,22 @@ export class PartSet {
     parts: IPart[] | undefined;
 
     constructor(setData: ISet) {
+        // FigureData.json has the flags as strings ("0"/"1"): "0" is not false in JavaScript
         this.gender = setData.gender;
-        this.club = setData.club;
-        this.colorable = setData.colorable;
-        this.selectable = setData.selectable;
-        this.preselectable = setData.preselectable;
-        this.sellable = setData.sellable;
-        this.legacy = setData.legacy;
+        this.club = Number(setData.club) || 0;
+        this.colorable = PartSet.flag(setData.colorable);
+        this.selectable = PartSet.flag(setData.selectable);
+        this.preselectable = PartSet.flag(setData.preselectable);
+        this.sellable = PartSet.flag(setData.sellable);
+        this.legacy = PartSet.flag(setData.legacy);
 
         this.parts = [];
 
         this.loadParts(setData.parts);
 
-        if (setData.hidden) this.loadHiddenParts(setData.hidden);
+        // e.g. a hat that covers the hair: FigureData.json calls them hiddenLayers
+        const hidden = setData.hidden ?? setData.hiddenLayers;
+        if (hidden) this.loadHiddenParts(hidden);
     }
 
     loadParts(parts: IPart[]): void {
@@ -37,10 +40,11 @@ export class PartSet {
     }
 
     loadHiddenParts(hiddens: string[]) {
-        if (hiddens && hiddens.length > 0) {
-            for (const hidden of hiddens) {
-                hiddens.push(hidden);
-            }
-        }
+        this.hidden = [...(hiddens ?? [])];
+    }
+
+    /** A flag of FigureData: true, 1 or "1". */
+    private static flag(value: unknown): boolean {
+        return value === true || value === 1 || value === '1';
     }
 }

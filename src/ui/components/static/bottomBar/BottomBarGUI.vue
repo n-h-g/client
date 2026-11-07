@@ -410,26 +410,12 @@ function toggle(ui: string) {
     }
   }
 
+  /* the icons centered on the height of the bar, whatever their size */
   & .leftOptions {
     left: 10px;
-
-    
-
-    &:before {
-      background-image: url("@/assets/images/bottom-bar/room_infoIconLeft.png");
-      content: "";
-      position: absolute;
-      width: 6px;
-      height: 8px;
-      left: calc(50% + 3px);
-      top: 50%;
-      transform: translate(-50%, -50%);
-      z-index: 1;
-    }
-
-    &--active:before {
-      transform: translate(-50%, -50%) rotate(180deg);
-    }
+    height: 100%;
+    display: flex;
+    align-items: center;
   }
 
   & .rightOptions, .leftOptions {
@@ -448,6 +434,9 @@ function toggle(ui: string) {
       outline: none;
       filter: drop-shadow(1px 1px 0 rgba(0, 0, 0, .30));
       margin: 0 9px;
+      flex-shrink: 0;
+      background-repeat: no-repeat;
+      background-position: center;
 
       &:hover {
         top: -1px;
@@ -465,13 +454,12 @@ function toggle(ui: string) {
         background-image: url("@/assets/images/bottom-bar/inventory.png");
         width: 44px;
         height: 41px;
-        top: 5px;
       }
 
       &.catalog {
         background-image: url("@/assets/images/bottom-bar/catalog.png");
         width: 37px;
-        height: 36px
+        height: 37px;
       }
 
       &.friends {

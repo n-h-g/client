@@ -8,6 +8,7 @@ import {IFigureData} from './gamedata/IFigureData';
 import {FigureMap} from './gamedata/IFigureMap';
 import {IAvatarImageData} from './gamedata/IAvatarImageData';
 import {Texture} from 'pixi.js';
+import {Engine} from '../../../../Engine';
 import { BaseTexture, SCALE_MODES } from 'pixi.js';
 
 export class AvatarImageData implements IAvatarImageData {
@@ -51,6 +52,7 @@ export class AvatarImageData implements IAvatarImageData {
         this.figureMap = await this.AvatarDownloadManager.loadConfigFile(
             'FigureMap'
         );
+        await this.addNitroFigures();
         this.avatarActions = await this.AvatarDownloadManager.loadConfigFile(
             'HabboAvatarActions'
         );
@@ -65,6 +67,34 @@ export class AvatarImageData implements IAvatarImageData {
         );
     }
 
+    /**
+     * The parts of the figure data that the NHG figures do not have (e.g. the newer clothes), drawn with the
+     * Nitro figures: added to the FigureMap as "nitro:<library>". The NHG figures stay first.
+     */
+    private async addNitroFigures(): Promise<void> {
+        if (!this.figureMap || !Engine.getInstance().config.avatarNitroFigureMapUrl) return;
+
+        try {
+            const nitroFigureMap = await this.AvatarDownloadManager.loadNitroFigureMap();
+            let added = 0;
+
+            for (const library of nitroFigureMap?.libraries ?? []) {
+                for (const part of library.parts ?? []) {
+                    const byType = (this.figureMap[part.type] ??= {});
+                    const id = String(part.id);
+                    if (byType[id]) continue;
+
+                    byType[id] = AvatarDownloadManager.NITRO_PREFIX + library.id;
+                    added++;
+                }
+            }
+
+            console.info(`Avatar figures: ${added} parts from the Nitro figures`);
+        } catch (e) {
+            console.warn('Avatar figures: no Nitro FigureMap, only the NHG figures', e);
+        }
+    }
+
     getTexture(assetName: string): Texture | null {
         const texture = this.textures.get(assetName);
 
@@ -73,26 +103,51 @@ export class AvatarImageData implements IAvatarImageData {
         return texture;
     }
 
-    async loadTexture(assetName: string) {
-        if (!this.textures.has(assetName)) {
-            const texture = await this.AvatarDownloadManager.loadTexture(
-                assetName
-            );
-            this.textures.set(assetName, texture);
+    /** The downloads in progress: the avatars drawn together (e.g. the change look) share them. */
+    private loadingTextures = new Map<string, Promise<void>>();
+    private loadingParts = new Map<string, Promise<void>>();
+
+    /** The bitmap of a library. A missing one is not drawn: the avatar is drawn without it. */
+    loadTexture(assetName: string): Promise<void> {
+        if (this.textures.has(assetName)) return Promise.resolve();
+
+        let loading = this.loadingTextures.get(assetName);
+        if (!loading) {
+            loading = this.AvatarDownloadManager.loadTexture(assetName)
+                .then(texture => {
+                    if (texture) this.textures.set(assetName, texture);
+                })
+                .catch(e => console.warn(`Avatar library ${assetName}: no bitmap`, e))
+                .finally(() => this.loadingTextures.delete(assetName));
+            this.loadingTextures.set(assetName, loading);
         }
+
+        return loading;
     }
 
-    async loadPart(part: string) {
-        if (!this.offsets.has(part)) {
-            const offset = await this.AvatarDownloadManager.loadOffsets(part);
-            this.offsets.set(part, offset);
+    /**
+     * The spritesheet of a library (<library>/<library>.json, the offsets are in the same file): downloaded once.
+     * A missing or invalid one is remembered as empty, so its parts are skipped and it is not asked again.
+     */
+    loadPart(part: string): Promise<void> {
+        if (this.spritesheets.has(part)) return Promise.resolve();
+
+        let loading = this.loadingParts.get(part);
+        if (!loading) {
+            loading = this.AvatarDownloadManager.loadSpriteSheet(part)
+                .catch((e: unknown) => {
+                    console.warn(`Avatar library ${part}: no spritesheet`, e);
+                    return null;
+                })
+                .then((spritesheet: any) => {
+                    this.offsets.set(part, spritesheet);
+                    this.spritesheets.set(part, spritesheet);
+                })
+                .finally(() => this.loadingParts.delete(part));
+            this.loadingParts.set(part, loading);
         }
 
-        if (!this.spritesheets.has(part)) {
-            const spritesheet =
-                await this.AvatarDownloadManager.loadSpriteSheet(part);
-            this.spritesheets.set(part, spritesheet);
-        }
+        return loading;
     }
 
     async getSpriteSheet(partType: string): Promise<any> {

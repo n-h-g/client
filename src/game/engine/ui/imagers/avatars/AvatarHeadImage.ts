@@ -84,7 +84,11 @@ export class AvatarHeadImage {
                 image.destroy({children: true});
             });
 
-            imager.drawAvatar(avatar);
+            // e.g. a library that cannot be drawn: no image, not a promise that never ends
+            imager.drawAvatar(avatar).catch(e => {
+                console.warn('Avatar image of ' + figure, e);
+                resolve('');
+            });
         });
     }
 }

@@ -17,7 +17,7 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, ref, computed } from "vue";
+import { onMounted, onUnmounted, nextTick, ref, computed } from "vue";
 import { EventManager } from "../../../game/core/events/EventManager";
 import { DialogEventData } from "../../../game/engine/events/ui/data/general/Dialog";
 import { UIEvents } from "../../../game/engine/events/ui/UIEvents";
@@ -49,6 +49,36 @@ const style = computed(() => ({
   transform: `translate(${position.value.x}px, ${position.value.y}px)`,
 }));
 
+/**
+ * The position kept in the window: the whole dialog when it fits, else at least its top left corner, so the
+ * title bar (drag and close) is never out of the screen (e.g. a position saved with a larger window).
+ */
+function clamp(x: number, y: number) {
+  const element = dialog.value;
+  if (!element) return { x, y };
+
+  const rect = element.getBoundingClientRect();
+  if (rect.width === 0 && rect.height === 0) return { x, y };
+
+  // where the dialog is without the translation
+  const baseLeft = rect.left - position.value.x;
+  const baseTop = rect.top - position.value.y;
+
+  const maxLeft = Math.max(0, window.innerWidth - rect.width);
+  const maxTop = Math.max(0, window.innerHeight - rect.height);
+
+  return {
+    x: Math.min(Math.max(baseLeft + x, 0), maxLeft) - baseLeft,
+    y: Math.min(Math.max(baseTop + y, 0), maxTop) - baseTop,
+  };
+}
+
+function keepInWindow() {
+  const clamped = clamp(position.value.x, position.value.y);
+  position.value.x = clamped.x;
+  position.value.y = clamped.y;
+}
+
 function dragStart(ev: PointerEvent) {
   dragging.value = true;
 
@@ -62,8 +92,9 @@ function dragStart(ev: PointerEvent) {
 function drag(ev: PointerEvent) {
   if (!dragging.value) return;
 
-  position.value.x = ev.clientX - offset.value.x;
-  position.value.y = ev.clientY - offset.value.y;
+  const clamped = clamp(ev.clientX - offset.value.x, ev.clientY - offset.value.y);
+  position.value.x = clamped.x;
+  position.value.y = clamped.y;
 }
 
 function dragEnd() {
@@ -79,18 +110,29 @@ function dragEnd() {
 }
 
 onMounted(() => {
+  window.addEventListener("resize", keepInWindow);
+
   const saved = localStorage.getItem(`position_${props.box}`);
 
-  if (!saved) return;
+  if (saved) {
+    try {
+      const parsed = JSON.parse(saved);
 
-  try {
-    const parsed = JSON.parse(saved);
-
-    position.value.x = parsed.x ?? 0;
-    position.value.y = parsed.y ?? 0;
-  } catch (e) {
-    console.warn("Invalid saved dialog position");
+      position.value.x = parsed.x ?? 0;
+      position.value.y = parsed.y ?? 0;
+    } catch (e) {
+      console.warn("Invalid saved dialog position");
+    }
   }
+
+  // after the layout: the size of the dialog is known
+  nextTick(keepInWindow);
+});
+
+onUnmounted(() => {
+  window.removeEventListener("resize", keepInWindow);
+  window.removeEventListener("pointermove", drag);
+  window.removeEventListener("pointerup", dragEnd);
 });
 </script>
 

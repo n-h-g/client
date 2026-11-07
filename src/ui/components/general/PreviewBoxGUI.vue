@@ -80,8 +80,8 @@ EventManager.read(UIEvents.PREVIEW_BOX_MODE, (evt: PreviewModeEventData) => {
 })
 
 function isAnimated() {
-    const item = Engine.getInstance()?.roomService?.currentRoom?.roomEntityRepository?.get(entity.value.id) as Item
-    return item.base.data.visualization.type == 'furniture_animated'
+    const item = Engine.getInstance()?.roomService?.currentRoom?.roomEntityRepository?.get(entity.value.id) as Item | undefined
+    return item?.base?.data?.visualization?.type == 'furniture_animated'
 }
 
 function moveItem() {
@@ -102,8 +102,19 @@ function rotateItem() {
     })
 }
 
+/** The "Use" button: as the double click on the furni (the next state, sent to the server). */
 function useItem() {
-    
+    const item = Engine.getInstance()?.roomService?.currentRoom?.roomEntityRepository?.get(entity.value.id) as Item | undefined
+    const logic = item?.logic as { onDoubleClick?: () => void } | undefined
+
+    if (logic?.onDoubleClick) {
+        logic.onDoubleClick()
+        return
+    }
+
+    Engine.getInstance()?.networkingManager?.packetManager?.applyOut(OutgoingPacket.RoomUseItemEvent, {
+        id: entity.value.id
+    })
 }
 
 function changeLook() {

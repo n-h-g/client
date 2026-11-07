@@ -1,3 +1,4 @@
+import {ItemType} from '../ItemType';
 import {Engine} from '../../../../../Engine';
 import {EntityEvents} from '../../../../../engine/events/room/objects/entities/EntityEvents';
 import {ItemEvents} from '../../../../../engine/events/room/objects/entities/ItemEvents';
@@ -117,8 +118,15 @@ export abstract class ItemLogic extends EntityLogic implements MoveableLogic {
 
         this.roll = false;
 
-        // the server sends the real furni (AddRoomEntity) and the updated inventory
-        if (item.isInventoryGhost) this.removeGhost();
+        // the server sends the real furni (AddRoomEntity) and the updated inventory: then the next copy is placed
+        if (item.isInventoryGhost) {
+            Engine.getInstance()?.roomService?.onInventoryItemPlaced(
+                this.entity.name,
+                ItemType.FLOOR_ITEM,
+                this.entity.visualization.direction
+            );
+            this.removeGhost();
+        }
     }
 
     /**
@@ -130,6 +138,7 @@ export abstract class ItemLogic extends EntityLogic implements MoveableLogic {
         this.roll = false;
 
         if ((this.entity as Item).isInventoryGhost) {
+            Engine.getInstance()?.roomService?.stopPlacementChain();
             this.removeGhost();
             return;
         }

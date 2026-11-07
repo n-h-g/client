@@ -144,6 +144,11 @@ export class ApplicationEngine extends Application<HTMLCanvasElement> {
         this.view.style.width = window.innerWidth + 'px';
 
         this.renderer.resize(window.innerWidth, window.innerHeight);
+
+        // the viewport takes the clicks only inside its screen size (its hitArea): with the size of when it was
+        // created, a larger window (resized, devtools closed, phone rotated) had a part where nothing was clickable
+        this.wrappedViewport?.resize(window.innerWidth, window.innerHeight);
+        this.wrappedScreenCoords = new Point(window.innerWidth, window.innerHeight);
     }
 
     get viewport(): Viewport {

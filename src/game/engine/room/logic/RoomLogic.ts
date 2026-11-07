@@ -1,3 +1,4 @@
+import {ItemType} from '../../../core/room/object/items/ItemType';
 import {RoomLayout} from '../RoomLayout';
 import {Engine} from '../../../Engine';
 import {Sprite, Texture} from 'pixi.js';
@@ -200,6 +201,8 @@ export class RoomLogic implements Disposable {
                     OutgoingPacket.RoomPlaceItemEvent,
                     {id: Number(wallItem.id), wallPosition: location}
                 );
+                // the next copy of the wall furni follows (see RoomService.continuePlacement)
+                Engine.getInstance().roomService?.onInventoryItemPlaced(wallItem.name, ItemType.WALL_ITEM, null);
                 repository.delete(wallItem.id);
                 wallItem.visualization.container?.destroy({children: true});
                 repository.rollingEntity = null;

@@ -29,6 +29,8 @@ export interface ISet {
     legacy: boolean;
     parts: IPart[];
     hidden?: string[];
+    /** The name in FigureData.json (the hiddenlayers of figuredata.xml). */
+    hiddenLayers?: string[];
 }
 
 export enum Gender {
