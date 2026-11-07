@@ -47,8 +47,10 @@ export class Engine {
             backgroundColor: 0x000000,
             backgroundAlpha: 1,
             antialias: true,
-            resolution: 1,
-            autoDensity: false,
+            // the density of the screen (e.g. 1.25/1.5 on a Linux desktop scaled, 2 on a Retina): with 1 the canvas
+            // was drawn at low resolution and scaled up by the browser, blurred
+            resolution: window.devicePixelRatio || 1,
+            autoDensity: true,
             width: window.innerWidth,
             height: window.innerHeight,
             resizeTo: window,

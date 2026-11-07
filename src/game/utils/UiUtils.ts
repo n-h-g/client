@@ -1,4 +1,4 @@
-import {Matrix, Container, DisplayObject, ICanvas} from 'pixi.js';
+import {Matrix, Container, DisplayObject, ICanvas, RenderTexture} from 'pixi.js';
 import {App, Component, createApp} from 'vue';
 import {Engine} from '../Engine';
 import {UIComponent} from '../engine/ui/components/UIComponent';
@@ -90,27 +90,47 @@ export class UiUtils {
         return object.worldTransform;
     }
 
+    /*
+     * The images of the UI (avatar heads, furni previews, room thumbnails): always at density 1, as their size in the
+     * page. The renderer draws at the density of the screen: extracted directly they were 2x on a Retina screen.
+     */
+    private static withTexture1x<T>(object: DisplayObject | Container, extract: (texture: RenderTexture) => T): T {
+        const renderer = Engine.getInstance().application?.renderer;
+        const texture = renderer.generateTexture(object, {resolution: 1});
+
+        const result = extract(texture);
+
+        // a promise (image, base64) still reads the texture: destroyed when it's done
+        if (result instanceof Promise) {
+            result.finally(() => texture.destroy(true));
+        } else {
+            texture.destroy(true);
+        }
+
+        return result;
+    }
+
     static async generateImageFromObject(
         object: DisplayObject | Container
     ): Promise<HTMLImageElement> {
-        return await Engine.getInstance().application?.renderer.extract.image(
-            object
+        return await UiUtils.withTexture1x(object, texture =>
+            Engine.getInstance().application?.renderer.extract.image(texture)
         );
     }
 
     static generateCanvasFromObject(
         object: DisplayObject | Container
     ): ICanvas {
-        return Engine.getInstance().application?.renderer.extract.canvas(
-            object
+        return UiUtils.withTexture1x(object, texture =>
+            Engine.getInstance().application?.renderer.extract.canvas(texture)
         );
     }
 
     static async generateBase64FromObject(
         object: DisplayObject | Container
     ): Promise<string> {
-        return await Engine.getInstance().application?.renderer.extract.base64(
-            object
+        return await UiUtils.withTexture1x(object, texture =>
+            Engine.getInstance().application?.renderer.extract.base64(texture)
         );
     }
 

@@ -79,7 +79,8 @@ export class AvatarHeadImage {
                     image = avatar.Container;
                 }
 
-                const canvas = renderer.extract.canvas(image);
+                // at density 1 (see UiUtils): the head is as big as on a normal screen
+                const canvas = UiUtils.generateCanvasFromObject(image) as HTMLCanvasElement;
                 resolve(UiUtils.trimCanvas(canvas).toDataURL());
                 image.destroy({children: true});
             });

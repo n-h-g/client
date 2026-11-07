@@ -140,6 +140,10 @@ export class ApplicationEngine extends Application<HTMLCanvasElement> {
     }
 
     private onResize() {
+        // the density changes with the browser zoom or moving the window to another screen
+        const resolution = window.devicePixelRatio || 1;
+        if (this.renderer.resolution !== resolution) this.renderer.resolution = resolution;
+
         this.view.style.height = window.innerHeight + 'px';
         this.view.style.width = window.innerWidth + 'px';
 
