@@ -55,8 +55,22 @@
 				<!-- preview of the selected item, or the page description -->
 				<div class="catalogueInfo">
 					<template v-if="selectedItem">
-						<div class="catalogueInfoPreview">
-							<img v-if="preview" :src="preview" alt="" />
+						<div
+							class="catalogueInfoPreview"
+							:class="{ dragging: previewDragging }"
+							@pointerdown="startPreviewDrag"
+							@pointermove="movePreviewDrag"
+							@pointerup="stopPreviewDrag"
+							@pointercancel="stopPreviewDrag"
+						>
+							<img
+								v-if="preview"
+								:src="preview"
+								class="catalogueRoomPreviewImage"
+								:style="{ transform: `translate(${previewPan.x}px, ${previewPan.y}px)` }"
+								draggable="false"
+								alt=""
+							/>
 							<img v-else :src="getIconUrl(selectedItem.name)" class="catalogueInfoIcon" alt="" />
 						</div>
 						<div class="catalogueInfoText">
@@ -117,7 +131,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref } from "vue"
+import { computed, onBeforeUnmount, ref } from "vue"
 import { CataloguePageItem } from "../../../game/core/communication/incoming/catalogue/CataloguePageItem"
 import { EventManager } from "../../../game/core/events/EventManager"
 import { Engine } from "../../../game/Engine"
@@ -137,9 +151,23 @@ const currentPage = ref<any | null>(null)
 const items = ref<CataloguePageItem[]>([])
 const selectedItem = ref<CataloguePageItem | null>(null)
 const preview = ref("")
+const previewPan = ref({ x: 0, y: 0 })
+const previewDragging = ref(false)
+let previewDragStart = { pointerX: 0, pointerY: 0, panX: 0, panY: 0 }
 const search = ref("")
 const justBought = ref(false)
 let justBoughtTimer: ReturnType<typeof setTimeout> | undefined
+let previewAnimationTimer: ReturnType<typeof setInterval> | undefined
+
+function stopPreviewAnimation() {
+	if (previewAnimationTimer) clearInterval(previewAnimationTimer)
+	previewAnimationTimer = undefined
+}
+
+onBeforeUnmount(() => {
+	stopPreviewAnimation()
+	clearTimeout(justBoughtTimer)
+})
 
 // purchase confirmed by the server: short feedback on the buy button
 EventManager.read(UIEvents.CATALOG_ITEM_BOUGHT, () => {
@@ -203,6 +231,7 @@ function selectRoot(root: any) {
 }
 
 function openPage(page: any) {
+	stopPreviewAnimation()
 	currentPage.value = page
 	items.value = []
 	selectedItem.value = null
@@ -218,6 +247,7 @@ function openPage(page: any) {
 // =========================
 // the server sends all the items of the opened page: they replace the ones of the previous page
 EventManager.read(UIEvents.CATALOG_ITEMS_UPDATED, (data: CataloguePageData) => {
+	stopPreviewAnimation()
 	items.value = data.items ?? []
 	selectedItem.value = null
 	preview.value = ""
@@ -255,17 +285,57 @@ function getFurniDescription(className: string): string {
 }
 
 async function selectItem(item: CataloguePageItem) {
+	stopPreviewAnimation()
 	selectedItem.value = item
 	preview.value = ""
+	previewPan.value = { x: 0, y: 0 }
 
-	// render of the furni in its default direction (the icon is shown until it's ready)
+	// Render the offer in a room: decoration offers recolor the walls/floor,
+	// while regular furni is placed in the room. The icon stays as a fallback.
 	try {
-		const image = await FurniPreview.render(item.name)
+		const result = await FurniPreview.renderRoom(item.name, item.extraData)
 
-		if (image && selectedItem.value?.id === item.id) preview.value = image
+		if (result && selectedItem.value?.id === item.id) {
+			preview.value = result.image
+			previewPan.value = {
+				x: result.width / 2 - result.focusX,
+				y: result.height / 2 - result.focusY,
+			}
+			if (result.frames && result.frames.length > 1) {
+				let frameIndex = 1
+				previewAnimationTimer = setInterval(() => {
+					preview.value = result.frames![frameIndex]
+					frameIndex = (frameIndex + 1) % result.frames!.length
+				}, 140)
+			}
+		}
 	} catch (e) {
 		// no render: the icon stays
 	}
+}
+
+function startPreviewDrag(event: PointerEvent) {
+	if (!preview.value) return
+	previewDragging.value = true
+	previewDragStart = {
+		pointerX: event.clientX,
+		pointerY: event.clientY,
+		panX: previewPan.value.x,
+		panY: previewPan.value.y,
+	}
+	;(event.currentTarget as HTMLElement).setPointerCapture(event.pointerId)
+}
+
+function movePreviewDrag(event: PointerEvent) {
+	if (!previewDragging.value) return
+	previewPan.value = {
+		x: previewDragStart.panX + event.clientX - previewDragStart.pointerX,
+		y: previewDragStart.panY + event.clientY - previewDragStart.pointerY,
+	}
+}
+
+function stopPreviewDrag() {
+	previewDragging.value = false
 }
 
 // =========================
@@ -290,9 +360,11 @@ Engine.getInstance()?.networkingManager?.packetManager?.applyOut(OutgoingPacket.
 .catalogue {
 	position: absolute;
 	z-index: 2;
-	margin-top: 100px;
-	width: 580px;
-	height: 560px;
+	margin-top: 28px;
+	width: 840px;
+	height: 700px;
+	max-width: calc(100vw - 24px);
+	max-height: calc(100vh - 24px);
 
 	.content {
 		display: flex;
@@ -467,7 +539,7 @@ Engine.getInstance()?.networkingManager?.packetManager?.applyOut(OutgoingPacket.
 	}
 
 	.catalogueInfo {
-		flex: 0 0 150px;
+		flex: 0 0 290px;
 		display: flex;
 		align-items: center;
 		gap: 10px;
@@ -479,16 +551,35 @@ Engine.getInstance()?.networkingManager?.packetManager?.applyOut(OutgoingPacket.
 	}
 
 	.catalogueInfoPreview {
-		flex: 0 0 150px;
+		flex: 0 0 350px;
 		height: 100%;
 		display: flex;
 		align-items: center;
 		justify-content: center;
+		position: relative;
+		overflow: hidden;
+		background: #c8c8c8;
+		cursor: grab;
+		touch-action: none;
+
+		&.dragging {
+			cursor: grabbing;
+		}
 
 		img {
 			max-width: 100%;
 			max-height: 100%;
 			image-rendering: pixelated;
+		}
+
+		.catalogueRoomPreviewImage {
+			width: auto;
+			height: auto;
+			max-width: none;
+			max-height: none;
+			flex: none;
+			image-rendering: auto;
+			user-select: none;
 		}
 
 		.catalogueInfoIcon {
@@ -562,7 +653,7 @@ Engine.getInstance()?.networkingManager?.packetManager?.applyOut(OutgoingPacket.
 		img {
 			max-width: 44px;
 			max-height: 36px;
-			image-rendering: pixelated;
+			image-rendering: auto;
 		}
 	}
 

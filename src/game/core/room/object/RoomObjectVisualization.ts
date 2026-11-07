@@ -25,5 +25,5 @@ export abstract class RoomObjectVisualization {
 
 	abstract getZIndex(): number;
 
-    abstract render(): void;
+	abstract render(): void | Promise<void>;
 }

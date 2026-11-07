@@ -25,15 +25,15 @@ export class PlaneVisualization extends RoomObjectVisualization {
         throw new Error('Method not implemented.');
     }
 
-    render(): void {
-        this.getCanvasImageSource().then((img: HTMLImageElement) => {
-            this.plane.mapObjects.forEach(obj => {
-                if (obj instanceof RoomObjectController)
-                    obj.visualization?.render();
-            });
+    async render(): Promise<void> {
+        const img = await this.getCanvasImageSource();
 
-            this.applyTexture(img);
+        this.plane.mapObjects.forEach(obj => {
+            if (obj instanceof RoomObjectController)
+                obj.visualization?.render();
         });
+
+        this.applyTexture(img);
 
         this.plane.logic.registerEvents();
     }
@@ -74,7 +74,7 @@ export class PlaneVisualization extends RoomObjectVisualization {
     }
 
     
-    private applyTexture(img: HTMLImageElement) {
+    private applyTexture(img: CanvasImageSource) {
         const container = this.getCanvas();
         if (!this.useTexture || !img) return;
 

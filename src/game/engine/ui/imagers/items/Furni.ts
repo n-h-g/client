@@ -333,6 +333,12 @@ export class Furni extends RoomObjectSprite {
 		this.updateSprites(false, this.animation); 
 	}
 
+	/** Set an exact animation tick, used by catalogue previews to capture a deterministic loop. */
+	setFrame(frame: number) {
+		this.frame = Math.max(0, Math.floor(frame));
+		this.updateSprites(false, this.animation);
+	}
+
 	/**
 	 * Depth of each drawn layer from the furni origin (see RoomDepth.ofLayer). The shadow is not included.
 	 */

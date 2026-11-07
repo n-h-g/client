@@ -110,7 +110,7 @@ function openPage(page: any) {
 	img {
 		max-width: 20px;
 		max-height: 20px;
-		image-rendering: pixelated;
+		image-rendering: auto;
 	}
 }
 

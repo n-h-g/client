@@ -83,9 +83,11 @@ export class RoomVisualization implements Disposable {
         this.container.destroy();
     }
 
-    render() {
-        this.roomLayout.getWallPlane().visualization?.render();
-        this.roomLayout.getFloorPlane().visualization?.render();
+    async render(): Promise<void> {
+        await Promise.all([
+            this.roomLayout.getWallPlane().visualization?.render(),
+            this.roomLayout.getFloorPlane().visualization?.render(),
+        ]);
     }
 
     tileToLocal(x: number, y: number, z: number): Point {
