@@ -12,7 +12,9 @@ export class AvatarData {
      * calibrated on wl_sofa (height 1.1) and chair_norja (height 1.0).
      */
     // 42 with the previous anchor (2px higher): same position (Nitro uses scale / 2 = 32)
-    static AVATAR_SIT_OFFSET = 13.5;
+    static AVATAR_SIT_OFFSET = 32;
+    /** Floor sitting uses its own alignment; AVATAR_SIT_OFFSET is calibrated for seats. */
+    static AVATAR_SIT_FLOOR_OFFSET = 13.5;
 
     /**
      * Laying avatars use the "horizontal" canvas (HabboAvatarGeometry.json: 128 x 80, dx 30): as in Nitro

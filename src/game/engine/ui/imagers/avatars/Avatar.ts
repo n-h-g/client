@@ -54,6 +54,7 @@ export class Avatar {
     private ui: boolean;
     private danceStyle: number;
     private signValue: number;
+    private onFurni: boolean;
     /** The effect drawn with the avatar (loaded), null without effect. */
     private effect: AvatarEffect | null = null;
     private directionOffset = 0;
@@ -69,7 +70,8 @@ export class Avatar {
         placeholder = false,
         ui: boolean = false,
         danceStyle = 1,
-        signValue = 1
+        signValue = 1,
+        onFurni = false
     ) {
         this.avatarFigure = new AvatarFigure(figure);
 
@@ -83,6 +85,7 @@ export class Avatar {
         this.ui = ui;
         this.danceStyle = danceStyle;
         this.signValue = signValue;
+        this.onFurni = onFurni;
 
         this.actions = actions;
 
@@ -236,6 +239,10 @@ export class Avatar {
 
     get Actions() {
         return this.actions;
+    }
+
+    get OnFurni(): boolean {
+        return this.onFurni;
     }
 
     set Direction(direction: Direction) {

@@ -24,10 +24,10 @@ import { Graphics } from 'pixi.js';
 
 
 export abstract class HumanVisualization extends EntityVisualization {
-    entity: Human = null;
-	actions: Set<ActionId>;
-    danceStyle = 1;
-    signValue = 1;
+    public entity: Human = null;
+	protected actions: Set<ActionId>;
+    protected danceStyle = 1;
+    protected signValue = 1;
 
     protected avatar: Avatar;
     protected headDirection: Direction = Direction.SOUTH;
@@ -59,7 +59,7 @@ export abstract class HumanVisualization extends EntityVisualization {
                 this.getAvatarHeadDirection(),
                 this.actions,
                 this.frame,
-                0, false, false, false, this.danceStyle, this.signValue
+                0, false, false, false, this.danceStyle, this.signValue, this.onFurni
             );
 
             Engine.getInstance()
@@ -207,7 +207,7 @@ export abstract class HumanVisualization extends EntityVisualization {
                 this.getAvatarHeadDirection(),
                 this.getDrawActions(),
                 this.frame,
-                0, false, false, false, this.danceStyle, this.signValue
+                0, false, false, false, this.danceStyle, this.signValue, this.onFurni
             );
             this.avatar.Effect = this.effect;
         } else {
@@ -547,7 +547,12 @@ export abstract class HumanVisualization extends EntityVisualization {
      * @see AvatarData.AVATAR_LAY_OFFSET_X
      */
     private getPostureOffset(): Point {
-        if (this.actions?.has(ActionId.SIT)) return new Point(0, AvatarData.AVATAR_SIT_OFFSET);
+        if (this.actions?.has(ActionId.SIT)) {
+            const sitOffset = this.onFurni
+                ? AvatarData.AVATAR_SIT_OFFSET
+                : AvatarData.AVATAR_SIT_FLOOR_OFFSET;
+            return new Point(0, sitOffset);
+        }
         if (!this.actions?.has(ActionId.LAY)) return new Point(0, 0);
 
         // the laying sprites exist only for direction 2 and its mirror 4 (see AvatarSpriteComponent)

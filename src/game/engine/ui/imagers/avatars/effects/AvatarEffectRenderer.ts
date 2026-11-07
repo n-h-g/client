@@ -91,7 +91,11 @@ export class AvatarEffectRenderer {
         if (!asset) return;
 
         // a static sprite stays on the floor when the avatar (its container) is drawn lower to sit
-        if (data.hasStaticY && avatar.Actions.has(ActionId.SIT)) dy -= AvatarData.AVATAR_SIT_OFFSET;
+        if (data.hasStaticY && avatar.Actions.has(ActionId.SIT)) {
+            dy -= avatar.OnFurni
+                ? AvatarData.AVATAR_SIT_OFFSET
+                : AvatarData.AVATAR_SIT_FLOOR_OFFSET;
+        }
 
         const sprite = this.createSprite(asset, asset.flipH, dx, dy);
         sprite.zIndex = data.getDirectionOffsetZ(direction) < 0 ? Z_INDEX.spriteUnder : Z_INDEX.spriteOver;

@@ -456,9 +456,15 @@ export class RoomEntityRepository extends Repository<string, Entity> {
         });
 
         for (const {entity, footprint} of items) {
+            // A furni's front layers can visually overlap an avatar standing on
+            // the neighboring tile (e.g. the table edge over someone on the
+            // chair behind it). Include adjacent tiles as candidates; the layer
+            // depth check in ItemVisualization decides whether it is actually
+            // in front of that avatar.
+            const overlap = 1;
             const humansOnItem = humans.filter(human =>
-                human.tileX >= footprint.minX && human.tileX <= footprint.maxX &&
-                human.tileY >= footprint.minY && human.tileY <= footprint.maxY);
+                human.tileX >= footprint.minX - overlap && human.tileX <= footprint.maxX + overlap &&
+                human.tileY >= footprint.minY - overlap && human.tileY <= footprint.maxY + overlap);
 
             (entity.visualization as unknown as FrontLayersVisualization).updateFrontLayers(humansOnItem);
         }
