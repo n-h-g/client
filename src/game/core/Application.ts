@@ -12,6 +12,8 @@ import { Entity } from './room/object/entities/Entity';
 export class ApplicationEngine extends Application<HTMLCanvasElement> {
     private engine: Engine;
     private lastFrameTime: number;
+    /** A pause of the game loop longer than this is a page that was hidden (no animation frames). */
+    private static readonly RESUME_GAP_MS = 1000;
     private timeElapsed = 0;
     private wrappedViewport: Viewport;
     private debugInfoContainer: Container;
@@ -97,6 +99,9 @@ export class ApplicationEngine extends Application<HTMLCanvasElement> {
             this.timeElapsed = currentTime - this.lastFrameTime;
 
             if (this.timeElapsed > fpsInterval) {
+                // the loop was stopped (another tab, the window covered...): the room is shown as it is now
+                if (this.timeElapsed > ApplicationEngine.RESUME_GAP_MS) this.engine.roomService.onResume();
+
                 this.engine.roomService.tick(this.timeElapsed);
                 this.lastFrameTime = currentTime;
             }

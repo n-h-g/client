@@ -70,7 +70,10 @@ export class UpdateEntity extends MessageHandler {
                 const isWalking =
                     entityData.action?.actions?.includes(ActionId.WALK) ?? false;
 
-                if (entityData.type == EntityType.ITEM || (entityData.action && !isWalking)) {
+                // after a pause of the page the moves arrive in a burst: not animated (see RoomService.onResume)
+                const catchingUp = Engine.getInstance().roomService?.isCatchingUp ?? false;
+
+                if (entityData.type == EntityType.ITEM || (entityData.action && !isWalking) || catchingUp) {
                     entity.visualization.snapToNextPosition();
                 }
 

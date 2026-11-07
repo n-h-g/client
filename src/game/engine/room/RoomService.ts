@@ -251,6 +251,27 @@ export class RoomService
         });
     }
 
+    /** Until this time (performance.now) the positions of the server are applied without animation. */
+    private catchUpUntil = 0;
+    /** After a pause, the moves the server sent in the meanwhile arrive in a burst: this long. */
+    private static readonly CATCH_UP_MS = 1500;
+
+    /**
+     * The game loop starts again after a pause (the tab was hidden, the window covered): the browser didn't
+     * animate the room, but the server went on. As Habbo the room is shown as it is now: the walking avatars
+     * go to their position at once, and the moves of the server that arrive in a burst are not animated
+     * (they were replayed fast, the avatar walked the whole path at once).
+     */
+    onResume(): void {
+        this.catchUpUntil = performance.now() + RoomService.CATCH_UP_MS;
+        this.wrappedCurrentRoom?.roomEntityRepository.snapWalkingHumans();
+    }
+
+    /** The positions of the server are applied without animation (see onResume). */
+    get isCatchingUp(): boolean {
+        return performance.now() < this.catchUpUntil;
+    }
+
     tick(delta: number): void {
         this.wrappedCurrentRoom?.roomLayout.logic.tick(delta);
         this.wrappedCurrentRoom?.roomEntityRepository.tick(delta);

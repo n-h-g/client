@@ -375,6 +375,20 @@ export class RoomEntityRepository extends Repository<string, Entity> {
     }
 
     /**
+     * The walking avatars go at once to the position the server gave them (see RoomService.onResume).
+     * Only them: the others may have never got a next position from the server.
+     */
+    snapWalkingHumans(): void {
+        this.getAll().forEach((entity: Entity) => {
+            // structural check: Human can't be imported here without an import cycle
+            if (!('figure' in entity)) return;
+
+            const actions = (entity.visualization as {actions?: Set<ActionId>}).actions;
+            if (actions?.has(ActionId.WALK)) entity.visualization.snapToNextPosition();
+        });
+    }
+
+    /**
      * The base Z of the furni an avatar at x, y, z sits/lays on: the highest floor item on its tile that is not
      * above it (e.g. the bed, not the rug under the bed). Null if there is no furni there.
      */
