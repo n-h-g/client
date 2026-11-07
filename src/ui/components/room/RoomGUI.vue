@@ -70,6 +70,8 @@ const CHAT_HEIGHT_PERCENTAGE = 0.4
 /** Nitro's normal scroll speed: the bubbles go up by MOVE_AMOUNT every SCROLL_SPEED ms. */
 const SCROLL_SPEED = 6000
 const MOVE_AMOUNT = 15
+/** Space between the head of the avatar and a bubble born over it. */
+const CHAT_HEAD_MARGIN = 8
 
 let chatMessageCounter = 0
 
@@ -92,6 +94,14 @@ function setBubbleElement(message: UIChatBubble, element: HTMLElement | null) {
 function onHeadLoad(event: Event) {
     const image = event.target as HTMLImageElement
     image.style.width = Math.round(image.naturalWidth / 2) + 'px'
+}
+
+/** Screen y of the top of the avatar (its head, hat, effect). */
+function avatarScreenTop(data: RoomChatData): number | null {
+    const container = data.author?.visualization?.container as Container | undefined
+    if (!container || container.destroyed) return null
+
+    return container.getBounds().y
 }
 
 /** Screen x of the avatar: its container is pivoted at the feet, in the middle of the avatar. */
@@ -133,7 +143,11 @@ EventManager.read(UIEvents.ROOM_NEW_MESSAGE, async (data: RoomChatData) => {
     bubble.width = element.offsetWidth
     bubble.height = element.offsetHeight
     bubble.left = Math.max(0, Math.min(window.innerWidth - bubble.width, bubble.locationX - bubble.width / 2))
+    // on the bottom line of the chat strip, as Nitro, but never under the avatar that talks
+    // (e.g. an avatar high in the screen, with the camera moved): then just over its head
+    const headTop = avatarScreenTop(data)
     bubble.top = chatHeight.value - bubble.height
+    if (headTop != null) bubble.top = Math.min(bubble.top, headTop - bubble.height - CHAT_HEAD_MARGIN)
 
     makeRoom(bubble)
     bubble.ready = true

@@ -9,8 +9,43 @@ import {Human} from '../Human';
 import {HumanVisualization} from '../visualization/HumanVisualization';
 
 export abstract class HumanLogic extends EntityLogic {
+    /** Nitro's AvatarLogic: a blink every 4.5 - 5.5 s, the eyes closed for 50 - 250 ms. */
+    private static readonly BLINK_INTERVAL = 4500;
+    private static readonly BLINK_INTERVAL_RANDOM = 1000;
+    private static readonly BLINK_DURATION = 50;
+    private static readonly BLINK_DURATION_RANDOM = 200;
+
+    /** Time (ms) to the next blink and, while blinking, to the end of it. */
+    private nextBlink = HumanLogic.randomBlinkInterval();
+    private blinkEnd = 0;
+
     constructor(human: Human) {
         super(human);
+    }
+
+    private static randomBlinkInterval(): number {
+        return HumanLogic.BLINK_INTERVAL + Math.random() * HumanLogic.BLINK_INTERVAL_RANDOM;
+    }
+
+    /** The avatar closes its eyes for an instant now and then (as Habbo). */
+    private updateBlink(delta: number): void {
+        const humanVisualization = this.entity.visualization as HumanVisualization;
+
+        if (this.blinkEnd > 0) {
+            this.blinkEnd -= delta;
+            if (this.blinkEnd <= 0) {
+                this.blinkEnd = 0;
+                humanVisualization.setBlink(false);
+            }
+            return;
+        }
+
+        this.nextBlink -= delta;
+        if (this.nextBlink > 0) return;
+
+        this.nextBlink = HumanLogic.randomBlinkInterval();
+        this.blinkEnd = HumanLogic.BLINK_DURATION + Math.random() * HumanLogic.BLINK_DURATION_RANDOM;
+        humanVisualization.setBlink(true);
     }
 
     protected registerLogicEvents(): void {
@@ -28,6 +63,8 @@ export abstract class HumanLogic extends EntityLogic {
     tick(delta: number): void {
         const humanVisualization = this.entity
             .visualization as HumanVisualization;
+
+        this.updateBlink(delta);
 
         if (humanVisualization.needsUpdate) {
             this.frameTracker += delta;

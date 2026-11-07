@@ -37,6 +37,12 @@ function sendMessage(e) {
 
 	typed.value = false
 	message.value = ""
+
+	// the others stop seeing the typing bubble
+	Engine.getInstance().networkingManager.packetManager.applyOut(OutgoingPacket.UserTypeStatus, {
+		roomId: Engine.getInstance().roomService.currentRoom?.id,
+		typing: false
+	})
 }
 
 function onInput() {

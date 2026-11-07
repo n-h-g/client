@@ -24,6 +24,18 @@ export abstract class Item extends Entity {
      * its id is the inventory item id, not the id of a room entity.
      */
     isInventoryGhost = false;
+    /**
+     * The stack height of the server (what is placed on this item goes at its Z + this height): null for the
+     * furni not sent by the server (e.g. the preview from the inventory), that use the height of the Nitro data.
+     */
+    stackHeight: number | null = null;
+    /** Something can be placed on this furni (the server's items_base.allow_stack, e.g. not on many chairs). */
+    allowStack = true;
+
+    /** The height used to stack the furni on this one: the server's, else the logic height of the furni. */
+    getStackHeight(): number {
+        return this.stackHeight ?? this.base?.getLogicDimension(2) ?? 0;
+    }
 
     constructor(
         id: string,

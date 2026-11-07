@@ -3,7 +3,7 @@ import {Entity} from '../../core/room/object/entities/Entity';
 import {Point3d} from '../../utils/point/Point3d';
 import {EntityEvents} from '../events/room/objects/entities/EntityEvents';
 import {Point} from '../../utils/point/Point';
-import type {Item} from './objects/items/Item';
+import type {Item, ItemFootprint} from './objects/items/Item';
 import type {FloorItem} from './objects/items/FloorItem';
 import type {FloorPlane} from './objects/map/FloorPlane';
 import {TileType} from './objects/map/TileTypeEnum';
@@ -237,13 +237,16 @@ export class RoomEntityRepository extends Repository<string, Entity> {
 
     /**
      * Same check of the server (Room.canPlaceItemAt): all the tiles of the footprint inside the room,
-     * not holes and not the door. The tiles removed by a floor hole furni are holes too.
+     * not holes, not the door and without an avatar on them (a furni is not placed under someone).
+     * The tiles removed by a floor hole furni are holes too.
      */
     private canPlaceAt(item: FloorItem, x: number, y: number, direction: number): boolean {
         if (!this.floorPlane) return true;
 
         const footprint = item.getFootprintAt(x, y, direction);
         const door = this.floorPlane.room.getDoorPosition();
+        const blocked = this.getAvatarTilesNotUnder(item);
+        const notStackable = this.getNotStackableTiles(item);
 
         for (let tileX = footprint.minX; tileX <= footprint.maxX; tileX++) {
             for (let tileY = footprint.minY; tileY <= footprint.maxY; tileY++) {
@@ -252,10 +255,68 @@ export class RoomEntityRepository extends Repository<string, Entity> {
                 if (!tile || tile.type === TileType.Hole || tile.type === TileType.Door) return false;
                 if (tile.coveredByFloorHole) return false;
                 if (door && door.x === tileX && door.y === tileY) return false;
+                if (blocked.has(`${tileX},${tileY}`)) return false;
+                if (notStackable.has(`${tileX},${tileY}`)) return false;
             }
         }
 
         return true;
+    }
+
+    /**
+     * The tiles whose highest furni doesn't allow stacking (as the server, Room.canPlaceItemAt): nothing can be
+     * placed there. The furni that is being placed/moved doesn't count.
+     */
+    private getNotStackableTiles(item: FloorItem): Set<string> {
+        const tops = new Map<string, {top: number; allowStack: boolean}>();
+
+        this.getAll().forEach((entity: Entity) => {
+            const other = entity as unknown as Partial<Item>;
+            if (entity === item || typeof other.getFootprint !== 'function' || other.isInventoryGhost) return;
+
+            const footprint = other.getFootprint();
+            if (!footprint) return;
+
+            const top = Math.max(entity.position.z, 1) + (other.getStackHeight?.() ?? 0);
+
+            for (let x = footprint.minX; x <= footprint.maxX; x++) {
+                for (let y = footprint.minY; y <= footprint.maxY; y++) {
+                    const key = `${x},${y}`;
+                    const current = tops.get(key);
+                    if (!current || top > current.top) tops.set(key, {top, allowStack: other.allowStack !== false});
+                }
+            }
+        });
+
+        const tiles = new Set<string>();
+        tops.forEach((value, key) => { if (!value.allowStack) tiles.add(key); });
+
+        return tiles;
+    }
+
+    /**
+     * The tiles with an avatar, but the ones under the furni that is being moved (as the server: who is
+     * on it, e.g. sitting on it, doesn't block its move).
+     */
+    private getAvatarTilesNotUnder(item: FloorItem): Set<string> {
+        const start = !item.isInventoryGhost && this.rollingStartPosition && this.rollingStartDirection !== null
+            ? item.getFootprintAt(this.rollingStartPosition.x, this.rollingStartPosition.y, this.rollingStartDirection)
+            : null;
+
+        const tiles = new Set<string>();
+
+        this.getAll().forEach((entity: Entity) => {
+            // structural check: Human can't be imported here without an import cycle
+            if (!('figure' in entity)) return;
+
+            const x = Math.round(entity.position.x);
+            const y = Math.round(entity.position.y);
+            const underItem = start && x >= start.minX && x <= start.maxX && y >= start.minY && y <= start.maxY;
+
+            if (!underItem) tiles.add(`${x},${y}`);
+        });
+
+        return tiles;
     }
 
     /** The visualization of a floor furni, that can be shown as its icon while it's placed. */
@@ -295,7 +356,8 @@ export class RoomEntityRepository extends Repository<string, Entity> {
 
             if (!overlaps) return;
 
-            const top = Math.max(other.position.z, 1) + (otherItem.base?.getLogicDimension(2) ?? 0);
+            // the height of the server: the preview goes where the server will put the furni
+            const top = Math.max(other.position.z, 1) + (otherItem.getStackHeight?.() ?? 0);
             height = Math.max(height, top);
         });
 
@@ -313,12 +375,51 @@ export class RoomEntityRepository extends Repository<string, Entity> {
     }
 
     /**
+     * The base Z of the furni an avatar at x, y, z sits/lays on: the highest floor item on its tile that is not
+     * above it (e.g. the bed, not the rug under the bed). Null if there is no furni there.
+     */
+    getRestingItemZ(x: number, y: number, z: number): number | null {
+        const tileX = Math.round(x);
+        const tileY = Math.round(y);
+        let base: number | null = null;
+
+        this.getAll().forEach((entity: Entity) => {
+            const item = entity as unknown as Partial<Item>;
+            if (typeof item.getFootprint !== 'function' || item.isInventoryGhost) return;
+
+            const footprint = item.getFootprint();
+            if (!footprint || tileX < footprint.minX || tileX > footprint.maxX || tileY < footprint.minY || tileY > footprint.maxY) return;
+
+            const itemZ = entity.position.z;
+            if (itemZ > z + 0.01) return;
+
+            if (base === null || itemZ > base) base = itemZ;
+        });
+
+        return base;
+    }
+
+    /**
      * The layers of the floor items in front of the avatars on them are drawn over those avatars
      * (e.g. the front of a bath with an avatar sitting in it). To call when a floor item or an avatar
      * changes position, and after the zIndex of the avatars is calculated.
      */
     refreshFrontLayers() {
-        const humans: {x: number; y: number; depth: number; zIndex: number}[] = [];
+        const items: {entity: Entity; footprint: ItemFootprint}[] = [];
+
+        this.getAll().forEach((entity: Entity) => {
+            const item = entity as unknown as Partial<Item>;
+            const visualization = entity.visualization as unknown as Partial<FrontLayersVisualization>;
+            if (typeof item.getFootprint !== 'function' || typeof visualization?.updateFrontLayers !== 'function') return;
+
+            // a furni that is being moved is drawn as one piece
+            const footprint = item.isInventoryGhost || entity === this.rollingEntity ? null : item.getFootprint();
+
+            if (footprint) items.push({entity, footprint});
+            else visualization.updateFrontLayers([]);
+        });
+
+        const humans: {tileX: number; tileY: number; depth: number; zIndex: number}[] = [];
 
         this.getAll().forEach((entity: Entity) => {
             // structural check: Human can't be imported here without an import cycle
@@ -330,29 +431,24 @@ export class RoomEntityRepository extends Repository<string, Entity> {
             const {x, y, z} = entity.position;
 
             humans.push({
-                x: Math.round(x),
-                y: Math.round(y),
+                tileX: Math.round(x),
+                tileY: Math.round(y),
+                // as Nitro (RoomMessageHandler: status.z + sit height) a sitting/laying avatar is at the height of
+                // the seat, that the server gives it: e.g. on a 3 seats sofa the cushion of its own seat (z 1000)
+                // stays behind it and only the seats in front of it (z 2000) cover it
                 depth: RoomDepth.of(x, y, z) + relativeDepth,
                 zIndex: container.zIndex,
             });
         });
 
-        this.getAll().forEach((entity: Entity) => {
-            const item = entity as unknown as Partial<Item>;
-            const visualization = entity.visualization as unknown as Partial<FrontLayersVisualization>;
-            if (typeof item.getFootprint !== 'function' || typeof visualization?.updateFrontLayers !== 'function') return;
+        for (const {entity, footprint} of items) {
+            const humansOnItem = humans.filter(human =>
+                human.tileX >= footprint.minX && human.tileX <= footprint.maxX &&
+                human.tileY >= footprint.minY && human.tileY <= footprint.maxY);
 
-            // a furni that is being moved is drawn as one piece
-            const footprint = item.isInventoryGhost || entity === this.rollingEntity ? null : item.getFootprint();
-
-            visualization.updateFrontLayers(footprint
-                ? humans.filter(human =>
-                    human.x >= footprint.minX && human.x <= footprint.maxX &&
-                    human.y >= footprint.minY && human.y <= footprint.maxY)
-                : []);
-        });
+            (entity.visualization as unknown as FrontLayersVisualization).updateFrontLayers(humansOnItem);
+        }
     }
-
 
     /**
      * Removes from the floor the tiles under the open floor hole furni (as Nitro's FurnitureFloorHoleLogic).

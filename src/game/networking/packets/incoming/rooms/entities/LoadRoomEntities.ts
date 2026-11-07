@@ -29,6 +29,8 @@ export class LoadRoomEntities extends MessageHandler {
             .setState(data.interaction)
                 .setUser(data.user)
                 .setEffect(data.effect)
+                .setItem(data.item)
+                .setActions(data.action)
                 .build()
                 .then((entity: Entity) => {
                     Engine.getInstance().roomService?.currentRoom?.roomEntityRepository.add(

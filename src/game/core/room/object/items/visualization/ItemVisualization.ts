@@ -336,8 +336,30 @@ export abstract class ItemVisualization
                 this.entity.position.y + compareY,
                 this.entity.position.z
             ),
-            RoomPriority.ROOM_ITEM
+            this.isFlatFloorItem() ? RoomPriority.FLOOR_ITEM : RoomPriority.ROOM_ITEM
         );
+    }
+
+    /** Margin over the tiles of a flat furni for its thickness (e.g. the edge of a rug). */
+    private static readonly FLAT_ITEM_MARGIN = 16;
+
+    /**
+     * A furni that is part of the floor (a rug, val11_floor, party_floor): no height in its logic and an image
+     * not taller than its tiles. It's drawn with the floor, under the tile pointer (as Habbo).
+     * The height alone is not enough: e.g. party_tube_bubble has no height but it's a tall tube.
+     */
+    private isFlatFloorItem(): boolean {
+        const base = (this.entity as Item).base;
+        const container = (this.sprite as Furni | undefined)?.container;
+        if (!base || !container || base.getLogicDimension(2) > 0.01) return false;
+
+        const imageHeight = container.getLocalBounds().height;
+        if (imageHeight <= 0) return false;
+
+        // the height of the rhombus of its tiles: half a tile height for each tile along x and y
+        const tilesHeight = (base.getLogicDimension(0) + base.getLogicDimension(1)) * MapData.tileHeight / 2;
+
+        return imageHeight <= tilesHeight + ItemVisualization.FLAT_ITEM_MARGIN;
     }
 
     public getimagePreview(): string {

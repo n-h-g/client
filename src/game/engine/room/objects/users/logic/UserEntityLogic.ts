@@ -49,6 +49,9 @@ export class UserEntityLogic extends HumanLogic {
     onToggleTyping(typing): void {
         this.typing = typing;
         this.showLabel = false;
+
+        // the bubble over the head of the avatar, for everybody in the room
+        (this.entity.visualization as UserEntityVisualization).setTyping(!!typing);
     }
 
     onTalk(length?: number): void {

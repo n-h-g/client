@@ -1,6 +1,5 @@
 <template>
     <div id="avatarContainerGui" ref="avatarContainerGui" v-bind:style="{top: bounds.y + 'px', left: bounds.x + 'px'}">
-        <img src="~@/assets/images/chat/typing.png" :class="{hidden: !typing}" class="typing"/>
         <div class="label" :class="{hidden: !showLabel}">{{ label }}</div>
     </div>
 </template>

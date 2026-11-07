@@ -6,6 +6,8 @@ import {UserEntity} from '../../../../engine/room/objects/users/UserEntity';
 import {FurnidataItemType} from '../../../../engine/ui/imagers/items/enum/FurniDataItemType';
 import {Point3d} from '../../../../utils/point/Point3d';
 import {AspectComponent} from './components/AspectComponent';
+import {ActionsComponent} from './components/ActionsComponent';
+import {ActionId} from '../../../../engine/ui/imagers/avatars/enum/actions/ActionId';
 import {HeadBodyRotationComponent} from './components/HeadBodyRotation';
 import {PositionComponent} from './components/PositionComponent';
 import {UserComponent} from './components/UserComponent';
@@ -27,6 +29,9 @@ export class EntityBuilder {
     private figure?: AspectComponent;
     private wallPosition?: string;
     private effectId = 0;
+    private actions?: ActionsComponent;
+    private stackHeight: number | null = null;
+    private allowStack = true;
 
     setId(id: string): EntityBuilder {
         this.id = id;
@@ -80,6 +85,22 @@ export class EntityBuilder {
         return this;
     }
 
+    /** A furni: the stack height of the server and if something can be placed on it. */
+    setItem(item?: {height?: number; allowStack?: boolean}): EntityBuilder {
+        this.stackHeight = typeof item?.height === 'number' ? item.height : null;
+        this.allowStack = item?.allowStack ?? true;
+        return this;
+    }
+
+    /**
+     * The actions of a human when it's loaded (e.g. a user already sitting or dancing when the room is entered):
+     * without them it was drawn standing (with its shadow) until its next update.
+     */
+    setActions(actions?: ActionsComponent): EntityBuilder {
+        this.actions = actions;
+        return this;
+    }
+
     /** The avatar effect of a human. */
     setEffect(effect?: {id: number}): EntityBuilder {
         this.effectId = effect?.id ?? 0;
@@ -99,6 +120,19 @@ export class EntityBuilder {
     async build(): Promise<Entity> {
         const entity = await this.getEntityInstance();
         return entity;
+    }
+
+    private applyActions(visualization: HumanVisualization): void {
+        if (!this.actions) return;
+
+        visualization.danceStyle = this.actions.danceStyle ?? 1;
+        visualization.signValue = this.actions.signValue ?? 1;
+        visualization.onFurni = this.actions.onFurni ?? false;
+
+        // a user walking goes on with the next updates of the server: here it stands
+        for (const action of this.actions.actions ?? []) {
+            if (action !== ActionId.WALK) visualization.addAction(action);
+        }
     }
 
     private async getEntityInstance(): Promise<Entity> {
@@ -121,6 +155,7 @@ export class EntityBuilder {
                 if (this.bodyRotation != null) visualization.direction = this.bodyRotation;
                 if (this.headRotation != null) visualization.headRotation = this.headRotation;
                 visualization.setEffect(this.effectId);
+                this.applyActions(visualization);
             }
         } else if (this.type == EntityType.ITEM) {
             const isWallItem = !!this.wallPosition || this.position == null;
@@ -139,6 +174,8 @@ export class EntityBuilder {
                 }
 
                 (entity.visualization as ItemVisualization).state = this.state;
+                (entity as FloorItem).stackHeight = this.stackHeight;
+                (entity as FloorItem).allowStack = this.allowStack;
             } else {
                 const wallData = this.wallPosition
                     ? FurnitureWallData.fromLocation(this.wallPosition)

@@ -7,6 +7,8 @@ export enum RoomPriority {
     DOOR_WALL = 8,
     WALL = 7,
     FLOOR = 5,
+    /** The flat furni on the floor (rugs, floor tiles as val11_floor): over the floor, under the tile pointer. */
+    FLOOR_ITEM = 5.5,
     PLAYER_SHADOW = 8,
     WALL_ITEM = 9,
     POINTER = 6,

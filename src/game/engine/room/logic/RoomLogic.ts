@@ -82,6 +82,12 @@ export class RoomLogic implements Disposable {
             this.onCameraMove.bind(this)
         );
 
+        // the clicks out of the room (on nothing): the room container gets only the clicks on what it draws
+        Engine.getInstance().application.viewport.on(
+            'pointerdown',
+            this.onViewportPointerDown.bind(this)
+        );
+
         this.room.getFloorPlane().logic?.registerEvents();
         this.room.getWallPlane().logic?.registerEvents();
     }
@@ -97,6 +103,29 @@ export class RoomLogic implements Disposable {
 
     getCanvasWallHit(): HTMLCanvasElement {
         return this.canvasWallHit;
+    }
+
+    /**
+     * A click where the room draws nothing (the empty space around it, or a transparent pixel of the icon of the
+     * furni that is being placed): the room container doesn't get it, the viewport does. As a click out of the
+     * floor (onMouseClick) it cancels the placement: a floor furni shown as its icon, or a wall furni out of a wall.
+     * The clicks on the room also arrive here (after onMouseClick): on the floor/walls nothing changes.
+     */
+    private onViewportPointerDown(e: FederatedPointerEvent) {
+        const repository = Engine.getInstance().roomService?.currentRoom?.roomEntityRepository;
+        const rolling = repository?.rollingEntity;
+        if (!rolling) return;
+
+        const visualization = this.room.visualization;
+
+        if (rolling instanceof WallItem) {
+            if (!visualization.getWallAtGlobalPoint(e.global)) repository.cancelRollingEntity();
+            return;
+        }
+
+        if (repository.isRollingIcon() && !visualization.getTileAtGlobalPoint(e.global)) {
+            repository.cancelRollingEntity();
+        }
     }
 
     private onCameraMove(e: any) {

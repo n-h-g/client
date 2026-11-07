@@ -37,13 +37,16 @@ export class UpdateEntity extends MessageHandler {
                 humanVisualization.headRotation = entityData.bh_rot.head_rot;
             }
 
-            // standing up from a seat to walk: it starts from where the sitting avatar was drawn
+            // standing up from a seat or a bed to walk: it starts from the base of the furni, as Nitro
             if (entityData.position && entityData.type == EntityType.HUMAN) {
                 const humanVisualization = entity.visualization as HumanVisualization;
-                const wasSitting = humanVisualization.actions?.has(ActionId.SIT) ?? false;
-                const isSitting = entityData.action?.actions?.includes(ActionId.SIT) ?? wasSitting;
+                const resting = (actions?: Iterable<ActionId>) =>
+                    !!actions && [...actions].some(action => action === ActionId.SIT || action === ActionId.LAY);
 
-                if (wasSitting && !isSitting) humanVisualization.standUpFromSeat(entityData.position.z);
+                const wasResting = resting(humanVisualization.actions);
+                const isResting = entityData.action ? resting(entityData.action.actions) : wasResting;
+
+                if (wasResting && !isResting) humanVisualization.standUp(entityData.position.z);
             }
 
             if (entityData.position) {

@@ -2,6 +2,10 @@ import {RoomData} from '../../../../core/communication/incoming/rooms/RoomData';
 import {Engine} from '../../../../Engine';
 import {Point} from '../../../../utils/point/Point';
 import {MessageHandler} from '../../../handler/MessageHandler';
+import {EventManager} from '../../../../core/events/EventManager';
+import {DialogEventData} from '../../../../engine/events/ui/data/general/Dialog';
+import {UIEvents} from '../../../../engine/events/ui/UIEvents';
+import {UIEventsType} from '../../../../engine/events/ui/UIEventsType';
 
 export class UpdateRoomData extends MessageHandler {
     handle(): void {
@@ -33,6 +37,8 @@ export class UpdateRoomData extends MessageHandler {
             wallpaper: room.wallpaper ?? null,
             floor: room.floor ?? null,
             landscape: room.landscape ?? null,
-        });
+       });
+
+        EventManager.emit<DialogEventData>(UIEvents.CLOSE, {type: UIEventsType.NAVIGATOR});
     }
 }

@@ -23,6 +23,11 @@ export interface EntityData {
     effect?: {
         id: number;
     };
+    /** A furni: its stack height on the server and if something can be placed on it. */
+    item?: {
+        height?: number;
+        allowStack?: boolean;
+    };
     /** State of a furni with states (extraData = animation shown). */
     interaction?: {
         extraData?: number | string;

@@ -10,6 +10,7 @@ import {RoomVisualization} from '../../../../../engine/room/visualization/RoomVi
 import {Avatar} from '../../../../../engine/ui/imagers/avatars/Avatar';
 import {AvatarPlaceHolder} from '../../../../../engine/ui/imagers/avatars/AvatarPlaceholder';
 import type {AvatarEffect} from '../../../../../engine/ui/imagers/avatars/effects/AvatarEffect';
+import {TypingBubbleAddition} from './additions/TypingBubbleAddition';
 import {ActionId} from '../../../../../engine/ui/imagers/avatars/enum/actions/ActionId';
 import {AvatarData} from '../../../../../engine/ui/imagers/avatars/enum/AvatarData';
 import {Point} from '../../../../../utils/point/Point';
@@ -31,6 +32,10 @@ export abstract class HumanVisualization extends EntityVisualization {
     protected avatar: Avatar;
     protected headDirection: Direction = Direction.SOUTH;
     protected loaded = false;
+
+    /** The user is typing a chat message: the bubble over its head. */
+    private typing = false;
+    private readonly typingBubble = new TypingBubbleAddition();
 
     /** The effect of the server (0: none) and, once loaded, the effect drawn with the avatar. */
     private effectId = 0;
@@ -118,6 +123,55 @@ export abstract class HumanVisualization extends EntityVisualization {
         });
     }
 
+    /** The eyes are closed for an instant (see HumanLogic): the avatar blinks, as in Habbo. */
+    private blinking = false;
+
+    /** The actions that use the eyes: the avatar doesn't blink with them (Nitro: they prevent Sleep). */
+    private static readonly EYE_ACTIONS = [ActionId.SLEEP, ActionId.TALK, ActionId.LAUGH, ActionId.BLOW];
+
+    /** Opens/closes the eyes: the avatar is drawn again. */
+    setBlink(blinking: boolean): void {
+        if (this.blinking === blinking) return;
+
+        this.blinking = blinking;
+        if (this.loaded) this.draw();
+    }
+
+    /**
+     * The actions the avatar is drawn with: the ones of the server, plus Sleep (eyes closed, as Nitro's blink)
+     * while it blinks. The actions of the server are not changed.
+     */
+    private getDrawActions(): Set<ActionId> {
+        if (!this.blinking || HumanVisualization.EYE_ACTIONS.some(action => this.actions.has(action))) return this.actions;
+
+        // first: the imager gives each part the first action that has it, and Default has the eyes too
+        // (Nitro sorts by precedence: Sleep 520 before Default 1000)
+        return new Set([ActionId.SLEEP, ...this.actions]);
+    }
+
+    /** The user started/stopped typing (or sent its message): the bubble over its head. */
+    setTyping(typing: boolean): void {
+        if (this.typing === typing) return;
+
+        this.typing = typing;
+        this.updateTypingBubble();
+    }
+
+    private updateTypingBubble(): void {
+        this.typingBubble.update(this.container, this.typing && this.loaded, HumanVisualization.AVATAR_CANVAS_WIDTH, this.getTypingBubbleOffset());
+    }
+
+    /**
+     * Where the bubble goes from its standing place, in the avatar container (that already follows the posture).
+     * Sitting the head is where it is standing: the bubble doesn't move. Laying, Nitro moves the bubble down by a
+     * whole avatar (64) and the avatar by half (32): the bubble goes down by the rest.
+     */
+    private getTypingBubbleOffset(): {x: number; y: number} {
+        if (this.actions?.has(ActionId.LAY)) return {x: 0, y: 32};
+
+        return {x: 0, y: 0};
+    }
+
     /** The effect is animated: the avatar is drawn again at every frame. */
     get hasAnimatedEffect(): boolean {
         return this.effect?.isAnimated ?? false;
@@ -151,7 +205,7 @@ export abstract class HumanVisualization extends EntityVisualization {
                 this.entity.figure,
                 this.direction,
                 this.getAvatarHeadDirection(),
-                this.actions,
+                this.getDrawActions(),
                 this.frame,
                 0, false, false, false, this.danceStyle, this.signValue
             );
@@ -170,9 +224,9 @@ export abstract class HumanVisualization extends EntityVisualization {
         this.updateShadowVisibility();
 
         this.container = this.avatar.Container;
-        const avatarWidth = this.container.width > 0 ? this.container.width : 64;
-        const avatarHeight = this.container.height > 0 ? this.container.height : 110;
+        const {width: avatarWidth, height: avatarHeight} = this.getAvatarSize();
         this.drawBlowKissHeart(avatarWidth, avatarHeight);
+        this.updateTypingBubble();
         const oneShotFrameCount = this.getOneShotFrameCount();
         this.needsUpdate = this.actions.has(ActionId.DANCE) ||
             this.actions.has(ActionId.WAVE) ||
@@ -196,6 +250,21 @@ export abstract class HumanVisualization extends EntityVisualization {
 
         this.entity.logic.registerEvents();
     }
+
+    /**
+     * The size the avatar container is anchored with (pivot at the middle of its feet). The parts are drawn
+     * asynchronously: an avatar still empty uses the size of the avatar canvas.
+     */
+    private getAvatarSize(): {width: number; height: number} {
+        return {
+            width: this.container && this.container.width > 0 ? this.container.width : HumanVisualization.AVATAR_CANVAS_WIDTH,
+            height: this.container && this.container.height > 0 ? this.container.height : HumanVisualization.AVATAR_CANVAS_HEIGHT,
+        };
+    }
+
+    /** The avatar canvas (HabboAvatarGeometry "vertical", large). */
+    private static readonly AVATAR_CANVAS_WIDTH = 64;
+    private static readonly AVATAR_CANVAS_HEIGHT = 110;
 
     private drawBlowKissHeart(avatarWidth: number, avatarHeight: number): void {
         if (!this.actions.has(ActionId.BLOW) || this.frame < 3 || this.frame > 18) return;
@@ -265,7 +334,10 @@ export abstract class HumanVisualization extends EntityVisualization {
         this.container.cursor = 'pointer';
         this.container.eventMode = 'dynamic';
         this.container.interactiveChildren = true;
-         this.container.pivot.set(this.container.width / 2, this.container.height);
+        // the placeholder is drawn when its parts are loaded: anchored as the avatar (see draw), not at 0, 0,
+        // or its shadow appeared for an instant out of the tile of the user
+        const {width, height} = this.getAvatarSize();
+        this.container.pivot.set(width / 2, height);
 
         if (Engine.getInstance().roomService?.currentRoom) {
             Engine.getInstance().roomService?.currentRoom?.roomLayout.visualization.container?.addChild(
@@ -318,15 +390,14 @@ export abstract class HumanVisualization extends EntityVisualization {
     onFurni = false;
 
     /**
-     * As Nitro (AvatarVisualization.updateShadow) the shadow is drawn standing, walking and sitting on the floor:
-     * not sitting on a furni (e.g. in a bath, where it was on the water) or laying.
+     * The shadow is drawn only standing and walking: not sitting (on a furni or on the floor) or laying.
+     * It doesn't depend on onFurni: e.g. the avatars already sitting when the user enters the room don't have it.
      */
     private updateShadowVisibility(): void {
         const shadow = this.avatar?.ShadowContainer;
         if (!shadow) return;
 
-        const sitsOnFurni = this.actions.has(ActionId.SIT) && this.onFurni;
-        shadow.visible = !sitsOnFurni && !this.actions.has(ActionId.LAY);
+        shadow.visible = !this.actions.has(ActionId.SIT) && !this.actions.has(ActionId.LAY);
     }
 
     updatePosition() {
@@ -337,15 +408,13 @@ export abstract class HumanVisualization extends EntityVisualization {
     }
 
     getZIndex(): number {
+        // in the door from when it passes half of the step: there it crosses the line of the wall.
+        // (with Math.floor it was in the door only on arrival when the coordinates grow, or walking
+        // diagonally, and the avatar walking to the door was drawn over the wall for a whole step)
+        const door = Engine.getInstance().roomService.currentRoom.roomLayout.getDoorPosition();
         const isAtDoor =
-            Math.floor(this.entity.position.x) ==
-                Engine.getInstance()
-                    .roomService.currentRoom.roomLayout.getDoorPosition()
-                    .x &&
-            Math.floor(this.entity.position.y) ==
-                Engine.getInstance()
-                    .roomService.currentRoom.roomLayout.getDoorPosition()
-                    .y;
+            Math.abs(this.entity.position.x - door.x) < 0.5 &&
+            Math.abs(this.entity.position.y - door.y) < 0.5;
         // in the door the avatar goes under all the walls (the hat must not cover the wall over the door or the
         // walls next to it): with the priorities alone a door far from the origin (big x + y) was drawn over them
         if (isAtDoor) {
@@ -371,6 +440,9 @@ export abstract class HumanVisualization extends EntityVisualization {
      * Here the avatar is compared with the part of each floor item that is in its same screen column,
      * and its zIndex is moved below the items it's behind and above the items it's in front of.
      */
+    /** Items up to this height (rugs, floor tiles) are flat: they don't cover the avatars behind them. */
+    private static readonly FLAT_ITEM_HEIGHT = 0.1;
+
     private sortWithFloorItems(zIndex: number): number {
         const repository = Engine.getInstance().roomService?.currentRoom?.roomEntityRepository;
         if (!repository) return zIndex;
@@ -381,8 +453,13 @@ export abstract class HumanVisualization extends EntityVisualization {
         const column = y - x;
         const depth = x + y;
 
+        // the tile of the avatar: the items covering it are the ones it's on
+        const tileX = Math.round(x);
+        const tileY = Math.round(y);
+
         let lowerBound = -Infinity;
         let upperBound = Infinity;
+        let onBound = -Infinity;
 
         for (const entity of repository.getAll().values()) {
             const item = entity as unknown as Partial<Item>;
@@ -393,6 +470,12 @@ export abstract class HumanVisualization extends EntityVisualization {
             const itemZIndex = entity.visualization?.container?.zIndex;
             if (!footprint || itemZIndex === undefined) continue;
 
+            // on the item (sitting on the sofa, laying on the bed, in the bath, on a rug): always over it
+            if (tileX >= footprint.minX && tileX <= footprint.maxX && tileY >= footprint.minY && tileY <= footprint.maxY) {
+                onBound = Math.max(onBound, itemZIndex);
+                continue;
+            }
+
             // the columns covered by the item; an avatar more than one column away doesn't overlap it
             const itemColumn = Math.min(
                 Math.max(column, footprint.minY - footprint.maxX),
@@ -401,19 +484,24 @@ export abstract class HumanVisualization extends EntityVisualization {
             if (Math.abs(column - itemColumn) > 1) continue;
 
             // depth range of the item tiles in that column (tiles on the line y - x = itemColumn)
-            const front = 2 * Math.min(footprint.maxX, footprint.maxY - itemColumn) + itemColumn;
             const back = 2 * Math.max(footprint.minX, footprint.minY - itemColumn) + itemColumn;
 
             if (depth < back) {
-                upperBound = Math.min(upperBound, itemZIndex);
+                // a flat item (a rug) can't cover the avatar behind it: e.g. a rug in front of a sofa
+                // put the avatar sitting on the sofa under the sofa (same zIndex of the rug)
+                if ((item.getStackHeight?.() ?? 0) > HumanVisualization.FLAT_ITEM_HEIGHT) {
+                    upperBound = Math.min(upperBound, itemZIndex);
+                }
             } else {
-                // in front of the item or on it (sitting, laying, standing on a rug...)
+                // in front of the item
                 lowerBound = Math.max(lowerBound, itemZIndex);
             }
         }
 
         if (zIndex <= lowerBound) zIndex = lowerBound + 1;
         if (zIndex >= upperBound) zIndex = upperBound - 1;
+        // the item the avatar is on wins over the others: the avatar is never drawn under its seat
+        if (zIndex <= onBound) zIndex = onBound + 1;
 
         return zIndex;
     }
@@ -435,18 +523,21 @@ export abstract class HumanVisualization extends EntityVisualization {
     }
 
     /**
-     * The avatar stands up from a seat to walk. The server puts a sitting avatar on top of the seat and
-     * a walking one at the base of it (as Habbo); the sitting avatar is drawn AVATAR_SIT_OFFSET lower than
-     * its Z, so without this it would pop up when the sitting posture is removed and then go down.
-     * It starts from the Z where it was drawn: at most one sit offset lower, never under the next Z.
+     * The avatar stands up from a seat or a bed to walk. As Nitro: a sitting/laying avatar is at the base of the
+     * furni plus its height (RoomMessageHandler: status.z + sit/lay height); when it stands up the status has
+     * the base only, so the avatar goes at once to the base of the furni and walks from there.
+     * Without this it started from the top of the bed (or of the seat) and went down along the step,
+     * as on a stair.
      *
-     * @param nextZ the Z of the tile it walks to.
+     * @param nextZ the Z of the tile it walks to: where it goes if there is no furni under it.
      */
-    standUpFromSeat(nextZ: number): void {
-        const sitOffsetZ = AvatarData.AVATAR_SIT_OFFSET / (MapData.thickSpace * MapData.stairSteps);
-        const drop = Math.min(sitOffsetZ, Math.max(0, this.entity.position.z - nextZ));
+    standUp(nextZ: number): void {
+        const {x, y, z} = this.entity.position;
+        const base = Engine.getInstance().roomService?.currentRoom?.roomEntityRepository?.getRestingItemZ(x, y, z);
+        // never under the tile it walks to (e.g. the furni saved with Z 0 before the heights, that is the floor)
+        const target = Math.max(base ?? nextZ, nextZ);
 
-        this.entity.position.z -= drop;
+        if (z > target) this.entity.position.z = target;
     }
 
     /**

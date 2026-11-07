@@ -3,6 +3,7 @@ import {RoomMessageData} from '../../../../../core/communication/incoming/rooms/
 import {MessageType} from '../../../../../core/chat/MessageType';
 import {RoomChatMessage} from '../../../../../engine/game/chat/RoomChatMessage';
 import {MessageHandler} from '../../../../handler/MessageHandler';
+import type {HumanVisualization} from '../../../../../core/room/object/human/visualization/HumanVisualization';
 
 export class NewRoomMessage extends MessageHandler {
     handle(): void {
@@ -16,6 +17,9 @@ export class NewRoomMessage extends MessageHandler {
             );
 
         if (!entity) return;
+
+        // the message is sent: no more typing (as Habbo)
+        (entity.visualization as HumanVisualization).setTyping?.(false);
 
         const chatMessage = new RoomChatMessage(
             data.text,

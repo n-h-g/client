@@ -200,9 +200,9 @@ function checkAndCreateRoom() {
     layout: selectedModel.value.layout,
     mold: selectedModel.value
   }
+  // the window (and the navigator) is closed when the server has created the room and the user is in it
+  // (UpdateRoomData); if the room is not created it stays open
   Engine.getInstance()?.networkingManager?.packetManager.applyOut(OutgoingPacket.CreateNewRoom, body);
-
-  this.toggle();
 }
 
 function toggle() {

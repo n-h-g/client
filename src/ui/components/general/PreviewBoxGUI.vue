@@ -26,7 +26,7 @@
                     Move</div>
 
                 <div class="previewButton" ref="rotateItemButton" id="rotateItemButton"
-                    :class="{hidden: false}" @click.stop="rotateItem()">
+                    :class="{hidden: false}" @click.stop="rotateItem()" v-if="entity ? canRotate() : true">
                     Rotate</div>
 
                 <div class="previewButton" ref="pickItemButton" id="pickItemButton"
@@ -57,6 +57,7 @@ import { PreviewModeEventData } from '../../../game/engine/events/ui/data/genera
 import { UIEvents } from '../../../game/engine/events/ui/UIEvents'
 import { UIEventsType } from '../../../game/engine/events/ui/UIEventsType'
 import {Item} from '../../../game/engine/room/objects/items/Item'
+import {FloorItem} from '../../../game/engine/room/objects/items/FloorItem'
 import { OutgoingPacket } from '../../../game/networking/packets/outgoing/OutgoingPacket'
 import { IComponentShowableUI } from '../../../game/core/ui/IComponentShowableUI'
 import { UIComponent } from '../../../game/engine/ui/components/UIComponent'
@@ -82,6 +83,15 @@ EventManager.read(UIEvents.PREVIEW_BOX_MODE, (evt: PreviewModeEventData) => {
 function isAnimated() {
     const item = Engine.getInstance()?.roomService?.currentRoom?.roomEntityRepository?.get(entity.value.id) as Item | undefined
     return item?.base?.data?.visualization?.type == 'furniture_animated'
+}
+
+/**
+ * The "Rotate" button: only a floor furni with more than one rotation (e.g. not a rug, a table with one
+ * direction or a wall furni, that the server doesn't rotate).
+ */
+function canRotate() {
+    const item = Engine.getInstance()?.roomService?.currentRoom?.roomEntityRepository?.get(entity.value.id)
+    return item instanceof FloorItem && (item.base?.getAvailableDirections().length ?? 0) > 1
 }
 
 function moveItem() {

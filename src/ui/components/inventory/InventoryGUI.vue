@@ -180,6 +180,7 @@ function placeItem() {
 
     engine.roomService.startItemPlacement(selectedItem.value)
     
+    
     hide();
 }
 

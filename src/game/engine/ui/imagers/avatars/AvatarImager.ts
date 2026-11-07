@@ -565,10 +565,21 @@ export class AvatarImager {
                 component.ResourceType == 'lh' ||
                 component.ResourceType == 'ls' ||
                 component.ResourceType == 'rs' ||
+                // the sleeves of the coats
+                component.ResourceType == 'lc' ||
+                component.ResourceType == 'rc' ||
                 component.ResourceType == 'li'
             )
                 avatar.ArmsContainer.addChild(sprite);
-            else if (component.ResourceType == 'ch')
+            // the torso and what goes on it (AvatarDrawOrder: ch, cc, cp, wa, ca, then the arm in front):
+            // coat, print, belt and scarf were drawn in the main container, under the shirt and the arms
+            else if (
+                component.ResourceType == 'ch' ||
+                component.ResourceType == 'cc' ||
+                component.ResourceType == 'cp' ||
+                component.ResourceType == 'wa' ||
+                component.ResourceType == 'ca'
+            )
                 avatar.TorsoContainer.addChild(sprite);
             else avatar.Container.addChild(sprite);
         } else {
