@@ -11,5 +11,6 @@ export enum UIEventsType {
     CHANGE_LOOK = 'change_look',
     FRIENDS = 'friends',
     MESSENGER = 'messenger',
-    FRIEND_PROFILE = 'friend_profile'
+    FRIEND_PROFILE = 'friend_profile',
+    ROOM_DIMMER = 'room_dimmer'
 }

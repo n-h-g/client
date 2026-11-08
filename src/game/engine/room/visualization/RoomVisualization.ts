@@ -14,6 +14,8 @@ import { Disposable } from '../../../core/room/Disposable';
 import {Engine} from '../../../Engine';
 import { Wall } from '../objects/map/Wall';
 
+import {RoomLight} from './RoomLight';
+
 export class RoomVisualization implements Disposable {
     container: Container;
     needsUpdate = false;
@@ -24,6 +26,8 @@ export class RoomVisualization implements Disposable {
     private canvasDoorWall: Container;
     private canvasPointer: Container;
     private canvasStairs: Container;
+    /** The light of the room dimmer (RoomLight): the whole room, or only the floor and the walls. */
+    readonly light: RoomLight;
 
     constructor(room: RoomLayout) {
         this.roomLayout = room;
@@ -42,6 +46,10 @@ export class RoomVisualization implements Disposable {
         this.container.addChild(this.canvasFloor);
         this.container.addChild(this.canvasPointer);
         this.container.addChild(this.canvasStairs);
+
+        this.light = new RoomLight(this.container, [
+            this.canvasFloor, this.canvasWall, this.canvasDoorWall, this.canvasDoorTile, this.canvasStairs,
+        ]);
 
         this.container.x = (Engine.getInstance().application.screenCoords.x - this.container.width) / 2;
         this.container.y = (Engine.getInstance().application.screenCoords.y / 2 - - this.container.height) / 2;
@@ -80,6 +88,7 @@ export class RoomVisualization implements Disposable {
     }
 
     dispose(): void {
+        this.light.dispose();
         this.container.destroy();
     }
 

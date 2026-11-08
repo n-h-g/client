@@ -17,6 +17,7 @@ import { ChangeLookUI } from './guardrobe/ChangeLookUI';
 import {FriendsUI} from './friends/FriendsUI';
 import {MessengerUI} from './friends/MessengerUI';
 import {FriendProfileUI} from './friends/FriendProfileUI';
+import {RoomDimmerUI} from './room/RoomDimmerUI';
 
 export class ComponentsManager {
     readonly rootComponent: HTMLElement;
@@ -51,6 +52,7 @@ export class ComponentsManager {
         this.addComponent(UIComponent.FriendsMenuUI, new FriendsUI());
         this.addComponent(UIComponent.PrivateChatUI, new MessengerUI());
         this.addComponent(UIComponent.FriendProfileUI, new FriendProfileUI());
+        this.addComponent(UIComponent.RoomDimmerUI, new RoomDimmerUI());
     }
 
     initGameComponents(): void {

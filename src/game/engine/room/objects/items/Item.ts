@@ -6,6 +6,7 @@ import {FurniBase} from '../../../ui/imagers/items/FurniBase';
 import {ItemLogicBasic} from './logic/ItemLogicBasic';
 import {ItemLogicMultiState} from './logic/ItemLogicMultiState';
 import {ItemLogicDice} from './logic/ItemLogicDice';
+import {ItemLogicRoomDimmer} from './logic/ItemLogicRoomDimmer';
 import {ItemVisualizationAnimated} from './visualization/ItemVisualizationAnimated';
 import {ItemVisualizationStatic} from './visualization/ItemVisualizationStatic';
 
@@ -17,6 +18,7 @@ const ITEM_LOGICS: Record<string, (item: Item) => ItemLogic> = {
     // the hole (state 0) is removed from the floor by RoomEntityRepository.refreshFloorHoles
     furniture_floor_hole: item => new ItemLogicMultiState(item),
     furniture_dice: item => new ItemLogicDice(item),
+    furniture_roomdimmer: item => new ItemLogicRoomDimmer(item),
 };
 
 /** Inclusive rectangle of tiles covered by a floor item. */
@@ -40,6 +42,11 @@ export abstract class Item extends Entity {
      * furni not sent by the server (e.g. the preview from the inventory), that use the height of the Nitro data.
      */
     stackHeight: number | null = null;
+    /**
+     * The data of the furni sent by the server (interaction.extraData): usually its state, a number; some furni
+     * have other data, e.g. a room dimmer "state,preset,effect,color,brightness" (see ItemLogic.onExtraData).
+     */
+    extraData: number | string | null = null;
     /** Something can be placed on this furni (the server's items_base.allow_stack, e.g. not on many chairs). */
     allowStack = true;
 

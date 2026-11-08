@@ -7,6 +7,8 @@ import {ActionId} from '../../../../../engine/ui/imagers/avatars/enum/actions/Ac
 import {Logger} from '../../../../../utils/Logger';
 import {Point3d} from '../../../../../utils/point/Point3d';
 import {MessageHandler} from '../../../../handler/MessageHandler';
+import {Item} from '../../../../../engine/room/objects/items/Item';
+import {ItemLogic} from '../../../../../core/room/object/items/logic/ItemLogic';
 
 export class UpdateEntity extends MessageHandler {
     handle(): void {
@@ -24,6 +26,10 @@ export class UpdateEntity extends MessageHandler {
             if (entityData.interaction?.extraData != null && entityData.type == EntityType.ITEM) {
                 const state = Number(entityData.interaction.extraData);
                 if (Number.isFinite(state)) (entity.visualization as any).setState?.(state);
+
+                // the furni with other data than a state read it (e.g. the light of a room dimmer)
+                (entity as Item).extraData = entityData.interaction.extraData;
+                (entity.logic as ItemLogic).onExtraData?.(entityData.interaction.extraData);
             }
 
             if (entityData.aspect) {

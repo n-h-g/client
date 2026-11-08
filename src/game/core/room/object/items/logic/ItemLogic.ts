@@ -34,6 +34,13 @@ export abstract class ItemLogic extends EntityLogic implements MoveableLogic {
 
     onLoad() {}
 
+    /**
+     * New data of the furni from the server (Item.extraData): usually the state, already shown; some furni read
+     * other data (e.g. the light of a room dimmer).
+     */
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    onExtraData(data: number | string | null): void {}
+
     onHover(): void {
         super.onHover();
     }

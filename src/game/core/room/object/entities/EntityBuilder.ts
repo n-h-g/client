@@ -25,6 +25,7 @@ export class EntityBuilder {
     private headRotation?: number;
     private rotation?: number;
     private state = 0;
+    private extraData: number | string | null = null;
     private user?: UserComponent;
     private figure?: AspectComponent;
     private wallPosition?: string;
@@ -73,6 +74,7 @@ export class EntityBuilder {
     setState(interaction?: {extraData?: number | string}): EntityBuilder {
         const state = Number(interaction?.extraData);
         this.state = Number.isFinite(state) && state >= 0 ? state : 0;
+        this.extraData = interaction?.extraData ?? null;
 
         return this;
     }
@@ -176,11 +178,16 @@ export class EntityBuilder {
                 (entity.visualization as ItemVisualization).state = this.state;
                 (entity as FloorItem).stackHeight = this.stackHeight;
                 (entity as FloorItem).allowStack = this.allowStack;
+                (entity as FloorItem).extraData = this.extraData;
             } else {
                 const wallData = this.wallPosition
                     ? FurnitureWallData.fromLocation(this.wallPosition)
                     : new FurnitureWallData({localX: 0, localY: 0, width: 0, height: 0, y: 0, z: 0, direction: 2, stuffData: '', secondsToExpiration: 0, isOldFormat: false});
                 entity = new WallItem(this.id, this.name, base, wallData);
+
+                // e.g. a room dimmer on/off
+                (entity.visualization as ItemVisualization).state = this.state;
+                (entity as WallItem).extraData = this.extraData;
             }
         }
 

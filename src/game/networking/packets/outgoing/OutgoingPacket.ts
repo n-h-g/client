@@ -46,6 +46,12 @@ export enum OutgoingPacket {
     RoomDiceActivateEvent = 52,
     /** Close a dice (Nitro's FurnitureDiceDeactivateComposer): {id}. */
     RoomDiceOffEvent = 53,
+    /** The presets of a room dimmer (Nitro's RoomDimmerGetPresetsComposer): {id}. */
+    RoomDimmerGetPresetsEvent = 54,
+    /** Save a preset of the room dimmer (Nitro's RoomDimmerSavePresetsComposer): {id, preset, backgroundOnly, color, brightness, apply}. */
+    RoomDimmerSavePresetEvent = 55,
+    /** Switch the room dimmer on/off (Nitro's RoomDimmerChangeStateComposer): {id}. */
+    RoomDimmerToggleEvent = 56,
     /** A wallpaper/floor/landscape applied from the inventory (Nitro's FurniturePlacePaintComposer): {id}. */
     RoomApplyDecorationEvent = 29,
     MoveWallItemEvent = 33,

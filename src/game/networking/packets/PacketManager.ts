@@ -15,6 +15,7 @@ import {NewRoomMessage} from './incoming/rooms/entities/NewRoomMessage';
 import {RemoveEntity} from './incoming/rooms/entities/RemoveEntity';
 import {UpdateEntity} from './incoming/rooms/entities/UpdateEntity';
 import {ObjectsRolling} from './incoming/rooms/entities/ObjectsRolling';
+import {RoomDimmerPresets} from './incoming/rooms/items/RoomDimmerPresets';
 import { ReceiveRoomId } from './incoming/rooms/ReceiveRoomId';
 import {RoomPaint} from './incoming/rooms/RoomPaint';
 import {UpdateRoomData} from './incoming/rooms/UpdateRoomData';
@@ -50,6 +51,7 @@ export class PacketManager {
 			208: new ReceiveRoomId(),
             209: new RoomPaint(),
             210: new ObjectsRolling(),
+            211: new RoomDimmerPresets(),
             400: new UpdateUserInformation(),
             401: new LoadInventoryItems(),
             800: new CataloguePages(),
