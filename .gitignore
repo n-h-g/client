@@ -2,3 +2,5 @@
 /dist/
 /src/game/configuration/general.json
 /src/offline/
+
+.DS_Store

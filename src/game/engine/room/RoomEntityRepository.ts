@@ -433,7 +433,7 @@ export class RoomEntityRepository extends Repository<string, Entity> {
             else visualization.updateFrontLayers([]);
         });
 
-        const humans: {tileX: number; tileY: number; depth: number; zIndex: number}[] = [];
+        const humans: {tileX: number; tileY: number; z: number; relativeDepth: number; inside: boolean; depth: number; zIndex: number}[] = [];
 
         this.getAll().forEach((entity: Entity) => {
             // structural check: Human can't be imported here without an import cycle
@@ -447,6 +447,9 @@ export class RoomEntityRepository extends Repository<string, Entity> {
             humans.push({
                 tileX: Math.round(x),
                 tileY: Math.round(y),
+                z,
+                relativeDepth,
+                inside: !!actions && (actions.has(ActionId.SIT) || actions.has(ActionId.LAY)),
                 // as Nitro (RoomMessageHandler: status.z + sit height) a sitting/laying avatar is at the height of
                 // the seat, that the server gives it: e.g. on a 3 seats sofa the cushion of its own seat (z 1000)
                 // stays behind it and only the seats in front of it (z 2000) cover it
@@ -466,8 +469,33 @@ export class RoomEntityRepository extends Repository<string, Entity> {
                 human.tileX >= footprint.minX - overlap && human.tileX <= footprint.maxX + overlap &&
                 human.tileY >= footprint.minY - overlap && human.tileY <= footprint.maxY + overlap);
 
-            (entity.visualization as unknown as FrontLayersVisualization).updateFrontLayers(humansOnItem);
+            // A bath/tub/jacuzzi is sat in, not on: its front (one piece for all its length) covers an avatar
+            // sitting on any of its tiles. The layer depths are from the furni origin, so an avatar sitting on
+            // another tile is compared as if it were on the origin (on a sofa instead every seat has its own
+            // layers, at +1000 z per tile, and the origin is right).
+            const sitInside = RoomEntityRepository.isSitInsideFurni(entity.name);
+            const origin = entity.position;
+
+            const humansForLayers = humansOnItem.map(human => {
+                const onFootprint =
+                    human.tileX >= footprint.minX && human.tileX <= footprint.maxX &&
+                    human.tileY >= footprint.minY && human.tileY <= footprint.maxY;
+
+                if (!sitInside || !human.inside || !onFootprint) return human;
+
+                return {...human, depth: RoomDepth.of(origin.x, origin.y, human.z) + human.relativeDepth};
+            });
+
+            (entity.visualization as unknown as FrontLayersVisualization).updateFrontLayers(humansForLayers);
         }
+    }
+
+    /** The furni an avatar sits in (baths, tubs, jacuzzis, pools), not the toilets of the bathroom line. */
+    private static isSitInsideFurni(name: string): boolean {
+        const className = (name ?? '').split('*')[0].toLowerCase();
+        if (/toilet|chamberpot/.test(className)) return false;
+
+        return /bath|tub|camme|jacuzz|pool/.test(className);
     }
 
     /**
