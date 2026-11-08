@@ -18,7 +18,47 @@ export abstract class EntityVisualization extends RoomObjectVisualization {
         this.nextPosition = new Point3d(0, 0, 0);
     }
 
+    /** A slide in progress (moved by a roller), null if none: see slideTo. */
+    private slide: {fromX: number; fromY: number; fromZ: number; start: number; duration: number} | null = null;
+
+    /**
+     * Slides the entity to the given position in the given time, without walking (as Nitro's MovingObjectLogic for
+     * the furni and the avatars moved by a roller).
+     */
+    slideTo(point: Point3d, duration: number): void {
+        const position = this.entity.position;
+        this.slide = {fromX: position.x, fromY: position.y, fromZ: position.z, start: performance.now(), duration: Math.max(1, duration)};
+
+        this.nextPosition.x = point.x;
+        this.nextPosition.y = point.y;
+        this.nextPosition.z = point.z;
+    }
+
+    /**
+     * Moves the entity along its slide (see slideTo), called at every tick.
+     *
+     * @return true while it's sliding.
+     */
+    updateSlide(): boolean {
+        if (!this.slide) return false;
+
+        const t = Math.min(1, (performance.now() - this.slide.start) / this.slide.duration);
+        const position = this.entity.position;
+
+        position.x = this.slide.fromX + (this.nextPosition.x - this.slide.fromX) * t;
+        position.y = this.slide.fromY + (this.nextPosition.y - this.slide.fromY) * t;
+        position.z = this.slide.fromZ + (this.nextPosition.z - this.slide.fromZ) * t;
+
+        if (t >= 1) this.slide = null;
+
+        this.updatePosition();
+
+        return true;
+    }
+
     setNextPosition(point: Point3d) {
+        // a walk or a new position from the server ends the slide
+        this.slide = null;
         this.nextPosition.x = point.x;
         this.nextPosition.y = point.y;
 
@@ -96,6 +136,7 @@ export abstract class EntityVisualization extends RoomObjectVisualization {
      * an item is placed under it, or it's a furni moved by the server).
      */
     snapToNextPosition(): void {
+        this.slide = null;
         this.entity.position.x = this.nextPosition.x;
         this.entity.position.y = this.nextPosition.y;
         this.entity.position.z = this.nextPosition.z;

@@ -1,3 +1,4 @@
+import type {FederatedPointerEvent} from 'pixi.js';
 import {ItemLogic} from '../../../../../core/room/object/items/logic/ItemLogic';
 import { Engine } from '../../../../../Engine';
 import { OutgoingPacket } from '../../../../../networking/packets/outgoing/OutgoingPacket';
@@ -28,7 +29,7 @@ export class ItemLogicMultiState extends ItemLogic {
         visualization.setState((visualization.state + 1) % animations.length);
     }
     
-    onClick() {
+    onClick(event?: FederatedPointerEvent) {
         // single click: the preview, like the other furni; double click: next state
         super.onClick();
 
@@ -37,14 +38,30 @@ export class ItemLogicMultiState extends ItemLogic {
 
         if (diff > 0 && diff < this.DOUBLE_CLICK_THRESHOLD) {
 
-            this.onDoubleClick();
+            // after the walk of this click (RoomLogic, the same pointerdown): as Nitro the use comes last, else the
+            // walk to the tile under the mouse cancels it on the server (e.g. a teleport the user walks to)
+            const spriteTag = this.getSpriteTag(event);
+            setTimeout(() => this.onDoubleClick(spriteTag), 0);
             this.lastClickTime = 0;
         } else {
             this.lastClickTime = now;
         }
     }
 
-    onDoubleClick() {
+    /**
+     * The tag of the layer under the mouse (Nitro's spriteTag, e.g. 'activate' on a dice), '' if none.
+     */
+    protected getSpriteTag(event?: FederatedPointerEvent): string {
+        const furni = this.entity.visualization?.sprite as Furni | undefined;
+
+        return event?.global && typeof furni?.getSpriteTagAt === 'function' ? furni.getSpriteTagAt(event.global) : '';
+    }
+
+    /**
+     * @param spriteTag the tag of the layer double clicked, undefined from the "use" button of the preview.
+     */
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    onDoubleClick(spriteTag?: string) {
         if(!Engine.getInstance().config.offlineMode)
         {
             Engine.getInstance()?.networkingManager?.packetManager?.applyOut(

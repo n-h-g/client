@@ -5,8 +5,19 @@ import {Point3d} from '../../../../utils/point/Point3d';
 import {FurniBase} from '../../../ui/imagers/items/FurniBase';
 import {ItemLogicBasic} from './logic/ItemLogicBasic';
 import {ItemLogicMultiState} from './logic/ItemLogicMultiState';
+import {ItemLogicDice} from './logic/ItemLogicDice';
 import {ItemVisualizationAnimated} from './visualization/ItemVisualizationAnimated';
 import {ItemVisualizationStatic} from './visualization/ItemVisualizationStatic';
+
+/** The client logics of the furni by Nitro logicType (see Item.getItemLogicFromType). */
+const ITEM_LOGICS: Record<string, (item: Item) => ItemLogic> = {
+    furniture_basic: item => new ItemLogicBasic(item),
+    furniture_multistate: item => new ItemLogicMultiState(item),
+    furniture_multiheight: item => new ItemLogicMultiState(item),
+    // the hole (state 0) is removed from the floor by RoomEntityRepository.refreshFloorHoles
+    furniture_floor_hole: item => new ItemLogicMultiState(item),
+    furniture_dice: item => new ItemLogicDice(item),
+};
 
 /** Inclusive rectangle of tiles covered by a floor item. */
 export type ItemFootprint = {
@@ -74,16 +85,11 @@ export abstract class Item extends Entity {
         }
     }
 
+    /**
+     * The logic of the furni by its logicType (as Nitro's RoomObjectLogicFactory): what a click does, e.g. which
+     * packet it sends. A type not in ITEM_LOGICS is a basic furni.
+     */
     private getItemLogicFromType(type: string): ItemLogic {
-        switch (type) {
-            default:
-            case 'furniture_basic':
-                return new ItemLogicBasic(this);
-            case 'furniture_multistate':
-            case 'furniture_multiheight':
-            // the hole (state 0) is removed from the floor by RoomEntityRepository.refreshFloorHoles
-            case 'furniture_floor_hole':
-                return new ItemLogicMultiState(this);
-        }
+        return (ITEM_LOGICS[type] ?? ITEM_LOGICS.furniture_basic)(this);
     }
 }

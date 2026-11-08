@@ -5,6 +5,8 @@ export class Layer {
     alpha: number;
 	ignoreMouse: boolean;
     ink: string;
+    /** Nitro's sprite tag (e.g. 'activate' / 'deactivate' of a dice), '' if none. */
+    tag: string;
 
     private wrappedId: number;
 
@@ -14,6 +16,7 @@ export class Layer {
         this.alpha = data.alpha;
         this.z = data.z;
         this.ink = data.ink;
+        this.tag = data.tag ?? '';
     }
 
     get id(): number {

@@ -1,4 +1,4 @@
-import { BLEND_MODES, Container, Sprite, Texture } from 'pixi.js';
+import { BLEND_MODES, Container, IPointData, Sprite, Texture } from 'pixi.js';
 import { FurniBase } from './FurniBase';
 import { FurniData } from './FurniData';
 import { FurniAsset } from './FurniAsset';
@@ -325,6 +325,31 @@ export class Furni extends RoomObjectSprite {
 		const directions = this.wrappedFurniBase.getAvailableDirections();
 		const pos = directions.indexOf(direction);
 		return directions[(pos + 1) % directions.length];
+	}
+
+	/**
+	 * The tag of the layer under the given point (Nitro's spriteTag of the mouse event, e.g. 'activate' on the dice
+	 * and 'deactivate' on its base), '' if the layer on top there has none.
+	 * It's found from the point, not from the target of the event: the layers aren't interactive by themselves, so
+	 * Pixi gives the furni container (or the front one) as the target.
+	 *
+	 * @param point the position of the mouse on the screen (the global of the pointer event).
+	 */
+	getSpriteTagAt(point: IPointData): string {
+		let top: {layer: number; front: boolean; zIndex: number} | null = null;
+
+		for (const [layer, sprite] of this.layerSprites) {
+			if (layer < 0 || !sprite.worldVisible || sprite.eventMode === 'none' || !sprite.parent) continue;
+			if (!sprite.containsPoint(point)) continue;
+
+			// the layers in front of the avatars are drawn over the others
+			const front = sprite.parent === this.frontContainer;
+			if (!top || (front && !top.front) || (front === top.front && sprite.zIndex >= top.zIndex)) {
+				top = {layer, front, zIndex: sprite.zIndex};
+			}
+		}
+
+		return top ? this.wrappedFurniBase.getLayer(top.layer)?.tag ?? '' : '';
 	}
 
 	nextFrame() {

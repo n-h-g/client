@@ -42,6 +42,10 @@ export enum OutgoingPacket {
     RoomPlaceItemEvent = 25,
     RoomMoveItemEvent = 26,
     RoomUseItemEvent = 27,
+    /** Roll a dice (Nitro's FurnitureDiceActivateComposer): {id}. */
+    RoomDiceActivateEvent = 52,
+    /** Close a dice (Nitro's FurnitureDiceDeactivateComposer): {id}. */
+    RoomDiceOffEvent = 53,
     /** A wallpaper/floor/landscape applied from the inventory (Nitro's FurniturePlacePaintComposer): {id}. */
     RoomApplyDecorationEvent = 29,
     MoveWallItemEvent = 33,

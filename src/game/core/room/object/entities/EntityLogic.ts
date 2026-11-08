@@ -10,7 +10,7 @@ import {IComponentShowableUI} from '../../../ui/IComponentShowableUI';
 import {Human} from '../human/Human';
 import {RoomObjectLogic} from '../RoomObjectLogic';
 import {Entity} from './Entity';
-import type {Container} from 'pixi.js';
+import type {Container, FederatedPointerEvent} from 'pixi.js';
 
 export abstract class EntityLogic extends RoomObjectLogic {
     protected entity: Entity;
@@ -33,7 +33,7 @@ export abstract class EntityLogic extends RoomObjectLogic {
 
         if (container && container !== this.listenedContainer) {
             this.listenedContainer = container;
-            container.on('pointerdown', () => this.onClick());
+            container.on('pointerdown', event => this.onClick(event));
             container.on('pointerover', () => this.onHover());
         }
 
@@ -65,7 +65,8 @@ export abstract class EntityLogic extends RoomObjectLogic {
         // it must not jump to the entity origin tile when the mouse is over an entity.
     }
 
-    onClick(): void {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    onClick(event?: FederatedPointerEvent): void {
         const tile = Engine.getInstance()
             .roomService.currentRoom.roomLayout.getFloorPlane()
             .getTilebyPosition(

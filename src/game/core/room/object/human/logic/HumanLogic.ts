@@ -66,6 +66,9 @@ export abstract class HumanLogic extends EntityLogic {
 
         this.updateBlink(delta);
 
+        // moved by a roller
+        humanVisualization.updateSlide();
+
         if (humanVisualization.needsUpdate) {
             this.frameTracker += delta;
             // the dances and the effects are animated as Nitro (a frame every 2 updates of 41 ms)

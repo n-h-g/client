@@ -78,6 +78,9 @@ export abstract class ItemLogic extends EntityLogic implements MoveableLogic {
     }
 
     tick(delta: number) {
+        // moved by a roller
+        this.entity?.visualization?.updateSlide();
+
         if (this.roll) {
             this.onMove(delta);
         }
