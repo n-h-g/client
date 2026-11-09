@@ -200,8 +200,13 @@ export abstract class ItemVisualization
             // the Z 0 of the items saved before the heights is the floor (see FloorItem.calculateOffsetY)
             const originDepth = RoomDepth.of(origin.x, origin.y, Math.max(origin.z, 1));
 
+            // the avatars already drawn under the whole furni (e.g. the one in the door, under the walls): its
+            // layers are already over them. Moved "above" them, the front layers went under the walls too.
+            const furniZIndex = this.container?.zIndex ?? -Infinity;
+            const below = humans.filter(human => human.zIndex >= furniZIndex);
+
             for (const [layer, offset] of furni.getLayerDepths()) {
-                for (const human of humans) {
+                for (const human of below) {
                     if (originDepth + offset >= human.depth) continue;
 
                     front.add(layer);
