@@ -1,5 +1,6 @@
 import {RoomLayout} from '../RoomLayout';
 import {Container} from '@pixi/display';
+import {Graphics, Matrix, MSAA_QUALITY, Rectangle, RenderTexture, Renderer, Sprite, Texture} from 'pixi.js';
 import type {IPointData} from 'pixi.js';
 import {TileType} from '../objects/map/TileTypeEnum';
 import {Point} from '../../../utils/point/Point';
@@ -29,6 +30,14 @@ export class RoomVisualization implements Disposable {
     /** The light of the room dimmer (RoomLight): the whole room, or only the floor and the walls. */
     readonly light: RoomLight;
 
+    /**
+     * The floor, the walls, the stairs and the door: static, each one is drawn once in a texture (see
+     * updateBakedPlanes). A big room has hundreds of tiles: drawn one by one they took most of the time of a frame.
+     */
+    private readonly bakedPlanes: {source: Container; sprite: Sprite | null}[];
+    private planesDirty = true;
+    private bakedResolution = 0;
+
     constructor(room: RoomLayout) {
         this.roomLayout = room;
 
@@ -47,9 +56,11 @@ export class RoomVisualization implements Disposable {
         this.container.addChild(this.canvasPointer);
         this.container.addChild(this.canvasStairs);
 
-        this.light = new RoomLight(this.container, [
-            this.canvasFloor, this.canvasWall, this.canvasDoorWall, this.canvasDoorTile, this.canvasStairs,
-        ]);
+        this.bakedPlanes = [this.canvasFloor, this.canvasWall, this.canvasDoorWall, this.canvasDoorTile, this.canvasStairs]
+            .map(source => ({source, sprite: null}));
+
+        // the background light colors what is drawn: the texture of a plane, else the plane itself
+        this.light = new RoomLight(this.container, () => this.bakedPlanes.map(plane => plane.sprite ?? plane.source));
 
         this.container.x = (Engine.getInstance().application.screenCoords.x - this.container.width) / 2;
         this.container.y = (Engine.getInstance().application.screenCoords.y / 2 - - this.container.height) / 2;
@@ -89,6 +100,7 @@ export class RoomVisualization implements Disposable {
 
     dispose(): void {
         this.light.dispose();
+        for (const plane of this.bakedPlanes) plane.sprite?.texture.destroy(true);
         this.container.destroy();
     }
 
@@ -97,6 +109,111 @@ export class RoomVisualization implements Disposable {
             this.roomLayout.getWallPlane().visualization?.render(),
             this.roomLayout.getFloorPlane().visualization?.render(),
         ]);
+
+        this.markPlanesDirty();
+    }
+
+    /** The floor or the walls changed (e.g. a new wallpaper, a floor hole): their textures are drawn again. */
+    markPlanesDirty(): void {
+        this.planesDirty = true;
+    }
+
+    /**
+     * Called at every frame (RoomLogic.tick): the planes are drawn again in their textures when they changed, or
+     * when the resolution changed (the zoom, the density of the screen). The tiles and the walls stay in the room,
+     * transparent: they are still hit by the mouse, they aren't drawn. Until all their images are loaded they are
+     * drawn as before (a texture made before would miss them).
+     */
+    updateBakedPlanes(): void {
+        const renderer = Engine.getInstance().application?.renderer as unknown as Renderer | undefined;
+        if (!renderer || this.container.destroyed) return;
+
+        const resolution = renderer.resolution * Math.max(1, Math.abs(this.container.scale.x));
+        if (!this.planesDirty && resolution === this.bakedResolution) return;
+
+        if (!this.bakedPlanes.every(plane => RoomVisualization.texturesReady(plane.source))) return;
+
+        for (const plane of this.bakedPlanes) this.bakePlane(plane, renderer, resolution);
+
+        this.planesDirty = false;
+        this.bakedResolution = resolution;
+        this.light.refreshPlanes();
+    }
+
+    private bakePlane(plane: {source: Container; sprite: Sprite | null}, renderer: Renderer, resolution: number): void {
+        const source = plane.source;
+        source.alpha = 1;
+
+        // on whole pixels: the texture is drawn on the same pixels as the tiles (else it was resampled, blurred)
+        const local = source.getLocalBounds(new Rectangle());
+        const bounds = new Rectangle(Math.floor(local.x), Math.floor(local.y), 0, 0);
+        const width = Math.ceil(local.x + local.width) - bounds.x;
+        const height = Math.ceil(local.y + local.height) - bounds.y;
+        const maxSize = RoomVisualization.maxTextureSize(renderer);
+
+        // nothing to draw, or too big for a texture: the plane is drawn as before
+        if (width <= 0 || height <= 0 || width * resolution > maxSize || height * resolution > maxSize) {
+            if (plane.sprite) {
+                plane.sprite.destroy({texture: true, baseTexture: true});
+                plane.sprite = null;
+            }
+            return;
+        }
+
+        let texture = plane.sprite?.texture as RenderTexture | undefined;
+        if (!texture || texture.width !== width || texture.height !== height || texture.resolution !== resolution) {
+            texture?.destroy(true);
+            texture = RenderTexture.create({width, height, resolution, multisample: renderer.multisample});
+        }
+
+        // blit: the antialiased (multisampled) drawing is resolved into the texture while it's bound; without it the
+        // texture kept old data (e.g. a red floor)
+        renderer.render(source, {
+            renderTexture: texture,
+            clear: true,
+            transform: new Matrix(1, 0, 0, 1, -bounds.x, -bounds.y),
+            blit: texture.framebuffer.multisample > MSAA_QUALITY.NONE,
+        });
+
+        if (!plane.sprite) {
+            plane.sprite = new Sprite(texture);
+            plane.sprite.eventMode = 'none';
+            this.container.addChild(plane.sprite);
+        } else if (plane.sprite.texture !== texture) {
+            plane.sprite.texture = texture;
+        }
+
+        plane.sprite.position.set(source.x + bounds.x, source.y + bounds.y);
+        plane.sprite.zIndex = source.zIndex;
+
+        // still in the room for the mouse, not drawn (Pixi doesn't render a container with alpha 0)
+        source.alpha = 0;
+    }
+
+    /** True if the images of all the tiles/walls of the container are loaded. */
+    private static texturesReady(container: Container): boolean {
+        const ready = (texture?: Texture | null) => !texture || texture === Texture.WHITE || texture.baseTexture.valid;
+
+        for (const child of container.children) {
+            if (!child.visible) continue;
+
+            if (child instanceof Sprite && !ready(child.texture)) return false;
+
+            if (child instanceof Graphics) {
+                for (const data of child.geometry.graphicsData) {
+                    if (!ready(data.fillStyle?.texture) || !ready(data.lineStyle?.texture)) return false;
+                }
+            }
+
+            if (child instanceof Container && child.children.length && !RoomVisualization.texturesReady(child)) return false;
+        }
+
+        return true;
+    }
+
+    private static maxTextureSize(renderer: Renderer): number {
+        const gl = renderer.gl;
+        return gl ? gl.getParameter(gl.MAX_TEXTURE_SIZE) : 4096;
     }
 
     tileToLocal(x: number, y: number, z: number): Point {
@@ -211,8 +328,6 @@ export class RoomVisualization implements Disposable {
         object: RoomObjectController<RoomVisualization, RoomLogic>,
         follow = false
     ) {
-        console.log(object.visualization);
-
         if (!object) return;
 
         this.container.addChild(object.visualization.container);

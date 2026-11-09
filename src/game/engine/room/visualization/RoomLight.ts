@@ -32,11 +32,15 @@ export class RoomLight {
     private readonly roomOverlay: Graphics;
     private animation: number | null = null;
 
+    /** The planes that have the background filter now. */
+    private filteredPlanes: Container[] = [];
+    private planesColor = RoomLight.WHITE;
+
     /**
      * @param room the container of the whole room.
-     * @param planes the containers of the floor and of the walls.
+     * @param planes what draws the floor and the walls (their textures, see RoomVisualization.updateBakedPlanes).
      */
-    constructor(private readonly room: Container, private readonly planes: Container[]) {
+    constructor(private readonly room: Container, private readonly planes: () => Container[]) {
         const overlay = new Graphics();
         overlay.beginFill(0xffffff).drawRect(-RoomLight.OVERLAY_SIZE / 2, -RoomLight.OVERLAY_SIZE / 2, RoomLight.OVERLAY_SIZE, RoomLight.OVERLAY_SIZE).endFill();
         overlay.blendMode = BLEND_MODES.MULTIPLY;
@@ -103,11 +107,23 @@ export class RoomLight {
             this.light = this.originalLight + (this.targetLight - this.originalLight) * t;
         }
 
-        const background = this.backgroundOnly ? RoomLight.lightColor(this.color, this.light) : RoomLight.WHITE;
-        for (const plane of this.planes) this.applyFilter(plane, this.planesFilter, background);
+        this.planesColor = this.backgroundOnly ? RoomLight.lightColor(this.color, this.light) : RoomLight.WHITE;
+        this.refreshPlanes();
 
         if (t < 1) this.animation = requestAnimationFrame(this.update);
     };
+
+    /** The background light on what draws the planes now (e.g. they were drawn again in their textures). */
+    refreshPlanes(): void {
+        const planes = this.planes();
+
+        for (const old of this.filteredPlanes) {
+            if (!planes.includes(old)) this.applyFilter(old, this.planesFilter, RoomLight.WHITE);
+        }
+
+        for (const plane of planes) this.applyFilter(plane, this.planesFilter, this.planesColor);
+        this.filteredPlanes = planes;
+    }
 
     /** The color with the brightness as lightness (Nitro: hslToRGB((rgbToHSL(color) & 0xFFFF00) + light)). */
     static lightColor(color: number, light: number): number {
@@ -116,7 +132,7 @@ export class RoomLight {
 
     /** The filter multiplies red, green and blue by the color; with white it's removed (nothing to do). */
     private applyFilter(container: Container, filter: ColorMatrixFilter, color: number): void {
-        if (container.destroyed) return;
+        if (!container || container.destroyed) return;
 
         const others = (container.filters ?? []).filter(f => f !== filter);
 

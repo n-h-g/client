@@ -46,6 +46,8 @@ export class PlaneVisualization extends RoomObjectVisualization {
         this.plane.mapObjects.forEach(obj => {
             if (obj instanceof RoomObjectController) obj.visualization?.render();
         });
+
+        this.plane.room.visualization.markPlanesDirty();
     }
 
     private getCanvas() {

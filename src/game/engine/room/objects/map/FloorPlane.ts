@@ -86,6 +86,7 @@ export class FloorPlane extends RoomPlane {
 
             tile.coveredByFloorHole = covered;
             tile.visualization?.setHidden(covered);
+            this.room.visualization.markPlanesDirty();
         }
     }
 

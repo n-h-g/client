@@ -95,6 +95,9 @@ export class RoomLogic implements Disposable {
     tick(delta: number): void {
         this.room.getWallPlane().logic?.tick(delta);
         this.room.getFloorPlane().logic?.tick(delta);
+
+        // the floor and the walls drawn again in their textures if they changed
+        this.room.visualization.updateBakedPlanes();
     }
 
     getCanvasFloorHit(): HTMLCanvasElement {
