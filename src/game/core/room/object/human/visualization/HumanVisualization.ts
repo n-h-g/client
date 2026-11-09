@@ -352,8 +352,6 @@ export abstract class HumanVisualization extends EntityVisualization {
             : this.actions.has(ActionId.LAY)
                 ? 64
                 : 0;
-        // The avatar container is pivoted at the feet, so Nitro's -70px
-        // registration point maps to avatarHeight - 70 in local coordinates.
         heart.x = avatarWidth / 2 + offsetX - 8;
         heart.y = avatarHeight - 140 + postureOffsetY - 8 - progress * 24;
         heart.alpha = Math.min(1, progress * 3, (1 - progress) * 3);

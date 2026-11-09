@@ -11,7 +11,7 @@
 </template>
 
 <script setup lang="ts">
-import { nextTick, ref } from 'vue'
+import { nextTick, onBeforeUnmount, onMounted, ref } from 'vue'
 import { EventManager } from '../../../../game/core/events/EventManager'
 import { Engine } from '../../../../game/Engine'
 import { RoomUIEventData } from '../../../../game/engine/events/ui/data/room/RoomUIEventData'
@@ -32,6 +32,8 @@ EventManager.read(UIEvents.ROOM_UI, (payload: RoomUIEventData) => {
 
 	// out of the room: no more whispers
 	if (!payload.enabled) whisperTo.value = ""
+	// in the room: ready to talk
+	else nextTick(() => input.value?.focus())
 })
 
 EventManager.read(UIEvents.CHAT_WHISPER, (payload: WhisperData) => {
@@ -79,6 +81,43 @@ function onKeyDown(e: KeyboardEvent) {
 	// a whisper is not shown as typing
 	sendTyping(!whisperTo.value && message.value !== "")
 }
+
+/**
+ * The keys typed while nothing else takes them (after a click on the room...) go to the chat:
+ * there is no need to click on the input to talk again.
+ */
+function onWindowKeyDown(e: KeyboardEvent) {
+	if (!enabled.value || !input.value || e.defaultPrevented) return
+	if (e.ctrlKey || e.metaKey || e.altKey || e.isComposing) return
+
+	const target = e.target as HTMLElement | null
+	if (target && (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.tagName === 'SELECT' || target.isContentEditable)) return
+
+	// while placing a furni the keys are for the room (R rotates, Esc cancels)
+	if (Engine.getInstance().roomService?.currentRoom?.roomEntityRepository?.isEntityRolling()) return
+
+	if (e.key === "Enter") {
+		e.preventDefault()
+		input.value.focus()
+		return
+	}
+
+	// only the printable characters (no arrows, F keys, Esc...)
+	if (e.key.length !== 1) return
+
+	e.preventDefault()
+	message.value += e.key
+	input.value.focus()
+	nextTick(() => {
+		const el = input.value
+		if (el) el.setSelectionRange(el.value.length, el.value.length)
+	})
+
+	sendTyping(!whisperTo.value)
+}
+
+onMounted(() => window.addEventListener('keydown', onWindowKeyDown))
+onBeforeUnmount(() => window.removeEventListener('keydown', onWindowKeyDown))
 
 function sendTyping(typing: boolean) {
 	const roomId = Engine.getInstance().roomService.currentRoom?.id
