@@ -52,6 +52,18 @@ export enum OutgoingPacket {
     RoomDimmerSavePresetEvent = 55,
     /** Switch the room dimmer on/off (Nitro's RoomDimmerChangeStateComposer): {id}. */
     RoomDimmerToggleEvent = 56,
+    /** The badges of the user (inventory, tab Badges). */
+    RequestInventoryBadgesEvent = 57,
+    /** The user wears these badges, in this order: {codes} (at most 5). */
+    SetWornBadgesEvent = 58,
+    /** The bots in the inventory of the user (tab Bots). */
+    RequestInventoryBotsEvent = 59,
+    /** Place a bot of the inventory in the room, next to the user: {id}. */
+    PlaceBotEvent = 60,
+    /** Pick up a bot from the room (its owner or the owner of the room): {id} (its entity). */
+    PickupBotEvent = 61,
+    /** The pets of the user (tab Pets). */
+    RequestInventoryPetsEvent = 62,
     /** A wallpaper/floor/landscape applied from the inventory (Nitro's FurniturePlacePaintComposer): {id}. */
     RoomApplyDecorationEvent = 29,
     MoveWallItemEvent = 33,

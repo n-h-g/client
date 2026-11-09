@@ -41,6 +41,10 @@ export abstract class HumanVisualization extends EntityVisualization {
     private effectId = 0;
     private effect: AvatarEffect | null = null;
 
+    /** The hand item of the server (0: nothing) and if the avatar is drinking it now (see HumanLogic). */
+    private handItem = 0;
+    private usingHandItem = false;
+
     constructor(human: Human) {
         super(human);
         this.entity = human;
@@ -74,6 +78,7 @@ export abstract class HumanVisualization extends EntityVisualization {
     }
 
     dispose(): void {
+        window.clearTimeout(this.gestureTimer);
         super.dispose();
     }
 
@@ -123,6 +128,54 @@ export abstract class HumanVisualization extends EntityVisualization {
         });
     }
 
+    get HandItem(): number {
+        return this.handItem;
+    }
+
+    /** What the avatar carries in its hand (e.g. a coffee of a vending machine), 0 for nothing. */
+    setHandItem(id: number): void {
+        const item = id > 0 ? id : 0;
+        if (item === this.handItem) return;
+
+        this.handItem = item;
+        this.usingHandItem = false;
+        if (this.loaded) this.draw();
+    }
+
+    /** The avatar drinks/eats what it carries for an instant (see HumanLogic), as in Habbo. */
+    setUsingHandItem(using: boolean): void {
+        if (this.usingHandItem === using) return;
+
+        this.usingHandItem = using;
+        if (this.loaded) this.draw();
+    }
+
+    /**
+     * The expression of the last chat message (e.g. :) smiles, see ChatGestures), null without: shown for a while
+     * on the client only, as Nitro's gestures. It doesn't change the actions of the server.
+     */
+    private gesture: ActionId | null = null;
+    private gestureTimer: number | undefined;
+
+    showGesture(gesture: ActionId, duration: number): void {
+        window.clearTimeout(this.gestureTimer);
+
+        this.gesture = gesture;
+        this.frame = 0;
+        this.gestureTimer = window.setTimeout(() => {
+            this.gesture = null;
+            this.frame = 0;
+            if (this.loaded) this.draw();
+        }, duration);
+
+        if (this.loaded) this.draw();
+    }
+
+    /** True if the avatar has the action, of the server or as the expression of its chat. */
+    private hasDrawAction(action: ActionId): boolean {
+        return this.actions.has(action) || this.gesture === action;
+    }
+
     /** The eyes are closed for an instant (see HumanLogic): the avatar blinks, as in Habbo. */
     private blinking = false;
 
@@ -142,11 +195,14 @@ export abstract class HumanVisualization extends EntityVisualization {
      * while it blinks. The actions of the server are not changed.
      */
     private getDrawActions(): Set<ActionId> {
-        if (!this.blinking || HumanVisualization.EYE_ACTIONS.some(action => this.actions.has(action))) return this.actions;
+        // the expression first: the imager gives each part the first action that has it, and Default has the
+        // eyes and the face too (Nitro sorts by precedence: the gestures 510 before Default 1000)
+        const actions = this.gesture ? new Set([this.gesture, ...this.actions]) : this.actions;
 
-        // first: the imager gives each part the first action that has it, and Default has the eyes too
-        // (Nitro sorts by precedence: Sleep 520 before Default 1000)
-        return new Set([ActionId.SLEEP, ...this.actions]);
+        // the expressions use the eyes: no blink
+        if (!this.blinking || this.gesture || HumanVisualization.EYE_ACTIONS.some(action => actions.has(action))) return actions;
+
+        return new Set([ActionId.SLEEP, ...actions]);
     }
 
     /** The user started/stopped typing (or sent its message): the bubble over its head. */
@@ -210,6 +266,8 @@ export abstract class HumanVisualization extends EntityVisualization {
                 0, false, false, false, this.danceStyle, this.signValue, this.onFurni
             );
             this.avatar.Effect = this.effect;
+            this.avatar.HandItem = this.handItem;
+            this.avatar.UsingHandItem = this.usingHandItem;
         } else {
             this.avatar = new AvatarPlaceHolder(
                 '',
@@ -229,6 +287,7 @@ export abstract class HumanVisualization extends EntityVisualization {
         this.updateTypingBubble();
         const oneShotFrameCount = this.getOneShotFrameCount();
         this.needsUpdate = this.actions.has(ActionId.DANCE) ||
+            this.gesture === ActionId.LAUGH ||
             this.actions.has(ActionId.WAVE) ||
             this.actions.has(ActionId.RESPECT) ||
             this.actions.has(ActionId.WALK) ||
@@ -296,7 +355,7 @@ export abstract class HumanVisualization extends EntityVisualization {
         // The avatar container is pivoted at the feet, so Nitro's -70px
         // registration point maps to avatarHeight - 70 in local coordinates.
         heart.x = avatarWidth / 2 + offsetX - 8;
-        heart.y = avatarHeight - 70 + postureOffsetY - 8 - progress * 24;
+        heart.y = avatarHeight - 140 + postureOffsetY - 8 - progress * 24;
         heart.alpha = Math.min(1, progress * 3, (1 - progress) * 3);
         heart.zIndex = 1000;
         this.container.addChild(heart);
@@ -381,7 +440,7 @@ export abstract class HumanVisualization extends EntityVisualization {
     }
 
     private getOneShotFrameCount(): number {
-        if (this.actions.has(ActionId.LAUGH)) return 16;
+        if (this.hasDrawAction(ActionId.LAUGH)) return 16;
         if (this.actions.has(ActionId.BLOW)) return 20;
         return 0;
     }

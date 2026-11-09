@@ -11,6 +11,7 @@ export class UpdateUserInformation extends MessageHandler {
     handle(): void {
         const userInfo: UserData = this.message;
         Engine.getInstance().currentUserId = userInfo.id;
+        Engine.getInstance().currentUsername = userInfo.username ?? null;
 
         // the friends of the user, for the bottom bar (only the first time: the server sends the changes)
         FriendsStore.getInstance().requestOnce();

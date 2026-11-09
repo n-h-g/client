@@ -24,6 +24,10 @@ export class Action {
 
     types: IActionType[];
 
+    /** As Nitro's ActionDefinition: e.g. the hand item -> the "ri" part drawn (CarryItem, UseItem). */
+    private params = new Map<string, string>();
+    private defaultParameterValue = '';
+
     constructor(actionData: IAction) {
         this.id = actionData.id as ActionId;
         this.state = actionData.state;
@@ -37,6 +41,18 @@ export class Action {
         this.lay = actionData.lay;
         this.preventHeadTurn = actionData.preventHeadTurn;
         this.types = actionData.types;
+
+        for (const param of actionData.params ?? []) {
+            if (param.id === 'default') this.defaultParameterValue = param.value;
+            else this.params.set(param.id, param.value);
+        }
+    }
+
+    /** The value of a parameter (Nitro's getParameterValue): the default one if the action doesn't have it. */
+    getParameterValue(id: string): string {
+        if (!id) return '';
+
+        return this.params.get(id) || this.defaultParameterValue;
     }
 
     getActionStateName() {

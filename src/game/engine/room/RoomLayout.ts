@@ -139,9 +139,6 @@ export class RoomLayout {
     }
 
     createOrGetRoomCanvas(name: string): HTMLCanvasElement {
-        // Hit-test canvases belong to this room only. Catalogue previews create
-        // disposable rooms while the real room is live, so their DOM ids must
-        // not make them resize/reuse the live room's canvases.
         const canvasId = `room-${this.room.id}-${name}`;
         let canvas = document.getElementById(canvasId) as HTMLCanvasElement;
 

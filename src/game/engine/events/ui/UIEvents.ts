@@ -37,4 +37,12 @@ export class UIEvents extends Events {
     static CHANGE_LOOK: UIEvents = new UIEvents('change_look')
     /** A notification in the bubble alerts (top right), see BubbleAlertData. */
     static BUBBLE_ALERT: UIEvents = new UIEvents('bubble_alert');
+    /** The chat whispers to a user (WhisperData), or talks to the room again with an empty username. */
+    static CHAT_WHISPER: UIEvents = new UIEvents('chat_whisper');
+    /** The badges of the user (InventoryBadgesData). */
+    static INVENTORY_BADGES: UIEvents = new UIEvents('inventory_badges');
+    /** The bots in the inventory of the user (InventoryBotsData). */
+    static INVENTORY_BOTS: UIEvents = new UIEvents('inventory_bots');
+    /** The pets of the user (InventoryPetsData). */
+    static INVENTORY_PETS: UIEvents = new UIEvents('inventory_pets');
 }

@@ -41,6 +41,10 @@
                 </button>
             </template>
         </template>
+        <template v-else-if="avatar.isBot">
+            <button v-if="avatar.canPickUp" class="avatar-menu-row" @click="pickUpBot">Prendi</button>
+            <div v-else class="avatar-menu-row unavailable">Bot</div>
+        </template>
         <template v-else>
             <template v-if="avatar.userId != null && !friendship.isFriend">
                 <button v-if="friendship.hasRequestFrom" class="avatar-menu-row" @click="acceptFriend">Accetta amicizia</button>
@@ -48,7 +52,7 @@
                 <button v-else class="avatar-menu-row" @click="addFriend">Aggiungi amico</button>
             </template>
             <button class="avatar-menu-row unavailable" disabled>Trade</button>
-            <button class="avatar-menu-row unavailable" disabled>Whisper</button>
+            <button v-if="avatar.userId != null" class="avatar-menu-row" @click="whisper">Sussurra</button>
             <button class="avatar-menu-row unavailable" disabled>Give a gem <span class="gem">💎</span></button>
             <button class="avatar-menu-row unavailable" disabled>Ignore</button>
             <button class="avatar-menu-row unavailable" disabled>Report</button>
@@ -70,6 +74,7 @@ import {UIComponent} from '../../../game/engine/ui/components/UIComponent'
 import {IComponentShowableUI} from '../../../game/core/ui/IComponentShowableUI'
 import {OutgoingPacket} from '../../../game/networking/packets/outgoing/OutgoingPacket'
 import {FriendsStore} from '../../../game/engine/friends/FriendsStore'
+import {WhisperData} from '../../../game/engine/events/ui/data/room/WhisperData'
 
 const visible = ref(false)
 const menu = ref<HTMLElement | null>(null)
@@ -100,6 +105,18 @@ const friendship = computed(() => {
 function addFriend() {
     if (avatar.value.userId == null) return
     FriendsStore.getInstance().sendRequest({userId: avatar.value.userId})
+    close()
+}
+
+/** The bot goes back to the inventory of its owner. */
+function pickUpBot() {
+    Engine.getInstance()?.networkingManager?.packetManager?.applyOut(OutgoingPacket.PickupBotEvent, {id: avatar.value.id})
+    close()
+}
+
+/** The chat bar whispers to the user (see ChatBar). */
+function whisper() {
+    EventManager.emit<WhisperData>(UIEvents.CHAT_WHISPER, {username: avatar.value.name})
     close()
 }
 

@@ -343,23 +343,30 @@ export abstract class ItemVisualization
     /** Margin over the tiles of a flat furni for its thickness (e.g. the edge of a rug). */
     private static readonly FLAT_ITEM_MARGIN = 16;
 
+    /** Part of the width of its tiles a flat furni covers at least (a rug covers them, the edges may be thinner). */
+    private static readonly FLAT_ITEM_MIN_WIDTH = 0.75;
+
     /**
      * A furni that is part of the floor (a rug, val11_floor, party_floor): no height in its logic and an image
-     * not taller than its tiles. It's drawn with the floor, under the tile pointer (as Habbo).
-     * The height alone is not enough: e.g. party_tube_bubble has no height but it's a tall tube.
+     * not taller than its tiles, as wide as its tiles. It's drawn with the floor, under the tile pointer (as Habbo).
+     * The height alone is not enough: e.g. party_tube_bubble has no height but it's a tall tube; a football has no
+     * height and a small image, but it's on the floor, not part of it (the pointer was drawn over it).
      */
     private isFlatFloorItem(): boolean {
         const base = (this.entity as Item).base;
         const container = (this.sprite as Furni | undefined)?.container;
         if (!base || !container || base.getLogicDimension(2) > 0.01) return false;
 
-        const imageHeight = container.getLocalBounds().height;
-        if (imageHeight <= 0) return false;
+        const bounds = container.getLocalBounds();
+        if (bounds.height <= 0) return false;
 
-        // the height of the rhombus of its tiles: half a tile height for each tile along x and y
-        const tilesHeight = (base.getLogicDimension(0) + base.getLogicDimension(1)) * MapData.tileHeight / 2;
+        // the rhombus of its tiles: half a tile for each tile along x and y
+        const tiles = base.getLogicDimension(0) + base.getLogicDimension(1);
+        const tilesHeight = tiles * MapData.tileHeight / 2;
+        const tilesWidth = tiles * MapData.tileWidth / 2;
 
-        return imageHeight <= tilesHeight + ItemVisualization.FLAT_ITEM_MARGIN;
+        return bounds.height <= tilesHeight + ItemVisualization.FLAT_ITEM_MARGIN
+            && bounds.width >= tilesWidth * ItemVisualization.FLAT_ITEM_MIN_WIDTH;
     }
 
     public getimagePreview(): string {

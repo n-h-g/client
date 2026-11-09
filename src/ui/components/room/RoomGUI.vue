@@ -7,13 +7,13 @@
                 :key="message.internalId"
                 :ref="element => setBubbleElement(message, element as HTMLElement | null)"
                 :style="{ top: message.top + 'px', left: message.left + 'px', visibility: message.ready ? 'visible' : 'hidden' }"
-                :class="{ chatBubbleShout: message.data.shout }"
+                :class="{ chatBubbleShout: message.data.shout, chatBubbleWhisper: message.data.whisper }"
                 @click="onClickChat(message)">
                 <div class="chatBubbleHead">
                     <img v-if="message.head" :src="message.head" @load="onHeadLoad" />
                 </div>
                 <div class="chatBubbleContent">
-                    <b>{{ message.data.author?.name }}:</b> {{ message.data.text }}
+                    <b>{{ message.data.author?.name }}</b><span v-if="message.data.whisper && message.data.whisperTo" class="chatBubbleWhisperTo"> → {{ message.data.whisperTo }}</span><b>:</b> {{ message.data.text }}
                 </div>
                 <div class="chatBubblePointer"></div>
             </div>
@@ -356,9 +356,18 @@ function getAuthorName() {
             }
         }
 
-        .chatBubbleWhisper {
-            color: #636363;
-            font-style: italic;
+        /* a whisper, as Habbo: grey and italic */
+        .chatBubble.chatBubbleWhisper {
+            background: linear-gradient(180deg, #f2f2f2 0%, #dedede 50%, #f2f2f2 100%);
+
+            .chatBubbleContent {
+                color: #636363;
+                font-style: italic;
+            }
+
+            .chatBubbleWhisperTo {
+                font-weight: normal;
+            }
         }
         .chatBubbleShout {
             font-weight: bold; 

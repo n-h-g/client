@@ -4,6 +4,9 @@ import {UserEntityVisualization} from './visualization/UserEntityVisualization';
 
 export class UserEntity extends Human {
     userId: number | null = null;
+    /** A bot: the user that owns it (null for the bots of the hotel), see isBot. */
+    botOwnerId: number | null = null;
+    isBot = false;
 
     constructor(id = '', name = '', look = '') {
         super(id, name, look);

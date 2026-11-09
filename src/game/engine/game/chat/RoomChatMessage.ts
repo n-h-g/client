@@ -10,12 +10,15 @@ export class RoomChatMessage extends Message {
     x = 0;
     readonly author: Entity;
     readonly messageType: MessageType;
+    /** The username a whisper is for. */
+    readonly recipient?: string;
 
     constructor(
         message: string,
         author: Entity,
         messageType: MessageType,
-        destinationId = -1
+        destinationId = -1,
+        recipient?: string
     ) {
         super(
             Engine.getInstance().chatService.getLastMessageId(),
@@ -26,6 +29,7 @@ export class RoomChatMessage extends Message {
         );
         this.messageType = messageType;
         this.author = author;
+        this.recipient = recipient;
 
         this.compose();
     }

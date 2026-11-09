@@ -12,6 +12,9 @@ export class LoginResponse extends MessageHandler {
         if (Engine.getInstance().config.offlineMode) return;
 
         if (this.message.data) {
+            // the loading is over: a connection lost from now on is not tried again
+            Engine.getInstance()?.networkingManager?.webSocketManager?.onLoggedIn();
+
             const GameLoaderUI: GameLoaderUI =
                 Engine.getInstance().userInterfaceManager.componentsManager.getComponent<GameLoaderUI>(
                     UIComponent.GameLoaderUI

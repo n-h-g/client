@@ -3,11 +3,98 @@
         <div class="sub">
             <div class="item" :class="{ active: currentTab == 'floor' }" @click.stop="changeTab('floor')">Floor</div>
             <div class="item" :class="{ active: currentTab == 'wall' }" @click.stop="changeTab('wall')">Wall</div>
+            <div class="item" :class="{ active: currentTab == 'pets' }" @click.stop="changeTab('pets')">Pets</div>
+            <div class="item" :class="{ active: currentTab == 'bots' }" @click.stop="changeTab('bots')">Bots</div>
+            <div class="item" :class="{ active: currentTab == 'badges' }" @click.stop="changeTab('badges')">Badges</div>
         </div>
 
         <div class="inventoryContainer" @click="deselectItem()">
             <div class="inventoryContainerBg">
-                <div class="inventoryListAndButtonsContainer">
+                <!-- pets, bots and badges: their own list and panel -->
+                <div class="inventoryListAndButtonsContainer" v-if="currentTab == 'pets'">
+                    <div class="listContainer itemsContainer">
+                        <div class="inventoryEmpty" v-if="pets.length == 0">Non hai animali</div>
+                        <div class="itemInventory petInventory"
+                            :class="{ selected: selectedPet && selectedPet.id === pet.id }"
+                            v-for="pet in pets" :key="pet.id"
+                            :title="pet.name"
+                            @click.stop="selectedPet = pet">
+                            <span class="petInitial" :style="{ color: '#' + pet.color }">{{ pet.name.charAt(0).toUpperCase() }}</span>
+                        </div>
+                    </div>
+                    <div class="buttonsContainer">
+                        <template v-if="selectedPet">
+                            <div class="itemName">{{ selectedPet.name }}</div>
+                            <div class="itemDetails">{{ petTypeName(selectedPet.type) }}</div>
+                            <div class="itemDetails muted">Gli animali non si possono ancora mettere nelle stanze</div>
+                        </template>
+                    </div>
+                </div>
+
+                <div class="inventoryListAndButtonsContainer" v-else-if="currentTab == 'bots'">
+                    <div class="listContainer itemsContainer">
+                        <div class="inventoryEmpty" v-if="bots.length == 0">Non hai bot (scrivi :bot nome per crearne uno)</div>
+                        <div class="itemInventory"
+                            :class="{ selected: selectedBot && selectedBot.id === bot.id }"
+                            v-for="bot in bots" :key="bot.id"
+                            :title="bot.name"
+                            @click.stop="selectedBot = bot">
+                            <img v-if="botHeads[bot.look]" :src="botHeads[bot.look]" class="botHead" />
+                        </div>
+                    </div>
+                    <div class="buttonsContainer">
+                        <template v-if="selectedBot">
+                            <div class="itemName">{{ selectedBot.name }}</div>
+                            <div class="itemPreview">
+                                <img v-if="botHeads[selectedBot.look]" :src="botHeads[selectedBot.look]" class="botHeadLarge" />
+                            </div>
+                            <div class="buttonList">
+                                <div class="ui-button small" v-if="inRoom" @click.stop="placeBot()">Place</div>
+                                <div class="itemDetails muted" v-else>Entra in una stanza per metterlo</div>
+                            </div>
+                        </template>
+                    </div>
+                </div>
+
+                <div class="inventoryListAndButtonsContainer" v-else-if="currentTab == 'badges'">
+                    <div class="listContainer itemsContainer badgesContainer">
+                        <div class="wornBadges">
+                            <span class="label">Indossati</span>
+                            <div class="badgeSlot" v-for="slot in wornSlots" :key="slot.index"
+                                :class="{ selected: slot.badge && selectedBadge && selectedBadge.code === slot.badge.code }"
+                                @click.stop="slot.badge && (selectedBadge = slot.badge)">
+                                <img v-if="slot.badge && !brokenBadges[slot.badge.code]" :src="badgeImage(slot.badge.code)"
+                                    @error="brokenBadges[slot.badge.code] = true" />
+                                <span v-else-if="slot.badge" class="badgeCode">{{ slot.badge.code }}</span>
+                            </div>
+                        </div>
+                        <div class="inventoryEmpty" v-if="badges.length == 0">Non hai badge</div>
+                        <div class="itemInventory badgeInventory"
+                            :class="{ selected: selectedBadge && selectedBadge.code === badge.code, worn: badge.slot > 0 }"
+                            v-for="badge in badges" :key="badge.code"
+                            :title="badge.code"
+                            @click.stop="selectedBadge = badge">
+                            <img v-if="!brokenBadges[badge.code]" :src="badgeImage(badge.code)" @error="brokenBadges[badge.code] = true" />
+                            <span v-else class="badgeCode">{{ badge.code }}</span>
+                        </div>
+                    </div>
+                    <div class="buttonsContainer">
+                        <template v-if="selectedBadge">
+                            <div class="itemName">{{ selectedBadge.code }}</div>
+                            <div class="itemPreview">
+                                <img v-if="!brokenBadges[selectedBadge.code]" :src="badgeImage(selectedBadge.code)" class="badgeLarge" />
+                                <span v-else class="badgeCode">{{ selectedBadge.code }}</span>
+                            </div>
+                            <div class="buttonList">
+                                <div class="ui-button small" v-if="selectedBadge.slot > 0" @click.stop="setBadgeWorn(selectedBadge, false)">Togli</div>
+                                <div class="ui-button small" v-else-if="wornBadges.length < MAX_WORN_BADGES" @click.stop="setBadgeWorn(selectedBadge, true)">Indossa</div>
+                                <div class="itemDetails muted" v-else>Puoi indossare al massimo {{ MAX_WORN_BADGES }} badge</div>
+                            </div>
+                        </template>
+                    </div>
+                </div>
+
+                <div class="inventoryListAndButtonsContainer" v-else>
                     <div class="listContainer itemsContainer">
                         <template v-if="currentTab == 'floor'">
                             <div class="itemInventory" 
@@ -76,7 +163,7 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, ref } from "vue"
+import { computed, onMounted, reactive, ref } from "vue"
 import { ItemVisualization } from "../../../game/core/room/object/items/visualization/ItemVisualization"
 import { Engine } from "../../../game/Engine"
 import {Item} from "../../../game/engine/room/objects/items/Item"
@@ -91,6 +178,8 @@ import { InventoryItemsEventData } from "../../../game/engine/events/ui/data/inv
 import { FurniPreview } from "../../../game/engine/ui/imagers/items/utils/FurniPreview"
 import { ItemType } from "../../../game/core/room/object/items/ItemType"
 import { RoomDecorationLibrary } from "../../../game/engine/room/decoration/RoomDecorationLibrary"
+import { AvatarHeadImage } from "../../../game/engine/ui/imagers/avatars/AvatarHeadImage"
+import { InventoryBadge, InventoryBadgesData, InventoryBot, InventoryBotsData, InventoryPet, InventoryPetsData } from "../../../game/engine/events/ui/data/inventory/InventoryTabs"
 
 const tradeMode = ref(false)
 const myTradeItems = ref([])
@@ -143,6 +232,97 @@ EventManager.read(UIEvents.INVENTORY_ITEMS_ADDED, (data: InventoryItemsEventData
     }
 })
 
+// pets, bots and badges: asked to the server when their tab is opened
+
+const pets = ref<InventoryPet[]>([])
+const bots = ref<InventoryBot[]>([])
+const badges = ref<InventoryBadge[]>([])
+const selectedPet = ref<InventoryPet | null>(null)
+const selectedBot = ref<InventoryBot | null>(null)
+const selectedBadge = ref<InventoryBadge | null>(null)
+
+/** As Habbo: up to 5 badges worn. */
+const MAX_WORN_BADGES = 5
+
+/** The heads of the bots, by look. */
+const botHeads = reactive<Record<string, string>>({})
+/** The badges without image (the album has no image with that code): their code is shown. */
+const brokenBadges = reactive<Record<string, boolean>>({})
+
+const inRoom = computed(() => Engine.getInstance()?.roomService?.currentRoom != undefined)
+
+const wornBadges = computed(() => badges.value.filter(badge => badge.slot > 0).sort((a, b) => a.slot - b.slot))
+const wornSlots = computed(() => Array.from({ length: MAX_WORN_BADGES }, (_, index) => ({
+    index,
+    badge: wornBadges.value[index] ?? null,
+})))
+
+EventManager.read(UIEvents.INVENTORY_PETS, (data: InventoryPetsData) => {
+    pets.value = data.pets
+    if (selectedPet.value) selectedPet.value = data.pets.find(pet => pet.id === selectedPet.value!.id) ?? null
+})
+
+EventManager.read(UIEvents.INVENTORY_BOTS, (data: InventoryBotsData) => {
+    bots.value = data.bots
+    // e.g. the bot placed: it's not in the inventory anymore
+    if (selectedBot.value) selectedBot.value = data.bots.find(bot => bot.id === selectedBot.value!.id) ?? null
+
+    for (const bot of data.bots) {
+        if (!bot.look || botHeads[bot.look] !== undefined) continue
+
+        botHeads[bot.look] = ''
+        AvatarHeadImage.get(bot.look).then(image => {
+            if (image) botHeads[bot.look] = image
+            else delete botHeads[bot.look]
+        })
+    }
+})
+
+EventManager.read(UIEvents.INVENTORY_BADGES, (data: InventoryBadgesData) => {
+    badges.value = data.badges
+    if (selectedBadge.value) selectedBadge.value = data.badges.find(badge => badge.code === selectedBadge.value!.code) ?? null
+})
+
+/** The names of the Nitro pet types. */
+const PET_TYPES = ['Cane', 'Gatto', 'Coccodrillo', 'Terrier', 'Orso', 'Maiale', 'Leone', 'Rinoceronte', 'Ragno',
+    'Tartaruga', 'Pulcino', 'Rana', 'Drago', 'Mostro', 'Scimmia', 'Cavallo']
+
+function petTypeName(type: number): string {
+    return PET_TYPES[type] ?? `Animale ${type}`
+}
+
+function badgeImage(code: string): string {
+    return Engine.getInstance().config.badgesUrl.replace('%badgename%', encodeURIComponent(code))
+}
+
+/** The bot goes in the room, next to the user. */
+function placeBot() {
+    if (!selectedBot.value) return
+
+    Engine.getInstance().networkingManager.packetManager.applyOut(OutgoingPacket.PlaceBotEvent, { id: selectedBot.value.id })
+}
+
+/** Wears the badge (in the first free slot) or takes it off: the server sends the badges again. */
+function setBadgeWorn(badge: InventoryBadge, worn: boolean) {
+    const codes = wornBadges.value.map(other => other.code).filter(code => code !== badge.code)
+    if (worn) codes.push(badge.code)
+
+    Engine.getInstance().networkingManager.packetManager.applyOut(OutgoingPacket.SetWornBadgesEvent, {
+        codes: codes.slice(0, MAX_WORN_BADGES),
+    })
+}
+
+/** The data of the tab, from the server. */
+function requestTab(tab: string) {
+    const packets: Record<string, OutgoingPacket> = {
+        pets: OutgoingPacket.RequestInventoryPetsEvent,
+        bots: OutgoingPacket.RequestInventoryBotsEvent,
+        badges: OutgoingPacket.RequestInventoryBadgesEvent,
+    }
+
+    if (packets[tab] != null) Engine.getInstance()?.networkingManager?.packetManager?.applyOut(packets[tab])
+}
+
 function addAllItemsToTrade() {
 
 }
@@ -193,6 +373,7 @@ function getImageIcon(item: Item) {
 function changeTab(tab: string) {
 	currentTab.value = tab;
     showPlaceItemButton.value = false
+    requestTab(tab)
 }
 
 // the furni drawn in the preview panel (the icon is shown until it's ready)
@@ -377,6 +558,93 @@ onMounted(() => {
     }
 
     // Stile quadratini inventario
+    .inventoryEmpty {
+        width: 100%;
+        padding: 20px 10px;
+        color: #777;
+        font-size: 12px;
+        text-align: center;
+    }
+
+    .itemDetails {
+        font-size: 11px;
+        text-align: center;
+        color: #333;
+        margin-bottom: 6px;
+
+        &.muted {
+            color: #888;
+            font-style: italic;
+        }
+    }
+
+    .petInitial {
+        font-size: 20px;
+        font-weight: bold;
+        text-shadow: 0 1px 0 #333, 0 -1px 0 #333, 1px 0 0 #333, -1px 0 0 #333;
+    }
+
+    .botHead {
+        max-width: 38px !important;
+        max-height: 38px !important;
+    }
+
+    .botHeadLarge {
+        image-rendering: pixelated;
+        transform: scale(1.5);
+    }
+
+    .badgeInventory.worn {
+        background: #d6e9c6;
+    }
+
+    .badgeCode {
+        font-size: 8px;
+        font-weight: bold;
+        color: #333;
+        word-break: break-all;
+        text-align: center;
+    }
+
+    .badgeLarge {
+        image-rendering: pixelated;
+        transform: scale(1.5);
+    }
+
+    .badgesContainer .wornBadges {
+        width: 100%;
+        display: flex;
+        align-items: center;
+        gap: 4px;
+        padding-bottom: 6px;
+        margin-bottom: 4px;
+        border-bottom: 1px solid #ccc;
+
+        .label {
+            font-size: 11px;
+            font-weight: bold;
+            margin-right: 4px;
+        }
+
+        .badgeSlot {
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #fff;
+            border: 1px dashed #999;
+            border-radius: 4px;
+            cursor: pointer;
+
+            &.selected {
+                box-shadow: inset 0 0 0 2px #333;
+            }
+
+            img { max-width: 36px; max-height: 36px; }
+        }
+    }
+
     .itemInventory {
         width: 40px;
         height: 40px;

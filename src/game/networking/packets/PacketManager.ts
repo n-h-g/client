@@ -6,7 +6,11 @@ import {CataloguePages} from './incoming/catalogue/CataloguePages';
 import {BuyItem} from './incoming/catalogue/BuyItem';
 import {LoginResponse} from './incoming/handshake/LoginResponse';
 import {PongResponse} from './incoming/handshake/PongResponse';
+import {BubbleAlert} from './incoming/general/BubbleAlert';
 import {LoadInventoryItems} from './incoming/items/LoadInventoryItem';
+import {InventoryBadges} from './incoming/inventory/InventoryBadges';
+import {InventoryBots} from './incoming/inventory/InventoryBots';
+import {InventoryPets} from './incoming/inventory/InventoryPets';
 import {AllRoomsList} from './incoming/navigator/AllRoomsList';
 import {MyRoomsList} from './incoming/navigator/MyRoomsList';
 import {AddRoomEntity} from './incoming/rooms/entities/AddRoomEntity';
@@ -20,6 +24,7 @@ import { ReceiveRoomId } from './incoming/rooms/ReceiveRoomId';
 import {RoomPaint} from './incoming/rooms/RoomPaint';
 import {UpdateRoomData} from './incoming/rooms/UpdateRoomData';
 import {UserTypingStatus} from './incoming/rooms/users/UserTypingStatus';
+import {UserGesture} from './incoming/rooms/users/UserGesture';
 import {UpdateUserInformation} from './incoming/users/UpdateUserInformation';
 import {OutgoingPacket} from './outgoing/OutgoingPacket';
 import {FriendsList} from './incoming/friends/FriendsList';
@@ -39,6 +44,7 @@ export class PacketManager {
         const incomingPacketsHeader: any = {
             1: new LoginResponse(),
             2: new PongResponse(),
+            5: new BubbleAlert(),
             101: new AllRoomsList(),
             102: new MyRoomsList(),
             200: new UpdateRoomData(),
@@ -52,8 +58,12 @@ export class PacketManager {
             209: new RoomPaint(),
             210: new ObjectsRolling(),
             211: new RoomDimmerPresets(),
+            212: new UserGesture(),
             400: new UpdateUserInformation(),
             401: new LoadInventoryItems(),
+            402: new InventoryBadges(),
+            403: new InventoryBots(),
+            404: new InventoryPets(),
             800: new CataloguePages(),
             801: new CataloguePage(),
             802: new BuyItem(),

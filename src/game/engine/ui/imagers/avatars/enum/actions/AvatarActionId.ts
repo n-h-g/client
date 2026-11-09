@@ -35,6 +35,15 @@ export class AvatarActionId {
                 return 'wlk';
             case ActionId.LAUGH:
                 return 'laugh';
+            // the expressions of the face (HabboAvatarActions: the "gesture" part set, the eyes and the face)
+            case ActionId.SMILE:
+                return 'sml';
+            case ActionId.SAD:
+                return 'sad';
+            case ActionId.ANGRY:
+                return 'agr';
+            case ActionId.SURPRISED:
+                return 'srp';
             default:
             case ActionId.STAND:
                 return 'std';

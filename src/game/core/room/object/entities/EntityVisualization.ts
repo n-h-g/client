@@ -18,6 +18,15 @@ export abstract class EntityVisualization extends RoomObjectVisualization {
         this.nextPosition = new Point3d(0, 0, 0);
     }
 
+    /** True once the server gave a position (nextPosition is 0, 0, 0 before). */
+    private hasNextPosition = false;
+
+    /**
+     * A walking entity farther than this (tiles) from its previous step jumps there before the next one (see
+     * walkTo). A step takes a room cycle on the server (480 ms) and on the client (AVATAR_WALK_SPEED, 476 ms).
+     */
+    private static readonly MAX_WALK_LAG = 0.5;
+
     /** A slide in progress (moved by a roller), null if none: see slideTo. */
     private slide: {fromX: number; fromY: number; fromZ: number; start: number; duration: number} | null = null;
 
@@ -28,6 +37,7 @@ export abstract class EntityVisualization extends RoomObjectVisualization {
     slideTo(point: Point3d, duration: number): void {
         const position = this.entity.position;
         this.slide = {fromX: position.x, fromY: position.y, fromZ: position.z, start: performance.now(), duration: Math.max(1, duration)};
+        this.hasNextPosition = true;
 
         this.nextPosition.x = point.x;
         this.nextPosition.y = point.y;
@@ -56,9 +66,35 @@ export abstract class EntityVisualization extends RoomObjectVisualization {
         return true;
     }
 
+    /**
+     * The next step of a walk, as Habbo: each step from the previous one. An entity still far from the previous
+     * step (the page was hidden or paused and its frames stopped, the steps arrived in a burst, slow frames) jumps
+     * there and walks only this step at the normal speed: it doesn't go after the server in jumps.
+     */
+    walkTo(point: Point3d): void {
+        // the same step sent again (e.g. the look changed by a football gate, an effect, a hand item while walking):
+        // the entity goes on walking it, it doesn't jump to its end
+        const sameStep = this.hasNextPosition && point.x === this.nextPosition.x && point.y === this.nextPosition.y;
+
+        if (!sameStep && this.hasNextPosition && this.walkLag() > EntityVisualization.MAX_WALK_LAG) {
+            this.snapToNextPosition();
+        }
+
+        this.setNextPosition(point);
+    }
+
+    /** How far (tiles) the entity is from where it's going. */
+    private walkLag(): number {
+        const position = this.entity.position;
+        if (!position) return 0;
+
+        return Math.max(Math.abs(this.nextPosition.x - position.x), Math.abs(this.nextPosition.y - position.y));
+    }
+
     setNextPosition(point: Point3d) {
         // a walk or a new position from the server ends the slide
         this.slide = null;
+        this.hasNextPosition = true;
         this.nextPosition.x = point.x;
         this.nextPosition.y = point.y;
 

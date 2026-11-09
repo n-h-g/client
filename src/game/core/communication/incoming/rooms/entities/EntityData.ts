@@ -19,8 +19,17 @@ export interface EntityData {
     bh_rot: HeadBodyRotationComponent;
     type: EntityType;
     action: ActionsComponent;
+    /** A bot (a human without user): its id and the user that owns it (null for the bots of the hotel). */
+    bot?: {
+        id: number;
+        ownerId: number | null;
+    };
     /** The avatar effect of a human (0: none). */
     effect?: {
+        id: number;
+    };
+    /** What a human carries in its hand (0: nothing), e.g. the coffee of a vending machine. */
+    handItem?: {
         id: number;
     };
     /** A furni: its stack height on the server and if something can be placed on it. */

@@ -13,6 +13,8 @@ export class Engine {
 	lastFrameTime: number;
     timeElapsed: number;
     currentUserId: number | null = null;
+    /** The username of the logged user (e.g. to know if it owns the room). */
+    currentUsername: string | null = null;
 
     private static instance: Engine;
 

@@ -25,6 +25,7 @@
   "furnidataUrl": "http://localhost/nitro/gamedata/json/FurnitureData.json",
   "itemsIconsUrl": "http://localhost/nitro/icons/",
   "catalogueResourcesUrl": "https://sharasy.com:2096/gamedata/c_images/catalogue/",
+  "badgesUrl": "https://sharasy.com:2096/gamedata/c_images/album1584/%badgename%.gif",
   "soundResourcesUrl": "https://sharasy.com:2096/gamedata/sounds/",
   "avatarNitroFigurePath": "http://localhost/nitro/figure",
   "avatarNitroFigureMapUrl": "http://localhost/nitro/gamedata/json/FigureMap.json"

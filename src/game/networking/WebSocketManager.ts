@@ -7,19 +7,26 @@ import {OutgoingPacket} from './packets/outgoing/OutgoingPacket';
 import {UIEvents} from '../engine/events/ui/UIEvents';
 
 export class WebSocketManager {
+    /** Waits between the attempts to connect during the loading (the server may be starting): longer and longer. */
+    private static readonly RETRY_DELAYS_MS = [2000, 3000, 5000, 10000];
+
     private webSocket: WebSocket;
-    private reconnectCounter = 0;
     private networkingManager: NetworkingManager;
-	private wrappedClosed = false;
+	private wrappedClosed = true;
+
+    /** True once the user is logged in: before, a connection that fails or closes is tried again. */
+    private loggedIn = false;
+    /** The connection was closed by the client (logout, wrong ticket, page closed): not tried again. */
+    private closedByClient = false;
+    private attempts = 0;
+    private retryTimer: number | null = null;
 
     constructor(networkingManager: NetworkingManager) {
         this.networkingManager = networkingManager;
 
-        if (Engine.getInstance()?.config.debug)
-            Logger.debug('Connecting to server: ' + this.webSocketUrl);
+        window.onbeforeunload = () => this.disconnect();
 
-        this.webSocket = new WebSocket(this.webSocketUrl);
-        this.setUpWebSocketEvents();
+        this.connect();
     }
 
     /**
@@ -37,53 +44,54 @@ export class WebSocketManager {
         return (server.ssl ? 'wss://' : 'ws://') + server.host + ':' + server.port + '/' + server.channel;
     }
 
-    private setUpWebSocketEvents(): void {
-        this.webSocket.onopen = () => {
+    private connect(): void {
+        this.retryTimer = null;
+        this.attempts++;
+
+        if (Engine.getInstance()?.config.debug)
+            Logger.debug('Connecting to server: ' + this.webSocketUrl + ' (attempt ' + this.attempts + ')');
+
+        this.webSocket = new WebSocket(this.webSocketUrl);
+        this.setUpWebSocketEvents(this.webSocket);
+    }
+
+    /** The user is logged in: the loading is over, a connection lost from now on is not tried again. */
+    onLoggedIn(): void {
+        this.loggedIn = true;
+        this.attempts = 0;
+    }
+
+    private setUpWebSocketEvents(webSocket: WebSocket): void {
+        webSocket.onopen = () => {
             if (Engine.getInstance().config.debug)
                 Logger.debug('Connected');
+
+            this.wrappedClosed = false;
 
             Engine.getInstance().networkingManager.packetManager.applyOut(
                 OutgoingPacket.PingRequest
             );
-
-            this.wrappedClosed = false;
         };
 
-        this.webSocket.onerror = () => {
-            this.wrappedClosed = true;
-
+        // always followed by onclose, that tries again
+        webSocket.onerror = () => {
             if (Engine.getInstance().config.debug) {
                 Logger.debug('Connection error');
             }
-
-            EventManager.emit<LoadingProgressEventData>(UIEvents.LOAD, {
-                width: 50,
-                message: 'Connection Error',
-            });
         };
 
-        this.webSocket.onclose = () => {
+        webSocket.onclose = () => {
+            // an old socket (replaced by a new attempt) doesn't count
+            if (webSocket !== this.webSocket) return;
+
             this.wrappedClosed = true;
-            this.reconnectCounter = 0;
 
-            if (Engine.getInstance().config.server.reconnectOnFail) {
-                setInterval(() => {
-                    while (
-                        this.wrappedClosed &&
-                        this.reconnectCounter <=
-                            Engine.getInstance().config.server
-                                .reconnectOnFailTryTimes
-                    ) {
-                        this.reconnectCounter++;
-                        this.setUpWebSocketEvents();
-                    }
-                }, 2001);
-            }
+            if (this.loggedIn || this.closedByClient) return;
+
+            this.retryLater();
         };
 
-        window.onbeforeunload = () => this.disconnect();
-
-        this.webSocket.onmessage = event => {
+        webSocket.onmessage = event => {
             const packet = JSON.parse(event.data);
             const header = parseInt(packet.header);
             Engine.getInstance().networkingManager?.packetManager?.applyIn(
@@ -93,7 +101,32 @@ export class WebSocketManager {
         };
     }
 
+    /**
+     * The server can't be reached during the loading (e.g. it's restarting): the client tries again by itself,
+     * waiting more and more between the attempts, and the loader says when.
+     */
+    private retryLater(): void {
+        if (this.retryTimer !== null) return;
+
+        const delays = WebSocketManager.RETRY_DELAYS_MS;
+        const delay = delays[Math.min(this.attempts - 1, delays.length - 1)];
+
+        EventManager.emit<LoadingProgressEventData>(UIEvents.LOAD, {
+            width: 50,
+            message: `Server unreachable, retrying in ${Math.round(delay / 1000)} s...`,
+        });
+
+        this.retryTimer = window.setTimeout(() => this.connect(), delay);
+    }
+
     disconnect() {
+        this.closedByClient = true;
+
+        if (this.retryTimer !== null) {
+            window.clearTimeout(this.retryTimer);
+            this.retryTimer = null;
+        }
+
         this.networkingManager.packetManager.applyOut(
             OutgoingPacket.DisconnectMessage
         );

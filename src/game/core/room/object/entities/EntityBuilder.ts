@@ -30,6 +30,8 @@ export class EntityBuilder {
     private figure?: AspectComponent;
     private wallPosition?: string;
     private effectId = 0;
+    private bot?: {id: number; ownerId: number | null};
+    private handItemId = 0;
     private actions?: ActionsComponent;
     private stackHeight: number | null = null;
     private allowStack = true;
@@ -109,6 +111,18 @@ export class EntityBuilder {
         return this;
     }
 
+    /** A bot (a human without user). */
+    setBot(bot?: {id: number; ownerId: number | null}): EntityBuilder {
+        this.bot = bot;
+        return this;
+    }
+
+    /** What a human carries in its hand. */
+    setHandItem(handItem?: {id: number}): EntityBuilder {
+        this.handItemId = handItem?.id ?? 0;
+        return this;
+    }
+
     setName(name: string): EntityBuilder {
         this.name = name;
         return this;
@@ -145,18 +159,23 @@ export class EntityBuilder {
         let entity: Entity;
 
         if (this.type == EntityType.HUMAN) {
-            if (this.user.id != null) {
+            // a user, or a bot (no user: it crashed here, the bots were not shown)
+            if (this.user?.id != null || this.bot) {
                 entity = new UserEntity(
                     this.id,
                     this.name,
                     this.figure.look
                 );
-                entity.userId = this.user.id;
+                const human = entity as UserEntity;
+                human.userId = this.user?.id ?? null;
+                human.isBot = !!this.bot;
+                human.botOwnerId = this.bot?.ownerId ?? null;
                 entity.position = position;
                 const visualization = entity.visualization as HumanVisualization;
                 if (this.bodyRotation != null) visualization.direction = this.bodyRotation;
                 if (this.headRotation != null) visualization.headRotation = this.headRotation;
                 visualization.setEffect(this.effectId);
+                visualization.setHandItem(this.handItemId);
                 this.applyActions(visualization);
             }
         } else if (this.type == EntityType.ITEM) {

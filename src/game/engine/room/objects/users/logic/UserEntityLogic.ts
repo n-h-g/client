@@ -123,6 +123,10 @@ export class UserEntityLogic extends HumanLogic {
         );
 
         const bounds = this.entity.visualization.container.getBounds();
+        const engine = Engine.getInstance();
+        const ownsRoom = !!engine.currentUsername
+            && engine.roomService?.currentRoom?.roomInfo.authorName === engine.currentUsername;
+
         EventManager.emit<AvatarContextMenuData>(UIEvents.AVATAR_CONTEXT_MENU, {
             id: this.entity.id,
             name: this.entity.name,
@@ -131,6 +135,9 @@ export class UserEntityLogic extends HumanLogic {
             sitting: false,
             isSelf: false,
             userId: user.userId,
+            isBot: user.isBot,
+            // the server checks it again
+            canPickUp: user.isBot && user.botOwnerId != null && (user.botOwnerId === engine.currentUserId || ownsRoom),
         });
     }
 

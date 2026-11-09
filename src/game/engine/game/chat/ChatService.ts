@@ -8,6 +8,7 @@ import {RoomChatMessage} from './RoomChatMessage';
 import { Repository } from '../../../core/Repository';
 import { Message } from '../../../core/chat/Message';
 import { Service } from '../../../core/Service';
+import { MessageType } from '../../../core/chat/MessageType';
 
 export class ChatMessageService extends Service<string, Message> implements Disposable {
     private messageCounter = 0;
@@ -23,6 +24,8 @@ export class ChatMessageService extends Service<string, Message> implements Disp
         EventManager.emit<RoomChatData>(UIEvents.ROOM_NEW_MESSAGE, {
             text: chatMessage.text,
             author: chatMessage.author,
+            whisper: chatMessage.messageType === MessageType.WHISPER,
+            whisperTo: chatMessage.recipient,
             x: chatMessage.x,
             y: chatMessage.y,
             width: 0,

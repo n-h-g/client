@@ -58,6 +58,9 @@ export class Avatar {
     /** The effect drawn with the avatar (loaded), null without effect. */
     private effect: AvatarEffect | null = null;
     private directionOffset = 0;
+    /** The hand item (0: nothing) and if the avatar is drinking it now. */
+    private handItem = 0;
+    private usingHandItem = false;
 
     constructor(
         figure: string = DEFAULT_FIGURE,
@@ -177,6 +180,22 @@ export class Avatar {
 
     set DanceStyle(style: number) {
         this.danceStyle = style;
+    }
+
+    get HandItem(): number {
+        return this.handItem;
+    }
+
+    set HandItem(id: number) {
+        this.handItem = id > 0 ? id : 0;
+    }
+
+    get UsingHandItem(): boolean {
+        return this.usingHandItem;
+    }
+
+    set UsingHandItem(using: boolean) {
+        this.usingHandItem = using;
     }
 
     get Effect(): AvatarEffect | null {

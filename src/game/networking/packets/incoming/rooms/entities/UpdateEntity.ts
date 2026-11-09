@@ -32,8 +32,11 @@ export class UpdateEntity extends MessageHandler {
                 (entity.logic as ItemLogic).onExtraData?.(entityData.interaction.extraData);
             }
 
-            if (entityData.aspect) {
-                (entity as Human).figure = entityData.aspect.look; 
+            // the server sends the look in every update: the avatar is built again only when it changed
+            // (e.g. the wardrobe, a football gate)
+            const lookChanged = !!entityData.aspect && entityData.aspect.look !== (entity as Human).figure;
+            if (lookChanged) {
+                (entity as Human).figure = entityData.aspect.look;
                 entity.visualization.render();
             }
 
@@ -62,24 +65,26 @@ export class UpdateEntity extends MessageHandler {
                     );
                 }
 
-                entity.visualization.setNextPosition(
-                    new Point3d(
-                        entityData.position.x,
-                        entityData.position.y,
-                        entityData.position.z
-                    )
+                const nextPosition = new Point3d(
+                    entityData.position.x,
+                    entityData.position.y,
+                    entityData.position.z
                 );
 
-                // Walking entities interpolate x, y and z in EntityVisualization.move().
+                // Walking entities interpolate x, y and z in EntityVisualization.move(), one step at a time (an
+                // avatar behind, e.g. after a pause of the page, jumps to its previous step: see walkTo).
                 // Furni and humans that are not walking go directly to the new position:
                 // e.g. the final step on a bed/chair, or a furni placed/moved under a standing user.
                 const isWalking =
                     entityData.action?.actions?.includes(ActionId.WALK) ?? false;
 
-                // after a pause of the page the moves arrive in a burst: not animated (see RoomService.onResume)
-                const catchingUp = Engine.getInstance().roomService?.isCatchingUp ?? false;
+                if (entityData.type == EntityType.HUMAN && isWalking) {
+                    entity.visualization.walkTo(nextPosition);
+                } else {
+                    entity.visualization.setNextPosition(nextPosition);
+                }
 
-                if (entityData.type == EntityType.ITEM || (entityData.action && !isWalking) || catchingUp) {
+                if (entityData.type == EntityType.ITEM || (entityData.action && !isWalking)) {
                     entity.visualization.snapToNextPosition();
                 }
 
@@ -87,12 +92,16 @@ export class UpdateEntity extends MessageHandler {
                     entity.position.x != entityData.position.x ||
                     entity.position.y != entityData.position.y ||
                     entity.position.z != entityData.position.z ||
-                    entityData.aspect != undefined;
+                    lookChanged;
             }
 
             // before the actions (they can stop here): the effect is drawn when its library is loaded
             if (entityData.effect && entityData.type == EntityType.HUMAN) {
                 (entity.visualization as HumanVisualization).setEffect(entityData.effect.id);
+            }
+
+            if (entityData.handItem && entityData.type == EntityType.HUMAN) {
+                (entity.visualization as HumanVisualization).setHandItem(entityData.handItem.id);
             }
 
             if (entityData.action) {

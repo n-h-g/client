@@ -10,4 +10,6 @@ export type RoomChatData = {
     y: number;
     shout?: boolean;
     whisper?: boolean;
+    /** The username a whisper is for. */
+    whisperTo?: string;
 };

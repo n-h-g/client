@@ -35,6 +35,13 @@ export type FigureDataPart = {
     hidden: string[];
 };
 
+/**
+ * The zIndex of the hand item in the avatar container (see Avatar.assemble): over the shadow (-1) and under the
+ * body (0) when the avatar turns its back, else over every part (the face accessories are 9).
+ */
+const HAND_ITEM_BEHIND_Z = -0.5;
+const HAND_ITEM_FRONT_Z = 10;
+
 export class AvatarImager {
     private data: AvatarImageData;
     private structure: AvatarStructure;
@@ -43,6 +50,9 @@ export class AvatarImager {
     private textures: Repository<string, PIXI.Texture>;
 
     private spritePool: PIXI.Sprite[] = [];
+
+    /** If a hand item has the sprites of an action (see hasHandItemSprites): looked up once. */
+    private readonly handItemSprites = new Map<string, boolean>();
 
     /** The avatar effects (:effect): loaded once, drawn with the avatars that have them. */
     readonly effects: AvatarEffectManager;
@@ -157,7 +167,8 @@ export class AvatarImager {
                 await this.data.loadPart(signAsset);
             }
         }
-        const actions = this.structure.Actions?.getActionsByIds(avatar.Actions);
+        const actions = this.structure.Actions?.getActionsByIds(avatar.Actions) ?? [];
+        const handItem = await this.getHandItem(avatar, actions);
 
         const figureComponents = avatar.AvatarFigure.getAllComponents();
         // the parts hidden by the clothes and the ones removed by the effect (e.g. the shoes in a car)
@@ -168,6 +179,19 @@ export class AvatarImager {
             figureComponents.push(new AvatarFigureComponent({
                 type: 'li',
                 id: avatar.SignValue,
+                index: 0,
+                colorable: false,
+                colorindex: 0,
+            }, ''));
+        }
+
+        if (handItem) {
+            // first: the imager gives each part the first action that has it, the hand is the item's one
+            // (Nitro sorts by precedence: CarryItem 205 before Move 600 and Default 1000)
+            actions.unshift(handItem.action);
+            figureComponents.push(new AvatarFigureComponent({
+                type: 'ri',
+                id: handItem.partId,
                 index: 0,
                 colorable: false,
                 colorindex: 0,
@@ -217,7 +241,7 @@ export class AvatarImager {
         for (const component of figureComponents) {
             if (hiddens.includes(component.part.type)) continue;
             
-            if(component.part.type != 'sd' && component.part.type != 'li') 
+            if(component.part.type != 'sd' && component.part.type != 'li' && component.part.type != 'ri') 
             {
                 const partSet = this.structure.PartSets?.getPart(component.part.type);
                 if (!partSet) continue;
@@ -248,6 +272,60 @@ export class AvatarImager {
         }
 
         avatar.assemble();
+    }
+
+    /**
+     * What the avatar carries (Nitro's CARRY_OBJECT / USE_OBJECT): the action of the right hand, CarryItem ("crr")
+     * or UseItem ("drk") while it drinks, and the "ri" part of hh_human_item drawn in the hand (the parameter of
+     * the action, e.g. the coffees 11, 12 and 13 are the cup 6). Null without hand item, or when the actions
+     * prevent it (HabboAvatarActions: e.g. Lay and Dance prevent "cri" and "usei").
+     */
+    private async getHandItem(avatar: Avatar, actions: Action[]): Promise<{action: Action; partId: number} | null> {
+        if (!avatar.HandItem || avatar.isUI) return null;
+
+        const prevented = (action: Action) => actions.some(other => other.prevents?.includes(action.state));
+
+        const carry = this.structure.Actions?.getActionById(ActionId.CARRY_ITEM);
+        if (!carry || prevented(carry)) return null;
+
+        const item = String(avatar.HandItem);
+        let action = carry;
+        let partId = parseInt(carry.getParameterValue(item), 10);
+
+        if (avatar.UsingHandItem) {
+            const use = this.structure.Actions?.getActionById(ActionId.USE_ITEM);
+            const useId = use ? parseInt(use.getParameterValue(item), 10) : NaN;
+
+            // an item without the drinking sprites stays in the hand
+            if (use && !prevented(use) && Number.isFinite(useId) && await this.hasHandItemSprites(use, useId)) {
+                action = use;
+                partId = useId;
+            }
+        }
+
+        if (!Number.isFinite(partId) || !await this.hasHandItemSprites(action, partId)) return null;
+
+        return {action, partId};
+    }
+
+    /** True if the library of the "ri" part has its sprites for the action (e.g. h_drk_ri_6_2_0). */
+    private async hasHandItemSprites(action: Action, partId: number): Promise<boolean> {
+        const assetName = this.structure.Assets?.getUniqueName('ri', partId);
+        if (!assetName) return false;
+
+        const key = `${assetName}/${action.assetPartDefiniton}/${partId}`;
+        let has = this.handItemSprites.get(key);
+
+        if (has === undefined) {
+            await this.data.loadPart(assetName);
+
+            const spritesheet = this.data.SpriteSheets.get(assetName);
+            const prefix = `h_${action.assetPartDefiniton}_ri_${partId}_`;
+            has = !!spritesheet && Object.keys(spritesheet).some(name => name.startsWith(prefix));
+            this.handItemSprites.set(key, has);
+        }
+
+        return has;
     }
 
     /**
@@ -392,7 +470,9 @@ export class AvatarImager {
         // Some clothes do not have every dance action/frame variant. Reuse
         // the standing sprite for that frame so a missing wlk/wave asset does
         // not make the shirt (or another figure part) disappear.
-        const isFacialGesture = action.id === ActionId.BLOW || action.id === ActionId.LAUGH;
+        const isFacialGesture = action.id === ActionId.BLOW || action.id === ActionId.LAUGH
+            || action.id === ActionId.SMILE || action.id === ActionId.SAD
+            || action.id === ActionId.ANGRY || action.id === ActionId.SURPRISED;
         if ((layerPart || isFacialGesture) && !spritesheet?.[spriteComponent.ResourceName]) {
             spriteComponent = new AvatarSpriteComponent(
                 this.structure.Actions?.getDefaultAction()?.assetPartDefiniton ?? 'std',
@@ -535,6 +615,14 @@ export class AvatarImager {
                 sprite.tint = 0x000000;
                 avatar.ShadowContainer.addChild(sprite);
             }
+            // the hand item: in front of the avatar, or behind its body when it turns its back (AvatarDrawOrder:
+            // in the directions 0, 5, 6 and 7 "ri" comes before "bd", the body hides what it holds)
+            else if (component.ResourceType == 'ri') {
+                sprite.zIndex = this.isDrawnBehindBody('ri', component.Direction)
+                    ? HAND_ITEM_BEHIND_Z
+                    : HAND_ITEM_FRONT_Z;
+                avatar.Container.addChild(sprite);
+            }
             else if (component.ResourceType == 'sh')
                 avatar.ShoesContainer.addChild(sprite);
             else if (component.ResourceType == 'hd')
@@ -594,6 +682,17 @@ export class AvatarImager {
 
     private getTextureId(resourceName: string) {
         return resourceName + '.png';
+    }
+
+    /** True if the part comes before the body in the standing draw order of the direction (AvatarDrawOrder). */
+    private isDrawnBehindBody(partType: string, direction: Direction): boolean {
+        const parts = this.getDrawParts('std', direction);
+        if (!parts) return false;
+
+        const index = parts.indexOf(partType);
+        const body = parts.indexOf('bd');
+
+        return index >= 0 && body >= 0 && index < body;
     }
 
     private getDrawParts(

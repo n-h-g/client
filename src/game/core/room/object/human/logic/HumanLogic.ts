@@ -15,6 +15,19 @@ export abstract class HumanLogic extends EntityLogic {
     private static readonly BLINK_DURATION = 50;
     private static readonly BLINK_DURATION_RANDOM = 200;
 
+    /**
+     * Nitro's AvatarLogic: 5 s after getting a hand item the avatar uses it (drinks) for 1 s every 10 s.
+     * The items over 999 are only carried (e.g. a flower, a sign).
+     */
+    private static readonly HAND_ITEM_FIRST_USE = 5000;
+    private static readonly HAND_ITEM_USE_INTERVAL = 10000;
+    private static readonly HAND_ITEM_USE_DURATION = 1000;
+    private static readonly MAX_HAND_USE_ID = 999;
+
+    /** The hand item carried and for how long (ms). */
+    private handItem = 0;
+    private handItemTime = 0;
+
     /** Time (ms) to the next blink and, while blinking, to the end of it. */
     private nextBlink = HumanLogic.randomBlinkInterval();
     private blinkEnd = 0;
@@ -25,6 +38,28 @@ export abstract class HumanLogic extends EntityLogic {
 
     private static randomBlinkInterval(): number {
         return HumanLogic.BLINK_INTERVAL + Math.random() * HumanLogic.BLINK_INTERVAL_RANDOM;
+    }
+
+    /** The avatar drinks what it carries now and then (as Habbo). */
+    private updateHandItem(delta: number): void {
+        const humanVisualization = this.entity.visualization as HumanVisualization;
+        const item = humanVisualization.HandItem;
+
+        if (item !== this.handItem) {
+            this.handItem = item;
+            this.handItemTime = 0;
+        }
+
+        if (!item || item > HumanLogic.MAX_HAND_USE_ID) {
+            humanVisualization.setUsingHandItem(false);
+            return;
+        }
+
+        this.handItemTime += delta;
+        humanVisualization.setUsingHandItem(
+            this.handItemTime > HumanLogic.HAND_ITEM_FIRST_USE &&
+            this.handItemTime % HumanLogic.HAND_ITEM_USE_INTERVAL < HumanLogic.HAND_ITEM_USE_DURATION
+        );
     }
 
     /** The avatar closes its eyes for an instant now and then (as Habbo). */
@@ -65,6 +100,7 @@ export abstract class HumanLogic extends EntityLogic {
             .visualization as HumanVisualization;
 
         this.updateBlink(delta);
+        this.updateHandItem(delta);
 
         // moved by a roller
         humanVisualization.updateSlide();
