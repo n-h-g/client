@@ -22,10 +22,9 @@ export class UIEvents extends Events {
     static ROOM_UPDATE_CHAT: UIEvents = new UIEvents(
         'room_update_messages'
     );
-    static AVATAR_CONTAINER_UPDATED: UIEvents = new UIEvents(
-        'avatar_container_updated'
-    );
     static AVATAR_CONTEXT_MENU: UIEvents = new UIEvents('avatar_context_menu');
+    /** The avatar under the mouse changed (AvatarHoverData), null: no avatar. Its name is shown over it. */
+    static AVATAR_HOVER: UIEvents = new UIEvents('avatar_hover');
     static CATALOGUE_PAGES_UPDATED: UIEvents = new UIEvents(
         'catalog_pages_updated'
     );

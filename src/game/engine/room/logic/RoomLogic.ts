@@ -2,7 +2,7 @@ import {ItemType} from '../../../core/room/object/items/ItemType';
 import {RoomLayout} from '../RoomLayout';
 import {Engine} from '../../../Engine';
 import {Sprite, Texture} from 'pixi.js';
-import type {DisplayObject, FederatedPointerEvent} from 'pixi.js';
+import type {DisplayObject, FederatedPointerEvent, Renderer} from 'pixi.js';
 import type {Tile} from '../objects/map/Tile';
 import type {Entity} from '../../../core/room/object/entities/Entity';
 import { WallItem } from '../objects/items/WallItem';
@@ -18,6 +18,7 @@ import {UIEvents} from '../../events/ui/UIEvents';
 import {RoomChatData} from '../../events/ui/data/room/RoomChatData';
 import {Point} from '../../../utils/point/Point';
 import { Disposable } from '../../../core/room/Disposable';
+import {AvatarHoverData} from '../../events/ui/data/avatar/AvatarHoverData';
 
 export class RoomLogic implements Disposable {
     private room: RoomLayout;
@@ -25,6 +26,13 @@ export class RoomLogic implements Disposable {
     private canvasWallHit: HTMLCanvasElement;
 	private lastCameraPosition: Point;
     private hoveredTile: Tile | null = null;
+
+    /** How often (ms) the avatar under the mouse is looked for again, also with the mouse still (avatars walk). */
+    private static readonly HOVER_CHECK_INTERVAL = 100;
+    /** The mouse on the canvas (global coordinates), null out of it. */
+    private pointerGlobal: {x: number; y: number} | null = null;
+    private hoveredHumanId: string | null = null;
+    private nextHoverCheck = 0;
 
     constructor(room: RoomLayout) {
         this.room = room;
@@ -44,8 +52,17 @@ export class RoomLogic implements Disposable {
 
     private readonly keyDownListener = this.onKeyDown.bind(this);
 
+    /** The mouse left the canvas (e.g. it's on a window of the UI): no avatar under it. */
+    private readonly canvasLeaveListener = () => {
+        this.pointerGlobal = null;
+        this.setHoveredHuman(null);
+    };
+
 	dispose(): void {
         window.removeEventListener('keydown', this.keyDownListener);
+        Engine.getInstance().application?.view?.removeEventListener?.('pointerleave', this.canvasLeaveListener);
+        this.pointerGlobal = null;
+        this.setHoveredHuman(null);
     }
 
     /**
@@ -77,6 +94,10 @@ export class RoomLogic implements Disposable {
         window.removeEventListener('keydown', this.keyDownListener);
         window.addEventListener('keydown', this.keyDownListener);
 
+        const canvas = Engine.getInstance().application.view;
+        canvas.removeEventListener('pointerleave', this.canvasLeaveListener);
+        canvas.addEventListener('pointerleave', this.canvasLeaveListener);
+
         Engine.getInstance().application.viewport.on(
             'moved',
             this.onCameraMove.bind(this)
@@ -98,6 +119,61 @@ export class RoomLogic implements Disposable {
 
         // the floor and the walls drawn again in their textures if they changed
         this.room.visualization.updateBakedPlanes();
+
+        this.updateHoveredHuman();
+    }
+
+    /**
+     * The avatar under the mouse, for the tooltip with its name. It's found with a hit test of the point and not
+     * with pointerover/pointerout on the avatar: its container is made again at every frame of its animation
+     * (walking, dancing...), so those events were lost and the name stayed or never appeared. It's checked also
+     * with the mouse still: an avatar can walk under it or away from it.
+     */
+    private updateHoveredHuman(): void {
+        const now = performance.now();
+        if (now < this.nextHoverCheck) return;
+
+        this.nextHoverCheck = now + RoomLogic.HOVER_CHECK_INTERVAL;
+        this.setHoveredHuman(this.findHumanAt(this.pointerGlobal));
+    }
+
+    private findHumanAt(point: {x: number; y: number} | null): Entity | null {
+        if (!point) return null;
+
+        const currentRoom = Engine.getInstance().roomService?.currentRoom;
+        if (currentRoom?.roomLayout !== this.room) return null;
+
+        const repository = currentRoom.roomEntityRepository;
+        // while placing a furni the mouse is for the furni
+        if (repository.isEntityRolling()) return null;
+
+        const renderer = Engine.getInstance().application?.renderer as unknown as Renderer | undefined;
+        // the same hit test of the clicks: the furni in front of an avatar hide it
+        const hit = renderer?.events?.rootBoundary.hitTest(point.x, point.y);
+        if (!hit) return null;
+
+        const humans = new Map<DisplayObject, Entity>();
+        repository.getAll().forEach((entity: Entity) => {
+            const container = entity.visualization?.container;
+            // structural check: Human can't be imported here without an import cycle
+            if ('figure' in entity && container && !container.destroyed) humans.set(container, entity);
+        });
+
+        for (let object: DisplayObject | null = hit; object; object = object.parent) {
+            const human = humans.get(object);
+            if (human) return human;
+            if (object === this.room.visualization.container) break;
+        }
+
+        return null;
+    }
+
+    private setHoveredHuman(entity: Entity | null): void {
+        const id = entity?.id ?? null;
+        if (id === this.hoveredHumanId) return;
+
+        this.hoveredHumanId = id;
+        EventManager.emit<AvatarHoverData>(UIEvents.AVATAR_HOVER, entity ? {id: entity.id, name: entity.name} : null);
     }
 
     getCanvasFloorHit(): HTMLCanvasElement {
@@ -149,6 +225,10 @@ export class RoomLogic implements Disposable {
     }
 
     private onPointerMove(e: FederatedPointerEvent) {
+        // the avatar under the mouse is looked for at the next tick
+        this.pointerGlobal = {x: e.global.x, y: e.global.y};
+        this.nextHoverCheck = 0;
+
         const rolling = Engine.getInstance().roomService?.currentRoom?.roomEntityRepository?.rollingEntity;
         if (rolling instanceof WallItem) {
             const visualization = this.room.visualization;

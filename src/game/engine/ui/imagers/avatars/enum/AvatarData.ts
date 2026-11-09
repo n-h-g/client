@@ -31,8 +31,6 @@ export class AvatarData {
     static AVATAR_GENERIC_HEIGHT = 210;
 
     // offsets
-    static AVATAR_CONTAINER_OFFSET_LEFT = -4;
-    static AVATAR_CONTAINER_OFFSET_TOP = -20;
 
     static SHADOW_OFFSET_X = -8;
 

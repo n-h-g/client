@@ -10,7 +10,6 @@ import {CreateRoomUI} from './navigator/CreateRoomUI';
 import {CatalogueUI} from './catalogue/CatalogueUI';
 import {StaticContainerUI} from './static/StaticContainerUI';
 import {RoomUI} from './room/RoomUI';
-import {AvatarContainerUI} from './avatar/AvatarContainerUI';
 import {RoomInfoUI} from './room/RoomInfoUI';
 import {Repository} from '../../../core/Repository';
 import { ChangeLookUI } from './guardrobe/ChangeLookUI';
@@ -44,10 +43,6 @@ export class ComponentsManager {
         this.addComponent(UIComponent.CatalogueUI, new CatalogueUI());
         this.addComponent(UIComponent.RoomUI, new RoomUI());
         this.addComponent(UIComponent.ChangeLookUI, new ChangeLookUI)
-        this.addComponent(
-            UIComponent.AvatarContainerUI,
-            new AvatarContainerUI()
-        );
         this.addComponent(UIComponent.RoomInfoUI, new RoomInfoUI());
         this.addComponent(UIComponent.FriendsMenuUI, new FriendsUI());
         this.addComponent(UIComponent.PrivateChatUI, new MessengerUI());
