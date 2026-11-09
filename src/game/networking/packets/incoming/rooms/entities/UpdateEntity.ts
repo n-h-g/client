@@ -9,6 +9,7 @@ import {Point3d} from '../../../../../utils/point/Point3d';
 import {MessageHandler} from '../../../../handler/MessageHandler';
 import {Item} from '../../../../../engine/room/objects/items/Item';
 import {ItemLogic} from '../../../../../core/room/object/items/logic/ItemLogic';
+import type {PetEntityVisualization} from '../../../../../engine/room/objects/pets/visualization/PetEntityVisualization';
 
 export class UpdateEntity extends MessageHandler {
     handle(): void {
@@ -21,6 +22,11 @@ export class UpdateEntity extends MessageHandler {
                 );
 
             if (!entity) return;
+
+            if (entityData.type == EntityType.PET) {
+                UpdateEntity.updatePet(entity.visualization as PetEntityVisualization, entityData);
+                return;
+            }
 
             // new state of a furni (e.g. after a double click): its animation
             if (entityData.interaction?.extraData != null && entityData.type == EntityType.ITEM) {
@@ -133,6 +139,24 @@ export class UpdateEntity extends MessageHandler {
             if (Engine.getInstance().config.debug) {
                 Logger.debug('Invalid current room');
             }
+        }
+    }
+
+    /** A pet: it walks its steps as the avatars, its actions become its posture (mv, sit, lay, std). */
+    private static updatePet(visualization: PetEntityVisualization, data: EntityData): void {
+        if (data.bh_rot) visualization.setDirections(data.bh_rot.body_rot, data.bh_rot.head_rot);
+        if (data.action) visualization.setActions(data.action.actions ?? []);
+
+        if (!data.position) return;
+
+        const next = new Point3d(data.position.x, data.position.y, data.position.z);
+        const walking = data.action?.actions?.includes(ActionId.WALK) ?? visualization.walking;
+
+        if (walking) {
+            visualization.walkTo(next);
+        } else {
+            visualization.setNextPosition(next);
+            visualization.snapToNextPosition();
         }
     }
 }

@@ -7,6 +7,7 @@ import {ComponentsManager} from './components/ComponentsManager';
 import {AvatarImager} from './imagers/avatars/AvatarImager';
 import {AvatarStructure} from './imagers/avatars/structure/AvatarStructure';
 import {FurniImager} from './imagers/items/FurniImager';
+import {PetImager} from './imagers/pets/PetImager';
 import {RoomImager} from './imagers/room/RoomImager';
 import {SoundManager} from './sound/SoundManager';
 
@@ -16,6 +17,8 @@ export class UserInterfaceManager {
     readonly avatarStructure: AvatarStructure;
     readonly avatarImager: AvatarImager;
     readonly furniImager: FurniImager;
+    /** The pets: their libraries are loaded when a pet of that type is drawn. */
+    readonly petImager: PetImager;
     readonly roomImager: RoomImager;
 
     private wrappedReady = false;
@@ -32,6 +35,7 @@ export class UserInterfaceManager {
         this.avatarStructure = new AvatarStructure();
         this.avatarImager = new AvatarImager(this.avatarStructure);
         this.furniImager = new FurniImager();
+        this.petImager = new PetImager();
         this.roomImager = new RoomImager();
     }
 

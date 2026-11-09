@@ -19,14 +19,19 @@
                             v-for="pet in pets" :key="pet.id"
                             :title="pet.name"
                             @click.stop="selectedPet = pet">
-                            <span class="petInitial" :style="{ color: '#' + pet.color }">{{ pet.name.charAt(0).toUpperCase() }}</span>
+                            <img v-if="petImages[petKey(pet)]" :src="petImages[petKey(pet)]" class="petImage" />
+                            <span v-else class="petInitial" :style="{ color: '#' + pet.color }">{{ pet.name.charAt(0).toUpperCase() }}</span>
                         </div>
                     </div>
                     <div class="buttonsContainer">
                         <template v-if="selectedPet">
+                            <img v-if="petImages[petKey(selectedPet)]" :src="petImages[petKey(selectedPet)]" class="petImageLarge" />
                             <div class="itemName">{{ selectedPet.name }}</div>
                             <div class="itemDetails">{{ petTypeName(selectedPet.type) }}</div>
-                            <div class="itemDetails muted">Gli animali non si possono ancora mettere nelle stanze</div>
+                            <div class="buttonList">
+                                <div class="ui-button small" v-if="inRoom" @click.stop="placePet()">Place</div>
+                                <div class="itemDetails muted" v-else>Entra in una stanza per metterlo</div>
+                            </div>
                         </template>
                     </div>
                 </div>
@@ -179,6 +184,8 @@ import { FurniPreview } from "../../../game/engine/ui/imagers/items/utils/FurniP
 import { ItemType } from "../../../game/core/room/object/items/ItemType"
 import { RoomDecorationLibrary } from "../../../game/engine/room/decoration/RoomDecorationLibrary"
 import { AvatarHeadImage } from "../../../game/engine/ui/imagers/avatars/AvatarHeadImage"
+import { PetFigureData } from "../../../game/engine/ui/imagers/pets/PetFigureData"
+import { petTypeName } from "../../../game/engine/ui/imagers/pets/PetType"
 import { InventoryBadge, InventoryBadgesData, InventoryBot, InventoryBotsData, InventoryPet, InventoryPetsData } from "../../../game/engine/events/ui/data/inventory/InventoryTabs"
 
 const tradeMode = ref(false)
@@ -244,6 +251,13 @@ const selectedBadge = ref<InventoryBadge | null>(null)
 /** As Habbo: up to 5 badges worn. */
 const MAX_WORN_BADGES = 5
 
+/** The images of the pets (see PetImager), by figure. */
+const petImages = reactive<Record<string, string>>({})
+
+function petKey(pet: InventoryPet): string {
+    return PetFigureData.from(pet.type, pet.race, pet.color).figureString
+}
+
 /** The heads of the bots, by look. */
 const botHeads = reactive<Record<string, string>>({})
 /** The badges without image (the album has no image with that code): their code is shown. */
@@ -260,6 +274,19 @@ const wornSlots = computed(() => Array.from({ length: MAX_WORN_BADGES }, (_, ind
 EventManager.read(UIEvents.INVENTORY_PETS, (data: InventoryPetsData) => {
     pets.value = data.pets
     if (selectedPet.value) selectedPet.value = data.pets.find(pet => pet.id === selectedPet.value!.id) ?? null
+
+    const imager = Engine.getInstance()?.userInterfaceManager?.petImager
+    for (const pet of data.pets) {
+        const key = petKey(pet)
+        if (!imager || petImages[key] !== undefined) continue
+
+        // drawn once for each figure; without its library the initial stays
+        petImages[key] = ''
+        imager.getImage(key).then(image => {
+            if (image) petImages[key] = image
+            else delete petImages[key]
+        })
+    }
 })
 
 EventManager.read(UIEvents.INVENTORY_BOTS, (data: InventoryBotsData) => {
@@ -283,13 +310,6 @@ EventManager.read(UIEvents.INVENTORY_BADGES, (data: InventoryBadgesData) => {
     if (selectedBadge.value) selectedBadge.value = data.badges.find(badge => badge.code === selectedBadge.value!.code) ?? null
 })
 
-/** The names of the Nitro pet types. */
-const PET_TYPES = ['Cane', 'Gatto', 'Coccodrillo', 'Terrier', 'Orso', 'Maiale', 'Leone', 'Rinoceronte', 'Ragno',
-    'Tartaruga', 'Pulcino', 'Rana', 'Drago', 'Mostro', 'Scimmia', 'Cavallo']
-
-function petTypeName(type: number): string {
-    return PET_TYPES[type] ?? `Animale ${type}`
-}
 
 function badgeImage(code: string): string {
     return Engine.getInstance().config.badgesUrl.replace('%badgename%', encodeURIComponent(code))
@@ -300,6 +320,13 @@ function placeBot() {
     if (!selectedBot.value) return
 
     Engine.getInstance().networkingManager.packetManager.applyOut(OutgoingPacket.PlaceBotEvent, { id: selectedBot.value.id })
+}
+
+/** The pet goes in the room, next to the user (only where the user has rights: the server checks it). */
+function placePet() {
+    if (!selectedPet.value) return
+
+    Engine.getInstance().networkingManager.packetManager.applyOut(OutgoingPacket.PlacePetEvent, { id: selectedPet.value.id })
 }
 
 /** Wears the badge (in the first free slot) or takes it off: the server sends the badges again. */
@@ -582,6 +609,18 @@ onMounted(() => {
         font-size: 20px;
         font-weight: bold;
         text-shadow: 0 1px 0 #333, 0 -1px 0 #333, 1px 0 0 #333, -1px 0 0 #333;
+    }
+
+    .petImage {
+        max-width: 38px !important;
+        max-height: 38px !important;
+        image-rendering: pixelated;
+    }
+
+    .petImageLarge {
+        display: block;
+        margin: 0 auto 6px;
+        image-rendering: pixelated;
     }
 
     .botHead {

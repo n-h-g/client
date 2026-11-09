@@ -4,6 +4,7 @@ import {MessageHandler} from '../handler/MessageHandler';
 import {CataloguePage} from './incoming/catalogue/CataloguePage';
 import {CataloguePages} from './incoming/catalogue/CataloguePages';
 import {BuyItem} from './incoming/catalogue/BuyItem';
+import {CatalogueSearch} from './incoming/catalogue/CatalogueSearch';
 import {LoginResponse} from './incoming/handshake/LoginResponse';
 import {PongResponse} from './incoming/handshake/PongResponse';
 import {BubbleAlert} from './incoming/general/BubbleAlert';
@@ -67,6 +68,7 @@ export class PacketManager {
             800: new CataloguePages(),
             801: new CataloguePage(),
             802: new BuyItem(),
+            804: new CatalogueSearch(),
             900: new FriendsList(),
             901: new FriendRequestReceived(),
             902: new FriendRequestResult(),

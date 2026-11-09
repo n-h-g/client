@@ -30,6 +30,7 @@ export class AddRoomEntity extends MessageHandler {
             .setState(data.interaction)
             .setUser(data.user)
             .setBot(data.bot)
+            .setPet(data.pet)
                 .setEffect(data.effect)
                 .setHandItem(data.handItem)
                 .setItem(data.item)

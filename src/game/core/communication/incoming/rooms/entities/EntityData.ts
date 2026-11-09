@@ -24,6 +24,14 @@ export interface EntityData {
         id: number;
         ownerId: number | null;
     };
+    /** A pet: its id, its look (type, race, color) and the user that owns it. */
+    pet?: {
+        id: number;
+        type: number;
+        race: number;
+        color: string;
+        ownerId: number | null;
+    };
     /** The avatar effect of a human (0: none). */
     effect?: {
         id: number;

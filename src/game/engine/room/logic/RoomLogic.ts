@@ -155,8 +155,8 @@ export class RoomLogic implements Disposable {
         const humans = new Map<DisplayObject, Entity>();
         repository.getAll().forEach((entity: Entity) => {
             const container = entity.visualization?.container;
-            // structural check: Human can't be imported here without an import cycle
-            if ('figure' in entity && container && !container.destroyed) humans.set(container, entity);
+            // structural check: Human and PetEntity can't be imported here without an import cycle
+            if (('figure' in entity || 'petFigure' in entity) && container && !container.destroyed) humans.set(container, entity);
         });
 
         for (let object: DisplayObject | null = hit; object; object = object.parent) {

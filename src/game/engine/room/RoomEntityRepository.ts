@@ -534,7 +534,7 @@ export class RoomEntityRepository extends Repository<string, Entity> {
     private refreshHumansDepth() {
         this.getAll().forEach((entity: Entity) => {
             // structural check: Human can't be imported here without an import cycle
-            if (!('figure' in entity) || !entity.visualization?.container) return;
+            if (!('figure' in entity || 'petFigure' in entity) || !entity.visualization?.container) return;
 
             entity.visualization.container.zIndex = entity.visualization.getZIndex();
         });

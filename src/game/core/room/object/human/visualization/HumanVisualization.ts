@@ -487,7 +487,7 @@ export abstract class HumanVisualization extends EntityVisualization {
             isAtDoor ? RoomPriority.DOOR_FLOOR_USER : RoomPriority.USER
         );
 
-        return this.sortWithFloorItems(zIndex);
+        return HumanVisualization.sortWithFloorItems(this.entity.position.x, this.entity.position.y, zIndex);
     }
 
     /**
@@ -500,12 +500,11 @@ export abstract class HumanVisualization extends EntityVisualization {
     /** Items up to this height (rugs, floor tiles) are flat: they don't cover the avatars behind them. */
     private static readonly FLAT_ITEM_HEIGHT = 0.1;
 
-    private sortWithFloorItems(zIndex: number): number {
+    /** Also for the pets (PetEntityVisualization): they stand on the tiles as the avatars. */
+    static sortWithFloorItems(x: number, y: number, zIndex: number): number {
         const repository = Engine.getInstance().roomService?.currentRoom?.roomEntityRepository;
         if (!repository) return zIndex;
 
-        const x = this.entity.position.x;
-        const y = this.entity.position.y;
         // screen column (screen x grows with y - x) and depth (screen y grows with x + y)
         const column = y - x;
         const depth = x + y;

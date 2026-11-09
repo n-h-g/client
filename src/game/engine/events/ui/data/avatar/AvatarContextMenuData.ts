@@ -10,4 +10,6 @@ export type AvatarContextMenuData = {
     /** A bot, and if the user can pick it up (its owner, or the owner of the room). */
     isBot?: boolean;
     canPickUp?: boolean;
+    /** A pet: its menu has only "Prendi" (for its owner and the owner of the room). */
+    isPet?: boolean;
 };

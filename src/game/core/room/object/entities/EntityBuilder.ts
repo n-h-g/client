@@ -3,6 +3,9 @@ import {FloorItem} from '../../../../engine/room/objects/items/FloorItem';
 import type {ItemVisualization} from '../items/visualization/ItemVisualization';
 import {WallItem} from '../../../../engine/room/objects/items/WallItem';
 import {UserEntity} from '../../../../engine/room/objects/users/UserEntity';
+import {PetEntity} from '../../../../engine/room/objects/pets/PetEntity';
+import {PetFigureData} from '../../../../engine/ui/imagers/pets/PetFigureData';
+import type {PetEntityVisualization} from '../../../../engine/room/objects/pets/visualization/PetEntityVisualization';
 import {FurnidataItemType} from '../../../../engine/ui/imagers/items/enum/FurniDataItemType';
 import {Point3d} from '../../../../utils/point/Point3d';
 import {AspectComponent} from './components/AspectComponent';
@@ -31,6 +34,7 @@ export class EntityBuilder {
     private wallPosition?: string;
     private effectId = 0;
     private bot?: {id: number; ownerId: number | null};
+    private pet?: {id: number; type: number; race: number; color: string; ownerId: number | null};
     private handItemId = 0;
     private actions?: ActionsComponent;
     private stackHeight: number | null = null;
@@ -117,6 +121,12 @@ export class EntityBuilder {
         return this;
     }
 
+    /** A pet: its look and the user that owns it. */
+    setPet(pet?: {id: number; type: number; race: number; color: string; ownerId: number | null}): EntityBuilder {
+        this.pet = pet;
+        return this;
+    }
+
     /** What a human carries in its hand. */
     setHandItem(handItem?: {id: number}): EntityBuilder {
         this.handItemId = handItem?.id ?? 0;
@@ -178,6 +188,18 @@ export class EntityBuilder {
                 visualization.setHandItem(this.handItemId);
                 this.applyActions(visualization);
             }
+        } else if (this.type == EntityType.PET && this.pet) {
+            const pet = new PetEntity(this.id, this.name, PetFigureData.from(this.pet.type, this.pet.race, this.pet.color));
+            pet.petId = this.pet.id;
+            pet.ownerId = this.pet.ownerId ?? null;
+            pet.position = position;
+
+            const visualization = pet.visualization as PetEntityVisualization;
+            if (this.bodyRotation != null) visualization.setDirections(this.bodyRotation, this.headRotation);
+            // a pet walking goes on with the next updates of the server: here it stands (or sits, lies)
+            visualization.setActions((this.actions?.actions ?? []).filter(action => action !== ActionId.WALK));
+
+            entity = pet;
         } else if (this.type == EntityType.ITEM) {
             const isWallItem = !!this.wallPosition || this.position == null;
             const base =

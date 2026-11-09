@@ -41,9 +41,9 @@
                 </button>
             </template>
         </template>
-        <template v-else-if="avatar.isBot">
+        <template v-else-if="avatar.isBot || avatar.isPet">
             <button v-if="avatar.canPickUp" class="avatar-menu-row" @click="pickUpBot">Prendi</button>
-            <div v-else class="avatar-menu-row unavailable">Bot</div>
+            <div v-else class="avatar-menu-row unavailable">{{ avatar.isPet ? 'Animale' : 'Bot' }}</div>
         </template>
         <template v-else>
             <template v-if="avatar.userId != null && !friendship.isFriend">
@@ -108,9 +108,10 @@ function addFriend() {
     close()
 }
 
-/** The bot goes back to the inventory of its owner. */
+/** The bot (or the pet) goes back to the inventory of its owner. */
 function pickUpBot() {
-    Engine.getInstance()?.networkingManager?.packetManager?.applyOut(OutgoingPacket.PickupBotEvent, {id: avatar.value.id})
+    const packet = avatar.value.isPet ? OutgoingPacket.PickupPetEvent : OutgoingPacket.PickupBotEvent
+    Engine.getInstance()?.networkingManager?.packetManager?.applyOut(packet, {id: avatar.value.id})
     close()
 }
 

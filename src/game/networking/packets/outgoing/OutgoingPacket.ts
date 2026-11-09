@@ -64,6 +64,10 @@ export enum OutgoingPacket {
     PickupBotEvent = 61,
     /** The pets of the user (tab Pets). */
     RequestInventoryPetsEvent = 62,
+    /** A pet of the inventory goes in the room: {id}. */
+    PlacePetEvent = 63,
+    /** A pet goes back to the inventory of its owner: {id} (the entity). */
+    PickupPetEvent = 64,
     /** A wallpaper/floor/landscape applied from the inventory (Nitro's FurniturePlacePaintComposer): {id}. */
     RoomApplyDecorationEvent = 29,
     MoveWallItemEvent = 33,
@@ -78,6 +82,8 @@ export enum OutgoingPacket {
     DeclineTrade = 30,
     AcceptTrade = 31,
     CatalogBuyItemEvent = 802,
+    /** The search of the furni: {query, names} (names: class names whose FurnitureData name contains the text). */
+    CatalogSearchEvent = 803,
 
     //#region rooms
     SaveRoomAdsEvent = 38,

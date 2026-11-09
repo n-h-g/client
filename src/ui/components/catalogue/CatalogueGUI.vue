@@ -18,7 +18,7 @@
 			<div class="catalogueHeaderIcon">
 				<img v-if="currentPage?.iconName" :src="getIconUrl(currentPage.iconName)" alt="" />
 			</div>
-			<div class="catalogueHeaderTitle">{{ currentPage?.title ?? "" }}</div>
+			<div class="catalogueHeaderTitle">{{ searchActive ? "La tua ricerca" : currentPage?.title ?? "" }}</div>
 			<div class="catalogueHeaderWatermark">SHOP</div>
 		</div>
 
@@ -26,7 +26,7 @@
 			<!-- MENU -->
 			<div class="catalogueSide">
 				<div class="catalogueSearch">
-					<input v-model="search" type="text" placeholder="Cerca una pagina..." />
+					<input v-model="search" type="text" placeholder="Cerca un furni..." />
 					<span v-if="search" class="catalogueSearchClear" @click="search = ''">×</span>
 				</div>
 
@@ -54,7 +54,16 @@
 			<div class="cataloguePage">
 				<!-- preview of the selected item, or the page description -->
 				<div class="catalogueInfo">
-					<template v-if="selectedItem">
+					<template v-if="petOffer">
+						<div class="catalogueInfoPreview catalogueInfoPet">
+							<img v-if="petImages[petKey(selectedRace)]" :src="petImages[petKey(selectedRace)]" alt="" />
+						</div>
+						<div class="catalogueInfoText">
+							<div class="catalogueInfoName">{{ petTypeName(petType!) }}</div>
+							<div class="catalogueInfoDescription">{{ currentPage?.description }}</div>
+						</div>
+					</template>
+					<template v-else-if="selectedItem">
 						<div
 							class="catalogueInfoPreview"
 							:class="{ dragging: previewDragging }"
@@ -91,10 +100,34 @@
 					</template>
 				</div>
 
-				<!-- ITEMS -->
-				<div class="catalogueItems">
+				<!-- PETS: the breeds and the name -->
+				<div v-if="petOffer" class="catalogueItems cataloguePets">
+					<div class="cataloguePetName">
+						<label>Nome del tuo animale:</label>
+						<input v-model="petName" type="text" :maxlength="PET_NAME_LENGTH" placeholder="Scegli un nome" />
+					</div>
+					<div class="cataloguePetBreeds">
+						<div
+							v-for="race in petBreeds"
+							:key="race"
+							class="catalogueItem catalogueBreed"
+							:class="{ selected: selectedRace === race }"
+							@click="selectedRace = race"
+						>
+							<span class="catalogueItemIcon">
+								<img v-if="petImages[petKey(race)]" :src="petImages[petKey(race)]" alt="" />
+							</span>
+						</div>
+					</div>
+				</div>
+
+				<!-- ITEMS (of the page, or found by the search) -->
+				<div v-else class="catalogueItems">
+					<div v-if="searchActive && displayItems.length === 0" class="catalogueNavEmpty">
+						Nessun furni trovato
+					</div>
 					<div
-						v-for="item in items"
+						v-for="item in displayItems"
 						:key="item.id"
 						class="catalogueItem"
 						:class="{ selected: selectedItem?.id === item.id }"
@@ -115,10 +148,17 @@
 				<!-- BUY -->
 				<div
 					class="catalogueBuy"
-					:class="{ disabled: !selectedItem, bought: justBought }"
-					@click="buyItem"
+					:class="{ disabled: petOffer ? !petNameValid : !selectedItem, bought: justBought }"
+					@click="petOffer ? buyPet() : buyItem()"
 				>
 					<template v-if="justBought">Acquistato! È nel tuo inventario</template>
+					<template v-else-if="petOffer">
+						<template v-if="petNameValid">
+							Compra per {{ petOffer.credits }}
+							<img src="@/assets/images/catalogue/creditIcon.png" alt="" />
+						</template>
+						<template v-else>Scegli un nome!</template>
+					</template>
 					<template v-else-if="selectedItem">
 						Compra per {{ selectedItem.credits }}
 						<img src="@/assets/images/catalogue/creditIcon.png" alt="" />
@@ -131,7 +171,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onBeforeUnmount, ref } from "vue"
+import { computed, onBeforeUnmount, reactive, ref, watch } from "vue"
 import { CataloguePageItem } from "../../../game/core/communication/incoming/catalogue/CataloguePageItem"
 import { EventManager } from "../../../game/core/events/EventManager"
 import { Engine } from "../../../game/Engine"
@@ -143,6 +183,8 @@ import { OutgoingPacket } from "../../../game/networking/packets/outgoing/Outgoi
 import { FurniPreview } from "../../../game/engine/ui/imagers/items/utils/FurniPreview"
 import Dialog from "../dialog/Dialog.vue"
 import TreeMenu from "./TreeMenu.vue"
+import { PetFigureData } from "../../../game/engine/ui/imagers/pets/PetFigureData"
+import { petOfferType, petTypeName } from "../../../game/engine/ui/imagers/pets/PetType"
 
 const catalogMenu = ref<any[]>([])
 const allPages = ref<any[]>([])
@@ -159,6 +201,114 @@ const justBought = ref(false)
 let justBoughtTimer: ReturnType<typeof setTimeout> | undefined
 let previewAnimationTimer: ReturnType<typeof setInterval> | undefined
 
+// =========================
+// SEARCH (as Habbo: the furni, not only the pages)
+// =========================
+/** The furni found by the last search, null when the catalogue shows a page. */
+const searchItems = ref<CataloguePageItem[] | null>(null)
+const searchActive = computed(() => searchItems.value !== null)
+const displayItems = computed(() => searchItems.value ?? items.value)
+let searchTimer: ReturnType<typeof setTimeout> | undefined
+
+watch(search, value => {
+	clearTimeout(searchTimer)
+	const text = value.trim().toLowerCase()
+
+	if (text.length < 2) {
+		searchItems.value = null
+		return
+	}
+
+	// asked when the user stops typing
+	searchTimer = setTimeout(() => {
+		Engine.getInstance()?.networkingManager?.packetManager?.applyOut(OutgoingPacket.CatalogSearchEvent, {
+			query: text,
+			names: namesMatching(text),
+		})
+	}, 300)
+})
+
+// only the answer of the last search (an older one can arrive later)
+EventManager.read(UIEvents.CATALOG_SEARCH_RESULTS, (data: { query: string; items: CataloguePageItem[] }) => {
+	if (data.query !== search.value.trim().toLowerCase()) return
+
+	stopPreviewAnimation()
+	searchItems.value = data.items ?? []
+	selectedItem.value = null
+	preview.value = ""
+})
+
+/** The class names whose name in the FurnitureData contains the text (the server searches the class names). */
+function namesMatching(text: string): string[] {
+	getFurniData("")
+	const names: string[] = []
+
+	for (const [className, data] of furnidataByClassName ?? []) {
+		if (String(data?.name ?? "").toLowerCase().includes(text) && !className.toLowerCase().includes(text)) {
+			names.push(className)
+			if (names.length >= 300) break
+		}
+	}
+	return names
+}
+
+// =========================
+// PETS (the pages with layout "pets": the breed and the name, as Habbo)
+// =========================
+const PET_NAME_LENGTH = 15
+const petName = ref("")
+const selectedRace = ref(0)
+/** The images of the breeds of the page, by figure. */
+const petImages = reactive<Record<string, string>>({})
+
+const petOffer = computed(() =>
+	!searchActive.value && currentPage.value?.layout === "pets"
+		? items.value.find(item => petOfferType(item.name) != null) ?? null
+		: null
+)
+const petType = computed(() => petOfferType(petOffer.value?.name))
+/** The races the offer sells (its extraData, "0,1,2"). */
+const petBreeds = computed(() =>
+	String(petOffer.value?.extraData ?? "0")
+		.split(",")
+		.map(value => parseInt(value))
+		.filter(value => !isNaN(value))
+)
+const petNameValid = computed(() => /^[\p{L}\p{N} ._-]{1,15}$/u.test(petName.value.trim()))
+
+function petKey(race: number): string {
+	return PetFigureData.from(petType.value ?? 0, race, "ffffff").figureString
+}
+
+watch(petOffer, offer => {
+	if (!offer) return
+
+	selectedRace.value = petBreeds.value[0] ?? 0
+
+	const imager = Engine.getInstance()?.userInterfaceManager?.petImager
+	for (const race of petBreeds.value) {
+		const key = petKey(race)
+		if (!imager || petImages[key] !== undefined) continue
+
+		petImages[key] = ""
+		imager.getImage(key).then(image => {
+			if (image) petImages[key] = image
+			else delete petImages[key]
+		})
+	}
+})
+
+function buyPet() {
+	if (!petOffer.value || !petNameValid.value) return
+
+	Engine.getInstance()?.networkingManager?.packetManager?.applyOut(OutgoingPacket.CatalogBuyItemEvent, {
+		id: petOffer.value.id,
+		pageId: currentPage.value?.id,
+		petName: petName.value.trim(),
+		race: selectedRace.value,
+	})
+}
+
 function stopPreviewAnimation() {
 	if (previewAnimationTimer) clearInterval(previewAnimationTimer)
 	previewAnimationTimer = undefined
@@ -167,10 +317,13 @@ function stopPreviewAnimation() {
 onBeforeUnmount(() => {
 	stopPreviewAnimation()
 	clearTimeout(justBoughtTimer)
+	clearTimeout(searchTimer)
 })
 
 // purchase confirmed by the server: short feedback on the buy button
 EventManager.read(UIEvents.CATALOG_ITEM_BOUGHT, () => {
+	// a pet bought: the next one needs its own name
+	if (petOffer.value) petName.value = ""
 	justBought.value = true
 	clearTimeout(justBoughtTimer)
 	justBoughtTimer = setTimeout(() => (justBought.value = false), 2000)
@@ -232,6 +385,9 @@ function selectRoot(root: any) {
 
 function openPage(page: any) {
 	stopPreviewAnimation()
+	// a page opened from the menu: the search results go away (the text stays to find the other pages)
+	searchItems.value = null
+	clearTimeout(searchTimer)
 	currentPage.value = page
 	items.value = []
 	selectedItem.value = null
@@ -673,6 +829,50 @@ Engine.getInstance()?.networkingManager?.packetManager?.applyOut(OutgoingPacket.
 		font-size: 10px;
 		font-weight: 700;
 		color: #555;
+	}
+
+	// ---------------- pets
+	.catalogueInfoPet {
+		cursor: default;
+
+		img {
+			transform: scale(2);
+		}
+	}
+
+	.cataloguePets {
+		flex-direction: column;
+		flex-wrap: nowrap;
+		gap: 6px;
+	}
+
+	.cataloguePetName {
+		display: flex;
+		align-items: center;
+		gap: 6px;
+		font-size: 12px;
+		font-weight: 700;
+
+		input {
+			flex: 1;
+			padding: 3px 6px;
+			border: 1px solid #757571;
+			border-radius: 4px;
+		}
+	}
+
+	.cataloguePetBreeds {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 2px;
+	}
+
+	.catalogueBreed {
+		height: 52px;
+
+		img {
+			image-rendering: pixelated;
+		}
 	}
 
 	// ---------------- buy

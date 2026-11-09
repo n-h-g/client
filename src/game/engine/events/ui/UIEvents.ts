@@ -29,6 +29,8 @@ export class UIEvents extends Events {
         'catalog_pages_updated'
     );
     static CATALOG_ITEM_BOUGHT: UIEvents = new UIEvents('catalog_item_bought');
+    /** The furni found by a search of the catalogue: {query, items}. */
+    static CATALOG_SEARCH_RESULTS: UIEvents = new UIEvents('catalog_search_results');
     static CATALOG_ITEMS_UPDATED: UIEvents = new UIEvents(
         'catalog_items_updated'
     );
