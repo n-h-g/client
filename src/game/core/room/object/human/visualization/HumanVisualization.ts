@@ -10,6 +10,7 @@ import {RoomVisualization} from '../../../../../engine/room/visualization/RoomVi
 import {Avatar} from '../../../../../engine/ui/imagers/avatars/Avatar';
 import {AvatarPlaceHolder} from '../../../../../engine/ui/imagers/avatars/AvatarPlaceholder';
 import type {AvatarEffect} from '../../../../../engine/ui/imagers/avatars/effects/AvatarEffect';
+import {FloatingIdleZAddition} from './additions/FloatingIdleZAddition';
 import {TypingBubbleAddition} from './additions/TypingBubbleAddition';
 import {ActionId} from '../../../../../engine/ui/imagers/avatars/enum/actions/ActionId';
 import {AvatarData} from '../../../../../engine/ui/imagers/avatars/enum/AvatarData';
@@ -36,6 +37,8 @@ export abstract class HumanVisualization extends EntityVisualization {
     /** The user is typing a chat message: the bubble over its head. */
     private typing = false;
     private readonly typingBubble = new TypingBubbleAddition();
+    /** The avatar is idle (the Sleep action of the server): the zzz next to its head. */
+    private readonly idleZ = new FloatingIdleZAddition();
 
     /** The effect of the server (0: none) and, once loaded, the effect drawn with the avatar. */
     private effectId = 0;
@@ -79,6 +82,7 @@ export abstract class HumanVisualization extends EntityVisualization {
 
     dispose(): void {
         window.clearTimeout(this.gestureTimer);
+        this.idleZ.remove();
         super.dispose();
     }
 
@@ -247,6 +251,16 @@ export abstract class HumanVisualization extends EntityVisualization {
         this.typingBubble.update(this.container, this.typing && this.loaded, HumanVisualization.AVATAR_CANVAS_WIDTH, this.getTypingBubbleOffset());
     }
 
+    private updateIdleZ(): void {
+        this.idleZ.update(
+            this.container,
+            this.loaded && !!this.actions?.has(ActionId.SLEEP),
+            HumanVisualization.AVATAR_CANVAS_WIDTH,
+            this.direction,
+            this.getTypingBubbleOffset()
+        );
+    }
+
     /**
      * Where the bubble goes from its standing place, in the avatar container (that already follows the posture).
      * Sitting the head is where it is standing: the bubble doesn't move. Laying, Nitro moves the bubble down by a
@@ -315,6 +329,7 @@ export abstract class HumanVisualization extends EntityVisualization {
         const {width: avatarWidth, height: avatarHeight} = this.getAvatarSize();
         this.drawBlowKissHeart(avatarWidth, avatarHeight);
         this.updateTypingBubble();
+        this.updateIdleZ();
         const oneShotFrameCount = this.getOneShotFrameCount();
         this.needsUpdate = this.actions.has(ActionId.DANCE) ||
             this.gesture === ActionId.LAUGH ||
