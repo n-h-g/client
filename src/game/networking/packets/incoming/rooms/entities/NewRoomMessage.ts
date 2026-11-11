@@ -26,6 +26,7 @@ export class NewRoomMessage extends MessageHandler {
         const gesture = chatGesture(data.gesture);
         if (gesture) (entity.visualization as HumanVisualization).showGesture?.(gesture.action, gesture.duration);
 
+
         const chatMessage = new RoomChatMessage(
             data.text,
             entity,
@@ -36,6 +37,10 @@ export class NewRoomMessage extends MessageHandler {
         );
 
         Engine.getInstance().chatService.addMessage(chatMessage);
+
+        // the mouth moves while the message is said (the bots too; the pets have no mouth to move). After the
+        // bubble: it's placed on the avatar, and drawing the avatar again replaces its container
+        (entity.visualization as HumanVisualization).startTalking?.(data.text ?? '');
     }
 
 }

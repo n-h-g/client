@@ -171,6 +171,33 @@ export abstract class HumanVisualization extends EntityVisualization {
         if (this.loaded) this.draw();
     }
 
+    /** Until when the avatar talks (its mouth moves): the time of performance.now(), 0 if it doesn't. */
+    private talkingUntil = 0;
+    private talkTimer: number | undefined;
+
+    /**
+     * The avatar said something: its mouth moves for a while, as Nitro (a second every 10 characters of the
+     * message, RoomUnitChatHandler / AvatarLogic). With the other actions and the expressions.
+     */
+    startTalking(text: string): void {
+        const duration = Math.max(1, Math.ceil((text?.length ?? 0) / 10)) * 1000;
+
+        this.talkingUntil = performance.now() + duration;
+        // drawn again by the game loop (HumanLogic), not now: the chat places the bubble on the avatar
+        this.needsUpdate = true;
+
+        // the mouth closed at the end
+        window.clearTimeout(this.talkTimer);
+        this.talkTimer = window.setTimeout(() => {
+            this.talkingUntil = 0;
+            if (this.loaded) this.draw();
+        }, duration);
+    }
+
+    private isTalking(): boolean {
+        return this.talkingUntil > performance.now();
+    }
+
     /** True if the avatar has the action, of the server or as the expression of its chat. */
     private hasDrawAction(action: ActionId): boolean {
         return this.actions.has(action) || this.gesture === action;
@@ -197,7 +224,10 @@ export abstract class HumanVisualization extends EntityVisualization {
     private getDrawActions(): Set<ActionId> {
         // the expression first: the imager gives each part the first action that has it, and Default has the
         // eyes and the face too (Nitro sorts by precedence: the gestures 510 before Default 1000)
-        const actions = this.gesture ? new Set([this.gesture, ...this.actions]) : this.actions;
+        let actions = this.gesture ? new Set([this.gesture, ...this.actions]) : this.actions;
+        // talking: the mouth. First, as the expressions: the imager gives each part the first action that has it
+        // (Talk has the precedence 500, before the expressions 510 and Default 1000)
+        if (this.isTalking()) actions = new Set([ActionId.TALK, ...actions]);
 
         // the expressions use the eyes: no blink
         if (!this.blinking || this.gesture || HumanVisualization.EYE_ACTIONS.some(action => actions.has(action))) return actions;
@@ -292,6 +322,7 @@ export abstract class HumanVisualization extends EntityVisualization {
             this.actions.has(ActionId.RESPECT) ||
             this.actions.has(ActionId.WALK) ||
             this.hasAnimatedEffect ||
+            this.isTalking() ||
             (oneShotFrameCount > 0 && this.frame < oneShotFrameCount - 1);
 
         if (Engine.getInstance().roomService?.currentRoom) {

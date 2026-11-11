@@ -164,6 +164,9 @@ function avatarScreenX(data: RoomChatData): number | null {
 EventManager.read(UIEvents.ROOM_NEW_MESSAGE, async (data: RoomChatData) => {
     const locationX = avatarScreenX(data)
     if (locationX == null) return
+    // now: the avatar can be drawn again meanwhile (e.g. it starts talking), and a container just replaced is empty
+    // (its bounds at 0: the bubble went over the top of the screen)
+    const headTop = avatarScreenTop(data)
 
     const message: UIChatBubble = {
         data,
@@ -195,7 +198,6 @@ EventManager.read(UIEvents.ROOM_NEW_MESSAGE, async (data: RoomChatData) => {
     bubble.left = Math.max(0, Math.min(window.innerWidth - bubble.width, bubble.locationX - bubble.width / 2))
     // on the bottom line of the chat strip, as Nitro, but never under the avatar that talks
     // (e.g. an avatar high in the screen, with the camera moved): then just over its head
-    const headTop = avatarScreenTop(data)
     bubble.top = chatHeight.value - bubble.height
     if (headTop != null) bubble.top = Math.min(bubble.top, headTop - bubble.height - CHAT_HEAD_MARGIN)
 
