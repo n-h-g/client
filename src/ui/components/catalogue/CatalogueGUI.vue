@@ -145,6 +145,20 @@
 					</div>
 				</div>
 
+				<!-- QUANTITY (as Habbo: the same offer bought more times at once) -->
+				<div v-if="!petOffer && selectedItem" class="catalogueAmount">
+					<span>Quantità:</span>
+					<button type="button" :disabled="amount <= 1" @click="setAmount(amount - 1)">−</button>
+					<input
+						type="number"
+						min="1"
+						:max="MAX_AMOUNT"
+						:value="amount"
+						@change="setAmount(Number(($event.target as HTMLInputElement).value), $event.target as HTMLInputElement)"
+					/>
+					<button type="button" :disabled="amount >= MAX_AMOUNT" @click="setAmount(amount + 1)">+</button>
+				</div>
+
 				<!-- BUY -->
 				<div
 					class="catalogueBuy"
@@ -160,7 +174,7 @@
 						<template v-else>Scegli un nome!</template>
 					</template>
 					<template v-else-if="selectedItem">
-						Compra per {{ selectedItem.credits }}
+						Compra{{ amount > 1 ? ` ${amount}` : "" }} per {{ selectedItem.credits * amount }}
 						<img src="@/assets/images/catalogue/creditIcon.png" alt="" />
 					</template>
 					<template v-else>Seleziona un oggetto!</template>
@@ -455,6 +469,8 @@ function getFurniDescription(className: string): string {
 
 async function selectItem(item: CataloguePageItem) {
 	stopPreviewAnimation()
+	// another offer: one of it again
+	if (selectedItem.value?.id !== item.id) amount.value = 1
 	selectedItem.value = item
 	preview.value = ""
 	previewPan.value = { x: 0, y: 0 }
@@ -509,12 +525,23 @@ function stopPreviewDrag() {
 // =========================
 // BUY
 // =========================
+/** As the server (BuyItem.MAX_AMOUNT). */
+const MAX_AMOUNT = 100
+const amount = ref(1)
+
+function setAmount(value: number, input?: HTMLInputElement) {
+	amount.value = Math.max(1, Math.min(MAX_AMOUNT, Math.floor(value) || 1))
+	// the field shows the valid quantity (e.g. 500 typed: 100)
+	if (input) input.value = String(amount.value)
+}
+
 function buyItem() {
 	if (!selectedItem.value) return
 
 	Engine.getInstance()?.networkingManager?.packetManager?.applyOut(OutgoingPacket.CatalogBuyItemEvent, {
 		id: selectedItem.value.id,
 		pageId: currentPage.value?.id,
+		amount: amount.value,
 	})
 }
 
@@ -884,6 +911,43 @@ Engine.getInstance()?.networkingManager?.packetManager?.applyOut(OutgoingPacket.
 
 		img {
 			image-rendering: pixelated;
+		}
+	}
+
+	// ---------------- quantity
+	.catalogueAmount {
+		flex: 0 0 auto;
+		display: flex;
+		align-items: center;
+		justify-content: flex-end;
+		gap: 4px;
+		font-size: 12px;
+		font-weight: 700;
+
+		button {
+			width: 22px;
+			height: 22px;
+			padding: 0;
+			font-weight: 700;
+			line-height: 1;
+			border: 1px solid #757571;
+			border-radius: 4px;
+			background-color: #fff;
+			cursor: pointer;
+
+			&:disabled {
+				cursor: default;
+				opacity: 0.5;
+			}
+		}
+
+		input {
+			width: 44px;
+			height: 22px;
+			padding: 0 4px;
+			text-align: center;
+			border: 1px solid #757571;
+			border-radius: 4px;
 		}
 	}
 
