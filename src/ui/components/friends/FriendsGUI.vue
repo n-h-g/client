@@ -1,36 +1,36 @@
 <template>
-    <Dialog title="Amici" className="friends" :box="UIEventsType.FRIENDS">
+    <Dialog title="Friends" className="friends" :box="UIEventsType.FRIENDS">
         <div class="friendsContent">
             <form class="friendsSearch" @submit.prevent="addByName">
-                <input v-model="searchName" ref="searchInput" type="text" maxlength="32" placeholder="Trova amici: nome utente" />
-                <button class="ui-button small" type="submit" :disabled="!searchName.trim()">Aggiungi</button>
+                <input v-model="searchName" ref="searchInput" type="text" maxlength="32" placeholder="Find friends: username" />
+                <button class="ui-button small" type="submit" :disabled="!searchName.trim()">Add</button>
             </form>
 
             <div class="friendsSection" v-if="state.requests.length > 0">
-                <div class="friendsSectionTitle">Richieste di amicizia ({{ state.requests.length }})</div>
+                <div class="friendsSectionTitle">Friend requests ({{ state.requests.length }})</div>
                 <div class="friendRow" v-for="request in state.requests" :key="'r' + request.id">
                     <img class="friendHead" v-if="heads[request.look]" :src="heads[request.look]" />
                     <div class="friendHead empty" v-else></div>
                     <span class="friendName">{{ request.username }}</span>
-                    <button class="friendButton accept" @click="store.acceptRequest(request.id)">Accetta</button>
-                    <button class="friendButton decline" @click="store.declineRequest(request.id)">Rifiuta</button>
+                    <button class="friendButton accept" @click="store.acceptRequest(request.id)">Accept</button>
+                    <button class="friendButton decline" @click="store.declineRequest(request.id)">Decline</button>
                 </div>
             </div>
 
             <div class="friendsSection">
-                <div class="friendsSectionTitle">Amici ({{ state.friends.length }})</div>
+                <div class="friendsSectionTitle">Friends ({{ state.friends.length }})</div>
                 <div class="friendsEmpty" v-if="state.friends.length === 0">
-                    Non hai ancora amici: clicca un utente in una stanza o cerca il suo nome qui sopra.
+                    You have no friends yet: click a user in a room or search its name here above.
                 </div>
                 <div class="friendRow" :class="{ offline: !friend.online }" v-for="friend in state.friends" :key="'f' + friend.id">
                     <img class="friendHead" v-if="heads[friend.look]" :src="heads[friend.look]" />
                     <div class="friendHead empty" v-else></div>
                     <span class="friendStatus" :class="{ online: friend.online }"></span>
                     <span class="friendName" :title="friend.motto">{{ friend.username }}</span>
-                    <button class="friendIcon message" title="Messaggio" :disabled="!friend.online" @click="messenger.openChat(friend.id)"></button>
-                    <button class="friendIcon follow" title="Segui" :disabled="!friend.online" @click="store.follow(friend.id)"></button>
-                    <button class="friendIcon profile" title="Profilo" @click="store.openProfile(friend.id)"></button>
-                    <button class="friendButton decline" title="Rimuovi amico" @click="remove(friend)">✕</button>
+                    <button class="friendIcon message" title="Message" :disabled="!friend.online" @click="messenger.openChat(friend.id)"></button>
+                    <button class="friendIcon follow" title="Follow" :disabled="!friend.online" @click="store.follow(friend.id)"></button>
+                    <button class="friendIcon profile" title="Profile" @click="store.openProfile(friend.id)"></button>
+                    <button class="friendButton decline" title="Remove friend" @click="remove(friend)">✕</button>
                 </div>
             </div>
         </div>
@@ -85,7 +85,7 @@ function addByName() {
 }
 
 function remove(friend: Friend) {
-    if (confirm(`Vuoi rimuovere ${friend.username} dagli amici?`)) store.removeFriend(friend.id)
+    if (confirm(`Do you want to remove ${friend.username} from your friends?`)) store.removeFriend(friend.id)
 }
 </script>
 

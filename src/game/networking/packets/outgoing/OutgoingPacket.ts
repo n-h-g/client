@@ -87,6 +87,8 @@ export enum OutgoingPacket {
     UpdateMottoEvent = 72,
     /** The user scratches a pet ("Pet" in its menu): {id} (the entity). */
     ScratchPetEvent = 73,
+    /** The user gets on a horse or off the one it rides: {id (the entity of the pet), ride}. */
+    RidePetEvent = 74,
     /** A wallpaper/floor/landscape applied from the inventory (Nitro's FurniturePlacePaintComposer): {id}. */
     RoomApplyDecorationEvent = 29,
     MoveWallItemEvent = 33,

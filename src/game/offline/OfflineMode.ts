@@ -129,7 +129,7 @@ export class OfflineMode {
                     item
                 );
             } catch (e) {
-                console.error(`Errore nel caricamento del furni: ${spriteName}`, e);
+                console.error(`Error loading the furni: ${spriteName}`, e);
             }
         }
 
@@ -181,7 +181,7 @@ export class OfflineMode {
                     item
                 );
             } catch (e) {
-                console.error(`Errore caricamento WallItem: ${spriteName}`, e);
+                console.error(`Error loading the WallItem: ${spriteName}`, e);
             }
         }
         // ----------------------------------

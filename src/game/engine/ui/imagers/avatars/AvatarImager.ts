@@ -657,8 +657,16 @@ export class AvatarImager {
                 component.ResourceType == 'lc' ||
                 component.ResourceType == 'rc' ||
                 component.ResourceType == 'li'
-            )
-                avatar.ArmsContainer.addChild(sprite);
+            ) {
+                // the arm on the far side (AvatarDrawOrder: before "bd") is behind the body: in the arms
+                // container, over the torso, it showed over the shirt and the chest accessories
+                if (this.isArmBehindBody(component)) {
+                    sprite.zIndex = ARM_BEHIND_Z;
+                    avatar.Container.addChild(sprite);
+                } else {
+                    avatar.ArmsContainer.addChild(sprite);
+                }
+            }
             // the torso and what goes on it (AvatarDrawOrder: ch, cc, cp, wa, ca, then the arm in front):
             // coat, print, belt and scarf were drawn in the main container, under the shirt and the arms
             else if (
@@ -682,6 +690,19 @@ export class AvatarImager {
 
     private getTextureId(resourceName: string) {
         return resourceName + '.png';
+    }
+
+    /**
+     * True if the arm part is on the far side of the body. A mirrored part (directions 4, 5, 6 drawn from 2, 1, 0)
+     * is on the other side: its left arm is the right one of the draw order (Nitro's flipped set types).
+     */
+    private isArmBehindBody(component: AvatarSpriteComponent): boolean {
+        let type = component.ResourceType;
+        if (component.IsFlipped && type !== 'li') {
+            type = type.startsWith('l') ? 'r' + type.slice(1) : type.startsWith('r') ? 'l' + type.slice(1) : type;
+        }
+
+        return this.isDrawnBehindBody(type, component.Direction);
     }
 
     /** True if the part comes before the body in the standing draw order of the direction (AvatarDrawOrder). */

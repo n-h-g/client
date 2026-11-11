@@ -144,6 +144,12 @@ export class UpdateEntity extends MessageHandler {
 
     /** A pet: it walks its steps as the avatars, its actions become its posture (mv, sit, lay, std). */
     private static updatePet(visualization: PetEntityVisualization, data: EntityData): void {
+        // ridden or not (a horse)
+        if (data.pet) {
+            (visualization.entity as {riderId?: string | null}).riderId = data.pet.rider ?? null;
+            visualization.setRiding(data.pet.rider != null);
+        }
+
         if (data.bh_rot) visualization.setDirections(data.bh_rot.body_rot, data.bh_rot.head_rot);
         if (data.action) visualization.setActions(data.action.actions ?? []);
 

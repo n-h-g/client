@@ -9,6 +9,7 @@ import {ChatData} from '../../../../game/chat/ChatData';
 import {ActionId} from '../../../../ui/imagers/avatars/enum/actions/ActionId';
 import {UserEntityVisualization} from '../visualization/UserEntityVisualization';
 import {AvatarContextMenuData} from '../../../../events/ui/data/avatar/AvatarContextMenuData';
+import {PetEntityLogic} from '../../pets/logic/PetEntityLogic';
 import {HumanVisualization} from '../../../../../core/room/object/human/visualization/HumanVisualization';
 
 export class UserEntityLogic extends HumanLogic {
@@ -77,6 +78,7 @@ export class UserEntityLogic extends HumanLogic {
                 sitting: visualization.actions.has(ActionId.SIT),
                 isSelf: true,
                 userId: user.userId,
+                isRiding: PetEntityLogic.ridingPet() != null,
             });
             return;
         }

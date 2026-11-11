@@ -10,6 +10,17 @@ export class PetEntity extends Entity {
     /** The id of the pet on the server (the inventory one), not the id of the entity. */
     petId: number | null = null;
     ownerId: number | null = null;
+    /** How many times it was scratched (the "Carezze" of its card). */
+    respects = 0;
+    /** The entity of the user riding it (a horse), null if nobody rides it. */
+    riderId: string | null = null;
+
+    /** The pets that can be ridden: the horse (as Habbo). */
+    static readonly HORSE_TYPE = 15;
+
+    get canBeRidden(): boolean {
+        return this.petFigure.typeId === PetEntity.HORSE_TYPE;
+    }
 
     constructor(id: string, name: string, figure: PetFigureData) {
         super(id, name);

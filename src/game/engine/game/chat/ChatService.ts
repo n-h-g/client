@@ -28,6 +28,7 @@ export class ChatMessageService extends Service<string, Message> implements Disp
             whisper: chatMessage.messageType === MessageType.WHISPER,
             whisperTo: chatMessage.recipient,
             style: chatMessage.style,
+            info: chatMessage.info,
             x: chatMessage.x,
             y: chatMessage.y,
             width: 0,

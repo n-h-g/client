@@ -1,13 +1,13 @@
 <template>
-    <Dialog title="Regolatore luci" className="roomDimmer" :box="UIEventsType.ROOM_DIMMER">
+    <Dialog title="Mood light" className="roomDimmer" :box="UIEventsType.ROOM_DIMMER">
         <!-- the dimmer is off: as Nitro, only the button to switch it on -->
         <div class="dimmerContent off" v-if="!state.enabled">
             <div class="dimmerPanel dimmerOff">
-                <div class="dimmerOffTitle">Il regolatore luci è spento.</div>
-                <div class="dimmerInfo">Accendilo per scegliere il colore e l'intensità della luce della stanza.</div>
+                <div class="dimmerOffTitle">The mood light is off.</div>
+                <div class="dimmerInfo">Switch it on to choose the color and the brightness of the light of the room.</div>
             </div>
             <div class="dimmerButtons end">
-                <button class="ui-button small" @click="store.toggle()">Accendi</button>
+                <button class="ui-button small" @click="store.toggle()">Switch on</button>
             </div>
         </div>
 
@@ -52,18 +52,18 @@
                         :checked="preset.backgroundOnly"
                         @change="store.setBackgroundOnly(($event.target as HTMLInputElement).checked)"
                     />
-                    Solo sfondo
+                    Background only
                 </label>
 
                 <div class="dimmerInfo">
-                    L'effetto delle luci è un'anteprima che vedi solo tu. Applicalo alla stanza perché lo vedano
-                    anche gli altri.
+                    The light effect is a preview that only you see. Apply it to the room so the others
+                    see it too.
                 </div>
             </div>
 
             <div class="dimmerButtons">
-                <button class="ui-button small" @click="store.apply()">Applica alla stanza</button>
-                <button class="ui-button small" @click="store.toggle()">Spegni</button>
+                <button class="ui-button small" @click="store.apply()">Apply to the room</button>
+                <button class="ui-button small" @click="store.toggle()">Switch off</button>
             </div>
         </div>
     </Dialog>

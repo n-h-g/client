@@ -18,7 +18,7 @@
 			<div class="catalogueHeaderIcon">
 				<img v-if="currentPage?.iconName" :src="getIconUrl(currentPage.iconName)" alt="" />
 			</div>
-			<div class="catalogueHeaderTitle">{{ searchActive ? "La tua ricerca" : currentPage?.title ?? "" }}</div>
+			<div class="catalogueHeaderTitle">{{ searchActive ? "Your search" : currentPage?.title ?? "" }}</div>
 			<div class="catalogueHeaderWatermark">SHOP</div>
 		</div>
 
@@ -26,7 +26,7 @@
 			<!-- MENU -->
 			<div class="catalogueSide">
 				<div class="catalogueSearch">
-					<input v-model="search" type="text" placeholder="Cerca un furni..." />
+					<input v-model="search" type="text" placeholder="Search a furni..." />
 					<span v-if="search" class="catalogueSearchClear" @click="search = ''">×</span>
 				</div>
 
@@ -45,7 +45,7 @@
 					/>
 
 					<div v-if="search.trim() && searchResults.length === 0" class="catalogueNavEmpty">
-						Nessuna pagina trovata
+						No pages found
 					</div>
 				</div>
 			</div>
@@ -94,7 +94,7 @@
 						<div class="catalogueInfoText">
 							<div class="catalogueInfoName">{{ currentPage?.title ?? "" }}</div>
 							<div class="catalogueInfoDescription">
-								{{ currentPage?.description || (items.length ? "" : "Scegli una pagina dal menu.") }}
+								{{ currentPage?.description || (items.length ? "" : "Choose a page from the menu.") }}
 							</div>
 						</div>
 					</template>
@@ -103,8 +103,8 @@
 				<!-- PETS: the breeds and the name -->
 				<div v-if="petOffer" class="catalogueItems cataloguePets">
 					<div class="cataloguePetName">
-						<label>Nome del tuo animale:</label>
-						<input v-model="petName" type="text" :maxlength="PET_NAME_LENGTH" placeholder="Scegli un nome" />
+						<label>Name of your pet:</label>
+						<input v-model="petName" type="text" :maxlength="PET_NAME_LENGTH" placeholder="Choose a name" />
 					</div>
 					<div class="cataloguePetBreeds">
 						<div
@@ -124,7 +124,7 @@
 				<!-- ITEMS (of the page, or found by the search) -->
 				<div v-else class="catalogueItems">
 					<div v-if="searchActive && displayItems.length === 0" class="catalogueNavEmpty">
-						Nessun furni trovato
+						No furni found
 					</div>
 					<div
 						v-for="item in displayItems"
@@ -147,7 +147,7 @@
 
 				<!-- QUANTITY (as Habbo: the same offer bought more times at once) -->
 				<div v-if="!petOffer && selectedItem" class="catalogueAmount">
-					<span>Quantità:</span>
+					<span>Amount:</span>
 					<button type="button" :disabled="amount <= 1" @click="setAmount(amount - 1)">−</button>
 					<input
 						type="number"
@@ -165,19 +165,19 @@
 					:class="{ disabled: petOffer ? !petNameValid : !selectedItem, bought: justBought }"
 					@click="petOffer ? buyPet() : buyItem()"
 				>
-					<template v-if="justBought">Acquistato! È nel tuo inventario</template>
+					<template v-if="justBought">Bought! It's in your inventory</template>
 					<template v-else-if="petOffer">
 						<template v-if="petNameValid">
-							Compra per {{ petOffer.credits }}
+							Buy for {{ petOffer.credits }}
 							<img src="@/assets/images/catalogue/creditIcon.png" alt="" />
 						</template>
-						<template v-else>Scegli un nome!</template>
+						<template v-else>Choose a name!</template>
 					</template>
 					<template v-else-if="selectedItem">
-						Compra{{ amount > 1 ? ` ${amount}` : "" }} per {{ selectedItem.credits * amount }}
+						Buy{{ amount > 1 ? ` ${amount}` : "" }} for {{ selectedItem.credits * amount }}
 						<img src="@/assets/images/catalogue/creditIcon.png" alt="" />
 					</template>
-					<template v-else>Seleziona un oggetto!</template>
+					<template v-else>Select an item!</template>
 				</div>
 			</div>
 		</div>

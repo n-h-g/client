@@ -1,8 +1,8 @@
 <template>
 	<div class="chatBar" :class="{ hidden: !enabled }">
 		<div v-if="whisperTo" class="chatWhisperTarget">
-			Sussurra a <b>{{ whisperTo }}</b>
-			<button class="chatWhisperClose" title="Parla alla stanza (Esc)" @click="stopWhisper">✕</button>
+			Whisper to <b>{{ whisperTo }}</b>
+			<button class="chatWhisperClose" title="Talk to the room (Esc)" @click="stopWhisper">✕</button>
 		</div>
 		<div class="chatInputWrap" ref="inputWrap">
 			<!-- the style of the bubbles (as Habbo): the button opens the styles -->
@@ -18,7 +18,7 @@
 			</div>
 
 			<input ref="input" type="text" class="chatInput" :class="{ chatInputWhisper: whisperTo }" autofocus
-				:placeholder="whisperTo ? `Sussurra a ${whisperTo}..` : placeHolder" v-model="message" @keydown="onKeyDown"
+				:placeholder="whisperTo ? `Whisper to ${whisperTo}..` : placeHolder" v-model="message" @keydown="onKeyDown"
 				@keyup.enter="sendMessage">
 		</div>
 	</div>

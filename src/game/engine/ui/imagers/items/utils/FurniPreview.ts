@@ -23,14 +23,15 @@ export class FurniPreview {
     private static nextPreviewRoomId = -1;
     /**
      * @param name the furni name, with the color variant (chair_plasto*2).
+     * @param type floor or wall furni.
      * @param background the color of the panel showing the image: the layers with ink ADD (glows) are black
      *                   where they add nothing, on a transparent background they would leave a black box.
      */
-    static async render(name: string, background = 0xffffff): Promise<string | null> {
+    static async render(name: string, background = 0xffffff, type = FurnidataItemType.FloorItem): Promise<string | null> {
         const furniImager = Engine.getInstance()?.userInterfaceManager?.furniImager;
         if (!furniImager) return null;
 
-        const sprite = await furniImager.loadFurniSprite(FurnidataItemType.FloorItem, name);
+        const sprite = await furniImager.loadFurniSprite(type, name);
         if (!sprite) return null;
 
         await sprite.init();

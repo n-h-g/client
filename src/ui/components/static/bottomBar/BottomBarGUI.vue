@@ -25,7 +25,7 @@
     <div class="separator" :style="{ marginLeft: Math.round(leftEnd + 10) + 'px' }"></div>
     <ChatBar />
     <div class="rightOptions">
-      <div class="menuButton search_friends" title="Trova amici" @click="toggle('friends')"></div>
+      <div class="menuButton search_friends" title="Find friends" @click="toggle('friends')"></div>
 
       <!-- the friend bar: the friends, and "Trova Amici" in the empty places (as Habbo) -->
       <div v-if="friendBarSize > 0" class="friendBar" ref="friendBar">
@@ -35,18 +35,18 @@
           :key="slot ? 'f' + slot.id : 'empty' + index"
           class="friendBarItem"
           :class="{ offline: slot && !slot.online, findFriends: !slot, expanded: slot && slot.id === expandedId }"
-          :title="slot ? (slot.online ? slot.username + ' (online)' : slot.username + ' (offline)') : 'Trova amici'"
+          :title="slot ? (slot.online ? slot.username + ' (online)' : slot.username + ' (offline)') : 'Find friends'"
         >
           <!-- a friend opens its actions (as Habbo), an empty place the friends window -->
           <div class="friendBarMain" @click="slot ? toggleExpanded(slot.id) : toggle('friends')">
             <img v-if="slot && heads[slot.look]" class="friendBarHead" :src="heads[slot.look]" />
             <div v-else class="friendBarHead placeholder"></div>
-            <span class="friendBarName">{{ slot ? slot.username : 'Trova Amici' }}</span>
+            <span class="friendBarName">{{ slot ? slot.username : 'Find Friends' }}</span>
           </div>
           <div class="friendBarActions" v-if="slot && slot.id === expandedId">
-            <button class="friendBarAction message" title="Messaggio" :disabled="!slot.online" @click="openChat(slot.id)"></button>
-            <button class="friendBarAction follow" title="Segui" :disabled="!slot.online" @click="follow(slot.id)"></button>
-            <button class="friendBarAction profile" title="Profilo" @click="openProfile(slot.id)"></button>
+            <button class="friendBarAction message" title="Message" :disabled="!slot.online" @click="openChat(slot.id)"></button>
+            <button class="friendBarAction follow" title="Follow" :disabled="!slot.online" @click="follow(slot.id)"></button>
+            <button class="friendBarAction profile" title="Profile" @click="openProfile(slot.id)"></button>
           </div>
         </div>
         <button class="friendBarArrow" :disabled="page >= pageCount - 1" @click="page++">›</button>

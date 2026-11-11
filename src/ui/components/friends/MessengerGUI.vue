@@ -19,15 +19,15 @@
             <template v-if="active">
                 <div class="messengerHeader">
                     <span class="friendStatus" :class="{ online: activeFriend?.online }"></span>
-                    <span class="messengerName">{{ activeFriend?.username ?? 'Ex amico' }}</span>
-                    <button class="messengerIcon follow" title="Segui" :disabled="!activeFriend?.online" @click="friends.follow(active.friendId)"></button>
-                    <button class="messengerIcon profile" title="Profilo" :disabled="!activeFriend" @click="friends.openProfile(active.friendId)"></button>
-                    <button class="messengerClose" title="Chiudi la chat" @click="store.closeChat(active.friendId)">✕</button>
+                    <span class="messengerName">{{ activeFriend?.username ?? 'Former friend' }}</span>
+                    <button class="messengerIcon follow" title="Follow" :disabled="!activeFriend?.online" @click="friends.follow(active.friendId)"></button>
+                    <button class="messengerIcon profile" title="Profile" :disabled="!activeFriend" @click="friends.openProfile(active.friendId)"></button>
+                    <button class="messengerClose" title="Close the chat" @click="store.closeChat(active.friendId)">✕</button>
                 </div>
 
                 <div class="messengerMessages" ref="messagesBox">
                     <div class="messengerEmpty" v-if="active.messages.length === 0">
-                        Scrivi un messaggio a {{ activeFriend?.username }}.
+                        Write a message to {{ activeFriend?.username }}.
                     </div>
                     <div
                         v-for="(message, index) in active.messages"
@@ -47,7 +47,7 @@
                         type="text"
                         maxlength="255"
                         :disabled="!activeFriend?.online"
-                        :placeholder="activeFriend?.online ? 'Scrivi un messaggio...' : `${activeFriend?.username ?? 'Il tuo amico'} è offline`"
+                        :placeholder="activeFriend?.online ? 'Write a message...' : `${activeFriend?.username ?? 'Your friend'} is offline`"
                     />
                 </form>
             </template>

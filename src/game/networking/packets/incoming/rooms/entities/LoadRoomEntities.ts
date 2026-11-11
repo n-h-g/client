@@ -29,6 +29,8 @@ export class LoadRoomEntities extends MessageHandler {
             .setState(data.interaction)
                 .setUser(data.user)
                 .setBot(data.bot)
+                // the pets already in the room (without it they were not built: they showed up only when placed)
+                .setPet(data.pet)
                 .setEffect(data.effect)
                 .setHandItem(data.handItem)
                 .setItem(data.item)

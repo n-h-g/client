@@ -33,6 +33,28 @@
             </div>
         </div>
 
+        <!-- the card of a pet -->
+        <div v-else-if="mode == 'pet'" class="previewBoxContainer userPreview">
+            <div class="userCard petCard">
+                <div class="userCardTop">
+                    <span class="userCardName">{{ entity.name }}</span>
+                    <span class="userCardClose" title="Close" @click="hide()"></span>
+                </div>
+                <div class="petCardType">{{ petTypeName(pet.type) }}</div>
+
+                <div class="userCardBody">
+                    <div class="userCardAvatar">
+                        <img v-if="entity.image" :src="entity.image" alt="" />
+                    </div>
+                </div>
+
+                <div class="petCardInfo">
+                    <div>Scratches: {{ pet.respects }}</div>
+                    <div v-if="pet.owner">Owner: {{ pet.owner }}</div>
+                </div>
+            </div>
+        </div>
+
         <div v-else class="previewBoxContainer" v-bind:class="((mode == 'item'))?'itemPreview':'userPreview'">
             <div class="previewBoxContainerInfo">
                 <div class="titleBar">
@@ -91,6 +113,7 @@ import {FloorItem} from '../../../game/engine/room/objects/items/FloorItem'
 import { OutgoingPacket } from '../../../game/networking/packets/outgoing/OutgoingPacket'
 import { IComponentShowableUI } from '../../../game/core/ui/IComponentShowableUI'
 import { UIComponent } from '../../../game/engine/ui/components/UIComponent'
+import { petTypeName } from '../../../game/engine/ui/imagers/pets/PetType'
 import { ChangeLookEventData } from '../../../game/engine/events/ui/data/avatar/ChangeLookEventData'
 
 const mode = ref('')
@@ -125,6 +148,12 @@ function onPreview(evt: PreviewModeEventData) {
     entity.value.motto = evt.motto
     entity.value.id = evt.id
 
+    if (evt.mode == 'pet') {
+        pet.type = evt.petType ?? 0
+        pet.respects = evt.petRespects ?? 0
+        pet.owner = evt.petOwner ?? ''
+    }
+
     if (evt.mode != 'user') return
 
     if (!sameUser) {
@@ -144,6 +173,13 @@ function onPreview(evt: PreviewModeEventData) {
     }
 }
 
+// ---------------- the card of a pet
+const pet = reactive({ type: 0, respects: 0, owner: '' })
+
+function onPetRespects(data: { id: string; respects: number }) {
+    if (mode.value == 'pet' && data.id === entity.value.id) pet.respects = data.respects
+}
+
 function onUserInfo(info: UserInfoData) {
     if (info.userId !== userId.value) return
 
@@ -153,9 +189,11 @@ function onUserInfo(info: UserInfoData) {
 
 EventManager.read(UIEvents.PREVIEW_BOX_MODE, onPreview)
 EventManager.read(UIEvents.USER_INFO, onUserInfo)
+EventManager.read(UIEvents.PET_RESPECTS_CHANGED, onPetRespects)
 onUnmounted(() => {
     EventManager.off(UIEvents.PREVIEW_BOX_MODE, onPreview)
     EventManager.off(UIEvents.USER_INFO, onUserInfo)
+    EventManager.off(UIEvents.PET_RESPECTS_CHANGED, onPetRespects)
 })
 
 function badgeImage(code: string): string {
@@ -401,6 +439,35 @@ function hide(): void {
             font-size: 12px;
             color: #000;
             outline: none;
+        }
+    }
+
+    /* the card of a pet: as the one of a user, with its type and its scratches */
+    .petCard {
+        .userCardTop {
+            margin-bottom: 0;
+        }
+
+        .petCardType {
+            margin-bottom: 6px;
+            font-size: 12px;
+            color: #c8c8c4;
+        }
+
+        .userCardAvatar {
+            height: 110px;
+            align-items: center;
+
+            img {
+                margin-bottom: 0;
+                transform: scale(2);
+            }
+        }
+
+        .petCardInfo {
+            margin-top: 8px;
+            font-size: 12px;
+            line-height: 18px;
         }
     }
 

@@ -14,6 +14,10 @@ export type AvatarContextMenuData = {
     isPet?: boolean;
     /** A pet of the user: it can train it. */
     isPetOwner?: boolean;
+    /** A horse nobody rides: the user can get on it. */
+    canRide?: boolean;
+    /** The user rides this horse (or, on its own avatar, a horse): it can get off. */
+    isRiding?: boolean;
     /** The user owns the room and the avatar is of another user: it can kick or ban it. */
     canModerate?: boolean;
 };

@@ -13,7 +13,7 @@
                 <!-- pets, bots and badges: their own list and panel -->
                 <div class="inventoryListAndButtonsContainer" v-if="currentTab == 'pets'">
                     <div class="listContainer itemsContainer">
-                        <div class="inventoryEmpty" v-if="pets.length == 0">Non hai animali</div>
+                        <div class="inventoryEmpty" v-if="pets.length == 0">You have no pets</div>
                         <div class="itemInventory petInventory"
                             :class="{ selected: selectedPet && selectedPet.id === pet.id }"
                             v-for="pet in pets" :key="pet.id"
@@ -30,7 +30,7 @@
                             <div class="itemDetails">{{ petTypeName(selectedPet.type) }}</div>
                             <div class="buttonList">
                                 <div class="ui-button small" v-if="inRoom" @click.stop="placePet()">Place</div>
-                                <div class="itemDetails muted" v-else>Entra in una stanza per metterlo</div>
+                                <div class="itemDetails muted" v-else>Enter a room to place it</div>
                             </div>
                         </template>
                     </div>
@@ -38,7 +38,7 @@
 
                 <div class="inventoryListAndButtonsContainer" v-else-if="currentTab == 'bots'">
                     <div class="listContainer itemsContainer">
-                        <div class="inventoryEmpty" v-if="bots.length == 0">Non hai bot (scrivi :bot nome per crearne uno)</div>
+                        <div class="inventoryEmpty" v-if="bots.length == 0">You have no bots (write :bot name to create one)</div>
                         <div class="itemInventory"
                             :class="{ selected: selectedBot && selectedBot.id === bot.id }"
                             v-for="bot in bots" :key="bot.id"
@@ -55,7 +55,7 @@
                             </div>
                             <div class="buttonList">
                                 <div class="ui-button small" v-if="inRoom" @click.stop="placeBot()">Place</div>
-                                <div class="itemDetails muted" v-else>Entra in una stanza per metterlo</div>
+                                <div class="itemDetails muted" v-else>Enter a room to place it</div>
                             </div>
                         </template>
                     </div>
@@ -64,7 +64,7 @@
                 <div class="inventoryListAndButtonsContainer" v-else-if="currentTab == 'badges'">
                     <div class="listContainer itemsContainer badgesContainer">
                         <div class="wornBadges">
-                            <span class="label">Indossati</span>
+                            <span class="label">Worn</span>
                             <div class="badgeSlot" v-for="slot in wornSlots" :key="slot.index"
                                 :class="{ selected: slot.badge && selectedBadge && selectedBadge.code === slot.badge.code }"
                                 @click.stop="slot.badge && (selectedBadge = slot.badge)">
@@ -73,7 +73,7 @@
                                 <span v-else-if="slot.badge" class="badgeCode">{{ slot.badge.code }}</span>
                             </div>
                         </div>
-                        <div class="inventoryEmpty" v-if="badges.length == 0">Non hai badge</div>
+                        <div class="inventoryEmpty" v-if="badges.length == 0">You have no badges</div>
                         <div class="itemInventory badgeInventory"
                             :class="{ selected: selectedBadge && selectedBadge.code === badge.code, worn: badge.slot > 0 }"
                             v-for="badge in badges" :key="badge.code"
@@ -91,9 +91,9 @@
                                 <span v-else class="badgeCode">{{ selectedBadge.code }}</span>
                             </div>
                             <div class="buttonList">
-                                <div class="ui-button small" v-if="selectedBadge.slot > 0" @click.stop="setBadgeWorn(selectedBadge, false)">Togli</div>
-                                <div class="ui-button small" v-else-if="wornBadges.length < MAX_WORN_BADGES" @click.stop="setBadgeWorn(selectedBadge, true)">Indossa</div>
-                                <div class="itemDetails muted" v-else>Puoi indossare al massimo {{ MAX_WORN_BADGES }} badge</div>
+                                <div class="ui-button small" v-if="selectedBadge.slot > 0" @click.stop="setBadgeWorn(selectedBadge, false)">Take off</div>
+                                <div class="ui-button small" v-else-if="wornBadges.length < MAX_WORN_BADGES" @click.stop="setBadgeWorn(selectedBadge, true)">Wear</div>
+                                <div class="itemDetails muted" v-else>You can wear at most {{ MAX_WORN_BADGES }} badges</div>
                             </div>
                         </template>
                     </div>

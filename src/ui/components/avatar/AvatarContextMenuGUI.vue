@@ -17,6 +17,7 @@
                     <button class="avatar-menu-row menu-row-arrow" @click="setMenuView('dance')">Dance</button>
                     <button class="avatar-menu-row menu-row-arrow" @click="setMenuView('actions')">Actions</button>
                     <button class="avatar-menu-row menu-row-arrow" @click="setMenuView('signs')">Signs</button>
+                    <button v-if="avatar.isRiding" class="avatar-menu-row" @click="ridePet(false)">Dismount</button>
                 </template>
                 <template v-else-if="menuView === 'dance'">
                     <button class="avatar-menu-row" @click="runAction('dance', 1)">Pogo Mogo</button>
@@ -40,10 +41,12 @@
                     <button class="avatar-menu-row menu-back" @click="setMenuView('main')">Back</button>
                 </template>
             </template>
-            <!-- a pet (as Habbo; no ride/saddle: there are no saddles) -->
+            <!-- a pet (as Habbo): a horse can be ridden -->
             <template v-else-if="avatar.isPet">
                 <button class="avatar-menu-row" :class="{ unavailable: petRespects <= 0 }" :disabled="petRespects <= 0"
                     :title="petRespects <= 0 ? 'No more scratches today' : 'Scratches left today'" @click="scratchPet">Pet ({{ petRespects }})</button>
+                <button v-if="avatar.isRiding" class="avatar-menu-row" @click="ridePet(false)">Dismount</button>
+                <button v-else-if="avatar.canRide" class="avatar-menu-row" @click="ridePet(true)">Ride</button>
                 <button v-if="avatar.isPetOwner" class="avatar-menu-row" @click="comingSoon('Train')">Train</button>
                 <button v-if="avatar.canPickUp" class="avatar-menu-row" @click="pickUpBot">Pick up</button>
             </template>
@@ -142,6 +145,15 @@ function pickUpBot() {
 
 // ---------------- pets
 const petRespects = ref(PetRespects.left)
+
+/** "Ride": the user walks next to the horse and gets on it; "Dismount": it gets off (the server decides). */
+function ridePet(ride: boolean) {
+    Engine.getInstance()?.networkingManager?.packetManager?.applyOut(OutgoingPacket.RidePetEvent, {
+        id: avatar.value.id,
+        ride,
+    })
+    close()
+}
 
 /** "Pet": a scratch (the server counts them, PetScratched makes it smile). */
 function scratchPet() {

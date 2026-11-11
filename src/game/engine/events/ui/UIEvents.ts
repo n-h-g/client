@@ -16,6 +16,8 @@ export class UIEvents extends Events {
         'inventory_items_added'
     );
     static PREVIEW_BOX_MODE: UIEvents = new UIEvents('preview_box_mode');
+    /** A pet of the room was scratched: {id (its entity), respects}. */
+    static PET_RESPECTS_CHANGED: UIEvents = new UIEvents('pet_respects_changed');
     static HOTEL_VIEW: UIEvents = new UIEvents('hotel_view');
     static ROOM_UI: UIEvents = new UIEvents('room_ui');
     static ROOM_NEW_MESSAGE: UIEvents = new UIEvents('room_new_message');

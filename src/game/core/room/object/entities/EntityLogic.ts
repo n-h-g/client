@@ -92,12 +92,13 @@ export abstract class EntityLogic extends RoomObjectLogic {
             userId,
             isSelf: userId != null && userId === Engine.getInstance().currentUserId,
             look: user.figure,
-            image: (
-                await UiUtils.generateImageFromObject(
-                    this.entity.visualization?.container!
-                )
-            ).src,
+            image: await this.getPreviewImage(),
         });
+    }
+
+    /** The image of the entity in its card: as it is in the room (the furni show their first state, see ItemLogic). */
+    protected async getPreviewImage(): Promise<string> {
+        return (await UiUtils.generateImageFromObject(this.entity.visualization?.container!)).src;
     }
 
     async togglePreview() {

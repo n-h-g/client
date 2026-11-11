@@ -15,7 +15,7 @@
       </div>
       <div class="roomInfo">
         <h2>Name</h2>
-        <input maxlength="50" type="text" placeholder="Nome" v-model="roomName" :class="{ error: errorCreate }" />
+        <input maxlength="50" type="text" placeholder="Name" v-model="roomName" :class="{ error: errorCreate }" />
         <div class="button_container">
           <button @click="checkAndCreateRoom()">
             Create

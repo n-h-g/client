@@ -1,5 +1,5 @@
 <template>
-    <Dialog title="Profilo" className="friendProfile" :box="UIEventsType.FRIEND_PROFILE">
+    <Dialog title="Profile" className="friendProfile" :box="UIEventsType.FRIEND_PROFILE">
         <div class="friendProfileContent" v-if="friend">
             <div class="friendProfileAvatar">
                 <img v-if="avatarImage" :src="avatarImage" />
@@ -12,12 +12,12 @@
                     {{ friend.online ? 'Online' : 'Offline' }}
                 </div>
                 <div class="friendProfileButtons">
-                    <button class="ui-button small" :disabled="!friend.online" @click="messenger.openChat(friend.id)">Messaggio</button>
-                    <button class="ui-button small" :disabled="!friend.online" @click="friends.follow(friend.id)">Segui</button>
+                    <button class="ui-button small" :disabled="!friend.online" @click="messenger.openChat(friend.id)">Message</button>
+                    <button class="ui-button small" :disabled="!friend.online" @click="friends.follow(friend.id)">Follow</button>
                 </div>
             </div>
         </div>
-        <div class="friendProfileContent empty" v-else>Questo utente non è più tuo amico.</div>
+        <div class="friendProfileContent empty" v-else>This user is not your friend anymore.</div>
     </Dialog>
 </template>
 

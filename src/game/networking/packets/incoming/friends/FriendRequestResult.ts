@@ -9,18 +9,18 @@ export class FriendRequestResult extends MessageHandler {
         const {status, username} = this.message ?? {};
 
         const messages: Record<string, string> = {
-            REQUESTED: `Richiesta di amicizia inviata a ${username}`,
-            ACCEPTED: `Ora tu e ${username} siete amici`,
-            ALREADY_FRIENDS: `Tu e ${username} siete già amici`,
-            ALREADY_REQUESTED: `Hai già inviato una richiesta a ${username}`,
-            NOT_FOUND: `Nessun utente si chiama ${username}`,
-            INVALID: 'Non puoi aggiungere te stesso',
-            NOT_FRIEND: `${username || 'Questo utente'} non è tuo amico`,
-            FOLLOW_OFFLINE: `${username} non è online`,
-            FOLLOW_NOT_IN_ROOM: `${username} non è in una stanza`,
-            FOLLOW_SAME_ROOM: `Sei già nella stanza di ${username}`,
-            MESSAGE_OFFLINE: `${username} non è online: il messaggio non è stato inviato`,
-            UNAVAILABLE: 'Gli amici non sono disponibili, riprova più tardi',
+            REQUESTED: `Friend request sent to ${username}`,
+            ACCEPTED: `You and ${username} are now friends`,
+            ALREADY_FRIENDS: `You and ${username} are already friends`,
+            ALREADY_REQUESTED: `You already sent a request to ${username}`,
+            NOT_FOUND: `No user is called ${username}`,
+            INVALID: 'You can\'t add yourself',
+            NOT_FRIEND: `${username || 'This user'} is not your friend`,
+            FOLLOW_OFFLINE: `${username} is not online`,
+            FOLLOW_NOT_IN_ROOM: `${username} is not in a room`,
+            FOLLOW_SAME_ROOM: `You are already in the room of ${username}`,
+            MESSAGE_OFFLINE: `${username} is not online: the message was not sent`,
+            UNAVAILABLE: 'Friends are not available, try again later',
         };
 
         EventManager.emit<BubbleAlertData>(UIEvents.BUBBLE_ALERT, {

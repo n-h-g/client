@@ -15,14 +15,14 @@ export function petLibraryName(typeId: number): string | null {
 }
 
 /** The names of the pet types (as PET_LIBRARIES), for the UI. */
-const PET_TYPE_NAMES: readonly string[] = ['Cane', 'Gatto', 'Coccodrillo', 'Terrier', 'Orso', 'Maiale', 'Leone', 'Rinoceronte', 'Ragno',
-    'Tartaruga', 'Pulcino', 'Rana', 'Drago', 'Mostro', 'Scimmia', 'Cavallo', 'Pianta mostro', 'Coniglio',
-    'Coniglio malvagio', 'Coniglio depresso', 'Coniglio innamorato', 'Piccione buono', 'Piccione malvagio',
-    'Scimmia demoniaca', 'Orsetto', 'Terrier cucciolo', 'Gnomo', 'Folletto', 'Gattino', 'Cucciolo', 'Maialino',
-    'Haloompa', 'Pesce d\'aprile', 'Pterodattilo', 'Velociraptor', 'Mucca'];
+const PET_TYPE_NAMES: readonly string[] = ['Dog', 'Cat', 'Crocodile', 'Terrier', 'Bear', 'Pig', 'Lion', 'Rhino', 'Spider',
+    'Turtle', 'Chick', 'Frog', 'Dragon', 'Monster', 'Monkey', 'Horse', 'Monster plant', 'Bunny',
+    'Evil bunny', 'Depressed bunny', 'Love bunny', 'Good pigeon', 'Evil pigeon',
+    'Demon monkey', 'Baby bear', 'Baby terrier', 'Gnome', 'Leprechaun', 'Kitten', 'Puppy', 'Piglet',
+    'Haloompa', 'April fool', 'Pterosaur', 'Velociraptor', 'Cow'];
 
 export function petTypeName(type: number): string {
-    return PET_TYPE_NAMES[type] ?? `Animale ${type}`;
+    return PET_TYPE_NAMES[type] ?? `Pet ${type}`;
 }
 
 /** The type of a pet offer of the catalogue ("a0 pet<type>", as Arcturus), null if it isn't a pet. */

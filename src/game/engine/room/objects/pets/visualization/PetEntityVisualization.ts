@@ -22,6 +22,8 @@ export class PetEntityVisualization extends EntityVisualization {
     private loading = false;
     private posture: string = PetPosture.STAND;
     private headDirection = -1;
+    /** Someone rides it: its saddle is drawn by the effect of the rider (see Pet.setRiding). */
+    private riding = false;
     walking = false;
 
     constructor(entity: PetEntity) {
@@ -68,6 +70,12 @@ export class PetEntityVisualization extends EntityVisualization {
         this.pet.setDirection(this.direction);
         this.pet.setHeadDirection(this.headDirection);
         this.pet.setPosture(this.posture);
+        this.pet.setRiding(this.riding);
+    }
+
+    setRiding(riding: boolean): void {
+        this.riding = riding;
+        this.pet?.setRiding(riding);
     }
 
     /** The actions of the server: walking, sitting, lying, else standing (the postures of the pet libraries). */

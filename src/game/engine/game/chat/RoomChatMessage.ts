@@ -14,6 +14,8 @@ export class RoomChatMessage extends Message {
     readonly recipient?: string;
     /** The style of the bubble. */
     readonly style: number;
+    /** A notice of the game on an entity (e.g. a pet was scratched): the bubble has only the text. */
+    readonly info: boolean;
 
     constructor(
         message: string,
@@ -21,7 +23,8 @@ export class RoomChatMessage extends Message {
         messageType: MessageType,
         destinationId = -1,
         recipient?: string,
-        style = 0
+        style = 0,
+        info = false
     ) {
         super(
             Engine.getInstance().chatService.getLastMessageId(),
@@ -34,6 +37,7 @@ export class RoomChatMessage extends Message {
         this.author = author;
         this.recipient = recipient;
         this.style = style;
+        this.info = info;
 
         this.compose();
     }

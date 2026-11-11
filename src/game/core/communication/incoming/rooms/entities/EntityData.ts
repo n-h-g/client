@@ -31,6 +31,10 @@ export interface EntityData {
         race: number;
         color: string;
         ownerId: number | null;
+        /** How many times it was scratched. */
+        respects?: number;
+        /** The entity of the user riding it (a horse), null if nobody rides it. */
+        rider?: string | null;
     };
     /** The avatar effect of a human (0: none). */
     effect?: {

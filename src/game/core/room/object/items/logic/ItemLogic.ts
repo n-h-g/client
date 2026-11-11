@@ -4,6 +4,8 @@ import {EntityEvents} from '../../../../../engine/events/room/objects/entities/E
 import {ItemEvents} from '../../../../../engine/events/room/objects/entities/ItemEvents';
 import {Item} from '../../../../../engine/room/objects/items/Item';
 import {FurniData} from '../../../../../engine/ui/imagers/items/FurniData';
+import {FurnidataItemType} from '../../../../../engine/ui/imagers/items/enum/FurniDataItemType';
+import {FurniPreview} from '../../../../../engine/ui/imagers/items/utils/FurniPreview';
 import {OutgoingPacket} from '../../../../../networking/packets/outgoing/OutgoingPacket';
 import {MoveableLogic} from '../../Moveable';
 import {EntityLogic} from '../../entities/EntityLogic';
@@ -71,6 +73,30 @@ export abstract class ItemLogic extends EntityLogic implements MoveableLogic {
         // Only the preview: the movement goes to the tile under the mouse (RoomLogic.onMouseClick),
         // not to the furni origin tile (which can be a blocked tile, e.g. a table).
         this.togglePreview();
+    }
+
+    /** The color of the panel of the card (PreviewBoxGUI): behind the layers with ink ADD (see FurniPreview). */
+    private static readonly PREVIEW_BACKGROUND = 0x2e2e2c;
+
+    /**
+     * The card of a furni shows it in its first state (as the catalogue), not as it is now in the room: e.g. an
+     * effect furni while it's exploding, a lamp switched off. As it is if it can't be drawn.
+     */
+    protected async getPreviewImage(): Promise<string> {
+        try {
+            // structural check (a wall furni has its placement on the wall): importing WallItem here is a cycle
+            const type = 'placementWall' in this.entity ? FurnidataItemType.WallItem : FurnidataItemType.FloorItem;
+
+            const image = await Promise.race([
+                FurniPreview.render(this.entity.name, ItemLogic.PREVIEW_BACKGROUND, type),
+                new Promise<null>(resolve => setTimeout(() => resolve(null), 1500)),
+            ]);
+            if (image) return image;
+        } catch (e) {
+            // not drawn: as it is in the room
+        }
+
+        return super.getPreviewImage();
     }
 
     toggleMovement(value: boolean): void {

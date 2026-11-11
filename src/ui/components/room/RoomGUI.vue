@@ -12,7 +12,8 @@
                 <div class="chatBubbleHead">
                     <img v-if="message.head" :src="message.head" @load="onHeadLoad" />
                 </div>
-                <div class="chatBubbleContent">
+                <div v-if="message.data.info" class="chatBubbleContent">{{ message.data.text }}</div>
+                <div v-else class="chatBubbleContent">
                     <b>{{ message.data.author?.name }}</b><span v-if="message.data.whisper && message.data.whisperTo" class="chatBubbleWhisperTo"> → {{ message.data.whisperTo }}</span><b>:</b> {{ message.data.text }}
                 </div>
                 <div class="chatBubblePointer"></div>

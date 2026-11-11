@@ -34,7 +34,7 @@ export class EntityBuilder {
     private wallPosition?: string;
     private effectId = 0;
     private bot?: {id: number; ownerId: number | null};
-    private pet?: {id: number; type: number; race: number; color: string; ownerId: number | null};
+    private pet?: {id: number; type: number; race: number; color: string; ownerId: number | null; respects?: number; rider?: string | null};
     private handItemId = 0;
     private actions?: ActionsComponent;
     private stackHeight: number | null = null;
@@ -122,7 +122,7 @@ export class EntityBuilder {
     }
 
     /** A pet: its look and the user that owns it. */
-    setPet(pet?: {id: number; type: number; race: number; color: string; ownerId: number | null}): EntityBuilder {
+    setPet(pet?: {id: number; type: number; race: number; color: string; ownerId: number | null; respects?: number; rider?: string | null}): EntityBuilder {
         this.pet = pet;
         return this;
     }
@@ -192,11 +192,14 @@ export class EntityBuilder {
             const pet = new PetEntity(this.id, this.name, PetFigureData.from(this.pet.type, this.pet.race, this.pet.color));
             pet.petId = this.pet.id;
             pet.ownerId = this.pet.ownerId ?? null;
+            pet.respects = this.pet.respects ?? 0;
+            pet.riderId = this.pet.rider ?? null;
             pet.position = position;
 
             const visualization = pet.visualization as PetEntityVisualization;
             if (this.bodyRotation != null) visualization.setDirections(this.bodyRotation, this.headRotation);
             // a pet walking goes on with the next updates of the server: here it stands (or sits, lies)
+            visualization.setRiding(pet.riderId != null);
             visualization.setActions((this.actions?.actions ?? []).filter(action => action !== ActionId.WALK));
 
             entity = pet;

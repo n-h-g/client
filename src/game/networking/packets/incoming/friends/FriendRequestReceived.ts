@@ -13,7 +13,7 @@ export class FriendRequestReceived extends MessageHandler {
         const store = FriendsStore.getInstance();
 
         EventManager.emit<BubbleAlertData>(UIEvents.BUBBLE_ALERT, {
-            message: `${from.username} vuole essere tuo amico`,
+            message: `${from.username} wants to be your friend`,
             action: {
                 onConfirm: () => store.acceptRequest(from.id),
                 onDecline: () => store.declineRequest(from.id),

@@ -6,8 +6,8 @@
                 <span>{{ bubbleAlert.message }}</span>
             </div>
             <div class="bubbleAlertButtons" v-if="bubbleAlert.action">
-                <button class="button-accept" @click.stop="answer(bubbleAlert, true)">Accetta</button>
-                <button class="button-decline" @click.stop="answer(bubbleAlert, false)">Rifiuta</button>
+                <button class="button-accept" @click.stop="answer(bubbleAlert, true)">Accept</button>
+                <button class="button-decline" @click.stop="answer(bubbleAlert, false)">Decline</button>
             </div>
         </div>
     </div>
