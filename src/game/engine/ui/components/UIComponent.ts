@@ -23,4 +23,7 @@ export enum UIComponent {
     DoorbellUI = 'doorbell',
     DoorbellEntryUI = 'doorbellEntry',
     FurniChooserUI = 'furniChooser',
+    RoomLinkUI = 'roomLink',
+    RoomPublicInfoUI = 'roomPublicInfo',
+    CommandsUI = 'commands',
 }

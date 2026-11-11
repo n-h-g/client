@@ -89,6 +89,9 @@ export class Engine {
         return this.wrappedConfig;
     }
 
+    /** The room to enter after the login (the link of a room, /room/:roomId). */
+    pendingRoomId: number | null = null;
+
     set sso(sso: string) {
         this.wrappedSSO = sso;
     }

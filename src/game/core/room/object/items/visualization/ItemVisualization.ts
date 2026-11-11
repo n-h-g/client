@@ -335,6 +335,15 @@ export abstract class ItemVisualization
         const compareY =
             Math.trunc((this.entity as Item).base.getLogicDimension(2) / 100) /
             10;
+
+        // the same origin depth (x + y) gives the same zIndex: the item that reaches nearer to the viewer goes in
+        // front. E.g. a 2x2 table and the chair at its side on the same x + y: the avatar sitting on the chair
+        // (over the chair, HumanVisualization.sortWithFloorItems) was over the table too. Below a step of x + y.
+        const footprint = (this.entity as Item).getFootprint?.();
+        const reach = footprint
+            ? footprint.maxX + footprint.maxY - footprint.minX - footprint.minY
+            : 0;
+
         return RoomVisualization.calculateZIndex(
             new Point3d(
                 this.entity.position.x,
@@ -342,7 +351,7 @@ export abstract class ItemVisualization
                 this.entity.position.z
             ),
             this.isFlatFloorItem() ? RoomPriority.FLOOR_ITEM : RoomPriority.ROOM_ITEM
-        );
+        ) + reach;
     }
 
     /** Margin over the tiles of a flat furni for its thickness (e.g. the edge of a rug). */

@@ -7,7 +7,7 @@
                 :key="message.internalId"
                 :ref="element => setBubbleElement(message, element as HTMLElement | null)"
                 :style="{ top: message.top + 'px', left: message.left + 'px', visibility: message.ready ? 'visible' : 'hidden' }"
-                :class="{ chatBubbleShout: message.data.shout, chatBubbleWhisper: message.data.whisper, placed: message.placed }"
+                :class="['bubble-' + (message.data.style ?? 0), { chatBubbleShout: message.data.shout, chatBubbleWhisper: message.data.whisper, placed: message.placed }]"
                 @click="onClickChat(message)">
                 <div class="chatBubbleHead">
                     <img v-if="message.head" :src="message.head" @load="onHeadLoad" />
@@ -37,7 +37,8 @@
                 </div>
 
                 <ul class="roomToolsList">
-                    <li v-if="roomPanelInfo.haveRights" @click="openSettings()">
+                    <!-- the settings of your room, the info of the room of someone else -->
+                    <li @click="roomPanelInfo.haveRights ? openSettings() : openComponent(UIComponent.RoomPublicInfoUI)">
                         <span class="roomToolsIcon settings"></span><span class="roomToolsLabel">Settings</span>
                     </li>
                     <li @click="toggleZoom()">
@@ -49,7 +50,7 @@
                     <li @click="comingSoon('Like')">
                         <span class="roomToolsIcon"></span><span class="roomToolsLabel">Like</span>
                     </li>
-                    <li @click="comingSoon('Link to this room')">
+                    <li @click="openComponent(UIComponent.RoomLinkUI)">
                         <span class="roomToolsIcon"></span><span class="roomToolsLabel">Link to this room</span>
                     </li>
                 </ul>
@@ -331,6 +332,10 @@ function toggleZoom() {
     Engine.getInstance()?.roomService?.currentRoom?.roomLayout.visualization.zoom(zoomedOut ? 0.5 : 1)
 }
 
+function openComponent(component: UIComponent) {
+    Engine.getInstance()?.userInterfaceManager?.componentsManager?.getComponent<IComponentShowableUI>(component)?.show()
+}
+
 function comingSoon(feature: string) {
     EventManager.emit<BubbleAlertData>(UIEvents.BUBBLE_ALERT, { message: `${feature}: coming soon!` })
 }
@@ -345,6 +350,8 @@ onUnmounted(() => EventManager.off(UIEvents.ENTER_ROOM_INFO, onRoomInfo))
 
 
 <style lang="scss">
+@import "./chatBubbles.scss";
+
 #roomGui {
     position: absolute;
     width: 100%;
@@ -541,20 +548,11 @@ onUnmounted(() => EventManager.off(UIEvents.ENTER_ROOM_INFO, onRoomInfo))
         right: 0;
         pointer-events: none;
 
+        /* the look of the bubbles (their style): chatBubbles.scss */
         .chatBubble {
             position: absolute;
-            display: flex;
-            flex-direction: row;
             width: max-content;
             max-width: 350px;
-            min-height: 26px;
-            box-sizing: border-box;
-            border: 1px solid #000;
-            border-radius: 7px;
-            background: linear-gradient(180deg, #fff 0%, #ebebeb 50%, #fff 100%);
-            font-size: 14px;
-            line-height: 1.15;
-            word-break: break-word;
             user-select: none;
             pointer-events: all !important;
             cursor: pointer !important;
@@ -563,67 +561,10 @@ onUnmounted(() => EventManager.off(UIEvents.ENTER_ROOM_INFO, onRoomInfo))
             &.placed {
                 transition: top 0.2s ease;
             }
-
-            .chatBubbleHead {
-                position: relative;
-                flex: none;
-                width: 27px;
-                border-radius: 6px 0 0 6px;
-                background-color: #c8c8c8;
-                border-right: 1px solid #8e8e8e;
-
-                img {
-                    position: absolute;
-                    left: 50%;
-                    bottom: 2px;
-                    transform: translateX(-50%);
-                }
-            }
-
-            .chatBubbleContent {
-                padding: 5px 6px 5px 4px;
-                color: #000;
-            }
-
-            /* points to the avatar that talked */
-            .chatBubblePointer {
-                position: absolute;
-                left: 50%;
-                bottom: -6px;
-                transform: translateX(-50%);
-                width: 0;
-                height: 0;
-                border-left: 5px solid transparent;
-                border-right: 5px solid transparent;
-                border-top: 6px solid #000;
-
-                &::after {
-                    content: "";
-                    position: absolute;
-                    left: -4px;
-                    top: -7px;
-                    border-left: 4px solid transparent;
-                    border-right: 4px solid transparent;
-                    border-top: 5px solid #fff;
-                }
-            }
         }
 
-        /* a whisper, as Habbo: grey and italic */
-        .chatBubble.chatBubbleWhisper {
-            background: linear-gradient(180deg, #f2f2f2 0%, #dedede 50%, #f2f2f2 100%);
-
-            .chatBubbleContent {
-                color: #636363;
-                font-style: italic;
-            }
-
-            .chatBubbleWhisperTo {
-                font-weight: normal;
-            }
-        }
-        .chatBubbleShout {
-            font-weight: bold; 
+        .chatBubbleWhisperTo {
+            font-weight: normal;
         }
 
         .chatColorYellow {

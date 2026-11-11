@@ -31,7 +31,8 @@ export class NewRoomMessage extends MessageHandler {
             entity,
             data.whisper ? MessageType.WHISPER : MessageType.DEFAULT,
             -1,
-            data.whisper ? data.recipient : undefined
+            data.whisper ? data.recipient : undefined,
+            data.style ?? 0
         );
 
         Engine.getInstance().chatService.addMessage(chatMessage);

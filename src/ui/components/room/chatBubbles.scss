@@ -1,0 +1,671 @@
+// The styles of the chat bubbles, from the CSS of Nitro (Nitro_Assets): the bubble (a 9-slice border-image),
+// its pointer and, for some, an icon instead of the head. Generated from Nitro's .bubble-container rules:
+// .chat-bubble -> .chatBubble, .user-container -> .chatBubbleHead, .chat-content -> .chatBubbleContent,
+// .pointer -> .chatBubblePointer, .chat-bubble-icon -> .chatStyleIcon (the picker of ChatStyleSelector).
+// The style 0 uses bubble_0.png (Nitro: the transparent one, with the head area colored apart).
+
+// ---------------- the bubble of every style (the style rules below change the image, the slices, the pointer)
+.chatBubble {
+    min-height: 25px;
+    box-sizing: border-box;
+    font-size: 14px;
+    word-break: break-word;
+    // the border-image is drawn only with a border style
+    border-style: solid;
+    border-width: 0;
+    border-image-source: url("@/assets/images/chat/chatbubbles/bubble_0.png");
+    border-image-slice: 17 6 6 29 fill;
+    border-image-width: 17px 6px 6px 29px;
+    border-image-outset: 2px 0 0 0;
+    border-image-repeat: repeat repeat;
+}
+
+.chatBubble .chatBubbleHead {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 27px;
+    height: 25px;
+    z-index: 1;
+
+    img {
+        position: absolute;
+        left: 50%;
+        bottom: 2px;
+        transform: translateX(-50%);
+    }
+}
+
+.chatBubble .chatBubbleContent {
+    position: relative;
+    z-index: 2;
+    min-height: 25px;
+    box-sizing: border-box;
+    margin-left: 27px;
+    padding: 5px 6px 5px 4px;
+    line-height: 1.15;
+    color: #000;
+}
+
+// points to the avatar that talked
+.chatBubble .chatBubblePointer {
+    position: absolute;
+    left: 50%;
+    bottom: -5px;
+    width: 9px;
+    height: 6px;
+    transform: translateX(-50%);
+}
+
+// a whisper, as Habbo: grey and italic; a shout in bold
+.chatBubble.chatBubbleWhisper .chatBubbleContent {
+    font-style: italic;
+    color: #595959;
+}
+
+.chatBubble.chatBubbleShout .chatBubbleContent {
+    font-weight: 700;
+}
+
+// the icon of a style in the picker
+.chatStyleIcon {
+    position: relative;
+    background-repeat: no-repeat;
+    background-position: 50%;
+}
+
+.chatBubble.bubble-0 {
+    border-image-source:url("@/assets/images/chat/chatbubbles/bubble_0.png");
+}
+.chatBubble.bubble-0 .chatBubblePointer {
+    background:url("@/assets/images/chat/chatbubbles/bubble_0_1_33_34_pointer.png");
+    bottom:-5px;
+}
+.chatBubble.bubble-1 {
+    border-image-source:url("@/assets/images/chat/chatbubbles/bubble_1.png");
+    border-image-slice:18 6 6 29 fill;
+    border-image-width:18px 6px 6px 29px;
+    border-image-outset:3px 0 0 0;
+}
+.chatBubble.bubble-1 .chatBubbleHead {
+    display:none;
+}
+.chatBubble.bubble-1 .chatBubblePointer {
+    background:url("@/assets/images/chat/chatbubbles/bubble_0_1_33_34_pointer.png");
+}
+.chatBubble.bubble-2,
+.chatBubble.bubble-31 {
+    border-image-source:url("@/assets/images/chat/chatbubbles/bubble_2.png");
+}
+.chatBubble.bubble-2 .chatBubbleHead,
+.chatBubble.bubble-31 .chatBubbleHead {
+    display:none;
+}
+.chatBubble.bubble-2 .chatBubbleContent,
+.chatBubble.bubble-31 .chatBubbleContent {
+    color:#fff;
+}
+.chatBubble.bubble-2 .chatBubblePointer,
+.chatBubble.bubble-31 .chatBubblePointer {
+    background:url("@/assets/images/chat/chatbubbles/bubble_2_31_pointer.png");
+    height:7px;
+}
+.chatBubble.bubble-3 {
+    border-image-source:url("@/assets/images/chat/chatbubbles/bubble_3.png");
+}
+.chatBubble.bubble-3 .chatBubblePointer {
+    background:url("@/assets/images/chat/chatbubbles/bubble_3_pointer.png");
+}
+.chatBubble.bubble-4 {
+    border-image-source:url("@/assets/images/chat/chatbubbles/bubble_4.png");
+}
+.chatBubble.bubble-4 .chatBubblePointer {
+    background:url("@/assets/images/chat/chatbubbles/bubble_4_pointer.png");
+}
+.chatBubble.bubble-5 {
+    border-image-source:url("@/assets/images/chat/chatbubbles/bubble_5.png");
+}
+.chatBubble.bubble-5 .chatBubblePointer {
+    background:url("@/assets/images/chat/chatbubbles/bubble_5_pointer.png");
+}
+.chatBubble.bubble-6 {
+    border-image-source:url("@/assets/images/chat/chatbubbles/bubble_6.png");
+}
+.chatBubble.bubble-6 .chatBubblePointer {
+    background:url("@/assets/images/chat/chatbubbles/bubble_6_pointer.png");
+}
+.chatBubble.bubble-7 {
+    border-image-source:url("@/assets/images/chat/chatbubbles/bubble_7.png");
+}
+.chatBubble.bubble-7 .chatBubblePointer {
+    background:url("@/assets/images/chat/chatbubbles/bubble_7_pointer.png");
+}
+.chatBubble.bubble-8 {
+    border-image-source:url("@/assets/images/chat/chatbubbles/bubble_8.png");
+    border-image-slice:20 6 6 27 fill;
+    border-image-width:20px 6px 6px 27px;
+    border-image-outset:5px 0 0 0;
+}
+.chatBubble.bubble-8 .chatBubbleContent {
+    color:#fff;
+}
+.chatBubble.bubble-8 .chatBubblePointer {
+    background:url("@/assets/images/chat/chatbubbles/bubble_8_pointer.png");
+}
+.chatBubble.bubble-9 {
+    border-image-source:url("@/assets/images/chat/chatbubbles/bubble_9.png");
+    border-image-slice:17 18 12 19 fill;
+    border-image-width:17px 18px 12px 19px;
+    border-image-outset:7px 7px 0 9px;
+}
+.chatBubble.bubble-9 .chatBubbleContent {
+    margin-left:20px;
+}
+.chatBubble.bubble-9 .chatBubblePointer {
+    background:url("@/assets/images/chat/chatbubbles/bubble_9_pointer.png");
+    width:7px;
+    height:10px;
+    bottom:-6px;
+}
+.chatBubble.bubble-10 {
+    border-image-source:url("@/assets/images/chat/chatbubbles/bubble_10.png");
+    border-image-slice:29 18 8 37 fill;
+    border-image-width:29px 18px 8px 37px;
+    border-image-outset:12px 7px 1px 5px;
+}
+.chatBubble.bubble-10 .chatBubbleContent {
+    margin-left:24px;
+    color:#fff;
+}
+.chatBubble.bubble-10 .chatBubblePointer {
+    background:url("@/assets/images/chat/chatbubbles/bubble_10_pointer.png");
+    width:7px;
+    height:8px;
+    bottom:-3px;
+}
+.chatBubble.bubble-11 {
+    border-image-source:url("@/assets/images/chat/chatbubbles/bubble_11.png");
+}
+.chatBubble.bubble-11 .chatBubblePointer {
+    background:url("@/assets/images/chat/chatbubbles/bubble_11_pointer.png");
+}
+.chatBubble.bubble-12 {
+    border-image-source:url("@/assets/images/chat/chatbubbles/bubble_12.png");
+}
+.chatBubble.bubble-12 .chatBubblePointer {
+    background:url("@/assets/images/chat/chatbubbles/bubble_12_pointer.png");
+}
+.chatBubble.bubble-13 {
+    border-image-source:url("@/assets/images/chat/chatbubbles/bubble_13.png");
+}
+.chatBubble.bubble-13 .chatBubblePointer {
+    background:url("@/assets/images/chat/chatbubbles/bubble_13_pointer.png");
+}
+.chatBubble.bubble-14 {
+    border-image-source:url("@/assets/images/chat/chatbubbles/bubble_14.png");
+}
+.chatBubble.bubble-14 .chatBubbleContent {
+    color:#fff;
+}
+.chatBubble.bubble-14 .chatBubblePointer {
+    background:url("@/assets/images/chat/chatbubbles/bubble_14_pointer.png");
+}
+.chatBubble.bubble-15 {
+    border-image-source:url("@/assets/images/chat/chatbubbles/bubble_15.png");
+}
+.chatBubble.bubble-15 .chatBubbleContent {
+    color:#fff;
+}
+.chatBubble.bubble-15 .chatBubblePointer {
+    background:url("@/assets/images/chat/chatbubbles/bubble_15_pointer.png");
+}
+.chatBubble.bubble-16 {
+    border-image-source:url("@/assets/images/chat/chatbubbles/bubble_16.png");
+    border-image-slice:13 6 10 31 fill;
+    border-image-width:13px 6px 10px 31px;
+    border-image-outset:6px 0 0 0;
+}
+.chatBubble.bubble-16 .chatBubblePointer {
+    background:url("@/assets/images/chat/chatbubbles/bubble_16_pointer.png");
+    height:8px;
+}
+.chatBubble.bubble-17 {
+    border-image-source:url("@/assets/images/chat/chatbubbles/bubble_17.png");
+    border-image-slice:24 6 8 35 fill;
+    border-image-width:24px 6px 8px 35px;
+    border-image-outset:9px 0 2px 5px;
+}
+.chatBubble.bubble-17 .chatBubblePointer {
+    background:url("@/assets/images/chat/chatbubbles/bubble_17_pointer.png");
+}
+.chatBubble.bubble-18 {
+    border-image-source:url("@/assets/images/chat/chatbubbles/bubble_18.png");
+    border-image-slice:7 16 8 16 fill;
+    border-image-width:7px 16px 8px 16px;
+    border-image-outset:3px 10px 2px 11px;
+}
+.chatBubble.bubble-18 .chatBubbleContent {
+    margin-left:20px;
+}
+.chatBubble.bubble-18 .chatBubblePointer {
+    background:url("@/assets/images/chat/chatbubbles/bubble_18_pointer.png");
+    height:8px;
+}
+.chatBubble.bubble-19 {
+    border-image-source:url("@/assets/images/chat/chatbubbles/bubble_19.png");
+    border-image-slice:17 6 9 19 fill;
+    border-image-width:17px 6px 9px 19px;
+    border-image-outset:5px 0 0 8px;
+}
+.chatBubble.bubble-19 .chatBubbleContent {
+    margin-left:20px;
+}
+.chatBubble.bubble-19 .chatBubblePointer {
+    background:url("@/assets/images/chat/chatbubbles/bubble_19_20_pointer.png");
+}
+.chatBubble.bubble-20 {
+    border-image-source:url("@/assets/images/chat/chatbubbles/bubble_20.png");
+    border-image-slice:18 6 8 19 fill;
+    border-image-width:18px 6px 8px 19px;
+    border-image-outset:5px 0 0 8px;
+}
+.chatBubble.bubble-20 .chatBubbleContent {
+    margin-left:20px;
+}
+.chatBubble.bubble-20 .chatBubblePointer {
+    background:url("@/assets/images/chat/chatbubbles/bubble_19_20_pointer.png");
+}
+.chatBubble.bubble-21 {
+    border-image-source:url("@/assets/images/chat/chatbubbles/bubble_21.png");
+    border-image-slice:20 6 12 24 fill;
+    border-image-width:20px 6px 12px 24px;
+    border-image-outset:13px 2px 1px 3px;
+}
+.chatBubble.bubble-21 .chatBubbleContent {
+    margin-left:20px;
+}
+.chatBubble.bubble-21 .chatBubblePointer {
+    background:url("@/assets/images/chat/chatbubbles/bubble_21_pointer.png");
+    bottom:-4px;
+}
+.chatBubble.bubble-22 {
+    border-image-source:url("@/assets/images/chat/chatbubbles/bubble_22.png");
+    border-image-slice:18 19 11 33 fill;
+    border-image-width:18px 19px 11px 33px;
+    border-image-outset:7px 1px 1px 5px;
+}
+.chatBubble.bubble-22 .chatBubbleContent {
+    margin-left:20px;
+}
+.chatBubble.bubble-22 .chatBubblePointer {
+    background:url("@/assets/images/chat/chatbubbles/bubble_22_pointer.png");
+}
+.chatBubble.bubble-23 {
+    border-image-source:url("@/assets/images/chat/chatbubbles/bubble_23.png");
+    border-image-slice:16 6 7 32 fill;
+    border-image-width:16px 6px 7px 32px;
+    border-image-outset:5px 0 0 3px;
+}
+.chatBubble.bubble-23 .chatBubblePointer {
+    background:url("@/assets/images/chat/chatbubbles/bubble_23_37_pointer.png");
+}
+.chatBubble.bubble-24 {
+    border-image-source:url("@/assets/images/chat/chatbubbles/bubble_24.png");
+    border-image-slice:23 8 6 40 fill;
+    border-image-width:23px 8px 6px 40px;
+    border-image-outset:6px 0 0 6px;
+}
+.chatBubble.bubble-24 .chatBubbleContent {
+    margin-left:30px;
+    color:#fff;
+}
+.chatBubble.bubble-24 .chatBubblePointer {
+    background:url("@/assets/images/chat/chatbubbles/bubble_24_pointer.png");
+    bottom:-4px;
+}
+.chatBubble.bubble-25 {
+    border-image-source:url("@/assets/images/chat/chatbubbles/bubble_25.png");
+    border-image-slice:10 13 8 28 fill;
+    border-image-width:10px 13px 8px 28px;
+    border-image-outset:6px 3px 2px 0;
+}
+.chatBubble.bubble-25 .chatBubbleContent {
+    color:#fff;
+}
+.chatBubble.bubble-25 .chatBubblePointer {
+    background:url("@/assets/images/chat/chatbubbles/bubble_25_pointer.png");
+    height:9px;
+    bottom:-7px;
+}
+.chatBubble.bubble-26 {
+    border-image-source:url("@/assets/images/chat/chatbubbles/bubble_26.png");
+    border-image-slice:16 9 8 29 fill;
+    border-image-width:16px 9px 8px 29px;
+    border-image-outset:2px 2px 2px 0;
+}
+.chatBubble.bubble-26 .chatBubbleContent {
+    color:#c59432;
+    text-shadow:1px 1px rgba(0,0,0,.3);
+}
+.chatBubble.bubble-26 .chatBubblePointer {
+    background:url("@/assets/images/chat/chatbubbles/bubble_26_pointer.png");
+    height:10px;
+    bottom:-6px;
+}
+.chatBubble.bubble-27 {
+    border-image-source:url("@/assets/images/chat/chatbubbles/bubble_27.png");
+    border-image-slice:25 6 5 36 fill;
+    border-image-width:25px 6px 5px 36px;
+    border-image-outset:8px 0 0 5px;
+}
+.chatBubble.bubble-27 .chatBubbleContent {
+    margin-left:30px;
+    color:#fff;
+}
+.chatBubble.bubble-27 .chatBubblePointer {
+    background:url("@/assets/images/chat/chatbubbles/bubble_27_pointer.png");
+}
+.chatBubble.bubble-28 {
+    border-image-source:url("@/assets/images/chat/chatbubbles/bubble_28.png");
+    border-image-slice:16 7 7 27 fill;
+    border-image-width:16px 7px 7px 27px;
+    border-image-outset:3px 0 0 0;
+}
+.chatBubble.bubble-28 .chatBubbleContent {
+    margin-left:25px;
+}
+.chatBubble.bubble-28 .chatBubblePointer {
+    background:url("@/assets/images/chat/chatbubbles/bubble_28_pointer.png");
+}
+.chatBubble.bubble-29 {
+    border-image-source:url("@/assets/images/chat/chatbubbles/bubble_29.png");
+    border-image-slice:10 7 15 31 fill;
+    border-image-width:10px 7px 15px 31px;
+    border-image-outset:2px 0 0 1px;
+}
+.chatBubble.bubble-29 .chatBubblePointer {
+    background:url("@/assets/images/chat/chatbubbles/bubble_29_pointer.png");
+    bottom:-4px;
+}
+.chatBubble.bubble-30 {
+    border-image-source:url("@/assets/images/chat/chatbubbles/bubble_30.png");
+}
+.chatBubble.bubble-30 .chatBubbleHead {
+    display:none;
+}
+.chatBubble.bubble-30 .chatBubblePointer {
+    background:url("@/assets/images/chat/chatbubbles/bubble_30_pointer.png");
+    height:7px;
+}
+.chatBubble.bubble-32 {
+    border-image-source:url("@/assets/images/chat/chatbubbles/bubble_32.png");
+    border-image-slice:15 7 7 30 fill;
+    border-image-width:15px 7px 7px 30px;
+    border-image-outset:2px 0 0 0;
+}
+.chatBubble.bubble-32 .chatBubblePointer {
+    background:url("@/assets/images/chat/chatbubbles/bubble_32_pointer.png");
+}
+.chatBubble.bubble-33 {
+    border-image-source:url("@/assets/images/chat/chatbubbles/bubble_33_34.png");
+    border-image-slice:7 6 6 39 fill;
+    border-image-width:7px 6px 6px 39px;
+    border-image-outset:2px 0 0 0;
+}
+.chatBubble.bubble-33 .chatBubbleHead {
+    display:none;
+}
+.chatBubble.bubble-33 .chatBubbleContent {
+    margin-left:35px;
+}
+.chatBubble.bubble-33:before {
+    content:" ";
+    position:absolute;
+    width:19px;
+    height:19px;
+    left:9px;
+    top:2px;
+    background:url("@/assets/images/chat/chatbubbles/bubble_33_extra.png");
+}
+.chatBubble.bubble-33 .chatBubblePointer {
+    background:url("@/assets/images/chat/chatbubbles/bubble_0_1_33_34_pointer.png");
+}
+.chatBubble.bubble-34 {
+    border-image-source:url("@/assets/images/chat/chatbubbles/bubble_33_34.png");
+    border-image-slice:7 6 6 39 fill;
+    border-image-width:7px 6px 6px 39px;
+    border-image-outset:2px 0 0 0;
+}
+.chatBubble.bubble-34 .chatBubbleHead {
+    display:none;
+}
+.chatBubble.bubble-34 .chatBubbleContent {
+    margin-left:35px;
+}
+.chatBubble.bubble-34:before {
+    content:" ";
+    position:absolute;
+    width:19px;
+    height:19px;
+    left:9px;
+    top:2px;
+    background:url("@/assets/images/chat/chatbubbles/bubble_34_extra.png");
+}
+.chatBubble.bubble-34 .chatBubblePointer {
+    background:url("@/assets/images/chat/chatbubbles/bubble_0_1_33_34_pointer.png");
+}
+.chatBubble.bubble-35 {
+    border-image-source:url("@/assets/images/chat/chatbubbles/bubble_35.png");
+    border-image-slice:19 6 5 29 fill;
+    border-image-width:19px 6px 5px 29px;
+    border-image-outset:4px 0 0 0;
+}
+.chatBubble.bubble-35 .chatBubbleHead {
+    display:none;
+}
+.chatBubble.bubble-35 .chatBubblePointer {
+    background:url("@/assets/images/chat/chatbubbles/bubble_35_pointer.png");
+}
+.chatBubble.bubble-36 {
+    border-image-source:url("@/assets/images/chat/chatbubbles/bubble_36.png");
+    border-image-slice:17 7 5 30 fill;
+    border-image-width:17px 7px 5px 30px;
+    border-image-outset:2px 0 0 0;
+}
+.chatBubble.bubble-36 .chatBubbleHead {
+    display:none;
+}
+.chatBubble.bubble-36:before {
+    content:" ";
+    position:absolute;
+    width:13px;
+    height:18px;
+    left:5px;
+    top:2px;
+    background:url("@/assets/images/chat/chatbubbles/bubble_36_extra.png");
+}
+.chatBubble.bubble-36 .chatBubblePointer {
+    background:url("@/assets/images/chat/chatbubbles/bubble_36_pointer.png");
+}
+.chatBubble.bubble-37 {
+    border-image-source:url("@/assets/images/chat/chatbubbles/bubble_37.png");
+    border-image-slice:16 6 7 32 fill;
+    border-image-width:16px 6px 7px 32px;
+    border-image-outset:5px 0 0 3px;
+}
+.chatBubble.bubble-37 .chatBubblePointer {
+    background:url("@/assets/images/chat/chatbubbles/bubble_23_37_pointer.png");
+}
+.chatBubble.bubble-38 {
+    border-image-source:url("@/assets/images/chat/chatbubbles/bubble_38.png");
+    border-image-slice:17 7 5 30 fill;
+    border-image-width:17px 7px 5px 30px;
+    border-image-outset:2px 0 0 0;
+}
+.chatBubble.bubble-38 .chatBubbleHead {
+    display:none;
+}
+.chatBubble.bubble-38:before {
+    content:" ";
+    position:absolute;
+    width:19px;
+    height:19px;
+    left:3px;
+    top:2px;
+    background:url("@/assets/images/chat/chatbubbles/bubble_38_extra.png");
+}
+.chatBubble.bubble-38 .chatBubblePointer {
+    background:url("@/assets/images/chat/chatbubbles/bubble_38_pointer.png");
+}
+.chatStyleIcon.bubble-0 {
+    background-image:url("@/assets/images/chat/chatbubbles/bubble_0.png");
+}
+.chatStyleIcon.bubble-1 {
+    background-image:url("@/assets/images/chat/chatbubbles/bubble_1.png");
+    height:25px;
+}
+.chatStyleIcon.bubble-2,
+.chatStyleIcon.bubble-31 {
+    background-image:url("@/assets/images/chat/chatbubbles/bubble_2.png");
+}
+.chatStyleIcon.bubble-3 {
+    background-image:url("@/assets/images/chat/chatbubbles/bubble_3.png");
+}
+.chatStyleIcon.bubble-4 {
+    background-image:url("@/assets/images/chat/chatbubbles/bubble_4.png");
+}
+.chatStyleIcon.bubble-5 {
+    background-image:url("@/assets/images/chat/chatbubbles/bubble_5.png");
+}
+.chatStyleIcon.bubble-6 {
+    background-image:url("@/assets/images/chat/chatbubbles/bubble_6.png");
+}
+.chatStyleIcon.bubble-7 {
+    background-image:url("@/assets/images/chat/chatbubbles/bubble_7.png");
+}
+.chatStyleIcon.bubble-8 {
+    background-image:url("@/assets/images/chat/chatbubbles/bubble_8.png");
+}
+.chatStyleIcon.bubble-9 {
+    background-image:url("@/assets/images/chat/chatbubbles/bubble_9.png");
+}
+.chatStyleIcon.bubble-10 {
+    background-image:url("@/assets/images/chat/chatbubbles/bubble_10.png");
+}
+.chatStyleIcon.bubble-11 {
+    background-image:url("@/assets/images/chat/chatbubbles/bubble_11.png");
+}
+.chatStyleIcon.bubble-12 {
+    background-image:url("@/assets/images/chat/chatbubbles/bubble_12.png");
+}
+.chatStyleIcon.bubble-13 {
+    background-image:url("@/assets/images/chat/chatbubbles/bubble_13.png");
+}
+.chatStyleIcon.bubble-14 {
+    background-image:url("@/assets/images/chat/chatbubbles/bubble_14.png");
+}
+.chatStyleIcon.bubble-15 {
+    background-image:url("@/assets/images/chat/chatbubbles/bubble_15.png");
+}
+.chatStyleIcon.bubble-16 {
+    background-image:url("@/assets/images/chat/chatbubbles/bubble_16.png");
+}
+.chatStyleIcon.bubble-17 {
+    background-image:url("@/assets/images/chat/chatbubbles/bubble_17.png");
+}
+.chatStyleIcon.bubble-18 {
+    background-image:url("@/assets/images/chat/chatbubbles/bubble_18.png");
+}
+.chatStyleIcon.bubble-19 {
+    background-image:url("@/assets/images/chat/chatbubbles/bubble_19.png");
+}
+.chatStyleIcon.bubble-20 {
+    background-image:url("@/assets/images/chat/chatbubbles/bubble_20.png");
+}
+.chatStyleIcon.bubble-21 {
+    background-image:url("@/assets/images/chat/chatbubbles/bubble_21.png");
+}
+.chatStyleIcon.bubble-22 {
+    background-image:url("@/assets/images/chat/chatbubbles/bubble_22.png");
+}
+.chatStyleIcon.bubble-23 {
+    background-image:url("@/assets/images/chat/chatbubbles/bubble_23.png");
+}
+.chatStyleIcon.bubble-24 {
+    background-image:url("@/assets/images/chat/chatbubbles/bubble_24.png");
+}
+.chatStyleIcon.bubble-25 {
+    background-image:url("@/assets/images/chat/chatbubbles/bubble_25.png");
+}
+.chatStyleIcon.bubble-26 {
+    background-image:url("@/assets/images/chat/chatbubbles/bubble_26.png");
+}
+.chatStyleIcon.bubble-27 {
+    background-image:url("@/assets/images/chat/chatbubbles/bubble_27.png");
+}
+.chatStyleIcon.bubble-28 {
+    background-image:url("@/assets/images/chat/chatbubbles/bubble_28.png");
+}
+.chatStyleIcon.bubble-29 {
+    background-image:url("@/assets/images/chat/chatbubbles/bubble_29.png");
+}
+.chatStyleIcon.bubble-30 {
+    background-image:url("@/assets/images/chat/chatbubbles/bubble_30.png");
+}
+.chatStyleIcon.bubble-32 {
+    background-image:url("@/assets/images/chat/chatbubbles/bubble_32.png");
+}
+.chatStyleIcon.bubble-33 {
+    background-image:url("@/assets/images/chat/chatbubbles/bubble_33_34.png");
+}
+.chatStyleIcon.bubble-33:before {
+    content:" ";
+    position:absolute;
+    width:19px;
+    height:19px;
+    left:11px;
+    top:10px;
+    background:url("@/assets/images/chat/chatbubbles/bubble_33_extra.png");
+}
+.chatStyleIcon.bubble-34 {
+    background-image:url("@/assets/images/chat/chatbubbles/bubble_33_34.png");
+}
+.chatStyleIcon.bubble-34:before {
+    content:" ";
+    position:absolute;
+    width:19px;
+    height:19px;
+    left:11px;
+    top:10px;
+    background:url("@/assets/images/chat/chatbubbles/bubble_34_extra.png");
+}
+.chatStyleIcon.bubble-35 {
+    background-image:url("@/assets/images/chat/chatbubbles/bubble_35.png");
+}
+.chatStyleIcon.bubble-36 {
+    background-image:url("@/assets/images/chat/chatbubbles/bubble_36.png");
+}
+.chatStyleIcon.bubble-36:before {
+    content:" ";
+    position:absolute;
+    width:13px;
+    height:18px;
+    left:13px;
+    top:10px;
+    background:url("@/assets/images/chat/chatbubbles/bubble_36_extra.png");
+}
+.chatStyleIcon.bubble-37 {
+    background-image:url("@/assets/images/chat/chatbubbles/bubble_35.png");
+}
+.chatStyleIcon.bubble-38 {
+    background-image:url("@/assets/images/chat/chatbubbles/bubble_38.png");
+}
+.chatStyleIcon.bubble-38:before {
+    content:" ";
+    position:absolute;
+    width:19px;
+    height:19px;
+    left:11px;
+    top:10px;
+    background:url("@/assets/images/chat/chatbubbles/bubble_38_extra.png");
+}

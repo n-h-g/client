@@ -4,9 +4,23 @@
 			Sussurra a <b>{{ whisperTo }}</b>
 			<button class="chatWhisperClose" title="Parla alla stanza (Esc)" @click="stopWhisper">✕</button>
 		</div>
-		<input ref="input" type="text" class="chatInput" :class="{ chatInputWhisper: whisperTo }" autofocus
-			:placeholder="whisperTo ? `Sussurra a ${whisperTo}..` : placeHolder" v-model="message" @keydown="onKeyDown"
-			@keyup.enter="sendMessage">
+		<div class="chatInputWrap" ref="inputWrap">
+			<!-- the style of the bubbles (as Habbo): the button opens the styles -->
+			<button class="chatStyleButton" :class="{ open: stylesOpen }" title="Bubble style" @click="stylesOpen = !stylesOpen">
+				<span class="chatStyleButtonArrow"></span>
+				<span class="chatStyleButtonIcon"></span>
+			</button>
+			<div v-if="stylesOpen" class="chatStyles">
+				<button v-for="style in ChatStyleStore.SELECTABLE" :key="style" class="chatStyle"
+					:class="{ selected: style === chatStyle }" @click="pickStyle(style)">
+					<span class="chatStyleIcon" :class="'bubble-' + style"></span>
+				</button>
+			</div>
+
+			<input ref="input" type="text" class="chatInput" :class="{ chatInputWhisper: whisperTo }" autofocus
+				:placeholder="whisperTo ? `Sussurra a ${whisperTo}..` : placeHolder" v-model="message" @keydown="onKeyDown"
+				@keyup.enter="sendMessage">
+		</div>
 	</div>
 </template>
 
@@ -18,6 +32,7 @@ import { RoomUIEventData } from '../../../../game/engine/events/ui/data/room/Roo
 import { WhisperData } from '../../../../game/engine/events/ui/data/room/WhisperData'
 import { UIEvents } from '../../../../game/engine/events/ui/UIEvents'
 import { OutgoingPacket } from '../../../../game/networking/packets/outgoing/OutgoingPacket'
+import { ChatStyleStore } from '../../../../game/engine/game/chat/ChatStyleStore'
 
 let placeHolder = ref("Type here to talk..")
 let typed = ref(false)
@@ -60,6 +75,8 @@ function sendMessage(e) {
 		Engine.getInstance().networkingManager.packetManager.applyOut(OutgoingPacket.UserSay, {
 			text: message.value,
 			shout: shout,
+			// the style of the bubble (the picker next to the chat bar)
+			style: ChatStyleStore.current,
 			// only the user and the recipient see it (the server checks that it's in the room)
 			...(whisperTo.value ? { whisperTo: whisperTo.value } : {})
 		})
@@ -119,6 +136,27 @@ function onWindowKeyDown(e: KeyboardEvent) {
 onMounted(() => window.addEventListener('keydown', onWindowKeyDown))
 onBeforeUnmount(() => window.removeEventListener('keydown', onWindowKeyDown))
 
+// ---------------- the style of the bubbles
+const chatStyle = ref(ChatStyleStore.current)
+const stylesOpen = ref(false)
+const inputWrap = ref<HTMLElement | null>(null)
+
+onBeforeUnmount(ChatStyleStore.subscribe(style => chatStyle.value = style))
+
+function pickStyle(style: number) {
+	ChatStyleStore.set(style)
+	stylesOpen.value = false
+	input.value?.focus()
+}
+
+// a click out of the styles closes them
+function onDocumentPointerDown(event: PointerEvent) {
+	if (stylesOpen.value && !inputWrap.value?.contains(event.target as Node)) stylesOpen.value = false
+}
+
+onMounted(() => document.addEventListener('pointerdown', onDocumentPointerDown))
+onBeforeUnmount(() => document.removeEventListener('pointerdown', onDocumentPointerDown))
+
 function sendTyping(typing: boolean) {
 	const roomId = Engine.getInstance().roomService.currentRoom?.id
 	if (roomId == null) return
@@ -131,7 +169,91 @@ function sendTyping(typing: boolean) {
 </script>
 
 <style lang="scss">
+@import "../../room/chatBubbles.scss";
+
 .chatBar {
+	.chatStyleButton {
+		position: absolute;
+		left: 4px;
+		top: 50%;
+		z-index: 1;
+		display: flex;
+		align-items: center;
+		gap: 3px;
+		height: 28px;
+		padding: 0 5px;
+		transform: translateY(-50%);
+		background: #c9c9c9;
+		border: 1px solid #8e8e8e;
+		border-radius: 5px;
+		cursor: pointer;
+		outline: none;
+
+		&:hover,
+		&.open {
+			background: #d8d8d8;
+		}
+	}
+
+	.chatStyleButtonArrow {
+		width: 0;
+		height: 0;
+		border-left: 4px solid transparent;
+		border-right: 4px solid transparent;
+		border-top: 5px solid #333;
+	}
+
+	.chatStyleButtonIcon {
+		width: 17px;
+		height: 19px;
+		background: url("@/assets/images/chat/styles-icon.png") no-repeat center;
+	}
+
+	/* the styles, over the chat bar (as Habbo) */
+	.chatStyles {
+		position: absolute;
+		left: 0;
+		bottom: calc(100% + 8px);
+		z-index: 2;
+		display: grid;
+		grid-template-columns: repeat(6, 64px);
+		gap: 4px;
+		max-height: 220px;
+		padding: 8px;
+		overflow-y: auto;
+		background: #121212;
+		border: 2px solid #333;
+		border-radius: 6px;
+		box-shadow: 0 2px 6px rgba(0, 0, 0, .5);
+	}
+
+	.chatStyle {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		height: 34px;
+		padding: 0;
+		background: transparent;
+		border: 2px solid transparent;
+		border-radius: 6px;
+		cursor: pointer;
+		outline: none;
+
+		&:hover {
+			background: #2a2a2a;
+		}
+
+		&.selected {
+			background: #fff;
+			border-color: #fff;
+		}
+
+		.chatStyleIcon {
+			width: 56px;
+			height: 30px;
+		}
+	}
+
 	.chatWhisperTarget {
 		position: absolute;
 		left: 50%;

@@ -14,5 +14,11 @@ export const router = createRouter({
             name: 'Game Client with SSO',
             component: Game,
         },
+        {
+            // the link of a room (room tools > Link to this room): logged with the SSO of this browser
+            path: '/room/:roomId',
+            name: 'Game Client in a room',
+            component: Game,
+        },
     ],
 });

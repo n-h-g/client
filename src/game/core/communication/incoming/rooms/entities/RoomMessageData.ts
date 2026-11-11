@@ -7,4 +7,6 @@ export interface RoomMessageData {
     recipient?: string;
     /** The expression of the emoticon of the message (e.g. GestureSmile for ":)"), sent by the server. */
     gesture?: string;
+    /** The style of the bubble of the author. */
+    style?: number;
 }

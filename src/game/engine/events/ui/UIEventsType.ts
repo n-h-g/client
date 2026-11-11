@@ -18,4 +18,7 @@ export enum UIEventsType {
     DOORBELL = 'doorbell',
     DOORBELL_ENTRY = 'doorbell_entry',
     FURNI_CHOOSER = 'furni_chooser',
+    ROOM_LINK = 'room_link',
+    ROOM_PUBLIC_INFO = 'room_public_info',
+    COMMANDS = 'commands',
 }

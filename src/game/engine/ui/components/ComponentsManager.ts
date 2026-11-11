@@ -21,6 +21,8 @@ import {HelpUI} from './help/HelpUI';
 import {DoorbellUI} from './room/DoorbellUI';
 import {DoorbellEntryUI} from './room/DoorbellEntryUI';
 import {FurniChooserUI} from './room/FurniChooserUI';
+import {RoomLinkUI, RoomPublicInfoUI} from './room/RoomShareUI';
+import {CommandsUI} from './general/CommandsUI';
 
 export class ComponentsManager {
     readonly rootComponent: HTMLElement;
@@ -56,6 +58,9 @@ export class ComponentsManager {
         this.addComponent(UIComponent.DoorbellUI, new DoorbellUI());
         this.addComponent(UIComponent.DoorbellEntryUI, new DoorbellEntryUI());
         this.addComponent(UIComponent.FurniChooserUI, new FurniChooserUI());
+        this.addComponent(UIComponent.RoomLinkUI, new RoomLinkUI());
+        this.addComponent(UIComponent.RoomPublicInfoUI, new RoomPublicInfoUI());
+        this.addComponent(UIComponent.CommandsUI, new CommandsUI());
     }
 
     initGameComponents(): void {

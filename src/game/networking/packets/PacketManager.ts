@@ -33,6 +33,7 @@ import {RoomBans} from './incoming/rooms/RoomBans';
 import {DoorbellState} from './incoming/rooms/DoorbellState';
 import {UpdateUserInformation} from './incoming/users/UpdateUserInformation';
 import {UserInfo} from './incoming/users/UserInfo';
+import {CommandsList} from './incoming/users/CommandsList';
 import {OutgoingPacket} from './outgoing/OutgoingPacket';
 import {FriendsList} from './incoming/friends/FriendsList';
 import {FriendRequestReceived} from './incoming/friends/FriendRequestReceived';
@@ -72,6 +73,7 @@ export class PacketManager {
             216: new RoomBans(),
             217: new DoorbellState(),
             218: new UserInfo(),
+            219: new CommandsList(),
             400: new UpdateUserInformation(),
             401: new LoadInventoryItems(),
             402: new InventoryBadges(),

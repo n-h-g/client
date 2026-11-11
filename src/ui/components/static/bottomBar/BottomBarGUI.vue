@@ -287,21 +287,28 @@ function toggle(ui: string) {
     bottom: 0;
     height: auto;
 
-    .chatInput {
-      font-family: 'Ubuntu';
-      width: 580px;
-      height: 38px;
-      border: 2px solid #000;
-      border-radius: 8px;
-      margin: auto 0;
-      background-color: #e4e4e4;
-      display: flex;
-      flex-direction: row;
+    /* the input with the button of the bubble styles (ChatBar) */
+    .chatInputWrap {
       position: absolute;
       left: 50%;
       bottom: 5px;
+      width: 580px;
+      height: 38px;
       transform: translateX(-50%);
       z-index: 10000;
+      pointer-events: all !important;
+    }
+
+    .chatInput {
+      font-family: 'Ubuntu';
+      width: 100%;
+      height: 100%;
+      box-sizing: border-box;
+      border: 2px solid #000;
+      border-radius: 8px;
+      margin: 0;
+      padding-left: 48px;
+      background-color: #e4e4e4;
       outline: none;
       pointer-events: all !important;
 
@@ -320,10 +327,13 @@ function toggle(ui: string) {
 
   /* not enough room in the bar: the chat goes up, over it (as Habbo) */
   &.compact .chatBar {
-    .chatInput {
+    .chatInputWrap {
       bottom: 62px;
       /* clear of the room panel on the left (180px), at least 260px */
       width: max(260px, min(580px, calc(100vw - 380px)));
+    }
+
+    .chatInput {
       /* the grey frame of the floating chat: the black border alone gets lost over the room */
       box-shadow: 0 0 0 3px #a9a9a9, 0 0 0 4px #000;
     }

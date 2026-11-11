@@ -1,3 +1,4 @@
+import {ChatStyleStore} from './ChatStyleStore';
 import {EventManager} from '../../../core/events/EventManager';
 import {Disposable} from '../../../core/room/Disposable';
 import {Engine} from '../../../Engine';
@@ -26,6 +27,7 @@ export class ChatMessageService extends Service<string, Message> implements Disp
             author: chatMessage.author,
             whisper: chatMessage.messageType === MessageType.WHISPER,
             whisperTo: chatMessage.recipient,
+            style: chatMessage.style,
             x: chatMessage.x,
             y: chatMessage.y,
             width: 0,
@@ -83,6 +85,7 @@ export class ChatMessageService extends Service<string, Message> implements Disp
 					shout: shout,
 					whisper,
 					whisperId,
+					style: ChatStyleStore.current,
 				}
 			);
 		}

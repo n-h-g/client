@@ -554,8 +554,10 @@ export abstract class HumanVisualization extends EntityVisualization {
 
         if (zIndex <= lowerBound) zIndex = lowerBound + 1;
         if (zIndex >= upperBound) zIndex = upperBound - 1;
-        // the item the avatar is on wins over the others: the avatar is never drawn under its seat
-        if (zIndex <= onBound) zIndex = onBound + 1;
+        // the item the avatar is on wins over the others: the avatar is never drawn under its seat. Over the seat
+        // but under the item in front of it when there is room between them (the chair at the side of a table,
+        // see ItemVisualization.getZIndex): the zIndexes of the items can be one apart
+        if (zIndex <= onBound) zIndex = onBound < upperBound ? onBound + Math.min(1, (upperBound - onBound) / 2) : onBound + 1;
 
         return zIndex;
     }

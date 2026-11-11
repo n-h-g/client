@@ -7,6 +7,8 @@ import {Command} from './Command';
 export class FurniCommand extends Command {
     constructor() {
         super('furni');
+        this.usage = ':furni';
+        this.description = 'Lists the furni of the room: a click on one is a click on it in the room.';
     }
 
     handle(): void {

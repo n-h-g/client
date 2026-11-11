@@ -5,6 +5,8 @@ import {Command} from './Command';
 export class ZoomCommand extends Command {
     constructor() {
         super('zoom');
+        this.usage = ':zoom <scale>';
+        this.description = 'Zooms the room in (2, 3...); :zoom 1 is the normal size.';
     }
 
     handle(args: string[]): void {

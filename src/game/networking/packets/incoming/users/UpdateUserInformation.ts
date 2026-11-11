@@ -1,3 +1,5 @@
+import {ChatStyleStore} from '../../../../engine/game/chat/ChatStyleStore';
+import {OutgoingPacket} from '../../outgoing/OutgoingPacket';
 import {UserData} from '../../../../core/communication/incoming/users/UserData';
 import {EventManager} from '../../../../core/events/EventManager';
 import {TopbarEventData} from '../../../../engine/events/ui/data/static/Topbar';
@@ -19,6 +21,15 @@ export class UpdateUserInformation extends MessageHandler {
         EventManager.emit<TopbarEventData>(UIEvents.SET_TOPBAR, {
             credits: userInfo.credits,
         });
+
+        if (userInfo.chatStyle != null) ChatStyleStore.set(userInfo.chatStyle);
+
+        // logged from the link of a room: into it (once)
+        const engine = Engine.getInstance();
+        if (engine.pendingRoomId != null) {
+            engine.networkingManager?.packetManager?.applyOut(OutgoingPacket.UserEnterRoom, {id: engine.pendingRoomId});
+            engine.pendingRoomId = null;
+        }
 
         // the look of the logged user, for the change look panel
         if (userInfo.look) {
