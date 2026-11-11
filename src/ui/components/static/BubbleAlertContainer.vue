@@ -51,7 +51,7 @@ function remove(alert: BubbleAlert) {
 .bubbleAlertContainer {
     position: fixed;
     /* under the top bar */
-    top: 80px;
+    top: 112px;
     right: 12px;
     z-index: 20;
     display: flex;

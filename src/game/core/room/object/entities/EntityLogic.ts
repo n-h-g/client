@@ -80,11 +80,18 @@ export abstract class EntityLogic extends RoomObjectLogic {
     }
 
     async loadPreviewData(mode) {
+        // a user (UserEntity): its card asks the server its motto and badges
+        const user = this.entity as {userId?: number | null; isBot?: boolean; figure?: string};
+        const userId = user.isBot ? null : user.userId ?? null;
+
         EventManager.emit<PreviewModeEventData>(UIEvents.PREVIEW_BOX_MODE, {
             id: this.entity.id,
             mode: mode,
             name: this.entity.name,
             motto: '',
+            userId,
+            isSelf: userId != null && userId === Engine.getInstance().currentUserId,
+            look: user.figure,
             image: (
                 await UiUtils.generateImageFromObject(
                     this.entity.visualization?.container!

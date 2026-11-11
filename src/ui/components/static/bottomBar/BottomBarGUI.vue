@@ -1,6 +1,6 @@
 <template>
-  <div class="bottomBar">
-    <div class="leftOptions">
+  <div class="bottomBar" :class="{ compact }">
+    <div class="leftOptions" ref="leftOptions">
       <div class="menuButton home"></div>
       <div class="menuButton inventory" @click="toggle('inventory')">
       </div>
@@ -8,6 +8,7 @@
       </div>
       <div class="menuButton catalog" @click="toggle('catalogue')">
       </div>
+      <div class="menuButton quests" title="Quests" @click="comingSoon('Quests')"></div>
       <div class="menuButton friends" @click="toggle('friends')">
         <span class="badge" v-if="friends.requests.length > 0">{{ friends.requests.length }}</span>
       </div>
@@ -20,13 +21,14 @@
         @click="toggleMessenger"
       ></div>
     </div>
-    <div class="separator"></div>
+    <!-- after the icons, however many they are -->
+    <div class="separator" :style="{ marginLeft: Math.round(leftEnd + 10) + 'px' }"></div>
     <ChatBar />
     <div class="rightOptions">
       <div class="menuButton search_friends" title="Trova amici" @click="toggle('friends')"></div>
 
       <!-- the friend bar: the friends, and "Trova Amici" in the empty places (as Habbo) -->
-      <div class="friendBar" ref="friendBar">
+      <div v-if="friendBarSize > 0" class="friendBar" ref="friendBar">
         <button class="friendBarArrow" :disabled="page === 0" @click="page--">‹</button>
         <div
           v-for="(slot, index) in slots"
@@ -62,19 +64,81 @@ import { AvatarHeadImage } from '../../../../game/engine/ui/imagers/avatars/Avat
 import { UIComponent } from '../../../../game/engine/ui/components/UIComponent'
 import { IComponentShowableUI } from '../../../../game/core/ui/IComponentShowableUI'
 import ChatBar from './ChatBar.vue'
+import { EventManager } from '../../../../game/core/events/EventManager'
+import { UIEvents } from '../../../../game/engine/events/ui/UIEvents'
+import { BubbleAlertData } from '../../../../game/engine/events/ui/data/general/BubbleAlertData'
 
-/** Places of the friend bar: the friends, else "Trova Amici". */
+/** No quests on the server yet. */
+function comingSoon(feature: string) {
+  EventManager.emit<BubbleAlertData>(UIEvents.BUBBLE_ALERT, { message: `${feature}: coming soon!` })
+}
+
+/** Places of the friend bar (at most): the friends, else "Trova Amici". */
 const FRIEND_BAR_SIZE = 3
+
+// the sizes (px) that decide where the chat goes and how many friends fit (see the styles)
+const CHAT_WIDTH = 580
+/** A place of the friend bar: the item and the gap. */
+const FRIEND_ITEM_WIDTH = 128
+/** The right part without the friends: "find friends" icon, the padding and the arrows of the friend bar, the margin. */
+const RIGHT_FIXED_WIDTH = 110
+const MARGIN = 10
+
+const viewportWidth = ref(window.innerWidth)
+const leftOptions = ref<HTMLElement | null>(null)
+/** Where the icons on the left end (the messenger icon comes and goes). */
+const leftEnd = ref(340)
+
+/**
+ * As Habbo: the chat sits in the bar while it fits between the icons and the friend bar, else it goes up, over
+ * the bar; then the friend bar shows the friends that fit (none: only the "find friends" icon).
+ */
+const compact = computed(() => {
+  const chatLeft = viewportWidth.value / 2 - CHAT_WIDTH / 2 - MARGIN
+  const chatRight = viewportWidth.value / 2 + CHAT_WIDTH / 2 + MARGIN
+  const rightStart = viewportWidth.value - RIGHT_FIXED_WIDTH - FRIEND_BAR_SIZE * FRIEND_ITEM_WIDTH
+
+  return chatLeft < leftEnd.value || chatRight > rightStart
+})
+
+const friendBarSize = computed(() => {
+  if (!compact.value) return FRIEND_BAR_SIZE
+
+  const free = viewportWidth.value - leftEnd.value - 2 * MARGIN - RIGHT_FIXED_WIDTH
+  return Math.max(0, Math.min(FRIEND_BAR_SIZE, Math.floor(free / FRIEND_ITEM_WIDTH)))
+})
+
+function measure() {
+  viewportWidth.value = window.innerWidth
+  if (leftOptions.value) leftEnd.value = leftOptions.value.getBoundingClientRect().right
+}
+
+let leftObserver: ResizeObserver | null = null
+
+onMounted(() => {
+  window.addEventListener('resize', measure)
+  if (leftOptions.value) {
+    leftObserver = new ResizeObserver(measure)
+    leftObserver.observe(leftOptions.value)
+  }
+  measure()
+})
+
+onUnmounted(() => {
+  window.removeEventListener('resize', measure)
+  leftObserver?.disconnect()
+})
 
 const friends = ref<FriendsState>(FriendsStore.getInstance().current)
 const heads = reactive<Record<string, string>>({})
 const page = ref(0)
 
-const pageCount = computed(() => Math.max(1, Math.ceil(friends.value.friends.length / FRIEND_BAR_SIZE)))
+const pageCount = computed(() => Math.max(1, Math.ceil(friends.value.friends.length / Math.max(1, friendBarSize.value))))
 
 const slots = computed<(Friend | null)[]>(() => {
-  const shown: (Friend | null)[] = friends.value.friends.slice(page.value * FRIEND_BAR_SIZE, (page.value + 1) * FRIEND_BAR_SIZE)
-  while (shown.length < FRIEND_BAR_SIZE) shown.push(null)
+  const size = friendBarSize.value
+  const shown: (Friend | null)[] = friends.value.friends.slice(page.value * size, (page.value + 1) * size)
+  while (shown.length < size) shown.push(null)
   return shown
 })
 
@@ -252,6 +316,21 @@ function toggle(ui: string) {
 
   .muted {
     color: red;
+  }
+
+  /* not enough room in the bar: the chat goes up, over it (as Habbo) */
+  &.compact .chatBar {
+    .chatInput {
+      bottom: 62px;
+      /* clear of the room panel on the left (180px), at least 260px */
+      width: max(260px, min(580px, calc(100vw - 380px)));
+      /* the grey frame of the floating chat: the black border alone gets lost over the room */
+      box-shadow: 0 0 0 3px #a9a9a9, 0 0 0 4px #000;
+    }
+
+    .chatWhisperTarget {
+      bottom: 106px;
+    }
   }
 
   
@@ -460,6 +539,12 @@ function toggle(ui: string) {
         background-image: url("@/assets/images/bottom-bar/catalog.png");
         width: 37px;
         height: 37px;
+      }
+
+      &.quests {
+        background-image: url("@/assets/images/bottom-bar/quest.png");
+        width: 32px;
+        height: 35px;
       }
 
       &.friends {

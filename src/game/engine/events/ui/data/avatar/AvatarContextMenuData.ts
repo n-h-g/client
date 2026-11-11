@@ -12,4 +12,6 @@ export type AvatarContextMenuData = {
     canPickUp?: boolean;
     /** A pet: its menu has only "Prendi" (for its owner and the owner of the room). */
     isPet?: boolean;
+    /** The user owns the room and the avatar is of another user: it can kick or ban it. */
+    canModerate?: boolean;
 };

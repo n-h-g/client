@@ -199,7 +199,7 @@ let previewDragStart = { pointerX: 0, pointerY: 0, panX: 0, panY: 0 }
 const search = ref("")
 const justBought = ref(false)
 let justBoughtTimer: ReturnType<typeof setTimeout> | undefined
-let previewAnimationTimer: ReturnType<typeof setInterval> | undefined
+let previewAnimationTimer: ReturnType<typeof setTimeout> | undefined
 
 // =========================
 // SEARCH (as Habbo: the furni, not only the pages)
@@ -310,8 +310,21 @@ function buyPet() {
 }
 
 function stopPreviewAnimation() {
-	if (previewAnimationTimer) clearInterval(previewAnimationTimer)
+	if (previewAnimationTimer) clearTimeout(previewAnimationTimer)
 	previewAnimationTimer = undefined
+}
+
+/** The frames of the room preview, each for its time (FurniPreview: the speed of the room). */
+function playPreview(frames: string[], durations: number[]) {
+	let index = 0
+	const next = () => {
+		previewAnimationTimer = setTimeout(() => {
+			index = (index + 1) % frames.length
+			preview.value = frames[index]
+			next()
+		}, durations[index] ?? 140)
+	}
+	next()
 }
 
 onBeforeUnmount(() => {
@@ -449,21 +462,20 @@ async function selectItem(item: CataloguePageItem) {
 	// Render the offer in a room: decoration offers recolor the walls/floor,
 	// while regular furni is placed in the room. The icon stays as a fallback.
 	try {
-		const result = await FurniPreview.renderRoom(item.name, item.extraData)
+		const isCurrent = () => selectedItem.value?.id === item.id
 
-		if (result && selectedItem.value?.id === item.id) {
-			preview.value = result.image
+		// the still image at once, then the animation when its frames are drawn
+		const result = await FurniPreview.renderRoom(item.name, item.extraData, still => {
+			if (!isCurrent()) return
+			preview.value = still.image
 			previewPan.value = {
-				x: result.width / 2 - result.focusX,
-				y: result.height / 2 - result.focusY,
+				x: still.width / 2 - still.focusX,
+				y: still.height / 2 - still.focusY,
 			}
-			if (result.frames && result.frames.length > 1) {
-				let frameIndex = 1
-				previewAnimationTimer = setInterval(() => {
-					preview.value = result.frames![frameIndex]
-					frameIndex = (frameIndex + 1) % result.frames!.length
-				}, 140)
-			}
+		}, () => !isCurrent())
+
+		if (result && isCurrent() && result.frames && result.frames.length > 1) {
+			playPreview(result.frames, result.frameDurations ?? [])
 		}
 	} catch (e) {
 		// no render: the icon stays

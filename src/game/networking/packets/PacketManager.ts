@@ -26,7 +26,13 @@ import {RoomPaint} from './incoming/rooms/RoomPaint';
 import {UpdateRoomData} from './incoming/rooms/UpdateRoomData';
 import {UserTypingStatus} from './incoming/rooms/users/UserTypingStatus';
 import {UserGesture} from './incoming/rooms/users/UserGesture';
+import {RoomNotice} from './incoming/rooms/RoomNotice';
+import {DoorbellRequestMessage} from './incoming/rooms/DoorbellRequestMessage';
+import {DoorbellRemove} from './incoming/rooms/DoorbellRemove';
+import {RoomBans} from './incoming/rooms/RoomBans';
+import {DoorbellState} from './incoming/rooms/DoorbellState';
 import {UpdateUserInformation} from './incoming/users/UpdateUserInformation';
+import {UserInfo} from './incoming/users/UserInfo';
 import {OutgoingPacket} from './outgoing/OutgoingPacket';
 import {FriendsList} from './incoming/friends/FriendsList';
 import {FriendRequestReceived} from './incoming/friends/FriendRequestReceived';
@@ -60,6 +66,12 @@ export class PacketManager {
             210: new ObjectsRolling(),
             211: new RoomDimmerPresets(),
             212: new UserGesture(),
+            213: new RoomNotice(),
+            214: new DoorbellRequestMessage(),
+            215: new DoorbellRemove(),
+            216: new RoomBans(),
+            217: new DoorbellState(),
+            218: new UserInfo(),
             400: new UpdateUserInformation(),
             401: new LoadInventoryItems(),
             402: new InventoryBadges(),

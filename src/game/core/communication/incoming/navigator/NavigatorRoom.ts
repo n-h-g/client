@@ -4,5 +4,7 @@ export interface NavigatorRoom {
     id: number;
     type: NavigatorRoomType;
     name: string;
+    owner_id?: number;
+    owner_name?: string;
     users_count: number;
 }

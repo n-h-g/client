@@ -7,7 +7,7 @@
                 :key="message.internalId"
                 :ref="element => setBubbleElement(message, element as HTMLElement | null)"
                 :style="{ top: message.top + 'px', left: message.left + 'px', visibility: message.ready ? 'visible' : 'hidden' }"
-                :class="{ chatBubbleShout: message.data.shout, chatBubbleWhisper: message.data.whisper }"
+                :class="{ chatBubbleShout: message.data.shout, chatBubbleWhisper: message.data.whisper, placed: message.placed }"
                 @click="onClickChat(message)">
                 <div class="chatBubbleHead">
                     <img v-if="message.head" :src="message.head" @load="onHeadLoad" />
@@ -23,18 +23,61 @@
             <div id="roomCanvasContainer" style="position: absolute;" ref="roomCanvasContainer">
             </div>
         </div>
-        <div class="roomPanel" ref="roomPanel">
-            <div class="arrowLeft"></div>
-            <b>{{ getRoomName() }}</b>
-            <p>by {{ getAuthorName() }}</p>
-            <ul class="buttons-list">
-                <li class="settings" @click="openSettings()"></li>
-            </ul>
+        <!-- the room tools (bottom left, as Habbo): the tab on the left folds them -->
+        <div class="roomTools" ref="roomPanel" :class="{ folded: toolsFolded }">
+            <div class="roomToolsTab" :title="toolsFolded ? 'Open' : 'Close'" @click="toolsFolded = !toolsFolded">
+                <span class="roomToolsTabArrow"></span>
+            </div>
+
+            <div v-if="!toolsFolded" class="roomToolsBody">
+                <!-- the name of the room, opened by the room button -->
+                <div v-if="infoOpen" class="roomToolsInfo">
+                    <b>{{ roomPanelInfo.name || 'Unknown' }}</b>
+                    <span>by {{ roomPanelInfo.owner || 'Unknown' }}</span>
+                </div>
+
+                <ul class="roomToolsList">
+                    <li v-if="roomPanelInfo.haveRights" @click="openSettings()">
+                        <span class="roomToolsIcon settings"></span><span class="roomToolsLabel">Settings</span>
+                    </li>
+                    <li @click="toggleZoom()">
+                        <span class="roomToolsIcon zoom"></span><span class="roomToolsLabel">Zoom</span>
+                    </li>
+                    <li @click="comingSoon('Chat history')">
+                        <span class="roomToolsIcon"></span><span class="roomToolsLabel">Chat history</span>
+                    </li>
+                    <li @click="comingSoon('Like')">
+                        <span class="roomToolsIcon"></span><span class="roomToolsLabel">Like</span>
+                    </li>
+                    <li @click="comingSoon('Link to this room')">
+                        <span class="roomToolsIcon"></span><span class="roomToolsLabel">Link to this room</span>
+                    </li>
+                </ul>
+
+                <div class="roomToolsNavigation">
+                    <button class="roomToolsButton back" title="Previous room" :disabled="!canGoBack" @click="goToVisited(-1)"></button>
+                    <button class="roomToolsButton info" :class="{ active: infoOpen }" title="Room info" @click="infoOpen = !infoOpen"></button>
+                    <button class="roomToolsButton forward" title="Next room" :disabled="!canGoForward" @click="goToVisited(1)"></button>
+                </div>
+            </div>
         </div>
     </div>
 </template>
+<script lang="ts">
+/** The rooms visited in this session, to go back and forth (the room tools); kept while the room UI comes and goes. */
+const visitedRooms: number[] = []
+let visitedIndex = -1
+/** The room asked by back/forward: entered, it moves the position in the visited rooms instead of adding one. */
+let pendingVisit: number | null = null
+/** Zoomed out (half size), as Habbo: it stays from a room to the next. */
+let zoomedOut = false
+let toolsFoldedSaved = false
+</script>
+
 <script setup lang="ts">
-import { ref, onMounted, onUnmounted, nextTick } from 'vue'
+import { ref, onMounted, onUnmounted, nextTick, computed, watch } from 'vue'
+import { OutgoingPacket } from '../../../game/networking/packets/outgoing/OutgoingPacket'
+import { BubbleAlertData } from '../../../game/engine/events/ui/data/general/BubbleAlertData'
 import { EventManager } from '../../../game/core/events/EventManager'
 import { IComponentShowableUI } from '../../../game/core/ui/IComponentShowableUI'
 import { Engine } from '../../../game/Engine'
@@ -43,11 +86,12 @@ import { UIEvents } from '../../../game/engine/events/ui/UIEvents'
 import { UIComponent } from '../../../game/engine/ui/components/UIComponent'
 import { AvatarHeadImage } from '../../../game/engine/ui/imagers/avatars/AvatarHeadImage'
 import { Container } from 'pixi.js'
+import { EnterRoomUIEventData } from '../../../game/engine/events/ui/data/room/EnterRoomUIEventData'
 
 /**
- * The room chat as Nitro's ChatWidgetView (free flow mode): a bubble is born on the bottom line of the
- * chat strip, centered on the avatar that talks, and then it stays there (it doesn't follow the avatar).
- * Every few seconds all the bubbles go up; a new bubble pushes up the older ones it overlaps.
+ * The room chat: a bubble is born on the bottom line of the chat strip, centered on the avatar that talks,
+ * and then it stays there (it doesn't follow the avatar). Every few seconds all the bubbles go up; a new bubble
+ * pushes up all the older ones, so they are always in chronological order (see makeRoom).
  */
 interface UIChatBubble {
     data: RoomChatData;
@@ -62,6 +106,8 @@ interface UIChatBubble {
     skipMovement: boolean;
     /** Measured and placed: shown. */
     ready: boolean;
+    /** Shown where it was born: from now on its movements slide (the first placement doesn't, else it comes from the top). */
+    placed: boolean;
     head: string;
 }
 
@@ -72,6 +118,8 @@ const SCROLL_SPEED = 6000
 const MOVE_AMOUNT = 15
 /** Space between the head of the avatar and a bubble born over it. */
 const CHAT_HEAD_MARGIN = 8
+/** Space between a bubble and the one under it. */
+const CHAT_BUBBLE_GAP = 2
 
 let chatMessageCounter = 0
 
@@ -126,6 +174,7 @@ EventManager.read(UIEvents.ROOM_NEW_MESSAGE, async (data: RoomChatData) => {
         height: 0,
         skipMovement: false,
         ready: false,
+        placed: false,
         head: '',
     }
 
@@ -151,41 +200,30 @@ EventManager.read(UIEvents.ROOM_NEW_MESSAGE, async (data: RoomChatData) => {
 
     makeRoom(bubble)
     bubble.ready = true
+
+    // drawn in its place first, then the transition is on (for when it goes up)
+    requestAnimationFrame(() => requestAnimationFrame(() => bubble.placed = true))
 })
 
-/** Nitro's DoChatsOverlap: b is moved by additionalBTop. */
-function chatsOverlap(a: UIChatBubble, b: UIChatBubble, additionalBTop: number): boolean {
-    return !((a.left + a.width) < b.left
-        || a.left > (b.left + b.width)
-        || (a.top + a.height) < (b.top + additionalBTop)
-        || a.top > (b.top + additionalBTop + b.height))
-}
-
-/** Pushes up the older bubbles that the bubble overlaps (and the ones they overlap in turn). */
-function checkOverlappingChats(chat: UIChatBubble, moved: number, pushed: UIChatBubble[]) {
-    const list = messages.value
-
-    for (let i = list.indexOf(chat) - 1; i >= 0; i--) {
-        const collides = list[i]
-
-        if (!collides.ready || collides === chat || pushed.includes(collides)
-            || ((collides.top + collides.height) - moved) > (chat.top + chat.height)) continue
-
-        if (chatsOverlap(chat, collides, -moved)) {
-            const amount = Math.abs((collides.top + collides.height) - chat.top)
-
-            pushed.push(collides)
-            collides.top -= amount
-            collides.skipMovement = true
-
-            checkOverlappingChats(collides, amount, pushed)
-        }
-    }
-}
-
+/**
+ * The new bubble is the lowest one, as Habbo: the older bubbles go up together (all of them, so they keep their
+ * order) until the lowest of them is over the new one. The chat reads always in order from top to bottom.
+ * Before only the older bubbles over the new one and overlapping it were pushed: a bubble of another avatar, or a
+ * new bubble born over the head of an avatar high in the screen, left an older bubble under a newer one.
+ */
 function makeRoom(chat: UIChatBubble) {
     chat.skipMovement = true
-    checkOverlappingChats(chat, 0, [chat])
+
+    const older = messages.value.filter(other => other !== chat && other.ready)
+    const overlap = Math.max(0, ...older.map(other => other.top + other.height + CHAT_BUBBLE_GAP - chat.top))
+
+    if (overlap > 0) {
+        for (const other of older) {
+            other.top -= overlap
+            other.skipMovement = true
+        }
+    }
+
     removeHiddenChats()
 }
 
@@ -233,13 +271,76 @@ function openSettings() {
     Engine.getInstance().userInterfaceManager.componentsManager.getComponent<IComponentShowableUI>(UIComponent.RoomInfoUI).toggle()
 }
 
-function getRoomName() {
-    return Engine.getInstance().roomService.currentRoom?.roomInfo.roomName || 'Unknown'
+/**
+ * The name and the owner of the room, again when its settings are saved. Not "roomPanel": that is the template ref
+ * of the panel element, Vue would put the element in it.
+ */
+const roomPanelInfo = ref({
+    name: Engine.getInstance()?.roomService?.currentRoom?.roomInfo.roomName ?? '',
+    owner: Engine.getInstance()?.roomService?.currentRoom?.roomInfo.authorName ?? '',
+    haveRights: Engine.getInstance()?.roomService?.ownsCurrentRoom() ?? false,
+})
+
+function onRoomInfo(event: EnterRoomUIEventData) {
+    roomPanelInfo.value = { name: event.name, owner: event.owner, haveRights: event.haveRights }
+    onRoomEntered()
 }
 
-function getAuthorName() {
-    return Engine.getInstance().roomService.currentRoom?.roomInfo.authorName || 'Unknown'
+// ---------------- room tools
+const toolsFolded = ref(toolsFoldedSaved)
+const infoOpen = ref(true)
+const visitedVersion = ref(0)
+
+const canGoBack = computed(() => (visitedVersion.value, visitedIndex > 0))
+const canGoForward = computed(() => (visitedVersion.value, visitedIndex < visitedRooms.length - 1))
+
+// the name of the room for a while after entering it (as Habbo), then the room button shows it again
+let infoTimer: ReturnType<typeof setTimeout> | undefined
+
+function onRoomEntered() {
+    const roomId = Engine.getInstance()?.roomService?.currentRoom?.id
+    if (roomId == null || roomId === visitedRooms[visitedIndex]) return
+
+    if (pendingVisit != null && visitedRooms[visitedIndex + pendingVisit] === roomId) {
+        visitedIndex += pendingVisit
+    } else {
+        visitedRooms.splice(visitedIndex + 1)
+        visitedRooms.push(roomId)
+        visitedIndex = visitedRooms.length - 1
+    }
+    pendingVisit = null
+    visitedVersion.value++
+
+    if (zoomedOut) Engine.getInstance()?.roomService?.currentRoom?.roomLayout.visualization.zoom(0.5)
+
+    infoOpen.value = true
+    clearTimeout(infoTimer)
+    infoTimer = setTimeout(() => infoOpen.value = false, 5000)
 }
+
+function goToVisited(step: -1 | 1) {
+    const roomId = visitedRooms[visitedIndex + step]
+    if (roomId == null) return
+
+    pendingVisit = step
+    Engine.getInstance()?.networkingManager?.packetManager.applyOut(OutgoingPacket.UserEnterRoom, { id: roomId })
+}
+
+function toggleZoom() {
+    zoomedOut = !zoomedOut
+    Engine.getInstance()?.roomService?.currentRoom?.roomLayout.visualization.zoom(zoomedOut ? 0.5 : 1)
+}
+
+function comingSoon(feature: string) {
+    EventManager.emit<BubbleAlertData>(UIEvents.BUBBLE_ALERT, { message: `${feature}: coming soon!` })
+}
+
+watch(toolsFolded, folded => toolsFoldedSaved = folded)
+onRoomEntered()
+onUnmounted(() => clearTimeout(infoTimer))
+
+EventManager.read(UIEvents.ENTER_ROOM_INFO, onRoomInfo)
+onUnmounted(() => EventManager.off(UIEvents.ENTER_ROOM_INFO, onRoomInfo))
 </script>
 
 
@@ -250,38 +351,187 @@ function getAuthorName() {
     height: 100%;
     z-index: 10000;
 
-    .roomPanel {
-        background-color: #2e2e2c;
-        border: 2px solid #53524f;
-        min-height: 50px;
-        position:fixed;
-        left:0;
-        bottom:90px;
-        padding: 10px;
-        line-height: 5px;
+    /* the room tools, bottom left (as Habbo) */
+    .roomTools {
+        position: fixed;
+        left: 0;
+        bottom: 66px;
+        display: flex;
+        align-items: stretch;
+        pointer-events: all;
+        font-family: Ubuntu, sans-serif;
+        user-select: none;
 
-        b {
-            color: #fff;
-        }
-        p {
-            color: #fff;
-            opacity: 0.3;
-        }
+        .roomToolsTab {
+            flex: 0 0 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #1f1f1d;
+            border-radius: 0 0 0 0;
+            cursor: pointer;
 
-        .buttons-list {
-            list-style-type: none;
-
-            li {
-                background-image: url("@/assets/images/bottom-bar/settings.png");
-                height: 20px;
-                width: 20px;
-                border: 2px solid #53524f;
-                border-radius: 5px;
-                pointer-events: all;
-                cursor: pointer;
+            &:hover {
+                background: #2b2b28;
             }
         }
 
+        .roomToolsTabArrow {
+            width: 6px;
+            height: 8px;
+            background: url("@/assets/images/bottom-bar/room_infoIconLeft.png") no-repeat center;
+        }
+
+        &.folded {
+            .roomToolsTab {
+                height: 60px;
+                border-radius: 0 6px 6px 0;
+            }
+
+            .roomToolsTabArrow {
+                background-image: url("@/assets/images/bottom-bar/room_infoIconRight.png");
+            }
+        }
+
+        .roomToolsBody {
+            position: relative;
+            width: 170px;
+            padding: 8px 10px 10px 12px;
+            box-sizing: border-box;
+            background: rgba(28, 28, 26, .92);
+            border-radius: 0 6px 6px 0;
+        }
+
+        .roomToolsInfo {
+            position: absolute;
+            left: 0;
+            bottom: calc(100% + 6px);
+            width: 100%;
+            padding: 8px 10px;
+            box-sizing: border-box;
+            background: rgba(28, 28, 26, .92);
+            border-radius: 0 6px 6px 0;
+            color: #fff;
+
+            b {
+                display: block;
+                font-size: 14px;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                white-space: nowrap;
+            }
+
+            span {
+                font-size: 12px;
+                color: #9a9a96;
+            }
+        }
+
+        .roomToolsList {
+            margin: 0;
+            padding: 0;
+            list-style: none;
+
+            li {
+                display: flex;
+                align-items: center;
+                gap: 8px;
+                height: 29px;
+                cursor: pointer;
+
+                &:hover .roomToolsLabel {
+                    color: #fff;
+                }
+
+                &:hover .roomToolsIcon.settings {
+                    background-image: url("@/assets/images/bottom-bar/settings_hover.png");
+                }
+
+                &:hover .roomToolsIcon.zoom {
+                    background-image: url("@/assets/images/bottom-bar/zoom_hover.png");
+                }
+            }
+        }
+
+        /* the icons of the assets only: no icon, an empty place */
+        .roomToolsIcon {
+            flex: 0 0 22px;
+            height: 22px;
+            background: no-repeat center;
+
+            &.settings {
+                background-image: url("@/assets/images/bottom-bar/settings.png");
+            }
+
+            &.zoom {
+                background-image: url("@/assets/images/bottom-bar/zoom.png");
+            }
+        }
+
+        .roomToolsLabel {
+            font-size: 12px;
+            color: #b4b4ae;
+            text-decoration: underline;
+        }
+
+        .roomToolsNavigation {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            margin-top: 8px;
+        }
+
+        .roomToolsButton {
+            width: 32px;
+            height: 30px;
+            padding: 0;
+            background: #1f2a24 no-repeat center;
+            border: 1px solid #0d120f;
+            border-radius: 3px;
+            box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .06);
+            cursor: pointer;
+            outline: none;
+
+            &:hover:not(:disabled) {
+                background-color: #2b3a31;
+            }
+
+            &:disabled {
+                opacity: .45;
+                cursor: default;
+            }
+
+            &.back,
+            &.forward {
+                background-size: 6px 8px;
+                image-rendering: pixelated;
+            }
+
+            &.back {
+                background-image: url("@/assets/images/bottom-bar/room_infoIconLeft.png");
+            }
+
+            &.forward {
+                background-image: url("@/assets/images/bottom-bar/room_infoIconRight.png");
+            }
+
+            &.info {
+                width: 40px;
+                height: 34px;
+                background-color: #2f8a6c;
+                background-image: url("@/assets/images/bottom-bar/house.png");
+                border-color: #0d3326;
+                box-shadow: inset 0 0 0 2px rgba(255, 255, 255, .18);
+
+                &:hover {
+                    background-color: #36a07d;
+                }
+
+                &.active {
+                    box-shadow: inset 0 0 0 2px rgba(255, 255, 255, .5);
+                }
+            }
+        }
     }
 
     #chatBubbleContainer {
@@ -308,8 +558,11 @@ function getAuthorName() {
             user-select: none;
             pointer-events: all !important;
             cursor: pointer !important;
-            /* the bubbles slide up, as Nitro */
-            transition: top 0.2s ease;
+
+            /* the bubbles slide up, as Nitro: once shown in their place (a new bubble appears there directly) */
+            &.placed {
+                transition: top 0.2s ease;
+            }
 
             .chatBubbleHead {
                 position: relative;

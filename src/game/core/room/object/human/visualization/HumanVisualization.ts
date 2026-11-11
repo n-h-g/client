@@ -328,8 +328,6 @@ export abstract class HumanVisualization extends EntityVisualization {
     private drawBlowKissHeart(avatarWidth: number, avatarHeight: number): void {
         if (!this.actions.has(ActionId.BLOW) || this.frame < 3 || this.frame > 18) return;
 
-        // Nitro treats the heart as a separate avatar addition. Draw it over
-        // the avatar here so every client shows it when the Blow action is broadcast.
         const progress = (this.frame - 3) / 15;
         const heart = new Graphics();
         heart.beginFill(0xf35a9d);

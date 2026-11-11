@@ -17,6 +17,10 @@ import {FriendsUI} from './friends/FriendsUI';
 import {MessengerUI} from './friends/MessengerUI';
 import {FriendProfileUI} from './friends/FriendProfileUI';
 import {RoomDimmerUI} from './room/RoomDimmerUI';
+import {HelpUI} from './help/HelpUI';
+import {DoorbellUI} from './room/DoorbellUI';
+import {DoorbellEntryUI} from './room/DoorbellEntryUI';
+import {FurniChooserUI} from './room/FurniChooserUI';
 
 export class ComponentsManager {
     readonly rootComponent: HTMLElement;
@@ -48,6 +52,10 @@ export class ComponentsManager {
         this.addComponent(UIComponent.PrivateChatUI, new MessengerUI());
         this.addComponent(UIComponent.FriendProfileUI, new FriendProfileUI());
         this.addComponent(UIComponent.RoomDimmerUI, new RoomDimmerUI());
+        this.addComponent(UIComponent.HelpUI, new HelpUI());
+        this.addComponent(UIComponent.DoorbellUI, new DoorbellUI());
+        this.addComponent(UIComponent.DoorbellEntryUI, new DoorbellEntryUI());
+        this.addComponent(UIComponent.FurniChooserUI, new FurniChooserUI());
     }
 
     initGameComponents(): void {

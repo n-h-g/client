@@ -17,19 +17,19 @@ export class AvatarHeadImage {
         return this.cached(figure, true);
     }
 
-    /** The whole standing avatar. */
-    static full(figure: string): Promise<string> {
-        return this.cached(figure, false);
+    /** The whole standing avatar, turned to a direction (0-7, 2 by default as Habbo's previews). */
+    static full(figure: string, direction = 2): Promise<string> {
+        return this.cached(figure, false, direction);
     }
 
-    private static cached(figure: string, headOnly: boolean): Promise<string> {
+    private static cached(figure: string, headOnly: boolean, direction = 2): Promise<string> {
         if (!figure) return Promise.resolve('');
 
-        const key = (headOnly ? 'head:' : 'full:') + figure;
+        const key = (headOnly ? 'head:' : `full${direction}:`) + figure;
 
         let image = this.cache.get(key);
         if (!image) {
-            image = this.generate(figure, headOnly).catch(() => '');
+            image = this.generate(figure, headOnly, direction).catch(() => '');
             this.cache.set(key, image);
 
             // e.g. asked before the avatar imager is ready: drawn again next time
@@ -41,15 +41,15 @@ export class AvatarHeadImage {
         return image;
     }
 
-    private static async generate(figure: string, headOnly: boolean): Promise<string> {
+    private static async generate(figure: string, headOnly: boolean, direction: number): Promise<string> {
         const engine = Engine.getInstance();
         const imager = engine?.userInterfaceManager?.avatarImager;
         if (!imager) return '';
 
         // the standing posture, as the change look previews
         const actions = new Set<ActionId>(['std' as ActionId]);
-        // direction 2 as Habbo's friend bar, drawn for the UI (no shadow)
-        const avatar = new Avatar(figure, 2, 2, actions, 0, 0, false, false, true);
+        // drawn for the UI (no shadow)
+        const avatar = new Avatar(figure, direction, direction, actions, 0, 0, false, false, true);
 
         await imager.loadAvatar(avatar);
 

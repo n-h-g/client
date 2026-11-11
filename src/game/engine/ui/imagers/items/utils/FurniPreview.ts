@@ -10,6 +10,7 @@ import {RoomVisualization} from '../../../../room/visualization/RoomVisualizatio
 import {RoomPriority} from '../../../../room/visualization/RoomPriority';
 import {RoomDecorationLibrary} from '../../../../room/decoration/RoomDecorationLibrary';
 import {FurniData} from '../FurniData';
+import {FurniImager} from '../FurniImager';
 import {WallItem} from '../../../../room/objects/items/WallItem';
 import {FurnitureWallData} from '../../../../room/objects/items/WallItemData';
 import {TileType} from '../../../../room/objects/map/TileTypeEnum';
@@ -52,13 +53,22 @@ export class FurniPreview {
     }
 
     /** Render the offer and report its focus point in the resulting image. */
-    static async renderRoom(name: string, extraData?: string | null): Promise<{
+    static async renderRoom(
+        name: string,
+        extraData?: string | null,
+        /** The still image, as soon as it's drawn (the frames of the animation take longer). */
+        onStillImage?: (still: {image: string; width: number; height: number; focusX: number; focusY: number}) => void,
+        /** True: the preview isn't wanted anymore (another furni chosen): the frames are not drawn. */
+        isCancelled?: () => boolean,
+    ): Promise<{
         image: string;
         width: number;
         height: number;
         focusX: number;
         focusY: number;
         frames?: string[];
+        /** How long each frame stays (ms): the animation at the speed of the room, each state for a while. */
+        frameDurations?: number[];
     } | null> {
         const engine = Engine.getInstance();
         const furniImager = engine?.userInterfaceManager?.furniImager;
@@ -233,23 +243,6 @@ export class FurniPreview {
             const scene = new Container();
             scene.addChild(background, roomContainer);
             const sceneBounds = scene.getLocalBounds();
-            const frames = animatedSprite ? this.getAnimationTimeline(animatedSprite.furniBase) : [];
-            const previewFrames: string[] = [];
-            if (animatedSprite && frames.length > 1) {
-                for (const frame of frames) {
-                    animatedSprite.setAnimation(frame.animation);
-                    animatedSprite.setFrame(frame.tick);
-                    previewFrames.push(await UiUtils.generateBase64FromObject(scene));
-                }
-                // Close the loop at the default state so playback never gets stuck in a changed state.
-                animatedSprite.setAnimation(0);
-                animatedSprite.setFrame(0);
-                previewFrames.push(await UiUtils.generateBase64FromObject(scene));
-            }
-            const image = previewFrames[0] ?? await UiUtils.generateBase64FromObject(scene);
-            scene.removeChild(roomContainer);
-            scene.destroy({children: true});
-
             let imageFocus = focus;
             if (!imageFocus) {
                 const door = room.roomLayout.getDoorPosition();
@@ -266,21 +259,74 @@ export class FurniPreview {
                     );
             }
 
-            return {
+            // the still image first (state 0): shown at once, the animation comes when it's drawn
+            if (animatedSprite) {
+                animatedSprite.setAnimation(0);
+                animatedSprite.setFrame(0);
+            }
+            const image = await UiUtils.generateBase64FromObject(scene);
+            const still = {
                 image,
                 width: Math.ceil(sceneBounds.width),
                 height: Math.ceil(sceneBounds.height),
                 focusX: imageFocus.x - sceneBounds.x,
                 focusY: imageFocus.y - sceneBounds.y,
+            };
+            onStillImage?.(still);
+
+            const frames = animatedSprite ? this.getAnimationTimeline(animatedSprite.furniBase) : [];
+            const previewFrames: string[] = [];
+            const frameDurations: number[] = [];
+            if (animatedSprite && frames.length > 1) {
+                // a drawing is slow: the ticks that show the same frames of the layers (a frame lasts some ticks,
+                // a state is looped) are drawn once
+                const base = animatedSprite.furniBase;
+                const direction = base.getValidDirection((animatedSprite as any).direction ?? 0);
+                const layerCount = base.getLayerCount();
+                const drawn = new Map<string, string>([[this.frameKey(base, direction, layerCount, 0, 0), image]]);
+
+                for (const frame of frames) {
+                    if (isCancelled?.()) {
+                        previewFrames.length = 0;
+                        break;
+                    }
+
+                    const key = this.frameKey(base, direction, layerCount, frame.animation, frame.tick);
+                    let frameImage = drawn.get(key);
+                    if (!frameImage) {
+                        animatedSprite.setAnimation(frame.animation);
+                        animatedSprite.setFrame(frame.tick);
+                        frameImage = await UiUtils.generateBase64FromObject(scene);
+                        drawn.set(key, frameImage);
+                    }
+
+                    previewFrames.push(frameImage);
+                    frameDurations.push(frame.ticks * 1000 / FurniImager.FPS);
+                }
+
+                animatedSprite.setAnimation(0);
+                animatedSprite.setFrame(0);
+            }
+            scene.removeChild(roomContainer);
+            scene.destroy({children: true});
+
+            return {
+                ...still,
                 frames: previewFrames.length > 1 ? previewFrames : undefined,
+                frameDurations: previewFrames.length > 1 ? frameDurations : undefined,
             };
         } finally {
             room.dispose();
         }
     }
 
-    /** Sample each declared animation state, including its frame sequence, then return to state 0. */
-    private static getAnimationTimeline(base: {data?: any; getAnimations(): string[]}): {animation: number; tick: number}[] {
+    /**
+     * The frames of the preview: each declared animation state (as a click in the room changes it), shown at the
+     * speed of the room (a tick every 1000 / FPS ms, as ItemLogicMultiState) and for MIN_STATE_TICKS at least
+     * (its animation looped), else a state of a tick (e.g. the lamp on) would blink by.
+     * `ticks`: how long the frame stays. A long animation keeps one tick out of a few (MAX_PREVIEW_FRAMES).
+     */
+    private static getAnimationTimeline(base: {data?: any; getAnimations(): string[]}): {animation: number; tick: number; ticks: number}[] {
         const animationIds = base.getAnimations()
             .map(Number)
             .filter(Number.isFinite)
@@ -305,12 +351,46 @@ export class FurniPreview {
             return {animation, duration};
         });
 
-        const totalTicks = durations.reduce((sum, entry) => sum + entry.duration, 0);
-        const stride = Math.max(1, Math.ceil(totalTicks / 24));
-        const timeline: {animation: number; tick: number}[] = [];
-        for (const {animation, duration} of durations) {
-            for (let tick = 0; tick < duration; tick += stride) timeline.push({animation, tick});
+        // the states, looped to last MIN_STATE_TICKS at least (whole loops)
+        const states = durations.map(({animation, duration}) => ({
+            animation,
+            duration,
+            playTicks: Math.ceil(Math.max(duration, FurniPreview.MIN_STATE_TICKS) / duration) * duration,
+        }));
+
+        // a still state is one frame: the images go to the animated ones
+        const animatedTicks = states.reduce((sum, state) => sum + (state.duration > 1 ? state.duration : 0), 0);
+        const stride = Math.max(1, Math.ceil(animatedTicks / FurniPreview.MAX_PREVIEW_FRAMES));
+
+        const timeline: {animation: number; tick: number; ticks: number}[] = [];
+        for (const {animation, duration, playTicks} of states) {
+            if (duration === 1) {
+                timeline.push({animation, tick: 0, ticks: playTicks});
+                continue;
+            }
+
+            for (let tick = 0; tick < playTicks; tick += stride) {
+                timeline.push({animation, tick: tick % duration, ticks: Math.min(stride, playTicks - tick)});
+            }
         }
         return timeline;
     }
+
+    /** What a tick shows: the frame of each layer in the animation. */
+    private static frameKey(
+        base: {getFrameFrom(direction: number, animation: number, layer: number, tick: number): number},
+        direction: number,
+        layerCount: number,
+        animation: number,
+        tick: number,
+    ): string {
+        const layerFrames: number[] = [];
+        for (let layer = 0; layer < layerCount; layer++) layerFrames.push(base.getFrameFrom(direction, animation, layer, tick));
+
+        return `${animation}:${layerFrames.join(',')}`;
+    }
+
+    private static readonly MAX_PREVIEW_FRAMES = 24;
+    /** Each state of the preview stays 2 s at least. */
+    private static readonly MIN_STATE_TICKS = 48;
 }

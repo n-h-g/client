@@ -11,4 +11,8 @@ export class EventManager {
     static read(key: Events, callback: (payload: any) => void): void {
         this.eventManager.addListener(key.key, callback);
     }
+
+    static off(key: Events, callback: (payload: any) => void): void {
+        this.eventManager.removeListener(key.key, callback);
+    }
 }

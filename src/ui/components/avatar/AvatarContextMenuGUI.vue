@@ -9,55 +9,70 @@
         @click.stop
     >
         <div class="avatar-menu-title">{{ avatar.name }}</div>
-        <template v-if="avatar.isSelf">
-            <template v-if="menuView === 'main'">
-                <button class="avatar-menu-row" @click="changeLook">Look</button>
-                <button class="avatar-menu-row menu-row-arrow" @click="setMenuView('dance')">Balla <span>›</span></button>
-                <button class="avatar-menu-row menu-row-arrow" @click="setMenuView('actions')">Azioni <span>›</span></button>
+
+        <template v-if="!collapsed">
+            <template v-if="avatar.isSelf">
+                <template v-if="menuView === 'main'">
+                    <button class="avatar-menu-row menu-link" @click="changeLook">My Look</button>
+                    <button class="avatar-menu-row menu-row-arrow" @click="setMenuView('dance')">Dance</button>
+                    <button class="avatar-menu-row menu-row-arrow" @click="setMenuView('actions')">Actions</button>
+                    <button class="avatar-menu-row menu-row-arrow" @click="setMenuView('signs')">Signs</button>
+                </template>
+                <template v-else-if="menuView === 'dance'">
+                    <button class="avatar-menu-row" @click="runAction('dance', 1)">Pogo Mogo</button>
+                    <button class="avatar-menu-row" @click="runAction('dance', 2)">Duck Funk</button>
+                    <button class="avatar-menu-row" @click="runAction('dance', 3)">The Rollie</button>
+                    <button class="avatar-menu-row" @click="runAction('dance', 4)">Hab-Hop</button>
+                    <button class="avatar-menu-row menu-back" @click="setMenuView('main')">Back</button>
+                </template>
+                <template v-else-if="menuView === 'actions'">
+                    <button class="avatar-menu-row" @click="runAction('sit')">{{ avatar.sitting ? 'Stand' : 'Sit' }}</button>
+                    <button class="avatar-menu-row" @click="runAction('wave')">Wave</button>
+                    <button class="avatar-menu-row" @click="runAction('laugh')">Laugh</button>
+                    <button class="avatar-menu-row" @click="runAction('blow')">Blow a kiss</button>
+                    <button class="avatar-menu-row" @click="runAction('sleep')">Idle</button>
+                    <button class="avatar-menu-row menu-back" @click="setMenuView('main')">Back</button>
+                </template>
+                <template v-else>
+                    <div class="avatar-menu-signs">
+                        <button v-for="number in signNumbers" :key="number" class="sign-card" @click="runAction('sign', 1, number)">{{ number }}</button>
+                    </div>
+                    <button class="avatar-menu-row menu-back" @click="setMenuView('main')">Back</button>
+                </template>
             </template>
-            <template v-else-if="menuView === 'dance'">
-                <button class="avatar-menu-row menu-back" @click="setMenuView('main')">‹ Indietro</button>
-                <div class="avatar-menu-section">Balla</div>
-                <button class="avatar-menu-row" @click="runAction('dance', 1)">Pogo Mogo</button>
-                <button class="avatar-menu-row" @click="runAction('dance', 2)">Duft Punk</button>
-                <button class="avatar-menu-row" @click="runAction('dance', 3)">Dance 3</button>
-                <button class="avatar-menu-row" @click="runAction('dance', 4)">Dance 4</button>
+            <template v-else-if="avatar.isBot || avatar.isPet">
+                <button v-if="avatar.canPickUp" class="avatar-menu-row" @click="pickUpBot">Pick up</button>
+                <div v-else class="avatar-menu-row unavailable">{{ avatar.isPet ? 'Pet' : 'Bot' }}</div>
             </template>
-            <template v-else-if="menuView === 'actions'">
-                <button class="avatar-menu-row menu-back" @click="setMenuView('main')">‹ Indietro</button>
-                <div class="avatar-menu-section">Azioni</div>
-                <button class="avatar-menu-row" @click="runAction('sit')">{{ avatar.sitting ? 'Alzati' : 'Siediti' }}</button>
-                <button class="avatar-menu-row" @click="runAction('wave')">Saluta</button>
-                <button class="avatar-menu-row" @click="runAction('laugh')">Ridi</button>
-                <button class="avatar-menu-row" @click="runAction('blow')">Manda un bacio</button>
-                <button class="avatar-menu-row" @click="runAction('sleep')">Rilassati</button>
-                <button class="avatar-menu-row menu-row-arrow" @click="setMenuView('signs')">Segnali <span>›</span></button>
+            <template v-else-if="menuView === 'moderate'">
+                <button class="avatar-menu-row" @click="kick">Kick</button>
+                <button class="avatar-menu-row menu-row-arrow" @click="setMenuView('ban')">Ban</button>
+                <button class="avatar-menu-row menu-back" @click="setMenuView('main')">Back</button>
+            </template>
+            <template v-else-if="menuView === 'ban'">
+                <button class="avatar-menu-row" @click="ban('hour')">For an hour</button>
+                <button class="avatar-menu-row" @click="ban('day')">For a day</button>
+                <button class="avatar-menu-row" @click="ban('permanent')">Permanent</button>
+                <button class="avatar-menu-row menu-back" @click="setMenuView('moderate')">Back</button>
             </template>
             <template v-else>
-                <button class="avatar-menu-row menu-back" @click="setMenuView('actions')">‹ Indietro</button>
-                <div class="avatar-menu-section">Cartellini</div>
-                <button v-for="number in signNumbers" :key="number" class="avatar-menu-row sign-row" @click="runAction('sign', 1, number)">
-                    Cartellino <span class="sign-card">{{ number }}</span>
-                </button>
+                <template v-if="avatar.userId != null && !friendship.isFriend">
+                    <button v-if="friendship.hasRequestFrom" class="avatar-menu-row" @click="acceptFriend">Accept friend</button>
+                    <button v-else-if="friendship.hasSent" class="avatar-menu-row unavailable" disabled>Request sent</button>
+                    <button v-else class="avatar-menu-row" @click="addFriend">Ask to be a Friend</button>
+                </template>
+                <button class="avatar-menu-row unavailable" disabled>Trade</button>
+                <button v-if="avatar.userId != null" class="avatar-menu-row" @click="whisper">Whisper</button>
+                <button class="avatar-menu-row unavailable" disabled>Give a gem</button>
+                <button class="avatar-menu-row unavailable" disabled>Ignore</button>
+                <button class="avatar-menu-row unavailable" disabled>Report</button>
+                <button v-if="avatar.canModerate" class="avatar-menu-row menu-row-arrow" @click="setMenuView('moderate')">Moderate</button>
+                <button v-else class="avatar-menu-row unavailable" disabled>Moderate</button>
             </template>
         </template>
-        <template v-else-if="avatar.isBot || avatar.isPet">
-            <button v-if="avatar.canPickUp" class="avatar-menu-row" @click="pickUpBot">Prendi</button>
-            <div v-else class="avatar-menu-row unavailable">{{ avatar.isPet ? 'Animale' : 'Bot' }}</div>
-        </template>
-        <template v-else>
-            <template v-if="avatar.userId != null && !friendship.isFriend">
-                <button v-if="friendship.hasRequestFrom" class="avatar-menu-row" @click="acceptFriend">Accetta amicizia</button>
-                <button v-else-if="friendship.hasSent" class="avatar-menu-row unavailable" disabled>Richiesta inviata</button>
-                <button v-else class="avatar-menu-row" @click="addFriend">Aggiungi amico</button>
-            </template>
-            <button class="avatar-menu-row unavailable" disabled>Trade</button>
-            <button v-if="avatar.userId != null" class="avatar-menu-row" @click="whisper">Sussurra</button>
-            <button class="avatar-menu-row unavailable" disabled>Give a gem <span class="gem">💎</span></button>
-            <button class="avatar-menu-row unavailable" disabled>Ignore</button>
-            <button class="avatar-menu-row unavailable" disabled>Report</button>
-            <button class="avatar-menu-row unavailable" disabled>Moderate</button>
-        </template>
+
+        <!-- as Habbo: the menu shrinks to the name, and opens again -->
+        <button class="avatar-menu-toggle" :class="{ collapsed }" :title="collapsed ? 'Open' : 'Close'" @click="toggleCollapsed"></button>
         <div class="avatar-menu-arrow"></div>
     </div>
 </template>
@@ -81,9 +96,10 @@ const menu = ref<HTMLElement | null>(null)
 const avatar = ref<AvatarContextMenuData>({id: '', name: '', x: 0, y: 0, sitting: false, isSelf: false})
 const left = ref(0)
 const top = ref(0)
-const arrowLeft = ref(138)
+const arrowLeft = ref(58)
 const opensBelow = ref(false)
-const menuView = ref<'main' | 'dance' | 'actions' | 'signs'>('main')
+const menuView = ref<'main' | 'dance' | 'actions' | 'signs' | 'moderate' | 'ban'>('main')
+const collapsed = ref(false)
 const signNumbers = Array.from({length: 10}, (_, index) => index + 1)
 
 // the friendship with the user of the avatar, updated when the friend list changes (e.g. request sent)
@@ -156,6 +172,7 @@ function placeMenu() {
 EventManager.read(UIEvents.AVATAR_CONTEXT_MENU, (payload: AvatarContextMenuData) => {
     avatar.value = payload
     menuView.value = 'main'
+    collapsed.value = false
     visible.value = true
     ignoreOutsideUntil = Date.now() + 100
     nextTick(placeMenu)
@@ -166,7 +183,12 @@ function close() {
     menuView.value = 'main'
 }
 
-function setMenuView(view: 'main' | 'dance' | 'actions' | 'signs') {
+function toggleCollapsed() {
+    collapsed.value = !collapsed.value
+    nextTick(placeMenu)
+}
+
+function setMenuView(view: 'main' | 'dance' | 'actions' | 'signs' | 'moderate' | 'ban') {
     menuView.value = view
     nextTick(placeMenu)
 }
@@ -219,6 +241,26 @@ function runAction(action: 'dance' | 'sit' | 'wave' | 'laugh' | 'blow' | 'sleep'
     close()
 }
 
+/** The owner of the room sends the user out (the server checks it again). */
+function kick() {
+    if (avatar.value.userId == null) return close()
+
+    Engine.getInstance()?.networkingManager?.packetManager?.applyOut(OutgoingPacket.RoomKickUserEvent, {
+        userId: avatar.value.userId,
+    })
+    close()
+}
+
+function ban(length: 'hour' | 'day' | 'permanent') {
+    if (avatar.value.userId == null) return close()
+
+    Engine.getInstance()?.networkingManager?.packetManager?.applyOut(OutgoingPacket.RoomBanUserEvent, {
+        userId: avatar.value.userId,
+        length,
+    })
+    close()
+}
+
 function changeLook() {
     Engine.getInstance()?.userInterfaceManager?.componentsManager
         .getComponent<IComponentShowableUI>(UIComponent.ChangeLookUI)?.show()
@@ -246,125 +288,177 @@ onBeforeUnmount(() => {
 .avatar-context-menu {
     position: fixed;
     z-index: 100000;
-    width: 156px;
+    width: 116px;
     box-sizing: border-box;
-    padding: 1px;
+    padding: 3px 3px 0;
     overflow: visible;
-    color: #f4f2ef;
-    background: #161514;
-    border: 1px solid #171615;
-    border-radius: 5px;
-    box-shadow: 0 2px 0 rgba(0, 0, 0, .75);
+    color: #fff;
+    background: #3a3a3a;
+    border: 1px solid #000;
+    border-radius: 6px;
+    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .12), 0 2px 3px rgba(0, 0, 0, .35);
     pointer-events: auto;
     font-family: Ubuntu, Arial, sans-serif;
-    image-rendering: pixelated;
+    font-weight: 700;
+    user-select: none;
 
-    .avatar-menu-title,
+    .avatar-menu-title {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        height: 20px;
+        padding: 0 4px;
+        overflow: hidden;
+        font-size: 12px;
+        font-weight: 700;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+    }
+
     .avatar-menu-row {
+        position: relative;
         display: flex;
         align-items: center;
         justify-content: center;
         width: 100%;
-        height: 25px;
+        height: 22px;
+        margin-top: 2px;
+        padding: 0 16px;
         box-sizing: border-box;
-        color: inherit;
-        font-size: 11px;
-        line-height: 1;
-    }
-
-    .avatar-menu-title {
-        height: 24px;
-        background: #45413e;
-        border-radius: 3px 3px 0 0;
-        font-weight: 700;
-        letter-spacing: 0;
-    }
-
-    .avatar-menu-row {
-        padding: 0 4px;
-        background: #2d2a29;
+        background: #555;
         border: 0;
-        border-top: 1px solid #514d4a;
-        cursor: pointer;
-        text-shadow: 0 1px 0 #111;
-    }
-
-    .avatar-menu-row:hover {
-        background: #3b3735;
-    }
-
-    .avatar-menu-row.unavailable {
-        cursor: default;
-    }
-
-    .avatar-menu-section {
-        display: flex;
-        align-items: center;
-        height: 19px;
-        padding: 0 7px;
-        color: #bbb6b1;
-        background: #45413e;
-        border-top: 1px solid #514d4a;
-        font-size: 9px;
+        border-radius: 2px;
+        box-shadow: inset 0 1px 0 rgba(255, 255, 255, .08);
+        color: inherit;
+        font-family: inherit;
+        font-size: 12px;
         font-weight: 700;
-        text-transform: uppercase;
-        letter-spacing: .35px;
+        line-height: 1;
+        white-space: nowrap;
+        cursor: pointer;
+        outline: none;
+
+        &:hover {
+            background: #676767;
+        }
+
+        &.unavailable {
+            color: #9a9a9a;
+            cursor: default;
+
+            &:hover {
+                background: #555;
+            }
+        }
     }
 
-    .menu-row-arrow {
-        justify-content: space-between;
-        padding: 0 8px;
+    .menu-link {
+        text-decoration: underline;
     }
 
-    .menu-row-arrow span {
-        font-size: 17px;
+    // the white chevron of a submenu
+    .menu-row-arrow::after {
+        content: "";
+        position: absolute;
+        right: 8px;
+        top: 50%;
+        width: 5px;
+        height: 5px;
+        border-top: 2px solid #fff;
+        border-right: 2px solid #fff;
+        transform: translateY(-50%) rotate(45deg);
     }
 
     .menu-back {
-        justify-content: flex-start;
-        padding-left: 7px;
-        background: #45413e;
+        background: #474747;
+        color: #ddd;
+
+        &::before {
+            content: "";
+            position: absolute;
+            left: 8px;
+            top: 50%;
+            width: 5px;
+            height: 5px;
+            border-top: 2px solid #ddd;
+            border-left: 2px solid #ddd;
+            transform: translateY(-50%) rotate(-45deg);
+        }
     }
 
-    .sign-row {
-        justify-content: space-between;
-        padding: 0 12px;
+    .avatar-menu-signs {
+        display: grid;
+        grid-template-columns: repeat(5, 1fr);
+        gap: 2px;
+        margin-top: 2px;
     }
 
     .sign-card {
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        width: 13px;
-        height: 13px;
+        height: 20px;
+        padding: 0;
         color: #26211b;
         background: #f2d96b;
-        border: 1px solid #d5ae42;
+        border: 1px solid #b8912b;
         border-radius: 2px;
-        font-size: 9px;
+        font-family: inherit;
+        font-size: 10px;
         font-weight: 700;
+        cursor: pointer;
+        outline: none;
+
+        &:hover {
+            background: #ffe98a;
+        }
     }
 
-    .gem {
-        margin-left: 8px;
-        font-size: 11px;
+    // the white triangle at the bottom: shrinks / opens the menu
+    .avatar-menu-toggle {
+        display: block;
+        width: 100%;
+        height: 14px;
+        padding: 0;
+        background: transparent;
+        border: 0;
+        cursor: pointer;
+        outline: none;
+
+        &::after {
+            content: "";
+            display: block;
+            margin: 0 auto;
+            width: 0;
+            height: 0;
+            border-left: 6px solid transparent;
+            border-right: 6px solid transparent;
+            border-top: 6px solid #fff;
+        }
+
+        &.collapsed::after {
+            border-top: 0;
+            border-bottom: 6px solid #fff;
+        }
+
+        &:hover::after {
+            filter: drop-shadow(0 0 2px rgba(255, 255, 255, .6));
+        }
     }
 
+    // the tail towards the avatar
     .avatar-menu-arrow {
         position: absolute;
         left: calc(var(--avatar-menu-arrow-left) - 6px);
-        bottom: -9px;
+        bottom: -7px;
         width: 10px;
         height: 10px;
-        background: #45413e;
-        border-right: 1px solid #171615;
-        border-bottom: 1px solid #171615;
+        background: #3a3a3a;
+        border-right: 1px solid #000;
+        border-bottom: 1px solid #000;
         transform: rotate(45deg);
         z-index: -1;
     }
 
     &.opens-below .avatar-menu-arrow {
-        top: -6px;
+        top: -7px;
         bottom: auto;
         transform: rotate(225deg);
     }

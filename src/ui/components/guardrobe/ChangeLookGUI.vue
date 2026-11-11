@@ -1,59 +1,66 @@
 <template>
-    <Dialog title="ChangeLook" class-name="changelookUI" :box="UIEventsType.CHANGE_LOOK">
-        <div class="changeLookContainer">
-            <div class="tabs">
-                <div class="tab" :class="{ active: currentTab == 'faceAndBody' }" @click="changeTab('faceAndBody')">
-                    Face and Body
-                </div>
-                <div class="tab" :class="{ active: currentTab == 'head' }" @click="changeTab('head')">
-                    Head
-                </div>
-                <div class="tab" :class="{ active: currentTab == 'torso' }" @click="changeTab('torso')">
-                    Torso
-                </div>
-                <div class="tab" :class="{ active: currentTab == 'legs' }" @click="changeTab('legs')">
-                    Legs
-                </div>
-            </div>
-            <div class="tabContainer">
-                <div class="firstChoose" v-if="currentTab == 'faceAndBody'">
-                    <div class="chooseTab" :class="{active: gender == 'M'}" @click="setGender('M')">
-                        <img src="@/assets/images/look_editor/gender_male.png" />
-                    </div>
-                    <div class="chooseTab" :class="{active: gender == 'F'}" @click="setGender('F')">
-                        <img src="@/assets/images/look_editor/gender_female.png" />
+    <Dialog title="Wardrobe" class-name="changelookUI" :box="UIEventsType.CHANGE_LOOK">
+        <div class="wardrobe">
+            <div class="wardrobeEditor">
+                <!-- the categories -->
+                <div class="wardrobeTabs">
+                    <div class="wardrobeTab" v-for="tab in avatarTabs" :key="tab.id"
+                        :class="{ active: currentTab == tab.id }" :title="tab.label" @click="changeTab(tab.id)">
+                        <img :src="lookEditorImage(tab.icon)" alt="" />
                     </div>
                 </div>
-                <div class="firstChoose" v-else>
-                    <div class="chooseTab" v-for="(tab, key) in currentMainTab?.tabs" :key="key"
-                        :class="{active: secondTabId == key}" @click="changeSecondTab(key)">
-                        <img :src="getSecondTabImage(tab.image)" />
-                    </div>
+
+                <!-- the parts of the category (the gender for the body) -->
+                <div class="wardrobeSubTabs">
+                    <template v-if="currentTab == 'faceAndBody'">
+                        <div class="wardrobeTab" :class="{ active: gender == 'M' }" title="Boy" @click="setGender('M')">
+                            <img src="@/assets/images/look_editor/gender_male.png" alt="" />
+                        </div>
+                        <div class="wardrobeTab" :class="{ active: gender == 'F' }" title="Girl" @click="setGender('F')">
+                            <img src="@/assets/images/look_editor/gender_female.png" alt="" />
+                        </div>
+                    </template>
+                    <template v-else>
+                        <div class="wardrobeTab" v-for="(tab, key) in currentMainTab?.tabs" :key="key"
+                            :class="{ active: secondTabId == key }" @click="changeSecondTab(key)">
+                            <img :src="lookEditorImage(tab.image)" alt="" />
+                        </div>
+                    </template>
                 </div>
-                <div class="parts" :class="currentTab != 'faceAndBody' ? currentSubTab?.type : 'faceAndBody'">
-                    <div class="part" v-for="part in partSet" :key="part.key"
-                        :class="{selected: part.selected, hc: part.isHc, loaded: part.loaded}"
+
+                <div class="wardrobeParts wardrobeScroll">
+                    <div class="wardrobePart" v-for="part in partSet" :key="part.key"
+                        :class="{ selected: part.selected, hc: part.isHc, loaded: part.loaded, remove: part.key == -1 }"
                         @click="handleChangePart(part)">
-                        <img :src="part.img" />
+                        <img :src="part.img" alt="" />
                     </div>
                 </div>
-                <div class="lookPreview">
-                    <div class="lookBackground">
-                        <img v-if="lookImage != ''" :src='lookImage' />
-                    </div>
-                    <div class="buttonContainer">
-                        <button class="saveButton" @click="saveLook">Salva</button>
-                    </div>
-                </div>
-                <div class="palettesContainer">
-                    <div class="palette" v-for="palette in palettes" :key="palette.key">
-                        <div class="color" v-for="color in palette.colors" :key="color.colorId"
-                            :class="{selected: color.selected, hc: color.isHc}"
-                            :style="{backgroundColor: '#' + color.backgroundColor}"
+
+                <div class="wardrobePalettes">
+                    <div class="wardrobePalette wardrobeScroll" v-for="palette in palettes" :key="palette.key">
+                        <div class="wardrobeColor" v-for="color in palette.colors" :key="color.colorId"
+                            :class="{ selected: color.selected, hc: color.isHc }"
+                            :style="{ backgroundColor: '#' + color.backgroundColor }"
                             @click="handleChangeColor(color, palette)">
                         </div>
                     </div>
                 </div>
+            </div>
+
+            <div class="wardrobePreview">
+                <div class="wardrobeAvatar">
+                    <img v-if="lookImage != ''" :src="lookImage" alt=""
+                        :style="lookImageWidth ? { width: lookImageWidth + 'px' } : undefined" @load="onLookImageLoad" />
+                </div>
+                <div class="wardrobeRotate">
+                    <svg class="wardrobeArrow" viewBox="0 0 48 30" @click="rotate(1)">
+                        <path d="M45 9 Q26 1 12 13 L7 7 L4 26 L22 24 L16 18 Q27 10 45 17 Z" />
+                    </svg>
+                    <svg class="wardrobeArrow flipped" viewBox="0 0 48 30" @click="rotate(-1)">
+                        <path d="M45 9 Q26 1 12 13 L7 7 L4 26 L22 24 L16 18 Q27 10 45 17 Z" />
+                    </svg>
+                </div>
+                <button class="wardrobeSave" @click="saveLook">Save changes</button>
             </div>
         </div>
     </Dialog>
@@ -77,6 +84,8 @@ import { EventManager } from '../../../game/core/events/EventManager'
 const avatarTabs = [
     {
         id: "faceAndBody",
+        label: "Body",
+        icon: "tab_body",
         tabs: [{
             type: "hd",
             image: "avatar_editor_download_icon",
@@ -85,6 +94,8 @@ const avatarTabs = [
     },
     {
         id: "head",
+        label: "Head",
+        icon: "head_hats",
         tabs: [
             { type: "hr", image: "head_hair", required: false },
             { type: "ha", image: "head_hats", required: false },
@@ -95,6 +106,8 @@ const avatarTabs = [
     },
     {
         id: "torso",
+        label: "Torso",
+        icon: "top_shirt",
         tabs: [
             { type: "ch", image: "top_shirt", required: true },
             { type: "cc", image: "top_jacket", required: false },
@@ -104,6 +117,8 @@ const avatarTabs = [
     },
     {
         id: "legs",
+        label: "Legs",
+        icon: "bottom_trousers",
         tabs: [
             { type: "lg", image: "bottom_trousers", required: true },
             { type: "sh", image: "bottom_shoes", required: false },
@@ -122,12 +137,22 @@ const look = ref<string>('hd-180-1.ch-255-66.lg-280-110.sh-305-62.ha-1012-110.hr
 const partSet = ref<any[]>([])
 const lookImage = ref<string>('')
 const palettes = ref<any[]>([])
+/** The preview is drawn bigger: a whole zoom keeps the pixels sharp (there are no bigger avatar assets). */
+const PREVIEW_ZOOM = 2
+const lookImageWidth = ref<number>(0)
+
+function onLookImageLoad(event: Event) {
+    lookImageWidth.value = (event.target as HTMLImageElement).naturalWidth * PREVIEW_ZOOM
+}
+
+/** Where the avatar of the preview looks (0-7). */
+const direction = ref<number>(2)
 
 const currentMainTab = computed(() => avatarTabs.find(e => e.id === currentTab.value))
 const currentSubTab = computed(() => currentMainTab.value?.tabs[secondTabId.value])
 
 // the preview follows the look; the thumbnails depend only on the tab, the gender and the colors
-watch(look, () => generateLookPreview());
+watch([look, direction], () => generateLookPreview());
 
 EventManager.read(UIEvents.CHANGE_LOOK, (evt: ChangeLookEventData) => {
     // a look saved before (e.g. with the colors "NaN" or a part written twice) is repaired
@@ -168,7 +193,7 @@ function hide() {
     Engine.getInstance()?.userInterfaceManager?.componentsManager.getComponent<IComponentShowableUI>(UIComponent.ChangeLookUI)?.hide()
 }
 
-function getSecondTabImage(image: string) {
+function lookEditorImage(image: string) {
     return new URL(`../../../assets/images/look_editor/${image}.png`, import.meta.url).href
 }
 
@@ -213,7 +238,7 @@ function generateLookPreview() {
     const generation = ++previewGeneration
     const figure = look.value
 
-    avatarImage(figure, false).then(dataUrl => {
+    AvatarHeadImage.full(figure, direction.value).then(dataUrl => {
         if (generation === previewGeneration) lookImage.value = dataUrl
     })
 }
@@ -416,6 +441,11 @@ function handleChangeColor(color: any, palette: any) {
     generatePartSet()
 }
 
+/** Turns the avatar of the preview (+1 clockwise, -1 the other way). */
+function rotate(step: number) {
+    direction.value = (direction.value + step + 8) % 8
+}
+
 function saveLook() {
     Engine.getInstance()?.networkingManager?.packetManager.applyOut(OutgoingPacket.UserChangeLookEvent, {
         look: look.value,
@@ -432,331 +462,335 @@ onMounted(() => {
 })
 </script>
 
-<style lang="scss" scoped>
-
+<style lang="scss">
 /* the root of the Dialog: in the middle of the screen, never larger than it (the bottom bar is 54px) */
-.changelookUI {
+#dialog.changelookUI {
     position: fixed;
-    top: max(8px, calc(50vh - 250px));
-    left: max(8px, calc(50vw - 380px));
-    width: min(760px, calc(100vw - 16px));
-    height: min(440px, calc(100vh - 70px));
-    display: flex;
-    flex-direction: column;
+    top: max(8px, calc(50vh - 290px));
+    left: max(8px, calc(50vw - 340px));
+    /* on whole pixels: half a pixel blurs the pixel art */
+    top: unquote("max(8px, round(down, calc(50vh - 290px), 1px))");
+    left: unquote("max(8px, round(down, calc(50vw - 340px), 1px))");
+    width: min(680px, calc(100vw - 16px));
+    height: min(560px, calc(100vh - 70px));
     box-sizing: border-box;
+
+    > .content {
+        padding: 10px 12px;
+        box-sizing: border-box;
+    }
 }
 
-.changeLookContainer {
+.wardrobe {
     height: 100%;
     display: flex;
-    flex-direction: column;
-    background-color: transparent;
+    gap: 14px;
     font-family: "Ubuntu", sans-serif;
+    user-select: none;
 
-    .tabs {
-        flex: 0 0 auto;
-        padding: 5px 16px 0;
-        border-bottom: 1px solid #000;
-        display: flex;
-        flex-wrap: wrap;
-        align-items: flex-end;
-        gap: 2px;
+    // ---------------- the scrollbars, as Habbo's (grey track, round thumb, arrows)
+    .wardrobeScroll {
+        overflow-y: auto;
+        overflow-x: hidden;
 
-        .tab {
-            text-align: center;
-            border-top-left-radius: 4px;
-            border-top-right-radius: 4px;
+        &::-webkit-scrollbar {
+            width: 15px;
+        }
+
+        &::-webkit-scrollbar-track {
+            background: #e3e3dc;
             border: 1px solid #000;
-            border-bottom: 0;
-            padding: 3px 6px;
-            color: #000;
-            background-color: #c3c2b8;
-            position: relative;
-            cursor: pointer;
-            user-select: none;
-            white-space: nowrap;
+            border-radius: 2px;
+        }
 
-            &.active {
-                border-left: 2px solid #000;
-                border-right: 2px solid #000;
-                border-top: 2px solid #000;
-                background-color: #eceae0;
+        &::-webkit-scrollbar-thumb {
+            border: 1px solid #000;
+            border-radius: 4px;
+            background:
+                repeating-linear-gradient(#e9e9e1 0 2px, #8f8f8a 2px 3px) center / 7px 11px no-repeat,
+                linear-gradient(90deg, #f4f4ef, #c9c9c1);
+        }
 
-                &::after {
-                    content: ' ';
-                    position: absolute;
-                    bottom: -1px;
-                    width: 100%;
-                    height: 2px;
-                    background-color: #eceae0;
-                    left: 0;
-                }
+        &::-webkit-scrollbar-button:single-button {
+            display: block;
+            height: 13px;
+            background-color: #e9e9e1;
+            border: 1px solid #000;
+            border-radius: 2px;
+            background-repeat: no-repeat;
+            background-position: center;
+            background-size: 7px 5px;
+        }
+
+        &::-webkit-scrollbar-button:single-button:vertical:decrement {
+            background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 7 5'><path d='M0 5 L3.5 0 L7 5 Z' fill='black'/></svg>");
+        }
+
+        &::-webkit-scrollbar-button:single-button:vertical:increment {
+            background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 7 5'><path d='M0 0 L3.5 5 L7 0 Z' fill='black'/></svg>");
+        }
+    }
+
+    // ---------------- left: categories, parts and colors
+    .wardrobeEditor {
+        flex: 1;
+        min-width: 0;
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+    }
+
+    .wardrobeTabs,
+    .wardrobeSubTabs {
+        flex: 0 0 auto;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        padding: 0 10px;
+    }
+
+    .wardrobeTab {
+        flex: 0 0 auto;
+        height: 42px;
+        min-width: 50px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        border-radius: 6px;
+
+        img {
+            image-rendering: pixelated;
+            pointer-events: none;
+            filter: grayscale(1);
+            opacity: 0.55;
+            transition: filter 0.1s, opacity 0.1s;
+        }
+
+        &:hover img {
+            opacity: 0.85;
+        }
+
+        &.active {
+            background: rgba(0, 0, 0, 0.06);
+
+            img {
+                filter: none;
+                opacity: 1;
             }
         }
     }
 
-    /* the subtabs, the parts, the preview and the colors: side by side, stacked on a small screen */
-    .tabContainer {
+    // the categories stay colored, the parts of the category are grey until chosen
+    .wardrobeTabs .wardrobeTab img {
+        filter: none;
+    }
+
+    .wardrobeParts {
         flex: 1 1 auto;
         min-height: 0;
         display: grid;
-        grid-template-columns: 70px minmax(0, 1fr) 150px auto;
-        grid-template-rows: minmax(0, 1fr);
-        grid-template-areas: "side parts preview colors";
+        grid-template-columns: repeat(auto-fill, 58px);
+        grid-auto-rows: 58px;
+        justify-content: space-between;
+        align-content: start;
+        gap: 8px;
+        padding: 2px 8px 2px 2px;
+    }
+
+    .wardrobePart {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+        background: radial-gradient(circle at 50% 60%, #d9d9d4 0 58%, #cdcdc6 59%);
+        cursor: pointer;
+        overflow: hidden;
+
+        img {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+            pointer-events: none;
+        }
+
+        &:hover {
+            background: radial-gradient(circle at 50% 60%, #e6e6e1 0 58%, #d8d8d1 59%);
+        }
+
+        &.selected {
+            background: radial-gradient(circle at 50% 60%, #eef2f4 0 58%, #dde4e8 59%);
+            box-shadow: inset 0 0 0 2px #4c8fbd, inset 0 0 0 4px #b9d6ea;
+        }
+    }
+
+    .wardrobePalettes {
+        flex: 0 0 96px;
+        display: flex;
         gap: 10px;
-        padding: 5px 0;
+        border-top: 1px solid #c9c9c1;
+        padding-top: 6px;
+    }
 
-        .firstChoose {
-            grid-area: side;
-            display: flex;
-            flex-direction: column;
-            justify-content: flex-start;
-            align-items: center;
-            gap: 6px;
-            overflow-y: auto;
+    .wardrobePalette {
+        flex: 1;
+        min-width: 0;
+        display: grid;
+        grid-template-columns: repeat(auto-fill, 24px);
+        grid-auto-rows: 24px;
+        justify-content: space-between;
+        align-content: start;
+        gap: 4px;
+        padding: 1px 6px 1px 1px;
+    }
 
-            .chooseTab {
-                flex: 0 0 auto;
-                background-color: #cbd1d8;
-                padding: 4px;
-                width: 50px;
-                height: 50px;
-                display: flex;
-                justify-content: center;
-                align-items: center;
-                cursor: pointer;
-                user-select: none;
-                border-radius: 5px;
-                box-shadow: inset 2px 2px 0 2px rgba(0, 0, 0, .25);
-                box-sizing: border-box;
+    .wardrobeColor {
+        position: relative;
+        border-radius: 50%;
+        cursor: pointer;
+        box-shadow: inset 0 -3px 0 rgba(0, 0, 0, 0.18), inset 0 0 0 1px rgba(0, 0, 0, 0.25);
 
-                img {
-                    object-fit: none;
-                }
-
-                &.active {
-                    background-color: #fff;
-                    box-shadow: inset 0 0 0 3px rgba(0, 0, 0, .4);
-                }
-            }
+        &:hover {
+            filter: brightness(1.1);
         }
 
-        .parts {
-            grid-area: parts;
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(50px, 1fr));
-            grid-auto-rows: 50px;
-            align-content: start;
-            gap: 4px;
-            overflow-y: auto;
-            overflow-x: hidden;
-            border-radius: 5px;
-            min-height: 0;
+        &.selected {
+            box-shadow: 0 0 0 2px #fff, 0 0 0 3px #4c8fbd;
 
-            .part {
-                background-color: #b3b5bc;
-                display: flex;
-                justify-content: center;
-                align-items: center;
-                border-radius: 5px;
-                box-shadow: inset 2px 2px 0 2px rgba(0, 0, 0, .25);
-                cursor: pointer;
-                user-select: none;
-                overflow: hidden;
-
-                img {
-                    max-width: 90%;
-                    max-height: 90%;
-                    object-fit: contain;
-                    image-rendering: pixelated;
-                    pointer-events: none;
-                }
-
-                &.selected {
-                    background-color: #fff;
-                    box-shadow: inset 0 0 0 3px rgba(0, 0, 0, .4);
-                }
+            &::after {
+                content: "";
+                position: absolute;
+                top: 4px;
+                left: 6px;
+                width: 8px;
+                height: 4px;
+                border-radius: 4px;
+                background: rgba(255, 255, 255, 0.6);
             }
         }
+    }
 
-        .lookPreview {
-            grid-area: preview;
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-            padding: 10px;
-            background-color: #c2ced4;
-            border-radius: 5px;
-            min-height: 0;
-            box-sizing: border-box;
+    // ---------------- right: the avatar
+    .wardrobePreview {
+        flex: 0 0 170px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 10px;
+        padding-top: 10px;
+    }
 
-            .lookBackground {
-                flex: 1 1 auto;
-                min-height: 120px;
-                border-radius: 5px;
-                background: radial-gradient(circle, rgba(202, 209, 219, 1) 0%, rgba(102, 113, 129, 1) 60%);
-                overflow: hidden;
-                display: flex;
-                justify-content: center;
-                align-items: center;
-                position: relative;
-                box-shadow: 0 4px 0 0px rgba(0, 0, 0, 0.15);
+    .wardrobeAvatar {
+        flex: 1 1 auto;
+        min-height: 0;
+        width: 100%;
+        display: flex;
+        align-items: flex-end;
+        justify-content: center;
+        position: relative;
 
-                img {
-                    z-index: 2;
-                    max-width: 100%;
-                    max-height: 100%;
-                    image-rendering: pixelated;
-                }
-
-                &::after {
-                    position: absolute;
-                    content: ' ';
-                    background-color: #667181;
-                    width: 300px;
-                    height: 200px;
-                    bottom: -125px;
-                    z-index: 1;
-                    border-radius: 50%;
-                }
-            }
-
-            .buttonContainer {
-                flex: 0 0 auto;
-
-                .saveButton {
-                    border-radius: 5px;
-                    width: 100%;
-                    height: 46px;
-                    background-color: #009d2f;
-                    color: #fff;
-                    padding: 0 10px;
-                    cursor: pointer;
-                    border: 0;
-                    outline: none;
-                    font-family: "Ubuntu", sans-serif;
-                    font-size: 1.3rem;
-                    text-shadow: 1px 1px 0 rgba(0, 0, 0, .5);
-                    box-shadow: 0 4px 0 0px rgba(0, 0, 0, 0.15), inset 0 4px 0 0px rgba(255, 255, 255, 0.15), inset 0 -4px 0 0px rgba(0, 0, 0, 0.15);
-
-                    &:hover {
-                        background-color: #00b737;
-                    }
-                }
-            }
+        // the floor under the avatar
+        &::before {
+            content: "";
+            position: absolute;
+            bottom: -6px;
+            width: 110px;
+            height: 26px;
+            border-radius: 50%;
+            background: rgba(0, 0, 0, 0.08);
         }
 
-        .palettesContainer {
-            grid-area: colors;
-            display: flex;
-            gap: 10px;
-            min-height: 0;
+        img {
+            position: relative;
+            flex: 0 0 auto;
+            image-rendering: pixelated;
+        }
+    }
 
-            .palette {
-                display: grid;
-                grid-template-columns: repeat(3, 36px);
-                grid-auto-rows: 36px;
-                align-content: start;
-                gap: 4px;
-                overflow-x: hidden;
-                overflow-y: auto;
-                border-radius: 5px;
+    .wardrobeRotate {
+        flex: 0 0 auto;
+        display: flex;
+        gap: 18px;
+        margin-top: 10px;
+    }
 
-                .color {
-                    border-radius: 5px;
-                    position: relative;
-                    box-shadow: inset 2px 2px 0 2px rgba(0, 0, 0, .25);
-                    cursor: pointer;
-                    user-select: none;
+    .wardrobeArrow {
+        width: 44px;
+        height: 28px;
+        cursor: pointer;
 
-                    &.selected {
-                        box-shadow: inset 0 0 0 3px rgba(0, 0, 0, .4);
+        path {
+            fill: #4a9bd1;
+            stroke: #1d5f8a;
+            stroke-width: 1.5;
+            stroke-linejoin: round;
+        }
 
-                        &::after {
-                            content: ' ';
-                            position: absolute;
-                            inset: 3px;
-                            border: 2px solid #fff;
-                            border-radius: 5px;
-                            box-shadow: inset 0 -4px 0 0px rgba(0, 0, 0, .25);
-                        }
+        &.flipped {
+            transform: scaleX(-1);
+        }
 
-                        &::before {
-                            content: ' ';
-                            position: absolute;
-                            top: 7px;
-                            left: 8px;
-                            right: 8px;
-                            height: 4px;
-                            border-radius: 33px;
-                            background-color: rgba(255, 255, 255, .5);
-                        }
-                    }
-                }
-            }
+        &:hover path {
+            fill: #63b2e4;
+        }
+
+        &:active {
+            translate: 0 1px;
+        }
+    }
+
+    .wardrobeSave {
+        flex: 0 0 auto;
+        margin-bottom: 4px;
+        padding: 5px 12px;
+        background: linear-gradient(#fff, #e9e9e4);
+        border: 2px solid #000;
+        border-radius: 6px;
+        font-family: inherit;
+        font-size: 13px;
+        font-weight: 700;
+        color: #000;
+        cursor: pointer;
+        outline: none;
+        box-shadow: inset 0 -2px 0 rgba(0, 0, 0, 0.12);
+
+        &:hover {
+            background: linear-gradient(#fff, #f3f3ef);
+        }
+
+        &:active {
+            translate: 0 1px;
         }
     }
 }
 
-/* tablet: the colors go under the parts, in rows that scroll sideways */
-@media (max-width: 760px) {
-    .changelookUI {
-        height: min(560px, calc(100vh - 70px));
-    }
-
-    .changeLookContainer .tabContainer {
-        grid-template-columns: 64px minmax(0, 1fr) 130px;
-        grid-template-rows: minmax(0, 1fr) auto;
-        grid-template-areas:
-            "side parts preview"
-            "colors colors colors";
-
-        .palettesContainer {
-            flex-direction: column;
-            gap: 6px;
-
-            .palette {
-                grid-template-columns: none;
-                grid-auto-flow: column;
-                grid-auto-columns: 32px;
-                grid-auto-rows: 32px;
-                overflow-x: auto;
-                overflow-y: hidden;
-                padding-bottom: 4px;
-            }
-        }
-    }
-}
-
-/* phone: everything in one column, the dialog scrolls */
-@media (max-width: 480px) {
-    .changelookUI {
+/* phone: the avatar goes under the editor, the dialog scrolls */
+@media (max-width: 540px) {
+    #dialog.changelookUI {
         top: 8px;
         height: calc(100vh - 70px);
     }
 
-    .changeLookContainer {
+    .wardrobe {
+        flex-direction: column;
         overflow-y: auto;
 
-        .tabs {
-            padding: 5px 4px 0;
+        .wardrobeEditor {
+            flex: 0 0 auto;
         }
 
-        .tabContainer {
-            min-height: auto;
-            grid-template-columns: 1fr;
-            grid-template-rows: auto 240px auto 220px;
-            grid-template-areas:
-                "side"
-                "parts"
-                "colors"
-                "preview";
+        .wardrobeParts {
+            flex: 0 0 220px;
+        }
 
-            .firstChoose {
-                flex-direction: row;
-                justify-content: center;
-                overflow-x: auto;
-            }
+        .wardrobeTabs,
+        .wardrobeSubTabs {
+            padding: 0;
+            overflow-x: auto;
+        }
+
+        .wardrobePreview {
+            flex: 0 0 260px;
         }
     }
 }

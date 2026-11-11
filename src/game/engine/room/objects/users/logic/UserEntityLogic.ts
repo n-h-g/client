@@ -63,6 +63,9 @@ export class UserEntityLogic extends HumanLogic {
 
     onClick() {
         const user = this.entity as import('../UserEntity').UserEntity;
+
+        // the card of the user (as Habbo's infostand), next to the menu over the avatar
+        void this.togglePreview();
         if (user.userId != null && user.userId === Engine.getInstance().currentUserId) {
             const bounds = this.entity.visualization.container.getBounds();
             const visualization = this.entity.visualization as HumanVisualization;
@@ -93,8 +96,7 @@ export class UserEntityLogic extends HumanLogic {
 
         const bounds = this.entity.visualization.container.getBounds();
         const engine = Engine.getInstance();
-        const ownsRoom = !!engine.currentUsername
-            && engine.roomService?.currentRoom?.roomInfo.authorName === engine.currentUsername;
+        const ownsRoom = engine.roomService?.ownsCurrentRoom() ?? false;
 
         EventManager.emit<AvatarContextMenuData>(UIEvents.AVATAR_CONTEXT_MENU, {
             id: this.entity.id,
@@ -107,6 +109,7 @@ export class UserEntityLogic extends HumanLogic {
             isBot: user.isBot,
             // the server checks it again
             canPickUp: user.isBot && user.botOwnerId != null && (user.botOwnerId === engine.currentUserId || ownsRoom),
+            canModerate: ownsRoom && !user.isBot && user.userId != null && user.userId !== engine.currentUserId,
         });
     }
 

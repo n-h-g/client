@@ -11,6 +11,7 @@ export enum OutgoingPacket {
     NavigatorAllRooms = 6,
     NavigatorMyRooms = 7,
     UserEnterRoom = 8,
+    UserExitRoom = 9,
     CreateNewRoom = 36,
 
     //#region User
@@ -68,6 +69,22 @@ export enum OutgoingPacket {
     PlacePetEvent = 63,
     /** A pet goes back to the inventory of its owner: {id} (the entity). */
     PickupPetEvent = 64,
+    /** The owner of the room sends a user out of it: {userId}. */
+    RoomKickUserEvent = 65,
+    /** The owner of the room bans a user: {userId, length} (hour, day, permanent). */
+    RoomBanUserEvent = 66,
+    /** Answer to the doorbell: {userId, accept}. */
+    DoorbellAnswerEvent = 67,
+    /** The users banned from the current room (room settings). */
+    RequestRoomBansEvent = 68,
+    /** Removes a ban of the current room: {userId}. */
+    RoomUnbanEvent = 69,
+    /** The user doesn't wait at the doorbell anymore (Cancel in the waiting window). */
+    DoorbellCancelEvent = 70,
+    /** The card of a user (clicking its avatar): {userId}, the server answers UserInfo. */
+    RequestUserInfoEvent = 71,
+    /** The user changes its motto: {motto} (38 characters at most). */
+    UpdateMottoEvent = 72,
     /** A wallpaper/floor/landscape applied from the inventory (Nitro's FurniturePlacePaintComposer): {id}. */
     RoomApplyDecorationEvent = 29,
     MoveWallItemEvent = 33,

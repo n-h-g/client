@@ -17,12 +17,15 @@ export class UpdateRoomData extends MessageHandler {
             return;
         }
 
-        if (
-            Engine.getInstance()?.roomService?.currentRoom?.id !=
-            room.id
-        )
-            Engine.getInstance()?.roomService.dispose();
-        else return;
+        // the same room again: its settings were saved (name, description...), the room stays
+        const currentRoom = Engine.getInstance()?.roomService?.currentRoom;
+        if (currentRoom?.id == room.id) {
+            currentRoom.roomInfo.update(room);
+            Engine.getInstance()?.roomService?.emitRoomInfo();
+            return;
+        }
+
+        Engine.getInstance()?.roomService.dispose();
 
         const newRoom = Engine.getInstance()?.roomService?.setRoom(
             room.name,
@@ -31,6 +34,9 @@ export class UpdateRoomData extends MessageHandler {
             room.id,
             room.owner_name
         );
+
+        newRoom?.roomInfo.update(room);
+        Engine.getInstance()?.roomService?.emitRoomInfo();
 
         // the room is drawn with the default look, then again with its wallpaper and floor
         newRoom?.roomLayout.setDecorations({

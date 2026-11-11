@@ -122,13 +122,24 @@
                         </template>
                     </div>
 
-                    <div class="buttonsContainer">
-                        <div class="itemName" v-if="selectedItem">
-                            {{ getItemName(selectedItem) }}
+                    <div class="buttonsContainer furniPanel">
+                        <!-- as the catalogue: the furni in a room, dragged to look around -->
+                        <div class="inventoryRoomPreview"
+                            :class="{ dragging: previewDragging }"
+                            @click.stop
+                            @pointerdown="startPreviewDrag"
+                            @pointermove="movePreviewDrag"
+                            @pointerup="stopPreviewDrag"
+                            @pointercancel="stopPreviewDrag">
+                            <img v-if="selectedItem && preview" :src="preview" class="inventoryRoomPreviewImage"
+                                :style="{ transform: `translate(${previewPan.x}px, ${previewPan.y}px)` }"
+                                draggable="false" alt="" />
+                            <img v-else-if="selectedItem" :src="getImageIcon(selectedItem)" class="inventoryPreviewIcon" alt="" />
                         </div>
-                        <div class="itemPreview">
-                            <img v-if="selectedItem" :src="preview || getImageIcon(selectedItem)" />
-                        </div>
+                        <template v-if="selectedItem">
+                            <div class="itemName">{{ getItemName(selectedItem) }}</div>
+                            <div class="itemDescription">{{ getFurniDescription(selectedItem.name) }}</div>
+                        </template>
                         <div class="buttonList">
                             <div class="ui-button small" v-if="showPlaceItemButton" @click.stop="placeItem()">{{ isDecoration(selectedItem) ? 'Apply' : 'Place' }}</div>
                             <div class="ui-button small" v-if="showAddAllItemsToTradeButton" @click.stop="addAllItemsToTrade()">Trade</div>
@@ -168,7 +179,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted, reactive, ref } from "vue"
+import { computed, onBeforeUnmount, onMounted, reactive, ref } from "vue"
 import { ItemVisualization } from "../../../game/core/room/object/items/visualization/ItemVisualization"
 import { Engine } from "../../../game/Engine"
 import {Item} from "../../../game/engine/room/objects/items/Item"
@@ -366,8 +377,30 @@ function isDecoration(item: any): boolean {
     return !!item && RoomDecorationLibrary.isDecorationItem(item.name)
 }
 
+// name and description of the furni from the furnidata (the item has the class name only), indexed once
+let furnidataByClassName: Map<string, any> | null = null
+
+function getFurniData(className: string): any {
+    if (!furnidataByClassName) {
+        const furnidata = Engine.getInstance()?.userInterfaceManager?.furniImager?.getFurnidata()
+        if (!furnidata) return null
+
+        furnidataByClassName = new Map()
+        for (const list of [furnidata.floorItems, furnidata.wallItems]) {
+            for (const id in list) furnidataByClassName.set(list[id].className, list[id])
+        }
+    }
+
+    return furnidataByClassName.get(className) ?? null
+}
+
+function getFurniDescription(className: string): string {
+    return getFurniData(className)?.description || ""
+}
+
 function getItemName(item: any): string {
-    const name = item.name || item.Name
+    const className = item.name || item.Name
+    const name = getFurniData(className)?.name || className
     return isDecoration(item) && item.extra_data ? `${name} ${item.extra_data}` : name
 }
 
@@ -403,16 +436,51 @@ function changeTab(tab: string) {
     requestTab(tab)
 }
 
-// the furni drawn in the preview panel (the icon is shown until it's ready)
+// the furni drawn in a room in the preview panel (the icon is shown until it's ready), animated as in the room
 const preview = ref("")
+const previewPan = ref({ x: 0, y: 0 })
+const previewDragging = ref(false)
+let previewDragStart = { pointerX: 0, pointerY: 0, panX: 0, panY: 0 }
+let previewAnimationTimer: ReturnType<typeof setTimeout> | undefined
+
+function stopPreviewAnimation() {
+    if (previewAnimationTimer) clearTimeout(previewAnimationTimer)
+    previewAnimationTimer = undefined
+}
+
+/** The frames of the room preview, each for its time (FurniPreview: the speed of the room). */
+function playPreview(frames: string[], durations: number[]) {
+    let index = 0
+    const next = () => {
+        previewAnimationTimer = setTimeout(() => {
+            index = (index + 1) % frames.length
+            preview.value = frames[index]
+            next()
+        }, durations[index] ?? 140)
+    }
+    next()
+}
+
+onBeforeUnmount(stopPreviewAnimation)
 
 async function selectItem(item: any) {
+    stopPreviewAnimation()
     selectedItem.value = item
     preview.value = ""
+    previewPan.value = { x: 0, y: 0 }
 
-    FurniPreview.render(item.name)
-        .then(image => {
-            if (image && selectedItem.value && slotKey(selectedItem.value) === slotKey(item)) preview.value = image
+    // decorations recolor the walls/floor of the room, the other furni is placed in it
+    const isCurrent = () => !!selectedItem.value && slotKey(selectedItem.value) === slotKey(item)
+
+    // the still image at once, then the animation when its frames are drawn
+    FurniPreview.renderRoom(item.name, item.extra_data, still => {
+        if (!isCurrent()) return
+        preview.value = still.image
+        previewPan.value = { x: still.width / 2 - still.focusX, y: still.height / 2 - still.focusY }
+    }, () => !isCurrent())
+        .then(result => {
+            if (!result || !isCurrent()) return
+            if (result.frames && result.frames.length > 1) playPreview(result.frames, result.frameDurations ?? [])
         })
         .catch(() => {})
 
@@ -420,7 +488,33 @@ async function selectItem(item: any) {
         showPlaceItemButton.value = true
 }
 
+function startPreviewDrag(event: PointerEvent) {
+    if (!preview.value) return
+    previewDragging.value = true
+    previewDragStart = {
+        pointerX: event.clientX,
+        pointerY: event.clientY,
+        panX: previewPan.value.x,
+        panY: previewPan.value.y,
+    }
+    ;(event.currentTarget as HTMLElement).setPointerCapture(event.pointerId)
+}
+
+function movePreviewDrag(event: PointerEvent) {
+    if (!previewDragging.value) return
+    previewPan.value = {
+        x: previewDragStart.panX + event.clientX - previewDragStart.pointerX,
+        y: previewDragStart.panY + event.clientY - previewDragStart.pointerY,
+    }
+}
+
+function stopPreviewDrag() {
+    previewDragging.value = false
+}
+
 function deselectItem() {
+    stopPreviewAnimation()
+    preview.value = ""
     selectedItem.value = null;
     showPlaceItemButton.value = false;
 }
@@ -445,8 +539,8 @@ onMounted(() => {
 <style lang="scss">
 .inventory {
     position: fixed;
-    height: 380px; // Aumentato leggermente per respirare
-    width: 490px;
+    height: 400px;
+    width: 600px;
 
     .inventoryContainer {
         height: calc(100% - 45px); // Sottrai l'altezza delle tab
@@ -514,6 +608,60 @@ onMounted(() => {
                 display: flex;
                 flex-direction: column;
                 gap: 5px;
+            }
+
+            /* the furni in a room (as the catalogue) */
+            &.furniPanel {
+                width: 230px;
+                flex-shrink: 0;
+                box-sizing: border-box;
+                padding: 6px;
+            }
+
+            .inventoryRoomPreview {
+                flex: 0 0 165px;
+                position: relative;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                overflow: hidden;
+                margin-bottom: 6px;
+                background: #c8c8c8;
+                border: 1px solid #999;
+                border-radius: 3px;
+                cursor: grab;
+                touch-action: none;
+
+                &.dragging {
+                    cursor: grabbing;
+                }
+
+                .inventoryRoomPreviewImage {
+                    flex: none;
+                    max-width: none;
+                    max-height: none;
+                    user-select: none;
+                }
+
+                .inventoryPreviewIcon {
+                    transform: scale(2);
+                    image-rendering: pixelated;
+                }
+            }
+
+            &.furniPanel .itemName {
+                text-align: left;
+                margin-bottom: 2px;
+                padding: 0;
+            }
+
+            .itemDescription {
+                flex: 1;
+                min-height: 0;
+                overflow-y: auto;
+                font-size: 12px;
+                line-height: 1.3;
+                color: #333;
             }
 
             .itemName {

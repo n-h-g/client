@@ -13,8 +13,11 @@ import { Engine } from '../../game/Engine'
 onMounted(() => {
     const route: RouteLocationNormalizedLoaded = useRoute()
     var sso: string;
-    if (route.params != null && route.params.sso != null)
-        sso = route.params.sso[0]
+    // a string ("/sso/1001"), an array only for a repeatable param: [0] of the string took its first character
+    // (the user 1001 logged in as the user 1)
+    const param = route.params?.sso
+    if (param != null)
+        sso = Array.isArray(param) ? param[0] : param
     const engine: Engine = new Engine()
     engine.init()
     if (sso != null)

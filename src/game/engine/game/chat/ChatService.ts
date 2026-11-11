@@ -60,6 +60,8 @@ export class ChatMessageService extends Service<string, Message> implements Disp
                 const commandClass =
                     commandService.repository?.get(splittedMessage);
                 commandClass?.handle(args);
+                // a command of the client: done here, it doesn't go in the chat
+                return true;
             }
             return false;
         }

@@ -3,6 +3,7 @@ import {CommandRepository} from './CommandRepository';
 import {Command} from './Command';
 import {ChooserCommand} from './ChooserCommand';
 import {ZoomCommand} from './ZoomCommand';
+import {FurniCommand} from './FurniCommand';
 import {Disposable} from '../../../core/room/Disposable';
 
 export class CommandService extends Service<string, Command> implements Disposable {
@@ -15,6 +16,7 @@ export class CommandService extends Service<string, Command> implements Disposab
     init() {
         this.addCommand(new ChooserCommand());
         this.addCommand(new ZoomCommand());
+        this.addCommand(new FurniCommand());
     }
 
 	dispose(): void {}

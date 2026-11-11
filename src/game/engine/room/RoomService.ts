@@ -1,4 +1,5 @@
 import {Room} from './Room';
+import {DoorbellStore} from './DoorbellStore';
 import {Point} from '../../utils/point/Point';
 import {Engine} from '../../Engine';
 import {EventManager} from '../../core/events/EventManager';
@@ -208,11 +209,31 @@ export class RoomService
         EventManager.emit<RoomUIEventData>(UIEvents.ROOM_UI, {
             enabled: true,
         });
+        this.emitRoomInfo();
+    }
+
+    /** The user owns the current room (it can change its settings, kick, ban, answer the doorbell). */
+    ownsCurrentRoom(): boolean {
+        const info = this.currentRoom?.roomInfo;
+        const engine = Engine.getInstance();
+        if (!info || !engine) return false;
+
+        if (info.ownerId != null && engine.currentUserId != null) return info.ownerId === engine.currentUserId;
+        return !!engine.currentUsername && info.authorName === engine.currentUsername;
+    }
+
+    /** The settings of the current room for the UI (room panel, room settings). */
+    emitRoomInfo(): void {
+        const info = this.currentRoom?.roomInfo;
+        if (!info) return;
+
         EventManager.emit<EnterRoomUIEventData>(UIEvents.ENTER_ROOM_INFO, {
-            name: this.currentRoom.roomInfo.roomName,
-            description: this.currentRoom.roomInfo.description,
-            owner: this.currentRoom.roomInfo.authorName ?? '',
-            haveRights: true,
+            name: info.roomName,
+            description: info.description ?? '',
+            owner: info.authorName ?? '',
+            haveRights: this.ownsCurrentRoom(),
+            maxUsers: info.maxUsers,
+            doorMode: info.doorMode,
         });
     }
 
@@ -226,6 +247,9 @@ export class RoomService
         }
 
         this.wrappedCurrentRoom.roomEntityRepository.cancelRollingEntity();
+
+        // the doorbell requests were for this room
+        DoorbellStore.getInstance().clear();
         this.nextPlacement = null;
 
         if (!Engine.getInstance().config.offlineMode) {

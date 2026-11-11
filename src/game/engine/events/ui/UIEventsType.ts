@@ -12,5 +12,10 @@ export enum UIEventsType {
     FRIENDS = 'friends',
     MESSENGER = 'messenger',
     FRIEND_PROFILE = 'friend_profile',
-    ROOM_DIMMER = 'room_dimmer'
+    ROOM_DIMMER = 'room_dimmer',
+    HELP = 'help',
+    NOTICE = 'notice',
+    DOORBELL = 'doorbell',
+    DOORBELL_ENTRY = 'doorbell_entry',
+    FURNI_CHOOSER = 'furni_chooser',
 }
