@@ -144,6 +144,9 @@ export class TileVisualization extends RoomObjectVisualization {
         const ctx = new Graphics();
         ctx.eventMode = 'dynamic';
 
+        // the edge of the floor (the room setting: thin to thick, MapData.thickSpace is the normal one)
+        const floorThickness = this.tile.plane.room.floorThicknessPx;
+
         // the sides of the tile go down to the neighbour tile on that side: a raised floor (e.g. an upper
         // level of a house) is drawn as a solid block instead of a thin slab floating in the air
         const fullHeightTick = this.tile.plane.room.hasFullHeightTick
@@ -180,14 +183,14 @@ export class TileVisualization extends RoomObjectVisualization {
             this.offsetY +
                 MapData.tileHeight +
                 leftTick +
-                MapData.thickSpace
+                floorThickness
         );
         ctx.lineTo(
             this.offsetX,
             this.offsetY +
                 MapData.tileHeight / 2 +
                 leftTick +
-                MapData.thickSpace
+                floorThickness
         );
 
         ctx.closePath();
@@ -206,14 +209,14 @@ export class TileVisualization extends RoomObjectVisualization {
             this.offsetY +
                 MapData.tileHeight +
                 rightTick +
-                MapData.thickSpace
+                floorThickness
         );
         ctx.lineTo(
             this.offsetX + MapData.tileWidth,
             this.offsetY +
                 MapData.tileHeight / 2 +
                 rightTick +
-                MapData.thickSpace
+                floorThickness
         );
         ctx.closePath();
         ctx.endFill();

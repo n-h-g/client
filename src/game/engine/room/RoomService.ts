@@ -234,6 +234,9 @@ export class RoomService
             haveRights: this.ownsCurrentRoom(),
             maxUsers: info.maxUsers,
             doorMode: info.doorMode,
+            hideWalls: info.hideWalls,
+            wallThickness: info.wallThickness,
+            floorThickness: info.floorThickness,
         });
     }
 

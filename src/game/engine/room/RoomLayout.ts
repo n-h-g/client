@@ -37,6 +37,11 @@ export class RoomLayout {
     private wrappedFloorDecoration: PlaneDecoration | null = null;
     private wrappedWallDecoration: PlaneDecoration | null = null;
 
+    /** The look of the room (its "Customize" settings, see setAppearance). */
+    private wallsHidden = false;
+    private wallThicknessLevel = 0;
+    private floorThicknessLevel = 0;
+
     constructor(room: Room, model: string, doorPosition: Point) {
         this.room = room;
 
@@ -214,6 +219,42 @@ export class RoomLayout {
 
         if (floorChanged) this.floorPlane.visualization?.redraw();
         if (wallChanged) this.wallPlane.visualization?.redraw();
+    }
+
+    /**
+     * The look of the room (the "Customize" settings): the walls hidden, the thickness of the walls and of the floor
+     * (-2 thinnest, -1 thin, 0 normal, 1 thick, as Habbo). The planes are drawn again when it changes.
+     */
+    setAppearance(hideWalls: boolean, wallThickness: number, floorThickness: number): void {
+        const wallChanged = hideWalls !== this.wallsHidden || wallThickness !== this.wallThicknessLevel;
+        const floorChanged = floorThickness !== this.floorThicknessLevel;
+
+        this.wallsHidden = hideWalls;
+        this.wallThicknessLevel = wallThickness;
+        this.floorThicknessLevel = floorThickness;
+
+        if (!this.visualization.container || this.visualization.container.destroyed) return;
+
+        if (floorChanged) this.floorPlane.visualization?.redraw();
+        if (wallChanged) this.wallPlane.visualization?.redraw();
+    }
+
+    get hideWalls(): boolean {
+        return this.wallsHidden;
+    }
+
+    /** The thickness of the walls in pixels: 2, 4, 8 (normal, MapData.wallDepth), 16. */
+    get wallThicknessPx(): number {
+        return RoomLayout.thicknessPx(this.wallThicknessLevel);
+    }
+
+    /** The thickness of the edge of the floor in pixels: 2, 4, 8 (normal, MapData.thickSpace), 16. */
+    get floorThicknessPx(): number {
+        return RoomLayout.thicknessPx(this.floorThicknessLevel);
+    }
+
+    private static thicknessPx(level: number): number {
+        return 8 * Math.pow(2, Math.max(-2, Math.min(1, Math.round(level || 0))));
     }
 
     private static samePlane(a: PlaneDecoration | null, b: PlaneDecoration | null): boolean {

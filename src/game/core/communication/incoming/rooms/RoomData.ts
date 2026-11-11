@@ -17,4 +17,8 @@ export interface RoomData {
     wallpaper?: string;
     floor?: string;
     landscape?: string;
+    /** The look of the room (the "Customize" settings): thickness -2 thinnest, -1 thin, 0 normal, 1 thick. */
+    hide_walls?: boolean;
+    wall_thickness?: number;
+    floor_thickness?: number;
 }

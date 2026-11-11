@@ -41,6 +41,8 @@ export type FigureDataPart = {
  */
 const HAND_ITEM_BEHIND_Z = -0.5;
 const HAND_ITEM_FRONT_Z = 10;
+/** The arm on the far side of the body: under the body (0), over the shadow (-1) and under what it holds (-0.5). */
+const ARM_BEHIND_Z = -0.6;
 
 export class AvatarImager {
     private data: AvatarImageData;

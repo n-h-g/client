@@ -15,6 +15,10 @@ export class RoomInfo {
     authorName: string;
     ownerId: number | null = null;
     doorMode: RoomDoorMode = RoomDoorMode.OPEN;
+    /** The look of the room: the walls hidden, their thickness and the floor's (-2 thinnest ... 1 thick). */
+    hideWalls = false;
+    wallThickness = 0;
+    floorThickness = 0;
 
     constructor(
         roomName: string,
@@ -40,5 +44,8 @@ export class RoomInfo {
         this.doorMode = data.door_mode ?? this.doorMode;
         this.authorName = data.owner_name ?? this.authorName;
         this.ownerId = data.owner_id ?? this.ownerId;
+        this.hideWalls = data.hide_walls ?? this.hideWalls;
+        this.wallThickness = data.wall_thickness ?? this.wallThickness;
+        this.floorThickness = data.floor_thickness ?? this.floorThickness;
     }
 }

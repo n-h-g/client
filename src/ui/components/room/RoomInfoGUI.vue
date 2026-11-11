@@ -4,6 +4,7 @@
             <div class="roomSettingsTabs">
                 <div class="roomSettingsTab" :class="{ active: currentTab == 'basic' }" @click="changeTab('basic')">Basic</div>
                 <div class="roomSettingsTab" :class="{ active: currentTab == 'access' }" @click="changeTab('access')">Access</div>
+                <div class="roomSettingsTab" :class="{ active: currentTab == 'customize' }" @click="changeTab('customize')">Customize</div>
                 <div class="roomSettingsTab" :class="{ active: currentTab == 'bans' }" @click="changeTab('bans')">Bans</div>
             </div>
 
@@ -44,6 +45,27 @@
                         <input v-model.number="doorMode" type="radio" :value="RoomDoorMode.DOORBELL" />
                         <span><b>Doorbell</b><br />The users ring and you choose who enters (you must be in the room).</span>
                     </label>
+                </template>
+
+                <!-- the look of the room: walls and floor -->
+                <template v-else-if="currentTab == 'customize'">
+                    <div class="roomSettingsLabel">Customization</div>
+                    <div class="roomSettingsInfo">
+                        Customize your walls and floors! You can choose whether the walls of your room are visible,
+                        and the thickness of the floor and of the walls.
+                    </div>
+
+                    <div class="roomSettingsLabel">Walls and floors</div>
+                    <label class="roomSettingsCheck">
+                        <input v-model="hideWalls" type="checkbox" />
+                        <span>Hide walls</span>
+                    </label>
+                    <select v-model.number="wallThickness" class="roomSettingsInput" aria-label="Wall thickness">
+                        <option v-for="choice in THICKNESS_CHOICES" :key="choice.value" :value="choice.value">{{ choice.label }} walls</option>
+                    </select>
+                    <select v-model.number="floorThickness" class="roomSettingsInput" aria-label="Floor thickness">
+                        <option v-for="choice in THICKNESS_CHOICES" :key="choice.value" :value="choice.value">{{ choice.label }} floors</option>
+                    </select>
                 </template>
 
                 <!-- the banned users -->
@@ -89,7 +111,15 @@ const MAX_NAME_LENGTH = 60
 const MAX_DESCRIPTION_LENGTH = 255
 const MAX_USERS_CHOICES = [10, 25, 50, 100]
 
-type Tab = 'basic' | 'access' | 'bans'
+type Tab = 'basic' | 'access' | 'customize' | 'bans'
+
+/** As the server (Room.MIN_THICKNESS .. MAX_THICKNESS) and Habbo. */
+const THICKNESS_CHOICES = [
+    { value: 0, label: 'Normal' },
+    { value: 1, label: 'Thick' },
+    { value: -1, label: 'Thin' },
+    { value: -2, label: 'Thinnest' },
+]
 
 const currentTab = ref<Tab>('basic')
 const roomName = ref('')
@@ -97,6 +127,9 @@ const description = ref('')
 const maxUsers = ref(25)
 const doorMode = ref<number>(RoomDoorMode.OPEN)
 const confirmDelete = ref(false)
+const hideWalls = ref(false)
+const wallThickness = ref(0)
+const floorThickness = ref(0)
 
 const bans = ref<RoomBan[]>([])
 const bansLoaded = ref(false)
@@ -105,16 +138,25 @@ const bansLoaded = ref(false)
  * The values of the room: the component is mounted when the window opens (after the room was entered), so they
  * are read from the room, and again when the server sends the room (e.g. saved from here).
  */
-function fill(info: { name: string, description?: string, maxUsers?: number, doorMode?: number }) {
+function fill(info: {
+    name: string, description?: string, maxUsers?: number, doorMode?: number,
+    hideWalls?: boolean, wallThickness?: number, floorThickness?: number,
+}) {
     roomName.value = info.name ?? ''
     description.value = info.description ?? ''
     maxUsers.value = MAX_USERS_CHOICES.includes(info.maxUsers ?? 0) ? info.maxUsers! : 25
     doorMode.value = info.doorMode ?? RoomDoorMode.OPEN
+    hideWalls.value = !!info.hideWalls
+    wallThickness.value = info.wallThickness ?? 0
+    floorThickness.value = info.floorThickness ?? 0
 }
 
 const roomInfo = Engine.getInstance()?.roomService?.currentRoom?.roomInfo
 if (roomInfo) {
-    fill({ name: roomInfo.roomName, description: roomInfo.description, maxUsers: roomInfo.maxUsers, doorMode: roomInfo.doorMode })
+    fill({
+        name: roomInfo.roomName, description: roomInfo.description, maxUsers: roomInfo.maxUsers, doorMode: roomInfo.doorMode,
+        hideWalls: roomInfo.hideWalls, wallThickness: roomInfo.wallThickness, floorThickness: roomInfo.floorThickness,
+    })
 }
 
 function onRoomInfo(event: EnterRoomUIEventData) {
@@ -158,6 +200,9 @@ function save() {
         description: description.value.trim(),
         maxUsers: maxUsers.value,
         doorMode: doorMode.value,
+        hideWalls: hideWalls.value,
+        wallThickness: wallThickness.value,
+        floorThickness: floorThickness.value,
         deleteRoom: false,
     })
     hide()
@@ -281,6 +326,21 @@ function banUntil(ban: RoomBan): string {
 
         input {
             margin-top: 2px;
+            accent-color: #367897;
+        }
+    }
+
+    .roomSettingsInfo {
+        line-height: 1.4;
+    }
+
+    .roomSettingsCheck {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        cursor: pointer;
+
+        input {
             accent-color: #367897;
         }
     }

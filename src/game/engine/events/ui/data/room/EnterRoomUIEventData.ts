@@ -6,4 +6,7 @@ export type EnterRoomUIEventData = {
     maxUsers?: number;
     /** 0 open, 1 with the doorbell (RoomDoorMode). */
     doorMode?: number;
+    hideWalls?: boolean;
+    wallThickness?: number;
+    floorThickness?: number;
 };
