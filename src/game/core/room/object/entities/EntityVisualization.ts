@@ -4,7 +4,6 @@ import {Entity} from './Entity';
 import {Point3d} from '../../../../utils/point/Point3d';
 import {AvatarData} from '../../../../engine/ui/imagers/avatars/enum/AvatarData';
 import {EntityEvents} from '../../../../engine/events/room/objects/entities/EntityEvents';
-import {Engine} from '../../../../Engine';
 
 export abstract class EntityVisualization extends RoomObjectVisualization {
     entity: Entity;
@@ -25,7 +24,17 @@ export abstract class EntityVisualization extends RoomObjectVisualization {
      * A walking entity farther than this (tiles) from its previous step jumps there before the next one (see
      * walkTo). A step takes a room cycle on the server (480 ms) and on the client (AVATAR_WALK_SPEED, 476 ms).
      */
-    private static readonly MAX_WALK_LAG = 0.5;
+    private static readonly MAX_WALK_LAG = 1.5;
+
+    /**
+     * How long the entity takes to walk a step (s): the server sends a step every room cycle (480 ms), the entity
+     * walks it in a bit more, so it never arrives before the next step and stops waiting for it (the walk
+     * stuttered at every tile when a step came a few ms late). It stays a little behind, by about a tenth of a tile.
+     */
+    private static readonly WALK_STEP_SECONDS = 0.52;
+
+    /** Tiles per second of the step being walked: what's left to walk in WALK_STEP_SECONDS (see walkTo). */
+    private walkSpeed = AvatarData.AVATAR_WALK_SPEED;
 
     /** A slide in progress (moved by a roller), null if none: see slideTo. */
     private slide: {fromX: number; fromY: number; fromZ: number; start: number; duration: number} | null = null;
@@ -80,6 +89,15 @@ export abstract class EntityVisualization extends RoomObjectVisualization {
             this.snapToNextPosition();
         }
 
+        if (!sameStep) {
+            // the rest of the previous step and the new one in a step's time: a late step is caught up smoothly
+            const position = this.entity.position;
+            const distance = position
+                ? Math.max(Math.abs(point.x - position.x), Math.abs(point.y - position.y))
+                : 1;
+            this.walkSpeed = Math.max(AvatarData.AVATAR_WALK_SPEED / 2, distance / EntityVisualization.WALK_STEP_SECONDS);
+        }
+
         this.setNextPosition(point);
     }
 
@@ -110,27 +128,27 @@ export abstract class EntityVisualization extends RoomObjectVisualization {
         if (this.entity.position.x < this.nextPosition.x) {
             this.entity.position.x =
                 this.entity.position.x +
-                    delta * AvatarData.AVATAR_WALK_SPEED;
+                    delta * this.walkSpeed;
             if (this.entity.position.x > this.nextPosition.x) {
                 this.entity.position.x = this.nextPosition.x;
             }
         } else if (this.entity.position.x > this.nextPosition.x) {
             this.entity.position.x = 
                 this.entity.position.x -
-                    delta * AvatarData.AVATAR_WALK_SPEED;
+                    delta * this.walkSpeed;
             if (this.entity.position.x < this.nextPosition.x) {
                 this.entity.position.x = this.nextPosition.x;
             }
         }
 
         if (this.entity.position.y < this.nextPosition.y) {
-            this.entity.position.y = this.entity.position.y + delta * AvatarData.AVATAR_WALK_SPEED;
+            this.entity.position.y = this.entity.position.y + delta * this.walkSpeed;
 
             if (this.entity.position.y > this.nextPosition.y) {
                 this.entity.position.y = this.nextPosition.y;
             }
         } else if (this.entity.position.y > this.nextPosition.y) {
-            this.entity.position.y = this.entity.position.y - delta * AvatarData.AVATAR_WALK_SPEED;
+            this.entity.position.y = this.entity.position.y - delta * this.walkSpeed;
 
             if (this.entity.position.y < this.nextPosition.y) {
                 this.entity.position.y = this.nextPosition.y;
@@ -191,8 +209,8 @@ export abstract class EntityVisualization extends RoomObjectVisualization {
         this.container.cursor = 'pointer';
 
         this.entity.logic.events.emit(EntityEvents.POSITION_CHANGED);
-
-        Engine.getInstance().roomService.currentRoom.roomLayout.visualization.container.sortChildren();
+        // no sortChildren here (it sorted the whole room at every frame of every entity walking): the room
+        // container is sortable, a new zIndex makes Pixi sort it once before the next frame is drawn
     }
 
     dispose(): void {

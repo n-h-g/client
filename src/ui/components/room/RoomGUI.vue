@@ -115,8 +115,11 @@ interface UIChatBubble {
 
 /** Part of the window height used by the chat strip (Nitro's chat.viewer.height.percentage). */
 const CHAT_HEIGHT_PERCENTAGE = 0.4
-/** Nitro's normal scroll speed: the bubbles go up by MOVE_AMOUNT every SCROLL_SPEED ms. */
-const SCROLL_SPEED = 6000
+/**
+ * The bubbles go up by MOVE_AMOUNT every SCROLL_SPEED ms. Nitro's normal speed (6000 ms) felt too slow: twice as
+ * fast, the old messages leave the room sooner.
+ */
+const SCROLL_SPEED = 3000
 const MOVE_AMOUNT = 15
 /** Space between the head of the avatar and a bubble born over it. */
 const CHAT_HEAD_MARGIN = 8
