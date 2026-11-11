@@ -1,7 +1,7 @@
 <template>
   <div class="bottomBar" :class="{ compact }">
     <div class="leftOptions" ref="leftOptions">
-      <div class="menuButton home"></div>
+      <div class="menuButton home" title="Hotel view" @click="goToHotelView()"></div>
       <div class="menuButton inventory" @click="toggle('inventory')">
       </div>
       <div class="menuButton navigator" @click="toggle('navigator')">
@@ -64,9 +64,20 @@ import { AvatarHeadImage } from '../../../../game/engine/ui/imagers/avatars/Avat
 import { UIComponent } from '../../../../game/engine/ui/components/UIComponent'
 import { IComponentShowableUI } from '../../../../game/core/ui/IComponentShowableUI'
 import ChatBar from './ChatBar.vue'
+import { OutgoingPacket } from '../../../../game/networking/packets/outgoing/OutgoingPacket'
 import { EventManager } from '../../../../game/core/events/EventManager'
 import { UIEvents } from '../../../../game/engine/events/ui/UIEvents'
 import { BubbleAlertData } from '../../../../game/engine/events/ui/data/general/BubbleAlertData'
+
+/** Out of the room, to the hotel view (as the exit of the top bar: the server removes the avatar from the room). */
+function goToHotelView() {
+  const engine = Engine.getInstance()
+  const room = engine?.roomService?.currentRoom
+  if (!room) return
+
+  engine.networkingManager?.packetManager.applyOut(OutgoingPacket.UserExitRoom, { id: room.id })
+  engine.roomService.leaveRoom()
+}
 
 /** No quests on the server yet. */
 function comingSoon(feature: string) {

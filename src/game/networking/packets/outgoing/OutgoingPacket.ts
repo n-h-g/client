@@ -85,6 +85,8 @@ export enum OutgoingPacket {
     RequestUserInfoEvent = 71,
     /** The user changes its motto: {motto} (38 characters at most). */
     UpdateMottoEvent = 72,
+    /** The user scratches a pet ("Pet" in its menu): {id} (the entity). */
+    ScratchPetEvent = 73,
     /** A wallpaper/floor/landscape applied from the inventory (Nitro's FurniturePlacePaintComposer): {id}. */
     RoomApplyDecorationEvent = 29,
     MoveWallItemEvent = 33,

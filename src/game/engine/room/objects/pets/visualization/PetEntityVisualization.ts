@@ -6,7 +6,7 @@ import {Point3d} from '../../../../../utils/point/Point3d';
 import {ActionId} from '../../../../ui/imagers/avatars/enum/actions/ActionId';
 import {FurniData} from '../../../../ui/imagers/items/FurniData';
 import {Pet} from '../../../../ui/imagers/pets/Pet';
-import {PetPosture} from '../../../../ui/imagers/pets/PetType';
+import {PetGesture, PetPosture} from '../../../../ui/imagers/pets/PetType';
 import {RoomPriority} from '../../../visualization/RoomPriority';
 import {RoomVisualization} from '../../../visualization/RoomVisualization';
 import {MapData} from '../../map/MapData';
@@ -90,6 +90,17 @@ export class PetEntityVisualization extends EntityVisualization {
         this.headDirection = head != null && head !== body ? head : -1;
         this.pet?.setDirection(body);
         this.pet?.setHeadDirection(this.headDirection);
+    }
+
+    private happyTimer: ReturnType<typeof setTimeout> | undefined;
+
+    /** Scratched: it smiles for a while (as Habbo). */
+    showHappy(): void {
+        if (!this.pet) return;
+
+        clearTimeout(this.happyTimer);
+        this.pet.setGesture(PetGesture.SMILE);
+        this.happyTimer = setTimeout(() => this.pet?.setGesture(null), 3000);
     }
 
     /** The animations of the pet (at the frames per second of Nitro). */

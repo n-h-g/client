@@ -1,3 +1,4 @@
+import {PetRespects} from '../../../../engine/room/objects/pets/PetRespects';
 import {ChatStyleStore} from '../../../../engine/game/chat/ChatStyleStore';
 import {OutgoingPacket} from '../../outgoing/OutgoingPacket';
 import {UserData} from '../../../../core/communication/incoming/users/UserData';
@@ -23,6 +24,7 @@ export class UpdateUserInformation extends MessageHandler {
         });
 
         if (userInfo.chatStyle != null) ChatStyleStore.set(userInfo.chatStyle);
+        if (userInfo.petRespects != null) PetRespects.left = userInfo.petRespects;
 
         // logged from the link of a room: into it (once)
         const engine = Engine.getInstance();

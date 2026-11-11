@@ -34,6 +34,7 @@ import {DoorbellState} from './incoming/rooms/DoorbellState';
 import {UpdateUserInformation} from './incoming/users/UpdateUserInformation';
 import {UserInfo} from './incoming/users/UserInfo';
 import {CommandsList} from './incoming/users/CommandsList';
+import {PetScratched, PetRespectsLeft} from './incoming/rooms/PetScratched';
 import {OutgoingPacket} from './outgoing/OutgoingPacket';
 import {FriendsList} from './incoming/friends/FriendsList';
 import {FriendRequestReceived} from './incoming/friends/FriendRequestReceived';
@@ -74,6 +75,8 @@ export class PacketManager {
             217: new DoorbellState(),
             218: new UserInfo(),
             219: new CommandsList(),
+            220: new PetScratched(),
+            221: new PetRespectsLeft(),
             400: new UpdateUserInformation(),
             401: new LoadInventoryItems(),
             402: new InventoryBadges(),

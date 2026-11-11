@@ -40,9 +40,16 @@
                     <button class="avatar-menu-row menu-back" @click="setMenuView('main')">Back</button>
                 </template>
             </template>
-            <template v-else-if="avatar.isBot || avatar.isPet">
+            <!-- a pet (as Habbo; no ride/saddle: there are no saddles) -->
+            <template v-else-if="avatar.isPet">
+                <button class="avatar-menu-row" :class="{ unavailable: petRespects <= 0 }" :disabled="petRespects <= 0"
+                    :title="petRespects <= 0 ? 'No more scratches today' : 'Scratches left today'" @click="scratchPet">Pet ({{ petRespects }})</button>
+                <button v-if="avatar.isPetOwner" class="avatar-menu-row" @click="comingSoon('Train')">Train</button>
                 <button v-if="avatar.canPickUp" class="avatar-menu-row" @click="pickUpBot">Pick up</button>
-                <div v-else class="avatar-menu-row unavailable">{{ avatar.isPet ? 'Pet' : 'Bot' }}</div>
+            </template>
+            <template v-else-if="avatar.isBot">
+                <button v-if="avatar.canPickUp" class="avatar-menu-row" @click="pickUpBot">Pick up</button>
+                <div v-else class="avatar-menu-row unavailable">Bot</div>
             </template>
             <template v-else-if="menuView === 'moderate'">
                 <button class="avatar-menu-row" @click="kick">Kick</button>
@@ -90,6 +97,8 @@ import {IComponentShowableUI} from '../../../game/core/ui/IComponentShowableUI'
 import {OutgoingPacket} from '../../../game/networking/packets/outgoing/OutgoingPacket'
 import {FriendsStore} from '../../../game/engine/friends/FriendsStore'
 import {WhisperData} from '../../../game/engine/events/ui/data/room/WhisperData'
+import {PetRespects} from '../../../game/engine/room/objects/pets/PetRespects'
+import {BubbleAlertData} from '../../../game/engine/events/ui/data/general/BubbleAlertData'
 
 const visible = ref(false)
 const menu = ref<HTMLElement | null>(null)
@@ -128,6 +137,24 @@ function addFriend() {
 function pickUpBot() {
     const packet = avatar.value.isPet ? OutgoingPacket.PickupPetEvent : OutgoingPacket.PickupBotEvent
     Engine.getInstance()?.networkingManager?.packetManager?.applyOut(packet, {id: avatar.value.id})
+    close()
+}
+
+// ---------------- pets
+const petRespects = ref(PetRespects.left)
+
+/** "Pet": a scratch (the server counts them, PetScratched makes it smile). */
+function scratchPet() {
+    if (petRespects.value <= 0) return
+
+    Engine.getInstance()?.networkingManager?.packetManager?.applyOut(OutgoingPacket.ScratchPetEvent, {id: avatar.value.id})
+    // until the server answers (PetRespectsLeft)
+    PetRespects.left = petRespects.value - 1
+    close()
+}
+
+function comingSoon(feature: string) {
+    EventManager.emit<BubbleAlertData>(UIEvents.BUBBLE_ALERT, {message: `${feature}: coming soon!`})
     close()
 }
 
@@ -171,6 +198,7 @@ function placeMenu() {
 
 EventManager.read(UIEvents.AVATAR_CONTEXT_MENU, (payload: AvatarContextMenuData) => {
     avatar.value = payload
+    petRespects.value = PetRespects.left
     menuView.value = 'main'
     collapsed.value = false
     visible.value = true

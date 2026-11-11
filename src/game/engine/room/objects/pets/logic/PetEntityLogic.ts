@@ -47,6 +47,7 @@ export class PetEntityLogic extends EntityLogic {
             isSelf: false,
             userId: null,
             isPet: true,
+            isPetOwner: pet.ownerId != null && pet.ownerId === engine.currentUserId,
             // the server checks it again
             canPickUp: pet.ownerId != null && (pet.ownerId === engine.currentUserId || ownsRoom),
         });
