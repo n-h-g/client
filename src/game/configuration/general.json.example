@@ -11,6 +11,11 @@
   "fps": 60,
   "debug": true,
   "debugRoomClick": true,
+  "auth": {
+    "loginRequired": true,
+    "accountApiUrl": "/api/v1/accounts",
+    "legacySso": true
+  },
   "offlineMode": false,
   "language": "it",
   "lookResource": "https://sharasy.com:2096/gamedata/character/avatar.php",

@@ -16,6 +16,7 @@ export default defineConfig({
         // development (nhg-server/docker-compose.dev.yml): the same paths as nginx in production
         proxy: {
             '/nhg/game': {target: 'ws://127.0.0.1:8083', ws: true},
+            '/api/v1/accounts': 'http://127.0.0.1:8086',
             '/nitro': 'http://127.0.0.1:8080',
             '/nhg-assets': 'http://127.0.0.1:8080',
         },

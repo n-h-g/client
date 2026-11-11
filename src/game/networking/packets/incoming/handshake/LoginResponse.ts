@@ -6,6 +6,7 @@ import {OutgoingPacket} from '../../outgoing/OutgoingPacket';
 import {UIEvents} from '../../../../engine/events/ui/UIEvents';
 import {UIComponent} from '../../../../engine/ui/components/UIComponent';
 import {GameLoaderUI} from '../../../../engine/ui/components/loader/GameLoaderUI';
+import {clearLegacySso, clearToken} from '../../../../auth/session';
 
 export class LoginResponse extends MessageHandler {
     handle(): void {
@@ -31,7 +32,13 @@ export class LoginResponse extends MessageHandler {
             Engine.getInstance()?.networkingManager?.packetManager?.applyOut(
                 OutgoingPacket.UserProfileInformation
             );
-        } else
-            Engine.getInstance()?.networkingManager?.webSocketManager?.disconnect();
+        } else {
+            // refused (an expired token, an unknown user, the legacy SSO disabled): back to the login page
+            const engine = Engine.getInstance();
+            engine?.networkingManager?.webSocketManager?.disconnect();
+            if (engine?.token) clearToken();
+            else clearLegacySso();
+            window.location.assign('/login?expired=1');
+        }
     }
 }

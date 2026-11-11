@@ -26,6 +26,7 @@ export class Engine {
     private wrappedChatService: ChatMessageService;
     private wrappedConfig = config;
     private wrappedSSO: string;
+    private wrappedToken: string | null = null;
 
     static getInstance(): Engine {
         return this.instance;
@@ -98,6 +99,15 @@ export class Engine {
 
     get sso(): string {
         return this.wrappedSSO;
+    }
+
+    /** The token of the account service (login page): sent instead of the legacy SSO. */
+    set token(token: string | null) {
+        this.wrappedToken = token;
+    }
+
+    get token(): string | null {
+        return this.wrappedToken;
     }
 
     get application(): ApplicationEngine {
