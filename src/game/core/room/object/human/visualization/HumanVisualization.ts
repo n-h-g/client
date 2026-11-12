@@ -21,7 +21,7 @@ import {Direction} from '../../../../objects/Direction';
 import {EntityVisualization} from '../../entities/EntityVisualization';
 import {Human} from '../Human';
 import type {Item} from '../../../../../engine/room/objects/items/Item';
-import { Graphics } from 'pixi.js';
+import { Container, Graphics } from 'pixi.js';
 
 
 export abstract class HumanVisualization extends EntityVisualization {
@@ -297,11 +297,21 @@ export abstract class HumanVisualization extends EntityVisualization {
         avatar!.Direction = direction;
     }
 
-    async draw(): Promise<void> {
-        if (this.container) this.container.destroy();
+    /** The last draw started: an older one that ends later is dropped (see draw). */
+    private drawToken = 0;
 
+    /**
+     * Draws the avatar again (new action, frame, effect, hand item...). The new avatar replaces the old one only when
+     * it's drawn: its parts can be still downloading (e.g. the first hand item of a vending machine, its carry/drink
+     * action) and the avatar disappeared until they arrived. Meanwhile the old one stays (and moves); a draw started
+     * later wins over an older one that ends after it (e.g. a frame of the walk while the hand item is loading).
+     */
+    async draw(): Promise<void> {
+        const token = ++this.drawToken;
+
+        let avatar: Avatar;
         if (this.loaded) {
-            this.avatar = new Avatar(
+            avatar = new Avatar(
                 this.entity.figure,
                 this.direction,
                 this.getAvatarHeadDirection(),
@@ -309,11 +319,11 @@ export abstract class HumanVisualization extends EntityVisualization {
                 this.frame,
                 0, false, false, false, this.danceStyle, this.signValue, this.onFurni
             );
-            this.avatar.Effect = this.effect;
-            this.avatar.HandItem = this.handItem;
-            this.avatar.UsingHandItem = this.usingHandItem;
+            avatar.Effect = this.effect;
+            avatar.HandItem = this.handItem;
+            avatar.UsingHandItem = this.usingHandItem;
         } else {
-            this.avatar = new AvatarPlaceHolder(
+            avatar = new AvatarPlaceHolder(
                 '',
                 this.direction,
                 this.direction,
@@ -322,11 +332,30 @@ export abstract class HumanVisualization extends EntityVisualization {
             );
         }
 
-        Engine.getInstance().userInterfaceManager?.avatarImager.drawAvatar(this.avatar);
+        // the size of the empty container, as before (the anchor doesn't depend on what is drawn)
+        const {width: avatarWidth, height: avatarHeight} = HumanVisualization.containerSize(avatar.Container);
+
+        try {
+            await Engine.getInstance().userInterfaceManager?.avatarImager.drawAvatar(avatar);
+        } catch (e) {
+            // drawn as far as it could: as before, when it wasn't awaited
+        }
+
+        if (token !== this.drawToken) {
+            avatar.Container.destroy();
+            return;
+        }
+
+        const old = this.container;
+        if (old && !old.destroyed) {
+            old.parent?.removeChild(old);
+            old.destroy();
+        }
+
+        this.avatar = avatar;
         this.updateShadowVisibility();
 
-        this.container = this.avatar.Container;
-        const {width: avatarWidth, height: avatarHeight} = this.getAvatarSize();
+        this.container = avatar.Container;
         this.drawBlowKissHeart(avatarWidth, avatarHeight);
         this.updateTypingBubble();
         this.updateIdleZ();
@@ -354,6 +383,14 @@ export abstract class HumanVisualization extends EntityVisualization {
         this.container.eventMode = 'dynamic';
 
         this.entity.logic.registerEvents();
+    }
+
+    /** The size an avatar container is anchored with, see getAvatarSize. */
+    private static containerSize(container: Container | null | undefined): {width: number; height: number} {
+        return {
+            width: container && container.width > 0 ? container.width : HumanVisualization.AVATAR_CANVAS_WIDTH,
+            height: container && container.height > 0 ? container.height : HumanVisualization.AVATAR_CANVAS_HEIGHT,
+        };
     }
 
     /**
@@ -448,14 +485,9 @@ export abstract class HumanVisualization extends EntityVisualization {
         }
 
         this.loadAvatar().then(() => {
-        
-            if (this.container) {
-                if (this.container.parent) this.container.parent.removeChild(this.container);
-                this.container.destroy({ children: true });
-            }
-
+            // the placeholder stays until the avatar is drawn: draw replaces it
             this.loaded = true;
-            this.draw(); 
+            this.draw();
         });
 
         this.entity.logic.events.emit(HumanEvents.HUMAN_RENDERING_COMPLETE);
@@ -504,8 +536,9 @@ export abstract class HumanVisualization extends EntityVisualization {
     updatePosition() {
         super.updatePosition();
 
-        // the layers of the furni under the avatar (e.g. the front of a bath) are sorted around it again
-        Engine.getInstance().roomService?.currentRoom?.roomEntityRepository?.refreshFrontLayers();
+        // the layers of the furni under the avatar (e.g. the front of a bath) are sorted around it again, before
+        // the next frame
+        Engine.getInstance().roomService?.currentRoom?.roomEntityRepository?.requestFrontLayersRefresh();
     }
 
     getZIndex(): number {

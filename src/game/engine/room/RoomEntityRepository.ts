@@ -76,8 +76,9 @@ export class RoomEntityRepository extends Repository<string, Entity> {
 
         entity.logic.events.emit(EntityEvents.STOP_ROLL);
 
-        // a floor hole that was being moved opens again where it was dropped
+        // a floor hole that was being moved opens again where it was dropped (now: its tiles are checked next)
         this.onFloorItemsChanged();
+        this.flushFloorItemsChanged();
     }
 
     /**
@@ -168,8 +169,9 @@ export class RoomEntityRepository extends Repository<string, Entity> {
         this.rollingStartDirection = entity.visualization?.direction ?? null;
         this.rollingWantedDirection = entity.visualization?.direction ?? 0;
 
-        // a floor hole that starts moving gives back its tiles (they must be valid places for it)
+        // a floor hole that starts moving gives back its tiles (they must be valid places for it, now)
         this.onFloorItemsChanged();
+        this.flushFloorItemsChanged();
     }
 
     /** True while the floor furni that is being moved is shown as its icon (it can't go under the mouse). */
@@ -364,14 +366,43 @@ export class RoomEntityRepository extends Repository<string, Entity> {
         return height;
     }
 
+    /** A floor item changed since the last frame: see onFloorItemsChanged. */
+    private floorItemsChanged = false;
+    /** An avatar or a pet moved since the last frame: see requestFrontLayersRefresh. */
+    private frontLayersChanged = false;
     /**
-     * To call when a floor item is added, moved, rotated, removed or changes state:
-     * updates the floor holes and the zIndex of the humans.
+     * The furni whose layers may be in front of an avatar (they had avatars around them at the last refresh): the
+     * only ones, with the furni near an avatar now, that refreshFrontLayers updates.
+     */
+    private readonly itemsNearHumans = new Set<Entity>();
+
+    /**
+     * To call when a floor item is added, moved, rotated, removed or changes state: the floor holes, the zIndex of
+     * the humans and the layers in front of them are updated once, before the next frame is drawn (tick). Every furni
+     * of the room calls it when it's drawn: done at once, a room with N furni went through all of them N times.
      */
     onFloorItemsChanged() {
+        this.floorItemsChanged = true;
+    }
+
+    /** The updates of onFloorItemsChanged now, if there are any (e.g. a placement needs the floor holes at once). */
+    flushFloorItemsChanged() {
+        if (!this.floorItemsChanged) return;
+
+        this.floorItemsChanged = false;
+        this.frontLayersChanged = false;
+
         this.refreshFloorHoles();
         this.refreshHumansDepth();
         this.refreshFrontLayers();
+    }
+
+    /**
+     * An avatar or a pet moved: the layers of the furni around it are sorted again, once before the next frame is
+     * drawn (with many avatars walking it was done for each of them, for every furni of the room, at every frame).
+     */
+    requestFrontLayersRefresh() {
+        this.frontLayersChanged = true;
     }
 
     /**
@@ -430,8 +461,13 @@ export class RoomEntityRepository extends Repository<string, Entity> {
             const footprint = item.isInventoryGhost || entity === this.rollingEntity ? null : item.getFootprint();
 
             if (footprint) items.push({entity, footprint});
-            else visualization.updateFrontLayers([]);
+            else if (this.itemsNearHumans.delete(entity)) visualization.updateFrontLayers([]);
         });
+
+        // the furni removed from the room
+        for (const entity of this.itemsNearHumans) {
+            if (!this.getAll().has(entity.id)) this.itemsNearHumans.delete(entity);
+        }
 
         const humans: {tileX: number; tileY: number; z: number; relativeDepth: number; inside: boolean; depth: number; zIndex: number}[] = [];
 
@@ -468,6 +504,13 @@ export class RoomEntityRepository extends Repository<string, Entity> {
             const humansOnItem = humans.filter(human =>
                 human.tileX >= footprint.minX - overlap && human.tileX <= footprint.maxX + overlap &&
                 human.tileY >= footprint.minY - overlap && human.tileY <= footprint.maxY + overlap);
+
+            // no avatar around it, now or at the last refresh: its layers are all in the furni already
+            if (humansOnItem.length === 0) {
+                if (!this.itemsNearHumans.delete(entity)) continue;
+            } else {
+                this.itemsNearHumans.add(entity);
+            }
 
             // A bath/tub/jacuzzi is sat in, not on: its front (one piece for all its length) covers an avatar
             // sitting on any of its tiles. The layer depths are from the furni origin, so an avatar sitting on
@@ -544,5 +587,13 @@ export class RoomEntityRepository extends Repository<string, Entity> {
         this.getAll().forEach((entity: Entity) => {
             entity.logic.tick(delta);
         });
+
+        // after the entities moved, before the frame is drawn: once for all of them
+        if (this.floorItemsChanged) {
+            this.flushFloorItemsChanged();
+        } else if (this.frontLayersChanged) {
+            this.frontLayersChanged = false;
+            this.refreshFrontLayers();
+        }
     }
 }
