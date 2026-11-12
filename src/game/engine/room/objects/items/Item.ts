@@ -7,6 +7,9 @@ import {ItemLogicBasic} from './logic/ItemLogicBasic';
 import {ItemLogicMultiState} from './logic/ItemLogicMultiState';
 import {ItemLogicDice} from './logic/ItemLogicDice';
 import {ItemLogicRoomDimmer} from './logic/ItemLogicRoomDimmer';
+import {ItemLogicRoomBranding} from './logic/ItemLogicRoomBranding';
+import {ItemVisualizationRoomBackground} from './visualization/ItemVisualizationRoomBackground';
+import {ItemVisualizationBillboard} from './visualization/ItemVisualizationBillboard';
 import {ItemVisualizationAnimated} from './visualization/ItemVisualizationAnimated';
 import {ItemVisualizationStatic} from './visualization/ItemVisualizationStatic';
 
@@ -19,6 +22,10 @@ const ITEM_LOGICS: Record<string, (item: Item) => ItemLogic> = {
     furniture_floor_hole: item => new ItemLogicMultiState(item),
     furniture_dice: item => new ItemLogicDice(item),
     furniture_roomdimmer: item => new ItemLogicRoomDimmer(item),
+    // the room background (ads_background): an image from its data
+    furniture_bg: item => new ItemLogicRoomBranding(item),
+    // the billboards (ads_mpu_*): an image from its data, a click opens its link
+    furniture_bb: item => new ItemLogicRoomBranding(item, true),
 };
 
 /** Inclusive rectangle of tiles covered by a floor item. */
@@ -89,6 +96,10 @@ export abstract class Item extends Entity {
                 return new ItemVisualizationStatic(this);
             case 'furniture_animated':
                 return new ItemVisualizationAnimated(this);
+            case 'furniture_bg':
+                return new ItemVisualizationRoomBackground(this);
+            case 'furniture_bb':
+                return new ItemVisualizationBillboard(this);
         }
     }
 

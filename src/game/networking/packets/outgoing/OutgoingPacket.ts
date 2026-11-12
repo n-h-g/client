@@ -53,6 +53,8 @@ export enum OutgoingPacket {
     RoomDimmerSavePresetEvent = 55,
     /** Switch the room dimmer on/off (Nitro's RoomDimmerChangeStateComposer): {id}. */
     RoomDimmerToggleEvent = 56,
+    /** Save the image of a room background, the infostand "save branding" (Nitro's SetObjectDataMessageComposer): {id, imageUrl, clickUrl, offsetX, offsetY, offsetZ}. */
+    RoomAdsSaveEvent = 75,
     /** The badges of the user (inventory, tab Badges). */
     RequestInventoryBadgesEvent = 57,
     /** The user wears these badges, in this order: {codes} (at most 5). */

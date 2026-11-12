@@ -1,8 +1,13 @@
 <template>
 	<Dialog title="Chooser" class-name="furniChooserDialog" :box="UIEventsType.FURNI_CHOOSER">
+		<div class="furniChooserSearch">
+			<input v-model="search" type="text" placeholder="Search..." />
+			<span v-if="search" class="furniChooserSearchClear" @click="search = ''">×</span>
+		</div>
+
 		<div class="furniChooser">
 			<div
-				v-for="furni in furniList"
+				v-for="furni in shownList"
 				:key="furni.id"
 				class="furniChooserRow"
 				:title="furni.className"
@@ -10,12 +15,13 @@
 			>{{ furni.name }}</div>
 
 			<div v-if="furniList.length === 0" class="furniChooserEmpty">No furni in this room.</div>
+			<div v-else-if="shownList.length === 0" class="furniChooserEmpty">No furni found.</div>
 		</div>
 	</Dialog>
 </template>
 
 <script setup lang="ts">
-import { onUnmounted, shallowRef } from "vue"
+import { computed, onUnmounted, ref, shallowRef } from "vue"
 import Dialog from "../dialog/Dialog.vue"
 import { Engine } from "../../../game/Engine"
 import { UIEventsType } from "../../../game/engine/events/ui/UIEventsType"
@@ -29,6 +35,17 @@ interface ChooserFurni {
 
 /** The furni of the room, by name (as Habbo's :furni). */
 const furniList = shallowRef<ChooserFurni[]>([])
+
+/** The text of the search: the furni whose name or class name contains it. */
+const search = ref("")
+
+const shownList = computed(() => {
+	const text = search.value.trim().toLowerCase()
+	if (!text) return furniList.value
+
+	return furniList.value.filter(furni =>
+		furni.name.toLowerCase().includes(text) || furni.className.toLowerCase().includes(text))
+})
 
 // the names of the furnidata (the items have the class name), indexed once
 let furniNames: Map<string, string> | null = null
@@ -69,10 +86,13 @@ refresh()
 const refreshTimer = setInterval(refresh, 1000)
 onUnmounted(() => clearInterval(refreshTimer))
 
-/** As a click on the furni in the room (its info, the double click uses it). */
+/**
+ * Selects the furni: its info (the infostand), as Habbo's chooser. Not its click: e.g. a billboard would open its
+ * link, a room background can't be clicked by who doesn't own the room.
+ */
 function select(id: string) {
 	const item = itemsOfRoom().find(entity => String(entity.id) === id)
-	item?.logic?.onClick()
+	item?.logic?.togglePreview()
 }
 </script>
 
@@ -86,13 +106,48 @@ function select(id: string) {
 	height: 260px;
 
 	> .content {
+		display: flex;
+		flex-direction: column;
+		gap: 6px;
 		padding: 8px;
 		box-sizing: border-box;
 	}
 }
 
+.furniChooserSearch {
+	flex: 0 0 auto;
+	position: relative;
+
+	input {
+		width: 100%;
+		box-sizing: border-box;
+		height: 24px;
+		padding: 0 22px 0 6px;
+		border: 1px solid #8f8f8f;
+		border-radius: 4px;
+		font-size: 12px;
+		background: #fff;
+		outline: none;
+
+		&:focus {
+			border-color: #63c5e9;
+		}
+	}
+
+	.furniChooserSearchClear {
+		position: absolute;
+		right: 6px;
+		top: 50%;
+		transform: translateY(-50%);
+		cursor: pointer;
+		font-weight: 700;
+		color: #777;
+	}
+}
+
 .furniChooser {
-	height: 100%;
+	flex: 1;
+	min-height: 0;
 	overflow-y: auto;
 	background: #fff;
 	border: 1px solid #b9b9b9;

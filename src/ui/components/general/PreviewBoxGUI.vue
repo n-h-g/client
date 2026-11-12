@@ -74,6 +74,14 @@
                 <div class="additionalInfoContainer">
                     <p>{{ entity.motto }}</p>
                 </div>
+                <!-- a room background (ads_background): its image, as Habbo's infostand -->
+                <div v-if="mode == 'item' && branding" class="brandingContainer" @keydown.stop>
+                    <label>imageUrl<textarea v-model="branding.imageUrl" rows="2" spellcheck="false"></textarea></label>
+                    <label>clickUrl<textarea v-model="branding.clickUrl" rows="2" spellcheck="false"></textarea></label>
+                    <label>offsetX<input v-model.number="branding.offsetX" type="number" /></label>
+                    <label>offsetY<input v-model.number="branding.offsetY" type="number" /></label>
+                    <label>offsetZ<input v-model.number="branding.offsetZ" type="number" /></label>
+                </div>
             </div>
             <div class="previewBoxContainerButtons" v-if="mode == 'item'" >
                 <div class="previewButton" ref="moveItemButton" id="moveItemButton"
@@ -89,8 +97,11 @@
                     Pick</div>
 
                 <div class="previewButton" ref="useItemButton" id="useItemButton"
-                    :class="{hidden: false}" @click.stop="useItem()" v-if="entity ? isAnimated(): true">
+                    :class="{hidden: false}" @click.stop="useItem()" v-if="!branding && (entity ? isAnimated(): true)">
                     Use</div>
+
+                <div class="previewButton" v-if="branding" @click.stop="saveBranding()">
+                    Save branding</div>
             </div>
         </div>
     </div>
@@ -115,6 +126,7 @@ import { IComponentShowableUI } from '../../../game/core/ui/IComponentShowableUI
 import { UIComponent } from '../../../game/engine/ui/components/UIComponent'
 import { petTypeName } from '../../../game/engine/ui/imagers/pets/PetType'
 import { ChangeLookEventData } from '../../../game/engine/events/ui/data/avatar/ChangeLookEventData'
+import { ItemLogicRoomBranding, RoomBranding } from '../../../game/engine/room/objects/items/logic/ItemLogicRoomBranding'
 
 const mode = ref('')
 const entity = ref({
@@ -147,6 +159,8 @@ function onPreview(evt: PreviewModeEventData) {
     entity.value.image = evt.image
     entity.value.motto = evt.motto
     entity.value.id = evt.id
+
+    branding.value = evt.mode == 'item' ? brandingOf(evt.id) : null
 
     if (evt.mode == 'pet') {
         pet.type = evt.petType ?? 0
@@ -231,6 +245,37 @@ function isAnimated() {
 function canRotate() {
     const item = Engine.getInstance()?.roomService?.currentRoom?.roomEntityRepository?.get(entity.value.id)
     return item instanceof FloorItem && (item.base?.getAvailableDirections().length ?? 0) > 1
+}
+
+/**
+ * The data of the room background in the infostand, editable: null if the furni isn't a room background or the user
+ * can't change it (as the server: the owner of the room).
+ */
+const branding = ref<RoomBranding | null>(null)
+
+function brandingOf(id: string): RoomBranding | null {
+    const roomService = Engine.getInstance()?.roomService
+    const item = roomService?.currentRoom?.roomEntityRepository?.get(id) as Item | undefined
+
+    if (!(item?.logic instanceof ItemLogicRoomBranding) || !roomService?.ownsCurrentRoom()) return null
+
+    return { ...item.logic.branding }
+}
+
+/** "Save branding": the server saves it and sends the furni again to the room (it shows the new image). */
+function saveBranding() {
+    if (!branding.value) return
+
+    const offset = (value: number) => (Number.isFinite(value) ? Math.trunc(value) : 0)
+
+    Engine.getInstance()?.networkingManager?.packetManager?.applyOut(OutgoingPacket.RoomAdsSaveEvent, {
+        id: entity.value.id,
+        imageUrl: (branding.value.imageUrl ?? '').trim(),
+        clickUrl: (branding.value.clickUrl ?? '').trim(),
+        offsetX: offset(branding.value.offsetX),
+        offsetY: offset(branding.value.offsetY),
+        offsetZ: offset(branding.value.offsetZ),
+    })
 }
 
 function moveItem() {
@@ -612,6 +657,42 @@ function hide(): void {
                     border: 1px solid #ccc;
                     border-radius: 3px;
                     box-sizing: border-box;
+                }
+            }
+        }
+
+        .brandingContainer {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            padding: 0 4px 6px;
+
+            label {
+                display: flex;
+                flex-direction: column;
+                gap: 2px;
+                font-size: 11px;
+                font-weight: 700;
+                color: #fff;
+            }
+
+            textarea,
+            input {
+                box-sizing: border-box;
+                width: 100%;
+                padding: 2px 4px;
+                border: 1px solid #8f8f8f;
+                border-radius: 3px;
+                background: #fff;
+                color: #000;
+                font-family: Ubuntu, sans-serif;
+                font-size: 11px;
+                font-weight: 400;
+                outline: none;
+                resize: none;
+
+                &:focus {
+                    border-color: #63c5e9;
                 }
             }
         }

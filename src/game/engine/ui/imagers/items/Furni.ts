@@ -14,6 +14,22 @@ import { RoomObjectSprite } from '../../../../core/room/object/RoomObjectSprite'
 import { AlphaHitTest } from './utils/AlphaHitTest';
 import { RoomDepth } from '../../../room/visualization/RoomDepth';
 
+/** The downloaded image of a room background or a billboard (see Furni.setBrandedImage). */
+export interface BrandedImage {
+	texture: Texture;
+	offsetX: number;
+	offsetY: number;
+	/** Added to the depth of the layer among the layers of the furni (a billboard, Nitro's FurnitureBBVisualization). */
+	offsetZ: number;
+	/** 0 as it is, 1 flipped horizontally, 2 both, 3 vertically. */
+	state: number;
+	/**
+	 * Where the image goes: 'direction' from the furni origin towards its direction (a room background, Nitro's
+	 * FurnitureRoomBackgroundVisualization), 'layer' at the offset of the layer (a billboard).
+	 */
+	anchor: 'direction' | 'layer';
+}
+
 export class Furni extends RoomObjectSprite {
 	private wrappedFurniBase: FurniBase;
 	private direction = 0;
@@ -39,6 +55,21 @@ export class Furni extends RoomObjectSprite {
 
 	/** Color variant of the furni: the number after the * in the name (chair_plasto*2 -> 2), 0 = default. */
 	colorId = 0;
+
+	/** Nitro's tag of the layer that shows a downloaded image (a room background, see setBrandedImage). */
+	static readonly BRANDED_IMAGE = 'branded_image';
+
+	/** The image shown by the layers tagged branded_image instead of their asset, null for the asset. */
+	private brandedImage: BrandedImage | null = null;
+
+	/**
+	 * The downloaded image of a room background or a billboard (Nitro's FurnitureBrandedImageVisualization): it
+	 * replaces the asset of the branded_image layer. Null shows the asset again (no image, or not loaded).
+	 */
+	setBrandedImage(image: BrandedImage | null): void {
+		this.brandedImage = image;
+		this.update(true);
+	}
 
 	constructor(
 		furniBase: FurniBase,
@@ -158,6 +189,12 @@ export class Furni extends RoomObjectSprite {
 	private updateSprite(layer: number, needsUpdate = false) {
 
 		const direction = this.wrappedFurniBase.getValidDirection(this.direction);
+
+		if (this.brandedImage && !this.isIcon && layer >= 0
+			&& this.wrappedFurniBase.getLayer(layer)?.tag === Furni.BRANDED_IMAGE) {
+			this.updateBrandedSprite(layer, direction, this.brandedImage);
+			return;
+		}
 		const frame = this.isIcon ? 0 : this.wrappedFurniBase.getFrameFrom(direction, this.animation, layer, this.frame);
 
 		//console.log(direction)
@@ -218,6 +255,66 @@ export class Furni extends RoomObjectSprite {
 		// color variants (e.g. chair_plasto*2) tint some layers
 		sprite.tint = layer >= 0 ? this.wrappedFurniBase.getColorFrom(this.colorId, layer) : 0xffffff;
 	}
+	/**
+	 * The layer with the downloaded image, as Nitro's FurnitureBrandedImageVisualization.addBackgroundAsset:
+	 * - a room background (FurnitureRoomBackgroundVisualization): the image goes from the furni origin towards the
+	 *   direction (1 up-right, 3 down-right, 5 down-left, 7 up-left, 4 centered);
+	 * - a billboard (FurnitureBBVisualization): its top left corner at the offset of the layer;
+	 * - moved by the offsets of the furni;
+	 * - the state flips it (1 horizontally, 2 both, 3 vertically), in the same place;
+	 * - the mouse hits its whole rectangle (no alpha test: a big image, maybe of another site); whether the furni can
+	 *   be selected at all is decided by its container (ItemVisualizationRoomBackground).
+	 */
+	private updateBrandedSprite(layer: number, direction: number, image: BrandedImage) {
+		const texture = image.texture;
+		const width = texture.width;
+		const height = texture.height;
+
+		let sprite = this.layerSprites.get(layer);
+		if (!sprite) {
+			sprite = new Sprite(texture);
+			this.layerSprites.set(layer, sprite);
+			(this.frontLayers.has(layer) ? this.frontContainer : this.container).addChild(sprite);
+		} else {
+			sprite.texture = texture;
+			sprite.visible = true;
+		}
+
+		const layerData = this.wrappedFurniBase.getLayer(layer);
+
+		// where the top left corner of the image is, from the origin of the furni
+		let left: number;
+		let top: number;
+		if (image.anchor === 'layer') {
+			left = layerData?.x ?? 0;
+			top = layerData?.y ?? 0;
+		} else {
+			switch (direction) {
+				case 1: left = 0; top = -height; break;
+				case 3: left = 0; top = 0; break;
+				case 5: left = -width; top = 0; break;
+				case 7: left = -width; top = -height; break;
+				default: left = -width / 2; top = -height / 2; break;
+			}
+		}
+		left += image.offsetX;
+		top += image.offsetY;
+
+		const flipH = image.state === 1 || image.state === 2;
+		const flipV = image.state === 2 || image.state === 3;
+
+		// flipped around its pivot: the pivot on the other side keeps the image in the same rectangle
+		sprite.scale.set(flipH ? -1 : 1, flipV ? -1 : 1);
+		sprite.pivot.set(flipH ? width + left : -left, flipV ? height + top : -top);
+
+		this.updateSpriteFrom(sprite, direction, layerData, layer);
+		sprite.zIndex += image.offsetZ;
+
+		sprite.tint = 0xffffff;
+		sprite.eventMode = 'static';
+		sprite.hitArea = null;
+	}
+
 	private allLayersIgnoreMouse(): boolean {
 		const count = this.wrappedFurniBase.getLayerCount();
 		for (let i = 0; i < count; i++) {
